@@ -48,7 +48,7 @@ export async function GET(req: Request) {
 
     const withEffective = await Promise.all(
       users.map(async (u) => {
-        const [practiceAgg, certAgg, lootAgg] = await Promise.all([
+        const [practiceAgg, certAgg, lootAgg, sessionPenaltyAgg] = await Promise.all([
           prisma.practiceAnswer.aggregate({
             where: { userId: u.id },
             _sum: { xpAwarded: true },
@@ -64,13 +64,18 @@ export async function GET(req: Request) {
             },
             _sum: { quantity: true },
           }),
+          prisma.gameSession.aggregate({
+            where: { userId: u.id },
+            _sum: { leaderboardPenalty: true },
+          }),
         ]);
 
         const xpUser = u.xp ?? 0;
         const xpPractice = practiceAgg._sum.xpAwarded ?? 0;
         const xpCert = certAgg._sum.xpAwarded ?? 0;
         const xpLoot = lootAgg._sum.quantity ?? 0;
-        const xpEffective = Math.max(xpUser, xpPractice + xpCert + xpLoot);
+        const xpPenalty = sessionPenaltyAgg._sum.leaderboardPenalty ?? 0;
+        const xpEffective = Math.max(0, Math.max(xpUser, xpPractice + xpCert + xpLoot) - xpPenalty);
 
         return {
           id: u.id,

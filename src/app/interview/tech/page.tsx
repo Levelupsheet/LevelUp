@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { hydrateAuthenticatedUser, resolveClientUserId } from "@/lib/activeUser";
 import { jsPDF } from "jspdf";
 
 type Session = { id: string; status: string; startedAt: string };
@@ -14,8 +15,12 @@ function msToClock(ms: number) {
 }
 
 export default function TechInterviewPage() {
-  const userId = "demo-user";
+  const userId = resolveClientUserId();
   const [session, setSession] = useState<Session | null>(null);
+
+  useEffect(() => {
+    hydrateAuthenticatedUser().catch(() => {});
+  }, []);
   const [question, setQuestion] = useState<string>("");
   const [answer, setAnswer] = useState<string>("");
   const [loading, setLoading] = useState(false);

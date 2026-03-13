@@ -17,6 +17,11 @@ enum UserRank {
   STUDENT
   PROFESSIONAL
 }
+
+enum AuthProvider {
+  LOCAL
+  GOOGLE
+}
 enum StartingPosition {
   HELPDESK_SUPPORT
   DESKTOP_TECHNICIAN
@@ -59,8 +64,11 @@ enum CertExam {
 
 model User {
   id               String            @id
-  email            String
+  email            String            @unique
   displayName      String?
+  avatarUrl        String?
+  authProvider     AuthProvider      @default(LOCAL)
+  authProviderId   String?           @unique
   startingPosition StartingPosition?
   moduleChoice     ModuleChoice?
   xp               Int               @default(0)
@@ -74,6 +82,17 @@ model User {
   practiceAnswers PracticeAnswer[]
   certAnswers     CertPracticeAnswer[]
   domains         UserDomain[]
+  learningProfile UserLearningProfile?
+  domainMastery   UserDomainMastery[]
+  difficultyStats UserDifficultyAccuracy[]
+  questionHistory UserQuestionHistory[]
+  gameSessions   GameSession[]
+  raffleEntries  RaffleEntry[]
+  freeEntrySubmissions FreeEntrySubmission[]
+  wonSweepstakes SweepstakesCampaign[] @relation("SweepstakesWinnerUser")
+  bossEncounters BossEncounter[]
+  quizAttemptAudits QuizAttemptAudit[]
+  suspiciousFlags SuspiciousAccountFlag[]
   interviews      InterviewSession[]
   notifications   Notification[]
   badges          Badge[]
@@ -130,6 +149,101 @@ model UserDomain {
 
   @@unique([userId, domain], name: "userId_domain")
   @@index([userId, xp])
+}
+
+
+model UserLearningProfile {
+  userId         String   @id
+  overallMastery Float    @default(50)
+  weakestDomains String[] @default([])
+  sessionsSinceLastGolden Int @default(0)
+  lastGoldenServedAt DateTime?
+  antiCheatCooldownUntil DateTime?
+  suspiciousScore Int @default(0)
+  updatedAt      DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model UserDomainMastery {
+  id                String         @id @default(cuid())
+  userId            String
+  domain            QuestionDomain
+  mastery           Float          @default(50)
+  correctCount      Int            @default(0)
+  wrongCount        Int            @default(0)
+  totalAnswers      Int            @default(0)
+  accuracy          Float          @default(0)
+  currentDifficulty Int            @default(1)
+  lastAnsweredAt    DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, domain], name: "userId_domainMastery")
+  @@index([userId, mastery])
+}
+
+model UserDifficultyAccuracy {
+  id             String         @id @default(cuid())
+  userId         String
+  domain         QuestionDomain
+  difficulty     Int
+  correctCount   Int            @default(0)
+  wrongCount     Int            @default(0)
+  totalAnswers   Int            @default(0)
+  accuracy       Float          @default(0)
+  lastAnsweredAt DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, domain, difficulty], name: "userId_domain_difficulty")
+  @@index([userId, difficulty])
+}
+
+model UserQuestionHistory {
+  id            String        @id @default(cuid())
+  userId        String
+  questionId    String
+  prompt        String
+  type          QuestionType?
+  domain        QuestionDomain
+  difficulty    Int           @default(1)
+  correct       Boolean
+  lane          ContentLane?
+  isGolden      Boolean       @default(false)
+  questionSetId String?
+  answeredAt    DateTime      @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, answeredAt])
+  @@index([userId, domain, difficulty])
+  @@index([userId, questionId])
+}
+
+
+
+model GameSession {
+  id                 String      @id @default(cuid())
+  userId             String
+  lane               ContentLane?
+  title              String?
+  startingPosition   StartingPosition?
+  certExam           CertExam?
+  correctCount       Int         @default(0)
+  totalQuestions     Int         @default(0)
+  xpEarned           Int         @default(0)
+  hintXpSpent        Int         @default(0)
+  hintsUsedCount     Int         @default(0)
+  hintsUsedJson      Json?
+  leaderboardPenalty Int         @default(0)
+  outcome            String?
+  createdAt          DateTime    @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([createdAt])
 }
 
 model InterviewSession {
@@ -219,7 +333,15 @@ model MarketingEvent {
 
 
 enum QuestionDomain {
+  IDENTITY
   NETWORKING
+  SECURITY
+  COMPUTE
+  STORAGE
+  AZURE
+  AWS
+  WINDOWS
+  GENERAL
 }
 
 enum QuestionSetStatus {
@@ -233,6 +355,29 @@ enum ContentLane {
   TEST_NOW
   TRAINING
   CERTIFICATIONS
+}
+
+enum QuestionType {
+  MULTIPLE_CHOICE
+  FILL_BLANK
+  SEQUENCE_ORDER
+  MULTI_SELECT
+  INCIDENT
+  CLI_COMMAND
+}
+
+enum KnowledgeBlockStatus {
+  DRAFT
+  PROCESSED
+  APPROVED
+  ARCHIVED
+}
+
+enum GeneratedQuestionReviewStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  EDITED
 }
 
 model QuestionSetPlacement {
@@ -252,6 +397,54 @@ model QuestionSetPlacement {
   @@index([lane, certExam])
 }
 
+model KnowledgeBlock {
+  id               String                    @id @default(cuid())
+  sourceBlockId    String                    @unique
+  title            String
+  setName          String
+  domain           QuestionDomain
+  lane             ContentLane
+  startingPosition StartingPosition?
+  certExam         CertExam?
+  difficulty       Int                       @default(1)
+  stage            Int                       @default(1)
+  tags             String[]                  @default([])
+  source           String?
+  status           KnowledgeBlockStatus      @default(DRAFT)
+  contentJson      Json
+  createdAt        DateTime                  @default(now())
+  updatedAt        DateTime                  @updatedAt
+
+  generatedQuestions GeneratedQuestion[]
+
+  @@index([lane, status, createdAt])
+  @@index([domain, difficulty])
+}
+
+model GeneratedQuestion {
+  id               String                        @id @default(cuid())
+  knowledgeBlockId String
+  prompt           String
+  type             QuestionType
+  data             Json
+  choices          Json?
+  correctIndex     Int?
+  explanation      String?
+  difficulty       Int                           @default(1)
+  tags             String[]                      @default([])
+  sortOrder        Int                           @default(0)
+  reviewStatus     GeneratedQuestionReviewStatus @default(PENDING)
+  editorNotes      String?
+  publishedAt      DateTime?
+  createdAt        DateTime                      @default(now())
+  updatedAt        DateTime                      @updatedAt
+
+  knowledgeBlock   KnowledgeBlock                @relation(fields: [knowledgeBlockId], references: [id], onDelete: Cascade)
+
+  @@index([knowledgeBlockId, reviewStatus, sortOrder])
+  @@index([knowledgeBlockId, createdAt])
+}
+
 model QuestionSet {
   id        String            @id @default(cuid())
   domain    QuestionDomain
@@ -268,21 +461,23 @@ model QuestionSet {
 }
 
 model MCQQuestion {
-  id           String   @id @default(cuid())
+  id           String       @id @default(cuid())
   setId        String
   prompt       String
-  choices      Json
-  correctIndex Int
-  sortOrder    Int      @default(0)
+  type         QuestionType @default(MULTIPLE_CHOICE)
+  data         Json?
+  choices      Json?
+  correctIndex Int?
+  sortOrder    Int          @default(0)
   explanation  String?
-  difficulty   Int      @default(1)
-  tags         String[] @default([])
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  difficulty   Int          @default(1)
+  tags         String[]     @default([])
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
 
   set QuestionSet @relation(fields: [setId], references: [id], onDelete: Cascade)
 
-  @@index([setId, sortOrder])
+  @@index([setId, type, sortOrder])
   @@index([setId, createdAt])
 }
 
@@ -375,6 +570,214 @@ model Wallet {
   tokenBalance Int    @default(0)
 
   user User @relation(fields: [userId], references: [id])
+}
+
+
+
+
+enum BossEncounterOutcome {
+  PENDING
+  VICTORY
+  DEFEAT
+}
+
+model BossEncounter {
+  id                   String               @id @default(cuid())
+  userId               String
+  lane                 ContentLane?
+  title                String?
+  bossName             String
+  isGolden             Boolean              @default(false)
+  spawnChance          Float?
+  goldenChance         Float?
+  bossDomain           QuestionDomain?
+  difficultyScale      Float                @default(1)
+  playerLevelSnapshot  Int                  @default(1)
+  sessionAccuracySnapshot Float             @default(0)
+  outcome              BossEncounterOutcome @default(PENDING)
+  correctCount         Int                  @default(0)
+  totalQuestions       Int                  @default(3)
+  xpFromQuestions      Int                  @default(0)
+  bonusXpAwarded       Int                  @default(0)
+  raffleEntriesAwarded Int                  @default(0)
+  playerStatsJson      Json?
+  bossStatsJson        Json?
+  abilitiesJson        Json?
+  questionsJson        Json?
+  answerEventsJson     Json?
+  resultMetaJson       Json?
+  spawnedAt            DateTime             @default(now())
+  completedAt          DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, spawnedAt])
+  @@index([userId, outcome])
+  @@index([bossDomain, spawnedAt])
+}
+
+enum RaffleEntrySource {
+  GOLDEN_QUESTION
+  GOLDEN_BOSS
+  BOSS_BATTLE
+  CHEST_REWARD
+  FREE_ENTRY
+}
+
+enum RaffleSourceRefType {
+  QUESTION
+  SESSION
+  BOSS_ENCOUNTER
+  LOOT_BOX
+  FREE_ENTRY_SUBMISSION
+  MANUAL_ADJUSTMENT
+}
+
+enum SweepstakesCampaignStatus {
+  DRAFT
+  ACTIVE
+  CLOSED
+  DRAWN
+}
+
+model SweepstakesCampaign {
+  id              String                    @id @default(cuid())
+  slug            String                    @unique
+  title           String
+  status          SweepstakesCampaignStatus @default(DRAFT)
+  startsAt        DateTime
+  endsAt          DateTime
+  prizePoolCents  Int                       @default(0)
+  prizePoolLabel  String?
+  termsUrl        String?
+  isLive          Boolean                   @default(false)
+  entryCapPerUserPerWeek Int                @default(5)
+  winnerEntryId   String?
+  winnerUserId    String?
+  drawnAt         DateTime?
+  createdAt       DateTime                  @default(now())
+  updatedAt       DateTime                  @updatedAt
+
+  entries         RaffleEntry[]
+  freeEntries     FreeEntrySubmission[]
+  winnerUser      User?                     @relation("SweepstakesWinnerUser", fields: [winnerUserId], references: [id], onDelete: SetNull)
+
+  @@index([status, startsAt, endsAt])
+}
+
+model RaffleEntry {
+  id         String             @id @default(cuid())
+  userId     String
+  campaignId String?
+  source     RaffleEntrySource  @default(GOLDEN_QUESTION)
+  sourceRefType RaffleSourceRefType?
+  sourceRefId String?
+  quantity   Int                @default(1)
+  weekStart  DateTime
+  createdAt  DateTime           @default(now())
+  meta       Json?
+  auditKey   String?            @unique
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  campaign SweepstakesCampaign? @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt])
+  @@index([userId, weekStart])
+  @@index([campaignId, createdAt])
+  @@index([sourceRefType, sourceRefId])
+}
+
+model FreeEntrySubmission {
+  id                    String               @id @default(cuid())
+  campaignId            String
+  userId                String?
+  email                 String
+  normalizedEmail       String
+  captchaProvider       String?
+  captchaVerifiedAt     DateTime?
+  verificationToken     String               @unique
+  verificationExpiresAt DateTime
+  verifiedAt            DateTime?
+  createdAt             DateTime             @default(now())
+  meta                  Json?
+
+  campaign SweepstakesCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  user     User?               @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([campaignId, createdAt])
+  @@index([normalizedEmail])
+  @@unique([campaignId, normalizedEmail], name: "campaignId_normalizedEmail")
+}
+
+enum PrizePoolType {
+  WEEKLY_GOLDEN_POOL
+  LEADERBOARD_POOL
+  MONTHLY_GRAND_POOL
+}
+
+enum SuspiciousFlagReason {
+  RAPID_ANSWERS
+  IP_RATE_LIMIT
+  ACCOUNT_RATE_LIMIT
+  DEVICE_FINGERPRINT_REUSE
+  CAPTCHA_FAILED
+  COOLDOWN_ACTIVE
+}
+
+enum SuspiciousFlagStatus {
+  OPEN
+  REVIEWED
+  DISMISSED
+}
+
+model PrizePool {
+  id               String        @id @default(cuid())
+  poolType         PrizePoolType @unique
+  currentAmount    Int           @default(0)
+  updatedAt        DateTime      @updatedAt
+  createdAt        DateTime      @default(now())
+}
+
+model QuizAttemptAudit {
+  id                String   @id @default(cuid())
+  userId            String?
+  ipAddress         String?
+  deviceFingerprint String?
+  lane              ContentLane?
+  answerCount       Int      @default(0)
+  rapidAnswerCount  Int      @default(0)
+  durationMs        Int?
+  captchaRequired   Boolean  @default(false)
+  captchaPassed     Boolean  @default(false)
+  blocked           Boolean  @default(false)
+  reasons           String[] @default([])
+  createdAt         DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([ipAddress, createdAt])
+  @@index([deviceFingerprint, createdAt])
+}
+
+model SuspiciousAccountFlag {
+  id                String               @id @default(cuid())
+  userId            String?
+  ipAddress         String?
+  deviceFingerprint String?
+  reason            SuspiciousFlagReason
+  status            SuspiciousFlagStatus @default(OPEN)
+  score             Int                  @default(1)
+  details           Json?
+  createdAt         DateTime             @default(now())
+  reviewedAt        DateTime?
+  reviewedBy        String?
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt])
+  @@index([reason, status, createdAt])
+  @@index([ipAddress, createdAt])
 }
 
 model InventoryItem {

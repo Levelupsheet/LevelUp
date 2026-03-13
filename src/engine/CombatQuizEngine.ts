@@ -1,12 +1,16 @@
 "use client";
 
+import type { QuestionData, QuestionType } from "@/lib/questionTypes";
+
 export type DifficultyTier = 1 | 2 | 3;
 
 export type CombatQuestion = {
   id: string;
   prompt: string;
-  choices: string[];
-  correctIndex: number;
+  type?: QuestionType;
+  choices?: string[];
+  correctIndex?: number | null;
+  data?: QuestionData | null;
   explanation?: string | null;
   /** Optional domain id used for mastery tracking (e.g. "identity", "networking") */
   domainId?: string;
@@ -98,6 +102,10 @@ export type SubmitResult = {
   tier: DifficultyTier;
   domainId: string;
   masteryValue: number;
+  playerDamage: number;
+  enemyDamage: number;
+  shieldBlocked?: boolean;
+  abilityName?: string | null;
 };
 
 export function clamp(n: number, a: number, b: number) {

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "../../_lib/prisma";
 import { ensureUser } from "../../_lib/ensureUser";
+import { awardRaffleEntries } from "@/lib/raffle";
 
 type LootBoxType = "BRONZE" | "SILVER" | "GOLD" | "PLATINUM" | "DIAMOND";
 
@@ -138,9 +139,25 @@ export async function POST(req: Request) {
           })),
         });
 
+        let raffleEntriesAwarded = 0;
+        const raffleDrops = drops.filter((d) => d.rewardType === "RAFFLE_ENTRY");
+        for (const reward of raffleDrops) {
+          const awarded = await awardRaffleEntries(tx as any, {
+            userId,
+            source: "CHEST_REWARD",
+            quantity: reward.quantity,
+            meta: { lootBoxId: box.id, rewardRef: reward.rewardRef ?? null, rarity: reward.rarity } as any,
+            sourceRefType: "LOOT_BOX",
+            sourceRefId: box.id,
+            auditKey: `loot:${userId}:${box.id}:${String(reward.rewardRef ?? "entry")}`,
+          });
+          raffleEntriesAwarded += awarded.awarded;
+        }
+
         out.push({
           lootBoxId: box.id,
           boxType: box.type,
+          raffleEntriesAwarded,
           drops: drops.map((d) => ({
             rewardType: d.rewardType,
             rewardRef: d.rewardRef ?? null,

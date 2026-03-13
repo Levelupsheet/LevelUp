@@ -16,7 +16,9 @@ export async function ensureUser(userId: string) {
       id: userId,
       email,
       displayName,
-      xp: 0,      lootGrantedUpToLevel: 0,
+      authProvider: "LOCAL",
+      xp: 0,
+      lootGrantedUpToLevel: 0,
       rank: "STUDENT",
     },
   });

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { requireAdminRequest } from "@/app/api/_lib/adminGuard";
 import { prisma } from "@/lib/prisma";
 
 /**
@@ -8,6 +9,8 @@ import { prisma } from "@/lib/prisma";
  * Creates a new active placement and deactivates prior active placements for the same lane+filter.
  */
 export async function POST(req: Request) {
+  const admin = await requireAdminRequest();
+  if (!admin.ok) return admin.response;
   try {
     const body = await req.json();
     const setId = String(body?.setId || "");
@@ -55,6 +58,8 @@ export async function POST(req: Request) {
 }
 
 export async function GET() {
+  const admin = await requireAdminRequest();
+  if (!admin.ok) return admin.response;
   const placements = await prisma.questionSetPlacement.findMany({
     orderBy: { createdAt: "desc" },
     take: 200,

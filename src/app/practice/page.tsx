@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { resolveClientUserId } from "@/lib/activeUser";
 
 type Snapshot = {
   xp: number;
@@ -36,7 +37,7 @@ export default function PracticePage() {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
-          userId: "demo-user",
+          userId: resolveClientUserId(),
           track: "IT_SUPPORT",
           tier,
           domain,

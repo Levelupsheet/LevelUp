@@ -226,12 +226,12 @@ const BASE: PracticeQuestion[] = [
 
 // A small default timed pool (mixed). Can be overridden via admin.
 const TEST_NOW_DEFAULT: PracticeQuestion[] = [
-  ...BASE.filter((q) => q.track === "HELPDESK_SUPPORT").slice(0, 2).map((q) => ({ ...q, id: `tn_${q.id}`, lane: "TEST_NOW", track: "MIXED" })),
-  ...BASE.filter((q) => q.track === "DESKTOP_TECHNICIAN").slice(0, 2).map((q) => ({ ...q, id: `tn_${q.id}`, lane: "TEST_NOW", track: "MIXED" })),
-  ...BASE.filter((q) => q.track === "CLOUD_ENGINEER").slice(0, 2).map((q) => ({ ...q, id: `tn_${q.id}`, lane: "TEST_NOW", track: "MIXED" })),
-  ...BASE.filter((q) => q.track === "A_PLUS").slice(0, 1).map((q) => ({ ...q, id: `tn_${q.id}`, lane: "TEST_NOW", track: "MIXED" })),
-  ...BASE.filter((q) => q.track === "SECURITY_PLUS").slice(0, 1).map((q) => ({ ...q, id: `tn_${q.id}`, lane: "TEST_NOW", track: "MIXED" })),
-  ...BASE.filter((q) => q.track === "AZ_900").slice(0, 2).map((q) => ({ ...q, id: `tn_${q.id}`, lane: "TEST_NOW", track: "MIXED" })),
+  ...BASE.filter((q) => q.track === "HELPDESK_SUPPORT").slice(0, 2).map((q) => ({ ...q, id: `tn_${q.id}`, lane: "TEST_NOW" as PracticeLane, track: "MIXED" })),
+  ...BASE.filter((q) => q.track === "DESKTOP_TECHNICIAN").slice(0, 2).map((q) => ({ ...q, id: `tn_${q.id}`, lane: "TEST_NOW" as PracticeLane, track: "MIXED" })),
+  ...BASE.filter((q) => q.track === "CLOUD_ENGINEER").slice(0, 2).map((q) => ({ ...q, id: `tn_${q.id}`, lane: "TEST_NOW" as PracticeLane, track: "MIXED" })),
+  ...BASE.filter((q) => q.track === "A_PLUS").slice(0, 1).map((q) => ({ ...q, id: `tn_${q.id}`, lane: "TEST_NOW" as PracticeLane, track: "MIXED" })),
+  ...BASE.filter((q) => q.track === "SECURITY_PLUS").slice(0, 1).map((q) => ({ ...q, id: `tn_${q.id}`, lane: "TEST_NOW" as PracticeLane, track: "MIXED" })),
+  ...BASE.filter((q) => q.track === "AZ_900").slice(0, 2).map((q) => ({ ...q, id: `tn_${q.id}`, lane: "TEST_NOW" as PracticeLane, track: "MIXED" })),
 ];
 
 export function getPositionPool(path: PositionPath): PracticeQuestion[] {

@@ -1,10 +1,10 @@
 import { prisma } from "../../_lib/prisma";
 import { ensureUser } from "../../_lib/ensureUser";
+import { getRequestUserId } from "../../_lib/authUser";
 
 export async function GET(req: Request) {
   try {
-    const url = new URL(req.url);
-    const userId = url.searchParams.get("userId");
+    const userId = await getRequestUserId(req);
     if (!userId) return Response.json({ ok: false, error: "userId required" }, { status: 400 });
 
     let user = await prisma.user.findUnique({ where: { id: userId } });

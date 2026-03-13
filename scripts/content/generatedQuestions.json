@@ -1,0 +1,629 @@
+{
+  "version": 1,
+  "generatedAt": "2026-03-13T02:41:46.444Z",
+  "groups": [
+    {
+      "blockId": "net-basics-ports-and-dns",
+      "set": {
+        "name": "Networking Foundations",
+        "domain": "NETWORKING",
+        "lane": "TEST_NOW",
+        "stage": 1,
+        "difficulty": 1
+      },
+      "questions": [
+        {
+          "prompt": "Which port does HTTPS use?",
+          "type": "multiple_choice",
+          "difficulty": 1,
+          "explanation": "HTTPS uses port 443",
+          "tags": [
+            "networking",
+            "fundamentals",
+            "https",
+            "ports"
+          ],
+          "data": {
+            "sourceStatement": "HTTPS uses port 443",
+            "choices": [
+              "443",
+              "53",
+              "80",
+              "22"
+            ],
+            "correctIndex": 0,
+            "xp": 10,
+            "timer": 25
+          },
+          "choices": [
+            "443",
+            "53",
+            "80",
+            "22"
+          ],
+          "correctIndex": 0
+        },
+        {
+          "prompt": "HTTPS uses port ____",
+          "type": "fill_blank",
+          "difficulty": 1,
+          "explanation": "HTTPS uses port 443",
+          "tags": [
+            "networking",
+            "fundamentals",
+            "https",
+            "ports"
+          ],
+          "data": {
+            "answers": [
+              "443"
+            ],
+            "placeholder": "Type your answer",
+            "caseSensitive": false,
+            "xp": 10,
+            "timer": 25
+          }
+        },
+        {
+          "prompt": "What does DNS primarily do?",
+          "type": "multiple_choice",
+          "difficulty": 1,
+          "explanation": "DNS translates hostnames to IP addresses",
+          "tags": [
+            "networking",
+            "fundamentals",
+            "dns"
+          ],
+          "data": {
+            "sourceStatement": "DNS translates hostnames to IP addresses",
+            "choices": [
+              "Encrypts email messages",
+              "Creates local user accounts",
+              "Translates hostnames to IP addresses",
+              "Builds DHCP scopes"
+            ],
+            "correctIndex": 2,
+            "xp": 10,
+            "timer": 25
+          },
+          "choices": [
+            "Encrypts email messages",
+            "Creates local user accounts",
+            "Translates hostnames to IP addresses",
+            "Builds DHCP scopes"
+          ],
+          "correctIndex": 2
+        },
+        {
+          "prompt": "DNS translates hostnames to IP addresses",
+          "type": "fill_blank",
+          "difficulty": 1,
+          "explanation": "DNS translates hostnames to IP addresses",
+          "tags": [
+            "networking",
+            "fundamentals",
+            "dns"
+          ],
+          "data": {
+            "answers": [
+              "Translates hostnames to IP addresses"
+            ],
+            "placeholder": "Type your answer",
+            "caseSensitive": false,
+            "xp": 10,
+            "timer": 25
+          }
+        },
+        {
+          "prompt": "What is SSH mainly used for?",
+          "type": "multiple_choice",
+          "difficulty": 1,
+          "explanation": "SSH provides secure remote command-line access",
+          "tags": [
+            "networking",
+            "fundamentals",
+            "ssh"
+          ],
+          "data": {
+            "sourceStatement": "SSH provides secure remote command-line access",
+            "choices": [
+              "Printing over USB",
+              "Streaming audio over the network",
+              "Resetting BIOS firmware",
+              "Secure remote command-line access"
+            ],
+            "correctIndex": 3,
+            "xp": 10,
+            "timer": 25
+          },
+          "choices": [
+            "Printing over USB",
+            "Streaming audio over the network",
+            "Resetting BIOS firmware",
+            "Secure remote command-line access"
+          ],
+          "correctIndex": 3
+        },
+        {
+          "prompt": "SSH provides secure remote command-line access",
+          "type": "fill_blank",
+          "difficulty": 1,
+          "explanation": "SSH provides secure remote command-line access",
+          "tags": [
+            "networking",
+            "fundamentals",
+            "ssh"
+          ],
+          "data": {
+            "answers": [
+              "Secure remote command-line access"
+            ],
+            "placeholder": "Type your answer",
+            "caseSensitive": false,
+            "xp": 10,
+            "timer": 25
+          }
+        },
+        {
+          "prompt": "Which term best matches this definition: Translates private IP addresses to public addresses for external communication",
+          "type": "multiple_choice",
+          "difficulty": 1,
+          "explanation": "NAT: Translates private IP addresses to public addresses for external communication",
+          "tags": [
+            "networking",
+            "fundamentals",
+            "NAT"
+          ],
+          "data": {
+            "sourceDefinition": "Translates private IP addresses to public addresses for external communication",
+            "choices": [
+              "DNS",
+              "DHCP",
+              "VPN",
+              "NAT"
+            ],
+            "correctIndex": 3,
+            "xp": 10,
+            "timer": 25
+          },
+          "choices": [
+            "DNS",
+            "DHCP",
+            "VPN",
+            "NAT"
+          ],
+          "correctIndex": 3
+        },
+        {
+          "prompt": "Translates private IP addresses to public addresses for external communication Fill in the missing term.",
+          "type": "fill_blank",
+          "difficulty": 1,
+          "explanation": "NAT: Translates private IP addresses to public addresses for external communication",
+          "tags": [
+            "networking",
+            "fundamentals",
+            "NAT"
+          ],
+          "data": {
+            "answers": [
+              "NAT",
+              "Network Address Translation"
+            ],
+            "placeholder": "Type the term",
+            "caseSensitive": false,
+            "xp": 10,
+            "timer": 25
+          }
+        },
+        {
+          "prompt": "Put the steps in the correct order for: Basic connectivity troubleshooting",
+          "type": "sequence_order",
+          "difficulty": 2,
+          "explanation": "Confirms where network connectivity is failing",
+          "tags": [
+            "networking",
+            "fundamentals",
+            "Basic connectivity troubleshooting"
+          ],
+          "data": {
+            "items": [
+              "Verify the physical or wireless connection",
+              "Ping the default gateway",
+              "Check the device IP configuration",
+              "Test external connectivity"
+            ],
+            "correctOrder": [
+              "Verify the physical or wireless connection",
+              "Check the device IP configuration",
+              "Ping the default gateway",
+              "Test external connectivity"
+            ],
+            "instructions": "Drag or move each step into the correct sequence.",
+            "xp": 20,
+            "timer": 30
+          }
+        },
+        {
+          "prompt": "Select all steps that belong to the procedure: Basic connectivity troubleshooting",
+          "type": "multi_select",
+          "difficulty": 2,
+          "explanation": "Confirms where network connectivity is failing",
+          "tags": [
+            "networking",
+            "fundamentals",
+            "Basic connectivity troubleshooting"
+          ],
+          "data": {
+            "choices": [
+              "Verify the physical or wireless connection",
+              "Check the device IP configuration",
+              "Ping the default gateway",
+              "Test external connectivity"
+            ],
+            "correctIndices": [
+              0,
+              1,
+              2,
+              3
+            ],
+            "minSelections": 2,
+            "maxSelections": 4,
+            "xp": 20,
+            "timer": 30
+          },
+          "choices": [
+            "Verify the physical or wireless connection",
+            "Check the device IP configuration",
+            "Ping the default gateway",
+            "Test external connectivity"
+          ]
+        },
+        {
+          "prompt": "Enter the command to: View IP configuration",
+          "type": "cli_command",
+          "difficulty": 1,
+          "explanation": "Expected command: ipconfig",
+          "tags": [
+            "networking",
+            "fundamentals",
+            "windows"
+          ],
+          "data": {
+            "expectedCommands": [
+              "ipconfig",
+              "ipconfig /all"
+            ],
+            "placeholder": "Type windows command",
+            "hint": "Platform: windows",
+            "allowContains": true,
+            "xp": 10,
+            "timer": 25
+          }
+        },
+        {
+          "prompt": "Enter the command to: Show interface addressing",
+          "type": "cli_command",
+          "difficulty": 1,
+          "explanation": "Expected command: ip addr",
+          "tags": [
+            "networking",
+            "fundamentals",
+            "linux"
+          ],
+          "data": {
+            "expectedCommands": [
+              "ip addr",
+              "ip a"
+            ],
+            "placeholder": "Type linux command",
+            "hint": "Platform: linux",
+            "allowContains": true,
+            "xp": 10,
+            "timer": 25
+          }
+        },
+        {
+          "prompt": "What is the best next action?",
+          "type": "incident",
+          "difficulty": 2,
+          "explanation": "Check DNS resolution and upstream internet connectivity.",
+          "tags": [
+            "networking",
+            "fundamentals",
+            "troubleshooting",
+            "dns"
+          ],
+          "data": {
+            "scenario": "A user can reach internal apps but not external websites.",
+            "choices": [
+              "Check DNS resolution and upstream internet connectivity.",
+              "Replace the monitor cable.",
+              "Disable all firewall rules immediately.",
+              "Delete the browser bookmarks."
+            ],
+            "correctIndex": 0,
+            "severity": "medium",
+            "xp": 20,
+            "timer": 30
+          },
+          "choices": [
+            "Check DNS resolution and upstream internet connectivity.",
+            "Replace the monitor cable.",
+            "Disable all firewall rules immediately.",
+            "Delete the browser bookmarks."
+          ],
+          "correctIndex": 0
+        }
+      ]
+    },
+    {
+      "blockId": "security-mfa-and-phishing",
+      "set": {
+        "name": "Security Awareness",
+        "domain": "NETWORKING",
+        "lane": "TRAINING",
+        "startingPosition": "HELPDESK_SUPPORT",
+        "stage": 2,
+        "difficulty": 2
+      },
+      "questions": [
+        {
+          "prompt": "What is the primary purpose of multi-factor authentication?",
+          "type": "multiple_choice",
+          "difficulty": 2,
+          "explanation": "Multi-factor authentication adds a second factor beyond a password",
+          "tags": [
+            "networking",
+            "security",
+            "helpdesk",
+            "mfa"
+          ],
+          "data": {
+            "sourceStatement": "Multi-factor authentication adds a second factor beyond a password",
+            "choices": [
+              "Add a second factor beyond a password",
+              "Disable account logging",
+              "Increase monitor brightness",
+              "Speed up DNS replication"
+            ],
+            "correctIndex": 0,
+            "xp": 20,
+            "timer": 30
+          },
+          "choices": [
+            "Add a second factor beyond a password",
+            "Disable account logging",
+            "Increase monitor brightness",
+            "Speed up DNS replication"
+          ],
+          "correctIndex": 0
+        },
+        {
+          "prompt": "Multi-factor authentication adds a second factor beyond a password",
+          "type": "fill_blank",
+          "difficulty": 2,
+          "explanation": "Multi-factor authentication adds a second factor beyond a password",
+          "tags": [
+            "networking",
+            "security",
+            "helpdesk",
+            "mfa"
+          ],
+          "data": {
+            "answers": [
+              "Add a second factor beyond a password"
+            ],
+            "placeholder": "Type your answer",
+            "caseSensitive": false,
+            "xp": 20,
+            "timer": 30
+          }
+        },
+        {
+          "prompt": "Which MFA option is phishing-resistant?",
+          "type": "multiple_choice",
+          "difficulty": 2,
+          "explanation": "Security keys are a phishing-resistant MFA method",
+          "tags": [
+            "networking",
+            "security",
+            "helpdesk",
+            "mfa",
+            "phishing"
+          ],
+          "data": {
+            "sourceStatement": "Security keys are a phishing-resistant MFA method",
+            "choices": [
+              "Security keys",
+              "SMS forwarding",
+              "Shared passwords",
+              "Anonymous guest Wi-Fi"
+            ],
+            "correctIndex": 0,
+            "xp": 20,
+            "timer": 30
+          },
+          "choices": [
+            "Security keys",
+            "SMS forwarding",
+            "Shared passwords",
+            "Anonymous guest Wi-Fi"
+          ],
+          "correctIndex": 0
+        },
+        {
+          "prompt": "____ are a phishing-resistant MFA method",
+          "type": "fill_blank",
+          "difficulty": 2,
+          "explanation": "Security keys are a phishing-resistant MFA method",
+          "tags": [
+            "networking",
+            "security",
+            "helpdesk",
+            "mfa",
+            "phishing"
+          ],
+          "data": {
+            "answers": [
+              "Security keys"
+            ],
+            "placeholder": "Type your answer",
+            "caseSensitive": false,
+            "xp": 20,
+            "timer": 30
+          }
+        },
+        {
+          "prompt": "Which term best matches this definition: A social engineering attack that tricks users into revealing credentials or sensitive data",
+          "type": "multiple_choice",
+          "difficulty": 2,
+          "explanation": "Phishing: A social engineering attack that tricks users into revealing credentials or sensitive data",
+          "tags": [
+            "networking",
+            "security",
+            "helpdesk",
+            "Phishing"
+          ],
+          "data": {
+            "sourceDefinition": "A social engineering attack that tricks users into revealing credentials or sensitive data",
+            "choices": [
+              "Phishing",
+              "Patch management",
+              "Disk encryption",
+              "Load balancing"
+            ],
+            "correctIndex": 0,
+            "xp": 20,
+            "timer": 30
+          },
+          "choices": [
+            "Phishing",
+            "Patch management",
+            "Disk encryption",
+            "Load balancing"
+          ],
+          "correctIndex": 0
+        },
+        {
+          "prompt": "A social engineering attack that tricks users into revealing credentials or sensitive data Fill in the missing term.",
+          "type": "fill_blank",
+          "difficulty": 2,
+          "explanation": "Phishing: A social engineering attack that tricks users into revealing credentials or sensitive data",
+          "tags": [
+            "networking",
+            "security",
+            "helpdesk",
+            "Phishing"
+          ],
+          "data": {
+            "answers": [
+              "Phishing"
+            ],
+            "placeholder": "Type the term",
+            "caseSensitive": false,
+            "xp": 20,
+            "timer": 30
+          }
+        },
+        {
+          "prompt": "Put the steps in the correct order for: Respond to a suspicious email report",
+          "type": "sequence_order",
+          "difficulty": 2,
+          "explanation": "Preserves evidence and starts incident handling quickly",
+          "tags": [
+            "networking",
+            "security",
+            "helpdesk",
+            "Respond to a suspicious email report"
+          ],
+          "data": {
+            "items": [
+              "Escalate to the security process or team",
+              "Document the report and response",
+              "Warn the user not to click further links",
+              "Capture the sender, links, and affected user details"
+            ],
+            "correctOrder": [
+              "Capture the sender, links, and affected user details",
+              "Warn the user not to click further links",
+              "Escalate to the security process or team",
+              "Document the report and response"
+            ],
+            "instructions": "Drag or move each step into the correct sequence.",
+            "xp": 20,
+            "timer": 30
+          }
+        },
+        {
+          "prompt": "Select all steps that belong to the procedure: Respond to a suspicious email report",
+          "type": "multi_select",
+          "difficulty": 2,
+          "explanation": "Preserves evidence and starts incident handling quickly",
+          "tags": [
+            "networking",
+            "security",
+            "helpdesk",
+            "Respond to a suspicious email report"
+          ],
+          "data": {
+            "choices": [
+              "Capture the sender, links, and affected user details",
+              "Warn the user not to click further links",
+              "Escalate to the security process or team",
+              "Document the report and response"
+            ],
+            "correctIndices": [
+              0,
+              1,
+              2,
+              3
+            ],
+            "minSelections": 2,
+            "maxSelections": 4,
+            "xp": 20,
+            "timer": 30
+          },
+          "choices": [
+            "Capture the sender, links, and affected user details",
+            "Warn the user not to click further links",
+            "Escalate to the security process or team",
+            "Document the report and response"
+          ]
+        },
+        {
+          "prompt": "What is the best next action?",
+          "type": "incident",
+          "difficulty": 3,
+          "explanation": "Treat it as potential MFA fatigue and secure the account immediately.",
+          "tags": [
+            "networking",
+            "security",
+            "helpdesk",
+            "mfa",
+            "incident"
+          ],
+          "data": {
+            "scenario": "A user reports repeated MFA prompts they did not initiate.",
+            "choices": [
+              "Treat it as potential MFA fatigue and secure the account immediately.",
+              "Ignore it because MFA prompts are normal.",
+              "Delete the user's browser history and close the ticket.",
+              "Tell the user to keep approving prompts until they stop."
+            ],
+            "correctIndex": 0,
+            "severity": "high",
+            "xp": 35,
+            "timer": 35
+          },
+          "choices": [
+            "Treat it as potential MFA fatigue and secure the account immediately.",
+            "Ignore it because MFA prompts are normal.",
+            "Delete the user's browser history and close the ticket.",
+            "Tell the user to keep approving prompts until they stop."
+          ],
+          "correctIndex": 0
+        }
+      ]
+    }
+  ]
+}

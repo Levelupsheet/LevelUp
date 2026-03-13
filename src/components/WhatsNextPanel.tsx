@@ -42,7 +42,7 @@ export default function WhatsNextPanel(props: {
   const items = useMemo<WhatsNextItem[]>(() => {
     const u = getActiveUser();
     const userId = u?.id ?? "demo-user";
-    const track = getTrackForPosition(u?.startingPosition);
+    const track = getTrackForPosition((u as any)?.startingPosition);
 
     const passedS1 = readBool(`lu_mock_passed_s1_${track}_${userId}`);
     const passedS2 = readBool(`lu_mock_passed_s2_${track}_${userId}`);

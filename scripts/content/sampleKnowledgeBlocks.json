@@ -1,0 +1,144 @@
+[
+  {
+    "id": "net-basics-ports-and-dns",
+    "setName": "Networking Foundations",
+    "domain": "NETWORKING",
+    "lane": "TEST_NOW",
+    "difficulty": 1,
+    "stage": 1,
+    "tags": ["networking", "fundamentals"],
+    "facts": [
+      {
+        "statement": "HTTPS uses port 443",
+        "questionHint": "Which port does HTTPS use?",
+        "answer": "443",
+        "distractors": ["80", "22", "53"],
+        "tags": ["https", "ports"]
+      },
+      {
+        "statement": "DNS translates hostnames to IP addresses",
+        "questionHint": "What does DNS primarily do?",
+        "answer": "Translates hostnames to IP addresses",
+        "distractors": ["Encrypts email messages", "Creates local user accounts", "Builds DHCP scopes"],
+        "tags": ["dns"]
+      },
+      {
+        "statement": "SSH provides secure remote command-line access",
+        "questionHint": "What is SSH mainly used for?",
+        "answer": "Secure remote command-line access",
+        "distractors": ["Streaming audio over the network", "Printing over USB", "Resetting BIOS firmware"],
+        "tags": ["ssh"]
+      }
+    ],
+    "definitions": [
+      {
+        "term": "NAT",
+        "definition": "Translates private IP addresses to public addresses for external communication",
+        "aliases": ["Network Address Translation"],
+        "distractors": ["DNS", "DHCP", "VPN"]
+      }
+    ],
+    "procedures": [
+      {
+        "title": "Basic connectivity troubleshooting",
+        "steps": [
+          "Verify the physical or wireless connection",
+          "Check the device IP configuration",
+          "Ping the default gateway",
+          "Test external connectivity"
+        ],
+        "outcome": "Confirms where network connectivity is failing"
+      }
+    ],
+    "commands": [
+      {
+        "platform": "windows",
+        "purpose": "View IP configuration",
+        "command": "ipconfig",
+        "aliases": ["ipconfig /all"],
+        "tags": ["windows", "networking"]
+      },
+      {
+        "platform": "linux",
+        "purpose": "Show interface addressing",
+        "command": "ip addr",
+        "aliases": ["ip a"],
+        "tags": ["linux", "networking"]
+      }
+    ],
+    "scenarios": [
+      {
+        "scenario": "A user can reach internal apps but not external websites.",
+        "bestAction": "Check DNS resolution and upstream internet connectivity.",
+        "distractors": [
+          "Replace the monitor cable.",
+          "Disable all firewall rules immediately.",
+          "Delete the browser bookmarks."
+        ],
+        "severity": "medium",
+        "tags": ["troubleshooting", "dns"]
+      }
+    ],
+    "distractors": ["4430", "Remote desktop printing", "Local BIOS password"]
+  },
+  {
+    "id": "security-mfa-and-phishing",
+    "setName": "Security Awareness",
+    "domain": "NETWORKING",
+    "lane": "TRAINING",
+    "startingPosition": "HELPDESK_SUPPORT",
+    "difficulty": 2,
+    "stage": 2,
+    "tags": ["security", "helpdesk"],
+    "facts": [
+      {
+        "statement": "Multi-factor authentication adds a second factor beyond a password",
+        "questionHint": "What is the primary purpose of multi-factor authentication?",
+        "answer": "Add a second factor beyond a password",
+        "distractors": ["Increase monitor brightness", "Speed up DNS replication", "Disable account logging"],
+        "tags": ["mfa"]
+      },
+      {
+        "statement": "Security keys are a phishing-resistant MFA method",
+        "questionHint": "Which MFA option is phishing-resistant?",
+        "answer": "Security keys",
+        "distractors": ["Shared passwords", "SMS forwarding", "Anonymous guest Wi-Fi"],
+        "tags": ["mfa", "phishing"]
+      }
+    ],
+    "definitions": [
+      {
+        "term": "Phishing",
+        "definition": "A social engineering attack that tricks users into revealing credentials or sensitive data",
+        "distractors": ["Patch management", "Disk encryption", "Load balancing"]
+      }
+    ],
+    "procedures": [
+      {
+        "title": "Respond to a suspicious email report",
+        "steps": [
+          "Capture the sender, links, and affected user details",
+          "Warn the user not to click further links",
+          "Escalate to the security process or team",
+          "Document the report and response"
+        ],
+        "outcome": "Preserves evidence and starts incident handling quickly"
+      }
+    ],
+    "commands": [],
+    "scenarios": [
+      {
+        "scenario": "A user reports repeated MFA prompts they did not initiate.",
+        "bestAction": "Treat it as potential MFA fatigue and secure the account immediately.",
+        "distractors": [
+          "Tell the user to keep approving prompts until they stop.",
+          "Ignore it because MFA prompts are normal.",
+          "Delete the user's browser history and close the ticket."
+        ],
+        "severity": "high",
+        "tags": ["mfa", "incident"]
+      }
+    ],
+    "distractors": ["Browser cache cleanup", "Printer toner replacement"]
+  }
+]

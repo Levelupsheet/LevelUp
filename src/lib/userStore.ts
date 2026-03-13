@@ -198,3 +198,25 @@ export function setTrackProgress(track: TrackId, pct: number) {
   upsertUser(next);
   return next;
 }
+
+export function syncAuthenticatedUser(input: {
+  id: string;
+  displayName: string;
+  email: string;
+  xp?: number;
+}) {
+  const existing = typeof window === "undefined" ? null : getUsers().find((u) => u.id === input.id);
+  const xp = Math.max(existing?.xp ?? 0, Math.floor(input.xp ?? 0));
+  const user: LocalUser = {
+    id: input.id,
+    displayName: input.displayName?.trim() || input.email || "Student",
+    email: input.email,
+    xp,
+    level: computeLevel(xp),
+    trackProgress: existing?.trackProgress ?? { azure_m365: 0, aws: 0, helpdesk: 0, desktop: 0 },
+    createdAt: existing?.createdAt ?? nowIso(),
+  };
+  upsertUser(user);
+  setActiveUserId(user.id);
+  return user;
+}

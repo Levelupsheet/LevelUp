@@ -1,12 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { hydrateAuthenticatedUser, resolveClientUserId } from "@/lib/activeUser";
 
 type Session = { id: string; stage: string; status: string; startedAt: string; finishedAt?: string | null };
 
 export default function HRInterviewPage() {
-  const userId = "demo-user";
+  const userId = resolveClientUserId();
   const [session, setSession] = useState<Session | null>(null);
+
+  useEffect(() => {
+    hydrateAuthenticatedUser().catch(() => {});
+  }, []);
   const [question, setQuestion] = useState<string>("");
   const [answer, setAnswer] = useState<string>("");
   const [loading, setLoading] = useState(false);

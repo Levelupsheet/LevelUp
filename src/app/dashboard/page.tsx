@@ -5,10 +5,13 @@ import ProgressBar from "@/components/ProgressBar";
 import MerchModal from "@/components/MerchModal";
 import MockInterviewModal from "@/components/MockInterviewModal";
 import PracticeMiniGameModal from "@/components/PracticeMiniGameModal";
-import WhatsNextPanel from "@/components/WhatsNextPanel";
 import AvatarMenu from "@/components/AvatarMenu";
+import WhatsNextPanel from "@/components/WhatsNextPanel";
+import AdaptiveLearningCard from "@/components/AdaptiveLearningCard";
 import LootVaultModal from "@/components/LootVaultModal";
-import { getActiveUser, setActiveUserId } from "@/lib/userStore";
+import AuthGateCard from "@/components/AuthGateCard";
+import GoogleLoginButton from "@/components/ui/GoogleLoginButton";
+import { getActiveUser, setActiveUserId, syncAuthenticatedUser } from "@/lib/userStore";
 import { addActivity, getActivities, clearActivitiesByType, clearActivities, removeActivity, type ActivityItem } from "@/lib/activityStore";
 
 type Eligibility = {
@@ -29,6 +32,10 @@ type Notification = {
 
 type Badge = { id: string; label: string; issuedAt: string; expiresAt: string; code: string };
 type Offer = { id: string; title: string; salaryText: string; createdAt: string; companyName: string; roleLabel: string };
+type LearningProfile = {
+  overview?: { overallMastery?: number; weakestDomains?: string[] };
+  profile?: { masteryByDomain?: Array<{ domain: string; mastery: number; accuracy: number; currentDifficulty: number; correctCount: number; wrongCount: number }> };
+};
 
 
 function labelPos(p: string){
@@ -59,6 +66,9 @@ function prettyType(t: string){
 export default function Dashboard() {
   const [userId, setUserId] = useState<string | null>(null);
   const [userLabel, setUserLabel] = useState<string | null>(null);
+  const [userAvatar, setUserAvatar] = useState<string | null>(null);
+  const [authChecked, setAuthChecked] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
   const [localXp, setLocalXp] = useState<number>(0);
   const [localLevel, setLocalLevel] = useState<number>(1);
 
@@ -83,6 +93,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(false);
   const [hrPassed, setHrPassed] = useState<boolean>(false);
   const [lootOpen, setLootOpen] = useState(false);
+  const [learningProfile, setLearningProfile] = useState<LearningProfile | null>(null);
 
   // Level-up detection (notification-only; user opens vault when ready)
   const prevLevelRef = useRef<number>(0);
@@ -148,6 +159,12 @@ export default function Dashboard() {
       let hrData: any = null;
       try { hrData = hrText ? JSON.parse(hrText) : null; } catch { hrData = null; }
       if (hrRes.ok) setHrPassed(Boolean(hrData?.passed));
+
+      const learningRes = await fetch(`/api/learning/profile?userId=${encodeURIComponent(activeUserId)}`);
+      const learningText = await learningRes.text();
+      let learningData: any = null;
+      try { learningData = learningText ? JSON.parse(learningText) : null; } catch { learningData = null; }
+      if (learningRes.ok) setLearningProfile(learningData);
     } catch (e: any) {
       console.error(e.message ?? "Error");
     } finally {
@@ -205,19 +222,51 @@ export default function Dashboard() {
   }
 
   useEffect(() => {
-    // Local auth (demo + local accounts) until Google sign-in is wired.
-    try {
-      const u = getActiveUser();
-      setUserId(u.id);
-      setUserLabel(u.displayName);
-      setLocalXp(u.xp ?? 0);
-      setLocalLevel((u as any).level ?? 1);
-      setActivity(getActivities(u.id));
-      localStorage.setItem("lu_demo_user", u.displayName);
-    } catch {
-      setUserId("demo-user");
-      setUserLabel("demo-user");
-    }
+    let mounted = true;
+
+    (async () => {
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const authErr = params.get("authError");
+        if (authErr && mounted) setAuthError(authErr);
+
+        const authRes = await fetch("/api/auth/me", { cache: "no-store" as any });
+        if (!authRes.ok) {
+          if (mounted) {
+            setAuthChecked(true);
+            setUserId(null);
+          }
+          return;
+        }
+
+        const authData = await authRes.json().catch(() => null);
+        const authUser = authData?.user;
+        if (!authUser?.id) {
+          if (mounted) setAuthChecked(true);
+          return;
+        }
+
+        const synced = syncAuthenticatedUser({
+          id: authUser.id,
+          displayName: authUser.name || authUser.email,
+          email: authUser.email,
+          xp: Number(authUser.xp ?? 0),
+        });
+
+        if (!mounted) return;
+        setUserId(synced.id);
+        setUserLabel(synced.displayName);
+        setUserAvatar(authUser.picture ?? null);
+        setLocalXp(synced.xp ?? 0);
+        setLocalLevel((synced as any).level ?? 1);
+        setActivity(getActivities(synced.id));
+        setAuthChecked(true);
+      } catch {
+        if (mounted) setAuthChecked(true);
+      }
+    })();
+
+    return () => { mounted = false; };
   }, []);
 
   useEffect(() => {
@@ -312,40 +361,19 @@ export default function Dashboard() {
     setNotes((prev) => prev.filter((x) => x.id !== n.id));
   }
 
-  if (!userId) {
+  if (!authChecked) {
     return (
-      <main style={{ padding: 24 }}>
-        <div className="card" style={{ maxWidth: 720, margin: "0 auto", padding: 18 }}>
-          <div style={{ fontSize: 20, fontWeight: 900 }}>You’re logged out</div>
-          <div style={{ marginTop: 8, opacity: 0.85 }}>
-            For now, LevelUp uses a demo account while we wire real sign-in.
-          </div>
-          <div style={{ marginTop: 14, display: "flex", gap: 10, flexWrap: "wrap" }}>
-            <button
-              className="primaryBtn"
-              type="button"
-              onClick={() => {
-                try {
-                  setActiveUserId("demo-user");
-                  const u = getActiveUser();
-                  localStorage.setItem("lu_demo_user", u.displayName);
-                } catch {}
-                setUserId("demo-user");
-              }}
-            >
-              Use demo account →
-            </button>
-            <button className="secondaryBtn" type="button" onClick={() => (window.location.href = "/start")}>
-              Back to Start
-            </button>
-          </div>
-        </div>
-      </main>
+      <div className="page"><div className="container" style={{ maxWidth: 1120 }}><div className="card" style={{ padding: 18 }}><div style={{ fontWeight: 800, fontSize: 18 }}>Checking sign-in…</div></div></div></div>
     );
+  }
+
+  if (!userId) {
+    return <AuthGateCard error={authError} />;
   }
 
   return (
     <>
+      {!userId ? <AuthGateCard error={authError} /> : null}
 
       <div className="dashBg" aria-hidden="true" />
 
@@ -371,6 +399,7 @@ export default function Dashboard() {
 
         <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
           <button className="secondaryBtn" type="button" onClick={() => (window.location.href = "/start#pricing")}>Pricing</button>
+          <GoogleLoginButton authenticated />
           <button className="primaryBtn" type="button" onClick={() => setShowLaunchModal(true)}>Start Now →</button>
 
           {/* Token balance pill */}
@@ -408,25 +437,29 @@ export default function Dashboard() {
           </div>
           <AvatarMenu
             userLabel={userLabel ?? userId}
-            avatarUrl={null}
-            onLogout={() => {
+            avatarUrl={userAvatar}
+            onLogout={async () => {
               try {
-                setActiveUserId("demo-user");
-                const u = getActiveUser();
-                localStorage.setItem("lu_demo_user", u.displayName);
+                await fetch("/api/auth/logout", { method: "POST" });
               } catch {}
-              setUserId("demo-user");
-              setUserLabel("demo-user");
-              try {
-                const u2 = getActiveUser();
-                setLocalXp(u2.xp ?? 0);
-                setLocalLevel((u2 as any).level ?? 1);
-              } catch {}
+              setUserId(null);
+              setUserLabel(null);
+              setUserAvatar(null);
+              window.location.href = "/";
             }}
           />
         </div>
         </div>
       </header>
+
+
+      <div style={{ maxWidth: 1400, margin: "0 auto" }}>
+        <AdaptiveLearningCard
+          overallMastery={learningProfile?.overview?.overallMastery}
+          weakestDomains={learningProfile?.overview?.weakestDomains}
+          rows={learningProfile?.profile?.masteryByDomain}
+        />
+      </div>
 
       {showLaunchModal && (
         <div className="luModalOverlay">
@@ -512,7 +545,7 @@ export default function Dashboard() {
 
       <LootVaultModal
         open={lootOpen}
-        userId={userId}
+        userId={userId} userLabel={userLabel ?? undefined} avatarUrl={userAvatar ?? undefined}
         onClose={() => setLootOpen(false)}
         onClaimed={() => {
           // Clear LOOT notifications locally + server-side
@@ -659,7 +692,7 @@ export default function Dashboard() {
           <div className="topbar">
             <div>
               <b>Welcome back</b>
-              <div><small>Signed in as <span style={{ opacity: 0.95 }}>{userId}</span></small></div>
+              <div><small>Signed in as <span style={{ opacity: 0.95 }}>{userLabel ?? userId}</span></small></div>
             </div>
 
             <div className="kpiRow">

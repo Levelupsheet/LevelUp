@@ -13,7 +13,7 @@ export async function POST(req: Request) {
     const user = await prisma.user.upsert({
       where: { id: body.userId },
       update: { moduleChoice: body.moduleChoice },
-      create: { id: body.userId, email: "demo@local", displayName: "Demo User", moduleChoice: body.moduleChoice },
+      create: { id: body.userId, email: `${body.userId}@local.leveluppro`, displayName: body.userId, authProvider: "LOCAL", moduleChoice: body.moduleChoice },
     });
 
     return Response.json({ ok: true, user: { id: user.id, moduleChoice: user.moduleChoice } });

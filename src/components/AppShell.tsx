@@ -4,17 +4,22 @@ import ThemeToggle from "@/components/ThemeToggle";
 import AmbientFX from "@/components/AmbientFX";
 import NotificationBell from "@/components/NotificationBell";
 import AvatarMenu from "@/components/AvatarMenu";
+import GoogleLoginButton from "@/components/ui/GoogleLoginButton";
 
 export default function AppShell({
   title,
   subtitle,
   userId,
+  userLabel,
+  avatarUrl,
   sidebar,
   children,
 }: {
   title: string;
   subtitle?: string;
   userId: string;
+  userLabel?: string;
+  avatarUrl?: string | null;
   sidebar: React.ReactNode;
   children: React.ReactNode;
 }) {
@@ -47,14 +52,15 @@ export default function AppShell({
             </div>
 
             <div className="kpiRow">
+              <GoogleLoginButton authenticated={Boolean(userId && !String(userId).startsWith("demo-user"))} compact />
               <NotificationBell userId={userId} />
               <ThemeToggle />
               <AvatarMenu
-                userLabel={userId}
-                avatarUrl={null}
-                onLogout={() => {
-                  // TODO: wire to real auth. For now, reset demo state.
+                userLabel={userLabel ?? userId}
+                avatarUrl={avatarUrl ?? null}
+                onLogout={async () => {
                   try {
+                    await fetch("/api/auth/logout", { method: "POST" });
                     localStorage.removeItem("lu_demo_user");
                   } catch {}
                   window.location.href = "/";

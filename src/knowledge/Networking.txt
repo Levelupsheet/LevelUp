@@ -1,0 +1,16 @@
+domain: networking
+stage: 1
+difficulty: 1
+
+facts:
+
+HTTPS uses port 443
+HTTP uses port 80
+FTP uses port 21
+SSH uses port 22
+SMTP uses port 25
+DNS uses port 53
+NTP uses port 123
+LDAP uses port 389
+LDAPS uses port 636
+RDP uses port 3389
