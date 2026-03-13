@@ -348,7 +348,7 @@ export default function DiabloQuizRunner(props: {
     if (!state.finished || finishedOnceRef.current) return;
     finishedOnceRef.current = true;
     onComplete?.({
-      outcome,
+      outcome: outcome as DiabloQuizRunSummary['outcome'],
       xpEarned: state.xpEarned,
       correctCount: state.correctCount,
       totalQuestions: combatQuestions.length,

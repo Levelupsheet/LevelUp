@@ -25,7 +25,8 @@ export async function POST(req: Request) {
       return { campaign: await tx.sweepstakesCampaign.findUnique({ where: { id: campaign.id } }), winner: { ...winner, user } };
     });
 
-    return Response.json({ ok: true, ...result });
+    // `result` may not be inferred as an object type; merge safely with Object.assign
+    return Response.json(Object.assign({ ok: true }, result as any));
   } catch (error: any) {
     return Response.json({ ok: false, error: "Failed to draw sweepstakes winner", detail: String(error?.message || error) }, { status: 500 });
   }

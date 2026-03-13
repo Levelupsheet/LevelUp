@@ -34,7 +34,6 @@ export async function getOrCreateActiveSweepstakes(tx: typeof prisma = prisma) {
     where: {
       status: "ACTIVE",
       isLive: true,
-      isLive: true,
       startsAt: { lte: now },
       endsAt: { gte: now },
     },

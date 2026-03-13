@@ -25,7 +25,7 @@ export async function POST(req: Request) {
     const campaign = await getOrCreateActiveSweepstakes(prisma);
     const nextPrizePoolCents = Number.isFinite(Number(body?.prizePoolCents)) ? Math.max(0, Math.floor(Number(body.prizePoolCents))) : campaign.prizePoolCents;
 
-    const [next] = await prisma.$transaction([
+    const [next] = (await prisma.$transaction([
       prisma.sweepstakesCampaign.update({
         where: { id: campaign.id },
         data: {
@@ -40,7 +40,7 @@ export async function POST(req: Request) {
         update: { currentAmount: nextPrizePoolCents },
         create: { poolType: "WEEKLY_GOLDEN_POOL", currentAmount: nextPrizePoolCents },
       }),
-    ]);
+    ])) as any[];
     const prizePools = await getPrizePoolSummary(prisma);
     return Response.json({ ok: true, campaign: next, prizePools });
   } catch (error: any) {

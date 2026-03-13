@@ -37,7 +37,8 @@ export async function POST(req: Request) {
       return { applied, prizePools };
     });
 
-    return Response.json({ ok: true, eventType, ...result });
+    const { applied, prizePools } = result as any;
+    return Response.json({ ok: true, eventType, applied, prizePools });
   } catch (error: any) {
     return Response.json({ ok: false, error: "Failed to process Stripe webhook", detail: String(error?.message || error) }, { status: 500 });
   }

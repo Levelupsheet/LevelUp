@@ -87,7 +87,7 @@ export async function POST(req: Request) {
       return { user, encounter: updatedEncounter, bonusXpAwarded, raffleEntriesAwarded };
     });
 
-    return Response.json({ ok: true, ...result });
+    return Response.json(Object.assign({ ok: true }, result as any));
   } catch (err: any) {
     return Response.json({ ok: false, error: "Failed to complete boss battle", detail: String(err?.message ?? err) }, { status: 500 });
   }

@@ -34,7 +34,7 @@ export async function GET(req: Request) {
       });
 
       return { status: "verified" as const, awarded: awarded.awarded };
-    });
+    }) as { status: "verified" | "already_verified"; awarded: number };
 
     return Response.redirect(new URL(`/sweepstakes?freeEntry=${result.status}&awarded=${result.awarded}`, req.url));
   } catch (error: any) {
