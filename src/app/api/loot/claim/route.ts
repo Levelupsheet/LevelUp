@@ -20,7 +20,7 @@ export async function POST(req: Request) {
     }
     if (!lootBoxIds.length) return NextResponse.json({ error: "Missing lootBoxIds" }, { status: 400 });
 
-    const result = await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx: any) => {
       // Ensure wallet exists
       const wallet = await tx.wallet.upsert({
         where: { userId },

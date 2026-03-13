@@ -87,62 +87,96 @@ export default function AdminContentStudioPage() {
   }
 
   async function loadQuestions(blockId: string) {
-    if (!blockId) {
-      setQuestions([]);
-      return;
-    }
-    const res = await fetch(`/api/admin/generated-questions?knowledgeBlockId=${encodeURIComponent(blockId)}`, { cache: "no-store" });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data?.error || "Failed to load generated questions");
-    setQuestions(data.questions || []);
+  if (!blockId) {
+    setQuestions([]);
+    return;
   }
 
-  useEffect(() => {
-    let mounted = true;
-    (async () => {
-      try {
-        const res = await fetch("/api/auth/me", { cache: "no-store" as any });
-        const data = await res.json().catch(() => null);
-        if (!mounted) return;
-        if (!res.ok || !data?.user?.isAdmin) {
-          window.location.href = "/dashboard";
-          return;
-        }
-        await loadBlocks().catch((e) => setMessage(e.message));
-      } finally {
-        if (mounted) setAuthChecked(true);
-      }
-    })();
-    if (!authChecked) {
-    return <div className="page"><div className="container"><div className="card">Checking admin access…</div></div></div>;
-  }
+  const res = await fetch(
+    `/api/admin/generated-questions?knowledgeBlockId=${encodeURIComponent(blockId)}`,
+    { cache: "no-store" }
+  );
 
-  return () => { mounted = false; };
-  }, []);
-  useEffect(() => { if (authChecked) loadQuestions(selectedBlockId).catch((e) => setMessage(e.message)); }, [selectedBlockId, authChecked]);
+  const data = await res.json();
+  if (!res.ok) throw new Error(data?.error || "Failed to load generated questions");
+  setQuestions(data.questions || []);
+}
 
-  const selectedBlock = useMemo(() => blocks.find((b) => b.id === selectedBlockId) || null, [blocks, selectedBlockId]);
+useEffect(() => {
+  let mounted = true;
 
-  async function importBlocks() {
-    setLoading(true);
-    setMessage("");
+  async function checkAdmin() {
     try {
-      const blocksToSave = JSON.parse(rawJson);
-      const res = await fetch("/api/admin/knowledge-blocks", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(Array.isArray(blocksToSave) ? { blocks: blocksToSave } : blocksToSave),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data?.error || "Import failed");
-      setMessage(`Saved ${data.count} knowledge block(s).`);
-      await loadBlocks();
-    } catch (e: any) {
-      setMessage(e?.message || "Import failed");
+      const res = await fetch("/api/auth/me", { cache: "no-store" as any });
+      const data = await res.json().catch(() => null);
+
+      if (!mounted) return;
+
+      if (!res.ok || !data?.user?.isAdmin) {
+        window.location.href = "/dashboard";
+        return;
+      }
+
+      await loadBlocks().catch((e) => setMessage(e.message));
     } finally {
-      setLoading(false);
+      if (mounted) setAuthChecked(true);
     }
   }
+
+  checkAdmin();
+
+  return () => {
+    mounted = false;
+  };
+}, []);
+
+useEffect(() => {
+  if (authChecked) {
+    loadQuestions(selectedBlockId).catch((e) => setMessage(e.message));
+  }
+}, [selectedBlockId, authChecked]);
+
+if (!authChecked) {
+  return (
+    <div className="page">
+      <div className="container">
+        <div className="card">Checking admin access…</div>
+      </div>
+    </div>
+  );
+}
+
+const selectedBlock = useMemo(
+  () => blocks.find((b) => b.id === selectedBlockId) || null,
+  [blocks, selectedBlockId]
+);
+
+async function importBlocks() {
+  setLoading(true);
+  setMessage("");
+
+  try {
+    const blocksToSave = JSON.parse(rawJson);
+
+    const res = await fetch("/api/admin/knowledge-blocks", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(
+        Array.isArray(blocksToSave) ? { blocks: blocksToSave } : blocksToSave
+      ),
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data?.error || "Import failed");
+
+    setMessage(`Saved ${data.count} knowledge block(s).`);
+    await loadBlocks();
+  } catch (e: any) {
+    setMessage(e?.message || "Import failed");
+  } finally {
+    setLoading(false);
+  }
+}
 
   async function generateForSelected() {
     if (!selectedBlockId) return;

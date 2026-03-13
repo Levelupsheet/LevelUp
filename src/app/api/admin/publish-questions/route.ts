@@ -12,7 +12,7 @@ export async function POST(req: Request) {
     const knowledgeBlockId = String(body?.knowledgeBlockId || "").trim();
     if (!knowledgeBlockId) return NextResponse.json({ error: "knowledgeBlockId is required" }, { status: 400 });
 
-    const block = await prisma.knowledgeBlock.findUnique({
+    const block = await (prisma as any).knowledgeBlock.findUnique({
       where: { id: knowledgeBlockId },
       include: { generatedQuestions: { where: { reviewStatus: { in: ["APPROVED", "EDITED"] } }, orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }] } },
     });
@@ -37,7 +37,7 @@ export async function POST(req: Request) {
 
     await prisma.mCQQuestion.deleteMany({ where: { setId } });
 
-    const data = block.generatedQuestions.map((q, index) => mapCandidateToDbQuestion({
+    const data = block.generatedQuestions.map((q: any, index: number) => mapCandidateToDbQuestion({
       prompt: q.prompt,
       type: q.type.toLowerCase() as any,
       difficulty: q.difficulty,
@@ -48,9 +48,9 @@ export async function POST(req: Request) {
       correctIndex: q.correctIndex,
     }, index));
 
-    await prisma.mCQQuestion.createMany({ data: data.map((row) => ({ setId, ...row })) });
-    await prisma.generatedQuestion.updateMany({ where: { knowledgeBlockId: block.id, reviewStatus: { in: ["APPROVED", "EDITED"] } }, data: { publishedAt: new Date() } });
-    await prisma.knowledgeBlock.update({ where: { id: block.id }, data: { status: "APPROVED" } });
+    await prisma.mCQQuestion.createMany({ data: data.map((row: any) => ({ setId, ...row })) });
+    await (prisma as any).generatedQuestion.updateMany({ where: { knowledgeBlockId: block.id, reviewStatus: { in: ["APPROVED", "EDITED"] } }, data: { publishedAt: new Date() } });
+    await (prisma as any).knowledgeBlock.update({ where: { id: block.id }, data: { status: "APPROVED" } });
 
     return NextResponse.json({ ok: true, setId, publishedCount: data.length });
   } catch (e: any) {

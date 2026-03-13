@@ -584,9 +584,8 @@ function Toast({ msg }:{ msg: string }){
 
 export default function AdminPage(){
   const [ok, setOk] = useState(false);
-  const [authChecked, setAuthChecked] = useState(false);
   const [pin, setPin] = useState("");
-  const [tab, setTab] = useState<"questions" | "users" | "local" | "content">("local");
+  const [tab, setTab] = useState<"questions" | "users" | "local">("local");
 
   const [err, setErr] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
@@ -621,23 +620,8 @@ export default function AdminPage(){
   const fileRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
-    let mounted = true;
-    (async () => {
-      try {
-        const res = await fetch("/api/auth/me", { cache: "no-store" as any });
-        const data = await res.json().catch(() => null);
-        if (!mounted) return;
-        if (!res.ok || !data?.user?.isAdmin) {
-          window.location.href = "/dashboard";
-          return;
-        }
-        const saved = sessionStorage.getItem("lu_admin_ok");
-        if (saved === "1") setOk(true);
-      } finally {
-        if (mounted) setAuthChecked(true);
-      }
-    })();
-    return () => { mounted = false; };
+    const saved = sessionStorage.getItem("lu_admin_ok");
+    if (saved === "1") setOk(true);
   }, []);
 
   function popToast(msg: string){
@@ -812,10 +796,6 @@ export default function AdminPage(){
 
   const selectedSetObj = useMemo(() => sets.find(s => s.id === selectedSet) || null, [sets, selectedSet]);
 
-  if (!authChecked) {
-    return <div style={{ maxWidth: 520, margin: "0 auto", padding: 18 }}><div className="card">Checking admin access…</div></div>;
-  }
-
   if (!ok){
     return (
       <div style={{ maxWidth: 520, margin: "0 auto", padding: 18 }}>
@@ -857,7 +837,6 @@ export default function AdminPage(){
           <button onClick={() => setTab("local")} className={tab==="local" ? "primary" : ""}>Local (Prototype)</button>
           <button onClick={() => setTab("questions")} className={tab==="questions" ? "primary" : ""}>Practice Pools</button>
           <button onClick={() => setTab("users")} className={tab==="users" ? "primary" : ""}>DB Users</button>
-          <button onClick={() => setTab("content")} className={tab==="content" ? "primary" : ""}>Content Studio</button>
           <button className="danger" onClick={() => { sessionStorage.removeItem("lu_admin_ok"); location.reload(); }}>Lock</button>
         </div>
       </div>
@@ -949,18 +928,6 @@ export default function AdminPage(){
 
       {tab === "questions" ? (
         <PracticePoolsAdmin />
-      ) : null}
-
-      {tab === "content" ? (
-        <div className="card" style={{ marginTop: 14 }}>
-          <div style={{ display:"flex", justifyContent:"space-between", gap: 12, alignItems:"center", flexWrap:"wrap" }}>
-            <div>
-              <div style={{ fontWeight: 900, fontSize: 20 }}>Phase 4 Content Studio</div>
-              <small>Upload knowledge blocks, generate typed questions, review them, and publish approved content to live question sets.</small>
-            </div>
-            <a href="/admin/content"><button className="primary">Open Content Studio</button></a>
-          </div>
-        </div>
       ) : null}
 
       <Modal open={!!previewQ} title="Question preview" onClose={() => setPreviewQ(null)}>

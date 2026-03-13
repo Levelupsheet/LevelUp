@@ -436,10 +436,10 @@ const BANK_STAGE1: Question[] = [
     correctIndex: 0,
     idealAnswer: "SFC and DISM are safe built-in tools to repair system files and the Windows component store.",
   }),
-].flat();
+].flat() as Question[];
 
 // ===== Stage 2 pool: mixed =====
-const BANK_STAGE2: Question[] = [
+const BANK_STAGE2 = [
   {
     id: "az2_1",
     track: "azure_m365",
@@ -506,7 +506,7 @@ const BANK_STAGE2: Question[] = [
     difficulty: "hard",
     tags: ["Security", "Windows"],
   },
-].flat();
+].flat() as Question[];
 
 function normalize(s: string) {
   return s.toLowerCase().replace(/[^a-z0-9\s\-\+\.]/g, " ");
@@ -591,7 +591,7 @@ export default function MockInterviewModal(props: { open: boolean; onClose: () =
 
   const combatQuestions = useMemo(() => {
     return (sessionQuestions ?? []).map((q, i) => {
-      const diff = q.difficulty === "h" ? 3 : q.difficulty === "m" ? 2 : 1;
+      const diff = q.difficulty === "hard" ? 3 : q.difficulty === "medium" ? 2 : 1;
       return {
         id: `${i}-${q.track}-${q.kind}`,
         prompt: q.question,
@@ -710,13 +710,13 @@ export default function MockInterviewModal(props: { open: boolean; onClose: () =
         localStorage.setItem(`lu_mock_passed_s1_${track}`, "1");
       } catch {}
       setTrackProgress(track as TrackId, 50);
-      addActivity({ kind: "unlock", title: "Mock Interview: Stage 1 cleared", detail: track });
+      addActivity(activeUser.id, { type: "PASS_INTERVIEW_STAGE1", title: "Mock Interview: Stage 1 cleared", body: track });
       setShowConfetti(true);
       setTimeout(() => setShowConfetti(false), 1800);
     }
     if (stage === 2 && passedThisRun) {
       setTrackProgress(track as TrackId, 100);
-      addActivity({ kind: "unlock", title: "Mock Interview: Stage 2 cleared", detail: track });
+      addActivity(activeUser.id, { type: "PASS_INTERVIEW_STAGE2", title: "Mock Interview: Stage 2 cleared", body: track });
       setShowConfetti(true);
       setTimeout(() => setShowConfetti(false), 1800);
     }
@@ -752,14 +752,14 @@ export default function MockInterviewModal(props: { open: boolean; onClose: () =
         ? `Good answer. You covered several points (${hit}/${total}).`
         : r.rating === "ok"
         ? `Decent. You got some points (${hit}/${total}).`
-        : r.rating === "weak"
+        : r.rating === "poor"
         ? `A bit thin (${hit}/${total}).`
         : `Not quite (${hit}/${total}).`;
 
     submitManual({
       correct: isCorrect,
       domainId: current.tags?.[0] ?? current.track,
-      level: current.difficulty === "h" ? 3 : current.difficulty === "m" ? 2 : 1,
+      level: current.difficulty === "hard" ? 3 : current.difficulty === "medium" ? 2 : 1,
       feedback: (current.idealAnswer ? `${fb} ${current.idealAnswer}` : fb) as string,
     });
   }
@@ -855,7 +855,7 @@ export default function MockInterviewModal(props: { open: boolean; onClose: () =
                   </div>
                   <div style={{ minWidth: 220 }}>
                     <div className="muted" style={{ fontSize: 12, marginBottom: 6 }}>Track Completion</div>
-                    <ProgressBar value={trackPct} />
+                    <ProgressBar value={trackPct} max={100} />
                     <div className="muted" style={{ fontSize: 12, marginTop: 6 }}>{trackPct}%</div>
                   </div>
                 </div>

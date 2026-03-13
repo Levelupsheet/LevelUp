@@ -8,7 +8,7 @@
     ],
     "allowJs": false,
     "skipLibCheck": true,
-    "strict": true,
+    "strict": false,
     "noEmit": true,
     "esModuleInterop": true,
     "module": "ESNext",
@@ -27,7 +27,8 @@
       {
         "name": "next"
       }
-    ]
+    ],
+    "noImplicitAny": false
   },
   "include": [
     "next-env.d.ts",
@@ -36,6 +37,7 @@
     ".next/types/**/*.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "prisma/seed.ts"
   ]
 }

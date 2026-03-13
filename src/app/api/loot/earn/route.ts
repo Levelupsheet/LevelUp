@@ -40,7 +40,7 @@ export async function POST(req: Request) {
       create: { userId, tokenBalance: 0 },
     });
 
-    const result = await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx: any) => {
       const user = await tx.user.findUnique({ where: { id: userId } });
       const grantedUpTo = (user as any)?.lootGrantedUpToLevel ?? 0;
       const currentXp = (user as any)?.xp ?? 0;

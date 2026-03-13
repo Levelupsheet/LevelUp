@@ -7,7 +7,6 @@ import MockInterviewModal from "@/components/MockInterviewModal";
 import PracticeMiniGameModal from "@/components/PracticeMiniGameModal";
 import AvatarMenu from "@/components/AvatarMenu";
 import WhatsNextPanel from "@/components/WhatsNextPanel";
-import AdaptiveLearningCard from "@/components/AdaptiveLearningCard";
 import LootVaultModal from "@/components/LootVaultModal";
 import AuthGateCard from "@/components/AuthGateCard";
 import GoogleLoginButton from "@/components/ui/GoogleLoginButton";
@@ -32,10 +31,6 @@ type Notification = {
 
 type Badge = { id: string; label: string; issuedAt: string; expiresAt: string; code: string };
 type Offer = { id: string; title: string; salaryText: string; createdAt: string; companyName: string; roleLabel: string };
-type LearningProfile = {
-  overview?: { overallMastery?: number; weakestDomains?: string[] };
-  profile?: { masteryByDomain?: Array<{ domain: string; mastery: number; accuracy: number; currentDifficulty: number; correctCount: number; wrongCount: number }> };
-};
 
 
 function labelPos(p: string){
@@ -93,7 +88,6 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(false);
   const [hrPassed, setHrPassed] = useState<boolean>(false);
   const [lootOpen, setLootOpen] = useState(false);
-  const [learningProfile, setLearningProfile] = useState<LearningProfile | null>(null);
 
   // Level-up detection (notification-only; user opens vault when ready)
   const prevLevelRef = useRef<number>(0);
@@ -159,12 +153,6 @@ export default function Dashboard() {
       let hrData: any = null;
       try { hrData = hrText ? JSON.parse(hrText) : null; } catch { hrData = null; }
       if (hrRes.ok) setHrPassed(Boolean(hrData?.passed));
-
-      const learningRes = await fetch(`/api/learning/profile?userId=${encodeURIComponent(activeUserId)}`);
-      const learningText = await learningRes.text();
-      let learningData: any = null;
-      try { learningData = learningText ? JSON.parse(learningText) : null; } catch { learningData = null; }
-      if (learningRes.ok) setLearningProfile(learningData);
     } catch (e: any) {
       console.error(e.message ?? "Error");
     } finally {
@@ -452,15 +440,6 @@ export default function Dashboard() {
         </div>
       </header>
 
-
-      <div style={{ maxWidth: 1400, margin: "0 auto" }}>
-        <AdaptiveLearningCard
-          overallMastery={learningProfile?.overview?.overallMastery}
-          weakestDomains={learningProfile?.overview?.weakestDomains}
-          rows={learningProfile?.profile?.masteryByDomain}
-        />
-      </div>
-
       {showLaunchModal && (
         <div className="luModalOverlay">
           <div className="luModal" role="dialog" aria-modal="true" aria-label="Choose what to start">
@@ -545,7 +524,7 @@ export default function Dashboard() {
 
       <LootVaultModal
         open={lootOpen}
-        userId={userId} userLabel={userLabel ?? undefined} avatarUrl={userAvatar ?? undefined}
+        userId={userId}
         onClose={() => setLootOpen(false)}
         onClaimed={() => {
           // Clear LOOT notifications locally + server-side

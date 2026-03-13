@@ -40,15 +40,6 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
 
   const q = opts.questions[state.idx];
 
-  const resolveQuestionModifiers = (question?: CombatQuestion | null) => {
-    const data = (question?.data && typeof question.data === "object" ? question.data : {}) as Record<string, unknown>;
-    const playerDamageMultiplier = Math.max(0, Number(data.playerDamageMultiplier ?? 1) || 1);
-    const enemyDamageMultiplier = Math.max(0, Number(data.enemyDamageMultiplier ?? 1) || 1);
-    const shieldBlocked = Boolean(data.blockNextCorrect);
-    const abilityName = data.bossAbility ? String(data.bossAbility) : null;
-    return { data, playerDamageMultiplier, enemyDamageMultiplier, shieldBlocked, abilityName };
-  };
-
   useEffect(() => {
     setState(initialCombatState(rules, timed));
   }, [questionsKey, timed, rules]);
@@ -97,13 +88,10 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
       const domainId = inferDomainId(q);
       const lvl = inferLevel(q);
       const effTier: DifficultyTier = Math.max(s.tier, lvl) as DifficultyTier;
-      const modifiers = resolveQuestionModifiers(q);
 
       const correct = false;
       const xpDelta = 0;
-      const playerDamage = Math.round(rules.playerDamageByTier[effTier] * modifiers.playerDamageMultiplier);
-      const enemyDamage = 0;
-      const playerHP = clamp(s.playerHP - playerDamage, 0, rules.startHP);
+      const playerHP = clamp(s.playerHP - rules.playerDamageByTier[effTier], 0, rules.startHP);
       const enemyHP = s.enemyHP;
 
       const prevMastery = s.mastery[domainId] ?? 50;
@@ -133,10 +121,6 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
           tier,
           domainId,
           masteryValue: nextMastery,
-          playerDamage,
-          enemyDamage,
-          shieldBlocked: false,
-          abilityName: modifiers.abilityName,
         });
       });
 
@@ -162,14 +146,11 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
       const domainId = inferDomainId(q);
       const lvl = inferLevel(q);
       const effTier: DifficultyTier = Math.max(s.tier, lvl) as DifficultyTier;
-      const modifiers = resolveQuestionModifiers(q);
       const correct = s.selected === q.correctIndex;
       const xpDelta = correct ? rules.xpByTier[effTier] : 0;
 
-      const playerDamage = correct ? 0 : Math.round(rules.playerDamageByTier[effTier] * modifiers.playerDamageMultiplier);
-      const enemyDamage = correct ? (modifiers.shieldBlocked ? 0 : Math.round(rules.enemyDamageByTier[effTier] * modifiers.enemyDamageMultiplier)) : 0;
-      const playerHP = clamp(correct ? s.playerHP : s.playerHP - playerDamage, 0, rules.startHP);
-      const enemyHP = clamp(correct ? s.enemyHP - enemyDamage : s.enemyHP, 0, rules.startHP);
+      const playerHP = clamp(correct ? s.playerHP : s.playerHP - rules.playerDamageByTier[effTier], 0, rules.startHP);
+      const enemyHP = clamp(correct ? s.enemyHP - rules.enemyDamageByTier[effTier] : s.enemyHP, 0, rules.startHP);
 
       const prevMastery = s.mastery[domainId] ?? 50;
       const masteryDelta = correct ? rules.masteryGainBase * effTier : -rules.masteryLossWrong;
@@ -189,7 +170,7 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
         lastWasCorrect: correct,
         correctCount: correct ? s.correctCount + 1 : s.correctCount,
         xpEarned: s.xpEarned + xpDelta,
-        feedback: modifiers.shieldBlocked && correct ? ((q.explanation ? `${q.explanation} ` : "") + "The boss shield blocked the hit.") : (q.explanation || (correct ? "Direct hit." : s.timeLeft <= 0 ? "Time's up." : "Not quite.")),
+        feedback: q.explanation || (correct ? "Direct hit." : s.timeLeft <= 0 ? "Time's up." : "Not quite."),
       };
 
       queueMicrotask(() => {
@@ -202,10 +183,6 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
           tier,
           domainId,
           masteryValue: nextMastery,
-          playerDamage,
-          enemyDamage,
-          shieldBlocked: modifiers.shieldBlocked && correct,
-          abilityName: modifiers.abilityName,
         });
       });
 
@@ -227,14 +204,11 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
       const domainId = manual.domainId ?? inferDomainId(q);
       const lvl = (manual.level ?? inferLevel(q)) as DifficultyTier;
       const effTier: DifficultyTier = Math.max(s.tier, lvl) as DifficultyTier;
-      const modifiers = resolveQuestionModifiers(q);
       const correct = manual.correct;
       const xpDelta = typeof manual.xpDelta === "number" ? manual.xpDelta : (correct ? rules.xpByTier[effTier] : 0);
 
-      const playerDamage = correct ? 0 : Math.round(rules.playerDamageByTier[effTier] * modifiers.playerDamageMultiplier);
-      const enemyDamage = correct ? (modifiers.shieldBlocked ? 0 : Math.round(rules.enemyDamageByTier[effTier] * modifiers.enemyDamageMultiplier)) : 0;
-      const playerHP = clamp(correct ? s.playerHP : s.playerHP - playerDamage, 0, rules.startHP);
-      const enemyHP = clamp(correct ? s.enemyHP - enemyDamage : s.enemyHP, 0, rules.startHP);
+      const playerHP = clamp(correct ? s.playerHP : s.playerHP - rules.playerDamageByTier[effTier], 0, rules.startHP);
+      const enemyHP = clamp(correct ? s.enemyHP - rules.enemyDamageByTier[effTier] : s.enemyHP, 0, rules.startHP);
 
       const prevMastery = s.mastery[domainId] ?? 50;
       const masteryDelta = correct ? rules.masteryGainBase * effTier : -rules.masteryLossWrong;
@@ -253,7 +227,7 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
         lastWasCorrect: correct,
         correctCount: correct ? s.correctCount + 1 : s.correctCount,
         xpEarned: s.xpEarned + xpDelta,
-        feedback: modifiers.shieldBlocked && correct ? ((manual.feedback ?? q.explanation ?? "Direct hit.") + " The boss shield blocked the hit.") : (manual.feedback ?? q.explanation ?? (correct ? "Direct hit." : "Not quite.")),
+        feedback: manual.feedback ?? q.explanation ?? (correct ? "Direct hit." : "Not quite."),
       };
 
       queueMicrotask(() => {
@@ -266,10 +240,6 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
           tier,
           domainId,
           masteryValue: nextMastery,
-          playerDamage,
-          enemyDamage,
-          shieldBlocked: modifiers.shieldBlocked && correct,
-          abilityName: modifiers.abilityName,
         });
       });
 

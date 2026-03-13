@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { exchangeCodeForTokens, fetchGoogleProfile } from "@/lib/auth/google";
 import { clearOauthStateCookie, createSessionCookie, makeSessionCookieOptions, readOauthStateCookie, AUTH_COOKIE } from "@/lib/auth/session";
-import { upsertGoogleUser } from "../../_lib/authUser";
+import { upsertGoogleUser } from "@/app/api/_lib/authUser";
 
 export async function GET(req: Request) {
   const url = new URL(req.url);
@@ -30,7 +30,7 @@ export async function GET(req: Request) {
 
     const sessionUser = {
       id: `google:${profile.sub}`,
-      email: profile.email.toLowerCase(),
+      email: profile.email,
       name: profile.name || profile.email,
       picture: profile.picture ?? null,
     };

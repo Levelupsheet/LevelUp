@@ -102,10 +102,6 @@ export type SubmitResult = {
   tier: DifficultyTier;
   domainId: string;
   masteryValue: number;
-  playerDamage: number;
-  enemyDamage: number;
-  shieldBlocked?: boolean;
-  abilityName?: string | null;
 };
 
 export function clamp(n: number, a: number, b: number) {

@@ -1,6 +1,5 @@
 import { getSessionUser } from "@/lib/auth/session";
 import { upsertGoogleUser } from "../../_lib/authUser";
-import { isAdminEmail } from "@/lib/adminAuth";
 
 export async function GET() {
   const sessionUser = await getSessionUser();
@@ -20,7 +19,6 @@ export async function GET() {
       xp: user.xp,
       startingPosition: user.startingPosition,
       moduleChoice: user.moduleChoice,
-      isAdmin: isAdminEmail(user.email),
     },
   });
 }

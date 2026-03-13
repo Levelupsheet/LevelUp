@@ -11,11 +11,7 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
-    "seed": "ts-node --transpile-only prisma/seed.ts",
-    "content:generate": "node scripts/content/generateQuestions.mjs",
-    "content:validate": "node scripts/content/validateQuestions.mjs",
-    "content:insert": "node scripts/content/insertQuestions.mjs",
-    "content:build": "npm run content:generate && npm run content:validate && npm run content:insert"
+    "seed": "ts-node --transpile-only prisma/seed.ts"
   },
   "dependencies": {
     "@prisma/client": "^5.20.0",
