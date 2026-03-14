@@ -347,8 +347,10 @@ export default function DiabloQuizRunner(props: {
   useEffect(() => {
     if (!state.finished || finishedOnceRef.current) return;
     finishedOnceRef.current = true;
+    const normalizedOutcome =
+      outcome === "victory" || outcome === "defeat" || outcome === "complete" ? outcome : null;
     onComplete?.({
-      outcome: outcome as DiabloQuizRunSummary['outcome'],
+      outcome: normalizedOutcome,
       xpEarned: state.xpEarned,
       correctCount: state.correctCount,
       totalQuestions: combatQuestions.length,
@@ -409,10 +411,7 @@ export default function DiabloQuizRunner(props: {
   }
 
   return (
-    <div
-      className="modalShell d2QuizShell combatModalShell"
-      style={{ position: "relative", width: "min(1240px, 96vw)", maxWidth: media?.width || 1240, minHeight: "min(720px, 100dvh - 120px)", maxHeight: "95vh", overflowY: "auto", margin: "0 auto" }}
-    >
+    <div className="modalShell" style={{ position: "relative", maxWidth: media?.width || 1240, minHeight: media?.height || 720, margin: "0 auto" }}>
       <div className="modalHead">
         <div>
           <div className="modalTitle d2Roman">{title}</div>
@@ -425,16 +424,16 @@ export default function DiabloQuizRunner(props: {
         )}
       </div>
 
-      <div className="modalBody d2QuizBody combatModalBody">
-        <div className="d2InterviewGrid d2QuizGrid combatResponsiveGrid">
-          <div className="combatSideCol combatPlayerCol" style={{ display: "grid", gap: 12 }}>
+      <div className="modalBody">
+        <div style={{ display: "grid", gridTemplateColumns: "minmax(220px, 0.85fr) minmax(520px, 1.4fr) minmax(220px, 0.85fr)", gap: 14, alignItems: "start" }}>
+          <div style={{ display: "grid", gap: 12 }}>
             <div className={hitPulse === "player" ? "d2Shake" : ""}>
               <D2LifeOrb value={state.playerHP} name={playerName} />
             </div>
             <ModelPanel title={playerName} src={playerVideo} />
           </div>
 
-          <div className={"d2QuestionCard d2QuizQuestionCard combatQuestionCol " + (hitPulse === "enemy" ? "d2HitFlash" : "") } style={{ minHeight: 560 }}>
+          <div className={"d2QuestionCard " + (hitPulse === "enemy" ? "d2HitFlash" : "") } style={{ minHeight: 560 }}>
             <span className="d2Rivet" style={{ left: 12, top: 12 }} />
             <span className="d2Rivet" style={{ right: 12, top: 12 }} />
             <span className="d2Rivet" style={{ left: 12, bottom: 12 }} />
@@ -518,7 +517,7 @@ export default function DiabloQuizRunner(props: {
             )}
           </div>
 
-          <div className="combatSideCol combatPlayerCol" style={{ display: "grid", gap: 12 }}>
+          <div style={{ display: "grid", gap: 12 }}>
             <D2EnemyHealthBar value={state.enemyHP} name={enemyName.toUpperCase().slice(0, 18)} />
             <ModelPanel title={enemyName.toUpperCase().slice(0, 18)} src={enemyVideo} mirrored />
           </div>

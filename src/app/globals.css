@@ -2109,126 +2109,118 @@ button.gold{
 .jobDescriptionText{ white-space: pre-wrap; line-height:1.55; opacity:0.92; }
 
 @media (max-width: 900px){
-  .luAvatarBtn{ width: 54px; height: 54px; border-radius: 14px; }
-  .luAvatarInitials{ font-size: 24px; }
+  .luAvatarBtn{ width: 44px; height: 44px; border-radius: 12px; }
+  .luAvatarInitials{ font-size: 20px; }
 }
 
 
-/* ===== Combat modal responsive patch ===== */
-.combatModalShell{
-  overflow-x:hidden;
+/* ===== Jobs dashboard + modal polish ===== */
+.jobScrollerGrid{
+  margin-top: 14px;
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap:12px;
 }
-.combatModalBody{
-  overflow-x:hidden;
+.jobCard{
+  display:grid;
+  gap:10px;
+  align-content:start;
 }
-.combatResponsiveGrid{
-  width:100%;
+.jobCardSummary{
+  font-size:14px;
+  line-height:1.45;
+  opacity:0.92;
+  white-space:normal;
+  overflow-wrap:anywhere;
+  display:-webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow:hidden;
+  min-height:4.2em;
 }
-.combatResponsiveGrid > *{
-  min-width:0;
+.luJobModal{
+  width:min(980px, 94vw);
+  max-width:980px;
+  max-height:88vh;
+  display:flex;
+  flex-direction:column;
 }
-.combatQuestionCol, .combatSideCol{
-  min-width:0;
-  width:100%;
+.luJobModalBody{
+  overflow:auto;
+  max-height:calc(88vh - 132px);
 }
-.combatQuestionCol{
-  max-width:100%;
+.jobSummaryLead{
+  font-size:15px;
+  line-height:1.5;
+  margin:10px 0 12px;
+  opacity:0.96;
 }
-.combatQuestionCol .badge{
-  max-width:100%;
+.jobDescriptionText{
+  white-space: pre-wrap;
+  line-height:1.65;
+  opacity:0.92;
+  overflow-wrap:anywhere;
 }
-.combatQuestionCol input,
-.combatQuestionCol textarea,
-.combatQuestionCol button,
-.combatQuestionCol label{
-  max-width:100%;
-  box-sizing:border-box;
-}
-.combatQuestionCol > *,
-.combatQuestionCol .card,
-.combatQuestionCol .d2RuneBar{
-  min-width:0;
-}
-
-@media (max-width: 980px){
-  .combatResponsiveGrid{
-    grid-template-columns: 1fr !important;
-    gap:14px !important;
-  }
-  .combatPlayerCol{ order:1; }
-  .combatQuestionCol{ order:2; min-height:0 !important; }
-  .combatEnemyCol{ order:3; }
-}
-
 @media (max-width: 900px){
-  .d2QuizShell.combatModalShell{
-    width:min(96vw, 680px) !important;
-    max-width:96vw !important;
+  .luJobModal{ width:min(96vw, 96vw); max-height:92vh; }
+  .luJobModalBody{ max-height:calc(92vh - 124px); }
+  .jobScrollerGrid{ grid-template-columns:1fr; }
+  .jobCardSummary{ -webkit-line-clamp: 2; min-height:2.9em; font-size:13px; }
+}
+
+/* ===== Quiz layout: restore desktop, keep mobile stacked ===== */
+.d2QuizShell{
+  width:min(1480px, 98vw) !important;
+  max-width:min(1480px, 98vw) !important;
+  min-height:min(760px, calc(100dvh - 84px)) !important;
+}
+.d2QuizBody{
+  padding:0;
+}
+.d2QuizGrid{
+  display:grid;
+  grid-template-columns: 210px minmax(620px, 1fr) 390px;
+  gap:18px;
+  align-items:start;
+}
+.d2QuizGrid > div,
+.d2QuizQuestionCard,
+.d2QuizQuestionCard > div,
+.d2QuestionCard,
+.d2QuestionCard > div{
+  min-width:0;
+}
+.d2QuizQuestionCard{
+  width:100%;
+  min-height:560px;
+  overflow:hidden;
+}
+.d2QuestionPrompt{
+  margin-top:12px;
+  font-size:clamp(22px, 2vw, 40px);
+  line-height:1.25;
+  font-weight:900;
+  overflow-wrap:anywhere;
+}
+@media (max-width: 1280px){
+  .d2QuizGrid{
+    grid-template-columns: 190px minmax(520px, 1fr) 320px;
+  }
+}
+@media (max-width: 900px){
+  .d2QuizShell{
+    width:100vw !important;
+    max-width:100vw !important;
     min-height:auto !important;
+    border-radius:0 !important;
   }
-  .combatModalBody{
-    padding:0 2px 10px !important;
-  }
-  .combatResponsiveGrid{
-    grid-template-columns:1fr !important;
-    gap:14px !important;
-  }
-  .combatQuestionCol{
-    min-height:0 !important;
-    width:100% !important;
-  }
-  .combatQuestionCol .d2ChoiceBtn{
-    font-size:15px;
-    padding:12px;
-  }
-  .combatQuestionCol .d2ActionRow{
-    display:grid;
-    grid-template-columns:1fr;
-    gap:10px;
-  }
-  .combatQuestionCol .d2Btn{
-    width:100%;
-  }
-}
-
-@media (max-width: 640px){
-  .d2QuizShell.combatModalShell{
-    width:96vw !important;
-    max-width:96vw !important;
-    max-height:95vh !important;
-  }
-  .combatModalBody{
-    padding:0 !important;
-  }
-  .combatResponsiveGrid{
-    grid-template-columns:1fr !important;
-    gap:12px !important;
-  }
-  .combatQuestionCol{
-    min-height:0 !important;
-  }
-  .d2QuestionCard{
-    padding:14px 12px 12px;
-    border-radius:16px;
-  }
-  .d2QuestionCard::after{ inset:8px; }
-  .d2QuestionCard .d2Rivet{ width:8px; height:8px; }
-  .d2RuneBar{ gap:4px; padding:8px; }
-  .d2ActionRow{ gap:8px; }
-  .d2Btn{ flex:1 1 auto; width:100%; }
-  .d2ChoiceBtn{ padding:12px; font-size:15px; }
-  .d2OrbFrame{ width:min(46vw, 180px) !important; height:min(46vw, 180px) !important; }
-  .d2OrbWrap{ width:100% !important; align-items:center; }
-  .d2NamePlate{ width:100%; max-width:280px; }
-  .d2EnemyCard, .d2QuestionCard, .d2OrbWrap, .card, .sidebar, .maincol, .topbar, .navTopInner{ min-width:0; }
-  .combatQuestionCol > div:first-child{ gap:8px !important; }
-  .combatQuestionCol > div:first-child .badge{ white-space:normal; }
-  .combatQuestionCol > div:first-child > div:last-child{ width:100%; justify-content:flex-start !important; }
-}
-
-@media (max-width: 420px){
-  .d2QuizShell.combatModalShell{ width:97vw !important; max-width:97vw !important; }
-  .d2QuestionCard{ padding:12px 10px 10px; }
-  .combatQuestionCol .d2ChoiceBtn{ font-size:14px; }
-  .combatQuestionCol .badge{ font-size:12px; }
+  .d2QuizBody{ padding: 0 8px 12px !important; }
+  .d2QuizGrid{ grid-template-columns:1fr !important; gap:12px; }
+  .d2QuizGrid > div{ width:100%; }
+  .d2QuizQuestionCard{ min-height:0 !important; padding:14px 12px 12px; }
+  .d2QuestionPrompt{ font-size:clamp(18px, 7vw, 28px); }
+  .d2QuestionCard .badge{ font-size:12px; padding:6px 10px; }
+  .d2ChoiceBtn{ padding:12px; font-size:14px; }
+  .d2ActionRow{ display:grid; grid-template-columns:1fr; gap:8px; }
+  .d2EnemyCard, .d2NamePlate, .card{ width:100%; box-sizing:border-box; }
 }

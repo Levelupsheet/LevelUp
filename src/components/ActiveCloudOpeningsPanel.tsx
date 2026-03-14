@@ -16,6 +16,27 @@ type JobOpening = {
   sourceLabel?: string | null;
 };
 
+function compactSummary(job: JobOpening) {
+  const base = String(job.summaryShort || job.description || "")
+    .replace(/[
+]+/g, " ")
+    .replace(/[•*]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  const raw = base.length > 240 ? base.slice(0, 240) : base;
+  const sentences = raw
+    .split(/(?<=[.!?])\s+/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+
+  const picked = (sentences.slice(0, 2).join(" ") || raw).trim();
+  if (!picked) {
+    return `${job.companyName}${job.locationText ? ` • ${job.locationText}` : ""}${job.employmentType ? ` • ${job.employmentType}` : ""}`;
+  }
+  return picked.length > 125 ? `${picked.slice(0, 122).trimEnd()}…` : picked;
+}
+
 function JobModal({ job, onClose }: { job: JobOpening | null; onClose: () => void }) {
   if (!job) return null;
   return (
@@ -28,11 +49,12 @@ function JobModal({ job, onClose }: { job: JobOpening | null; onClose: () => voi
           </div>
           <button className="secondaryBtn" type="button" onClick={onClose}>✕</button>
         </div>
-        <div className="luModalBody">
+        <div className="luModalBody luJobModalBody">
           <div className="jobMetaPills">
             {job.salaryText ? <span className="badge">{job.salaryText}</span> : null}
             {job.sourceLabel ? <span className="badge">{job.sourceLabel}</span> : null}
           </div>
+          <div className="jobSummaryLead">{compactSummary(job)}</div>
           {job.summaryBullets?.length ? (
             <div className="jobBulletList">
               {job.summaryBullets.map((line, idx) => <div key={idx} className="jobBulletItem">• {line}</div>)}
@@ -91,12 +113,7 @@ export default function ActiveCloudOpeningsPanel({ jobs }: { jobs: JobOpening[] 
                   </div>
                   {job.salaryText ? <span className="badge">{job.salaryText}</span> : null}
                 </div>
-                <div className="jobCardSummary">{job.summaryShort}</div>
-                {job.summaryBullets?.length ? (
-                  <div className="jobMiniBullets">
-                    {job.summaryBullets.slice(0, 3).map((line, idx) => <div key={idx}>• {line}</div>)}
-                  </div>
-                ) : null}
+                <div className="jobCardSummary">{compactSummary(job)}</div>
                 <div className="jobCardActions">
                   <button className="secondaryBtn" type="button" onClick={() => setViewing(job)}>View</button>
                   <a className="primaryBtn" href={job.applyUrl} target="_blank" rel="noreferrer">Apply</a>
