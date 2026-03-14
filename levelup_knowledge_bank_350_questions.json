@@ -1,0 +1,7002 @@
+[
+  {
+    "id": "identity_0001",
+    "type": "multiple_choice",
+    "domain": "IDENTITY",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "What does SSO stand for?",
+    "data": {
+      "choices": [
+        "Single Sign-On",
+        "Secure System Object",
+        "Server Side Operation",
+        "Session Security Option"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "SSO allows users to log in once and access multiple systems."
+  },
+  {
+    "id": "identity_0002",
+    "type": "multiple_choice",
+    "domain": "IDENTITY",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "What is the primary purpose of Multi-Factor Authentication (MFA)?",
+    "data": {
+      "choices": [
+        "Provide a second form of identity verification",
+        "Encrypt network traffic",
+        "Replace passwords",
+        "Store credentials securely"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "MFA requires multiple verification factors to confirm a user's identity."
+  },
+  {
+    "id": "identity_0003",
+    "type": "multiple_choice",
+    "domain": "IDENTITY",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "Which system manages identities and access policies in cloud environments?",
+    "data": {
+      "choices": [
+        "Identity and Access Management (IAM)",
+        "DNS",
+        "Load Balancer",
+        "Firewall"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "IAM systems manage user identities and permissions."
+  },
+  {
+    "id": "identity_0004",
+    "type": "multiple_choice",
+    "domain": "IDENTITY",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "What is the main role of Active Directory?",
+    "data": {
+      "choices": [
+        "Directory and identity management",
+        "Network routing",
+        "Web hosting",
+        "Database replication"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Active Directory manages users, computers, and permissions in a domain."
+  },
+  {
+    "id": "identity_0005",
+    "type": "multiple_choice",
+    "domain": "IDENTITY",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "Which system manages identities and access policies in cloud environments?",
+    "data": {
+      "choices": [
+        "Identity and Access Management (IAM)",
+        "DNS",
+        "Load Balancer",
+        "Firewall"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "IAM systems manage user identities and permissions."
+  },
+  {
+    "id": "identity_0006",
+    "type": "multiple_choice",
+    "domain": "IDENTITY",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "What is the primary purpose of Multi-Factor Authentication (MFA)?",
+    "data": {
+      "choices": [
+        "Provide a second form of identity verification",
+        "Encrypt network traffic",
+        "Replace passwords",
+        "Store credentials securely"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "MFA requires multiple verification factors to confirm a user's identity."
+  },
+  {
+    "id": "identity_0007",
+    "type": "multiple_choice",
+    "domain": "IDENTITY",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "Which protocol is commonly used for centralized authentication?",
+    "data": {
+      "choices": [
+        "LDAP",
+        "FTP",
+        "SMTP",
+        "SNMP"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "LDAP is commonly used for directory services and centralized authentication."
+  },
+  {
+    "id": "identity_0008",
+    "type": "multiple_choice",
+    "domain": "IDENTITY",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "What is the main role of Active Directory?",
+    "data": {
+      "choices": [
+        "Directory and identity management",
+        "Network routing",
+        "Web hosting",
+        "Database replication"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Active Directory manages users, computers, and permissions in a domain."
+  },
+  {
+    "id": "identity_0009",
+    "type": "multiple_choice",
+    "domain": "IDENTITY",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "What does SSO stand for?",
+    "data": {
+      "choices": [
+        "Single Sign-On",
+        "Secure System Object",
+        "Server Side Operation",
+        "Session Security Option"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "SSO allows users to log in once and access multiple systems."
+  },
+  {
+    "id": "identity_0010",
+    "type": "multiple_choice",
+    "domain": "IDENTITY",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "What is the main role of Active Directory?",
+    "data": {
+      "choices": [
+        "Directory and identity management",
+        "Network routing",
+        "Web hosting",
+        "Database replication"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Active Directory manages users, computers, and permissions in a domain."
+  },
+  {
+    "id": "identity_0011",
+    "type": "multiple_choice",
+    "domain": "IDENTITY",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "Which protocol is commonly used for centralized authentication?",
+    "data": {
+      "choices": [
+        "LDAP",
+        "FTP",
+        "SMTP",
+        "SNMP"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "LDAP is commonly used for directory services and centralized authentication."
+  },
+  {
+    "id": "identity_0012",
+    "type": "multiple_choice",
+    "domain": "IDENTITY",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "Which protocol is commonly used for centralized authentication?",
+    "data": {
+      "choices": [
+        "LDAP",
+        "FTP",
+        "SMTP",
+        "SNMP"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "LDAP is commonly used for directory services and centralized authentication."
+  },
+  {
+    "id": "identity_0013",
+    "type": "multiple_choice",
+    "domain": "IDENTITY",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "Which system manages identities and access policies in cloud environments?",
+    "data": {
+      "choices": [
+        "Identity and Access Management (IAM)",
+        "DNS",
+        "Load Balancer",
+        "Firewall"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "IAM systems manage user identities and permissions."
+  },
+  {
+    "id": "identity_0014",
+    "type": "multiple_choice",
+    "domain": "IDENTITY",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "Which protocol is commonly used for centralized authentication?",
+    "data": {
+      "choices": [
+        "LDAP",
+        "FTP",
+        "SMTP",
+        "SNMP"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "LDAP is commonly used for directory services and centralized authentication."
+  },
+  {
+    "id": "identity_0015",
+    "type": "multiple_choice",
+    "domain": "IDENTITY",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "Which system manages identities and access policies in cloud environments?",
+    "data": {
+      "choices": [
+        "Identity and Access Management (IAM)",
+        "DNS",
+        "Load Balancer",
+        "Firewall"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "IAM systems manage user identities and permissions."
+  },
+  {
+    "id": "identity_0016",
+    "type": "multiple_choice",
+    "domain": "IDENTITY",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "Which protocol is commonly used for centralized authentication?",
+    "data": {
+      "choices": [
+        "LDAP",
+        "FTP",
+        "SMTP",
+        "SNMP"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "LDAP is commonly used for directory services and centralized authentication."
+  },
+  {
+    "id": "identity_0017",
+    "type": "multiple_choice",
+    "domain": "IDENTITY",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "Which system manages identities and access policies in cloud environments?",
+    "data": {
+      "choices": [
+        "Identity and Access Management (IAM)",
+        "DNS",
+        "Load Balancer",
+        "Firewall"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "IAM systems manage user identities and permissions."
+  },
+  {
+    "id": "identity_0018",
+    "type": "multiple_choice",
+    "domain": "IDENTITY",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "Which protocol is commonly used for centralized authentication?",
+    "data": {
+      "choices": [
+        "LDAP",
+        "FTP",
+        "SMTP",
+        "SNMP"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "LDAP is commonly used for directory services and centralized authentication."
+  },
+  {
+    "id": "identity_0019",
+    "type": "multiple_choice",
+    "domain": "IDENTITY",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "What does SSO stand for?",
+    "data": {
+      "choices": [
+        "Single Sign-On",
+        "Secure System Object",
+        "Server Side Operation",
+        "Session Security Option"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "SSO allows users to log in once and access multiple systems."
+  },
+  {
+    "id": "identity_0020",
+    "type": "multiple_choice",
+    "domain": "IDENTITY",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "What is the primary purpose of Multi-Factor Authentication (MFA)?",
+    "data": {
+      "choices": [
+        "Provide a second form of identity verification",
+        "Encrypt network traffic",
+        "Replace passwords",
+        "Store credentials securely"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "MFA requires multiple verification factors to confirm a user's identity."
+  },
+  {
+    "id": "identity_0021",
+    "type": "multiple_choice",
+    "domain": "IDENTITY",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "Which system manages identities and access policies in cloud environments?",
+    "data": {
+      "choices": [
+        "Identity and Access Management (IAM)",
+        "DNS",
+        "Load Balancer",
+        "Firewall"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "IAM systems manage user identities and permissions."
+  },
+  {
+    "id": "identity_0022",
+    "type": "multiple_choice",
+    "domain": "IDENTITY",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "What does SSO stand for?",
+    "data": {
+      "choices": [
+        "Single Sign-On",
+        "Secure System Object",
+        "Server Side Operation",
+        "Session Security Option"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "SSO allows users to log in once and access multiple systems."
+  },
+  {
+    "id": "identity_0023",
+    "type": "multiple_choice",
+    "domain": "IDENTITY",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "What does SSO stand for?",
+    "data": {
+      "choices": [
+        "Single Sign-On",
+        "Secure System Object",
+        "Server Side Operation",
+        "Session Security Option"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "SSO allows users to log in once and access multiple systems."
+  },
+  {
+    "id": "identity_0024",
+    "type": "multiple_choice",
+    "domain": "IDENTITY",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "What does SSO stand for?",
+    "data": {
+      "choices": [
+        "Single Sign-On",
+        "Secure System Object",
+        "Server Side Operation",
+        "Session Security Option"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "SSO allows users to log in once and access multiple systems."
+  },
+  {
+    "id": "identity_0025",
+    "type": "multiple_choice",
+    "domain": "IDENTITY",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "What does SSO stand for?",
+    "data": {
+      "choices": [
+        "Single Sign-On",
+        "Secure System Object",
+        "Server Side Operation",
+        "Session Security Option"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "SSO allows users to log in once and access multiple systems."
+  },
+  {
+    "id": "identity_0026",
+    "type": "multiple_choice",
+    "domain": "IDENTITY",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "What is the main role of Active Directory?",
+    "data": {
+      "choices": [
+        "Directory and identity management",
+        "Network routing",
+        "Web hosting",
+        "Database replication"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Active Directory manages users, computers, and permissions in a domain."
+  },
+  {
+    "id": "identity_0027",
+    "type": "multiple_choice",
+    "domain": "IDENTITY",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "Which protocol is commonly used for centralized authentication?",
+    "data": {
+      "choices": [
+        "LDAP",
+        "FTP",
+        "SMTP",
+        "SNMP"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "LDAP is commonly used for directory services and centralized authentication."
+  },
+  {
+    "id": "identity_0028",
+    "type": "multiple_choice",
+    "domain": "IDENTITY",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "What is the primary purpose of Multi-Factor Authentication (MFA)?",
+    "data": {
+      "choices": [
+        "Provide a second form of identity verification",
+        "Encrypt network traffic",
+        "Replace passwords",
+        "Store credentials securely"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "MFA requires multiple verification factors to confirm a user's identity."
+  },
+  {
+    "id": "identity_0029",
+    "type": "multiple_choice",
+    "domain": "IDENTITY",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "What is the main role of Active Directory?",
+    "data": {
+      "choices": [
+        "Directory and identity management",
+        "Network routing",
+        "Web hosting",
+        "Database replication"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Active Directory manages users, computers, and permissions in a domain."
+  },
+  {
+    "id": "identity_0030",
+    "type": "multiple_choice",
+    "domain": "IDENTITY",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "What is the main role of Active Directory?",
+    "data": {
+      "choices": [
+        "Directory and identity management",
+        "Network routing",
+        "Web hosting",
+        "Database replication"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Active Directory manages users, computers, and permissions in a domain."
+  },
+  {
+    "id": "identity_0031",
+    "type": "multiple_choice",
+    "domain": "IDENTITY",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "What is the primary purpose of Multi-Factor Authentication (MFA)?",
+    "data": {
+      "choices": [
+        "Provide a second form of identity verification",
+        "Encrypt network traffic",
+        "Replace passwords",
+        "Store credentials securely"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "MFA requires multiple verification factors to confirm a user's identity."
+  },
+  {
+    "id": "identity_0032",
+    "type": "multiple_choice",
+    "domain": "IDENTITY",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "What does SSO stand for?",
+    "data": {
+      "choices": [
+        "Single Sign-On",
+        "Secure System Object",
+        "Server Side Operation",
+        "Session Security Option"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "SSO allows users to log in once and access multiple systems."
+  },
+  {
+    "id": "identity_0033",
+    "type": "multiple_choice",
+    "domain": "IDENTITY",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "Which protocol is commonly used for centralized authentication?",
+    "data": {
+      "choices": [
+        "LDAP",
+        "FTP",
+        "SMTP",
+        "SNMP"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "LDAP is commonly used for directory services and centralized authentication."
+  },
+  {
+    "id": "identity_0034",
+    "type": "multiple_choice",
+    "domain": "IDENTITY",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "Which protocol is commonly used for centralized authentication?",
+    "data": {
+      "choices": [
+        "LDAP",
+        "FTP",
+        "SMTP",
+        "SNMP"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "LDAP is commonly used for directory services and centralized authentication."
+  },
+  {
+    "id": "identity_0035",
+    "type": "multiple_choice",
+    "domain": "IDENTITY",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "What is the primary purpose of Multi-Factor Authentication (MFA)?",
+    "data": {
+      "choices": [
+        "Provide a second form of identity verification",
+        "Encrypt network traffic",
+        "Replace passwords",
+        "Store credentials securely"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "MFA requires multiple verification factors to confirm a user's identity."
+  },
+  {
+    "id": "identity_0036",
+    "type": "multiple_choice",
+    "domain": "IDENTITY",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "What does SSO stand for?",
+    "data": {
+      "choices": [
+        "Single Sign-On",
+        "Secure System Object",
+        "Server Side Operation",
+        "Session Security Option"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "SSO allows users to log in once and access multiple systems."
+  },
+  {
+    "id": "identity_0037",
+    "type": "multiple_choice",
+    "domain": "IDENTITY",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "What is the main role of Active Directory?",
+    "data": {
+      "choices": [
+        "Directory and identity management",
+        "Network routing",
+        "Web hosting",
+        "Database replication"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Active Directory manages users, computers, and permissions in a domain."
+  },
+  {
+    "id": "identity_0038",
+    "type": "multiple_choice",
+    "domain": "IDENTITY",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "What does SSO stand for?",
+    "data": {
+      "choices": [
+        "Single Sign-On",
+        "Secure System Object",
+        "Server Side Operation",
+        "Session Security Option"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "SSO allows users to log in once and access multiple systems."
+  },
+  {
+    "id": "identity_0039",
+    "type": "multiple_choice",
+    "domain": "IDENTITY",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "What is the main role of Active Directory?",
+    "data": {
+      "choices": [
+        "Directory and identity management",
+        "Network routing",
+        "Web hosting",
+        "Database replication"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Active Directory manages users, computers, and permissions in a domain."
+  },
+  {
+    "id": "identity_0040",
+    "type": "multiple_choice",
+    "domain": "IDENTITY",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "Which protocol is commonly used for centralized authentication?",
+    "data": {
+      "choices": [
+        "LDAP",
+        "FTP",
+        "SMTP",
+        "SNMP"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "LDAP is commonly used for directory services and centralized authentication."
+  },
+  {
+    "id": "identity_0041",
+    "type": "multiple_choice",
+    "domain": "IDENTITY",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "What is the main role of Active Directory?",
+    "data": {
+      "choices": [
+        "Directory and identity management",
+        "Network routing",
+        "Web hosting",
+        "Database replication"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Active Directory manages users, computers, and permissions in a domain."
+  },
+  {
+    "id": "identity_0042",
+    "type": "multiple_choice",
+    "domain": "IDENTITY",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "What does SSO stand for?",
+    "data": {
+      "choices": [
+        "Single Sign-On",
+        "Secure System Object",
+        "Server Side Operation",
+        "Session Security Option"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "SSO allows users to log in once and access multiple systems."
+  },
+  {
+    "id": "identity_0043",
+    "type": "multiple_choice",
+    "domain": "IDENTITY",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "What is the primary purpose of Multi-Factor Authentication (MFA)?",
+    "data": {
+      "choices": [
+        "Provide a second form of identity verification",
+        "Encrypt network traffic",
+        "Replace passwords",
+        "Store credentials securely"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "MFA requires multiple verification factors to confirm a user's identity."
+  },
+  {
+    "id": "identity_0044",
+    "type": "multiple_choice",
+    "domain": "IDENTITY",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "What is the main role of Active Directory?",
+    "data": {
+      "choices": [
+        "Directory and identity management",
+        "Network routing",
+        "Web hosting",
+        "Database replication"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Active Directory manages users, computers, and permissions in a domain."
+  },
+  {
+    "id": "identity_0045",
+    "type": "multiple_choice",
+    "domain": "IDENTITY",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "What is the primary purpose of Multi-Factor Authentication (MFA)?",
+    "data": {
+      "choices": [
+        "Provide a second form of identity verification",
+        "Encrypt network traffic",
+        "Replace passwords",
+        "Store credentials securely"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "MFA requires multiple verification factors to confirm a user's identity."
+  },
+  {
+    "id": "identity_0046",
+    "type": "multiple_choice",
+    "domain": "IDENTITY",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "Which protocol is commonly used for centralized authentication?",
+    "data": {
+      "choices": [
+        "LDAP",
+        "FTP",
+        "SMTP",
+        "SNMP"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "LDAP is commonly used for directory services and centralized authentication."
+  },
+  {
+    "id": "identity_0047",
+    "type": "multiple_choice",
+    "domain": "IDENTITY",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "Which system manages identities and access policies in cloud environments?",
+    "data": {
+      "choices": [
+        "Identity and Access Management (IAM)",
+        "DNS",
+        "Load Balancer",
+        "Firewall"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "IAM systems manage user identities and permissions."
+  },
+  {
+    "id": "identity_0048",
+    "type": "multiple_choice",
+    "domain": "IDENTITY",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "Which protocol is commonly used for centralized authentication?",
+    "data": {
+      "choices": [
+        "LDAP",
+        "FTP",
+        "SMTP",
+        "SNMP"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "LDAP is commonly used for directory services and centralized authentication."
+  },
+  {
+    "id": "identity_0049",
+    "type": "multiple_choice",
+    "domain": "IDENTITY",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "What does SSO stand for?",
+    "data": {
+      "choices": [
+        "Single Sign-On",
+        "Secure System Object",
+        "Server Side Operation",
+        "Session Security Option"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "SSO allows users to log in once and access multiple systems."
+  },
+  {
+    "id": "identity_0050",
+    "type": "multiple_choice",
+    "domain": "IDENTITY",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "What is the main role of Active Directory?",
+    "data": {
+      "choices": [
+        "Directory and identity management",
+        "Network routing",
+        "Web hosting",
+        "Database replication"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Active Directory manages users, computers, and permissions in a domain."
+  },
+  {
+    "id": "networking_0051",
+    "type": "multiple_choice",
+    "domain": "NETWORKING",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "What device forwards packets between networks?",
+    "data": {
+      "choices": [
+        "Router",
+        "Switch",
+        "Access Point",
+        "Repeater"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Routers move packets between different networks."
+  },
+  {
+    "id": "networking_0052",
+    "type": "multiple_choice",
+    "domain": "NETWORKING",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "What device forwards packets between networks?",
+    "data": {
+      "choices": [
+        "Router",
+        "Switch",
+        "Access Point",
+        "Repeater"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Routers move packets between different networks."
+  },
+  {
+    "id": "networking_0053",
+    "type": "multiple_choice",
+    "domain": "NETWORKING",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "Which port does HTTPS use?",
+    "data": {
+      "choices": [
+        "443",
+        "80",
+        "21",
+        "25"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "HTTPS uses TCP port 443 for secure web traffic."
+  },
+  {
+    "id": "networking_0054",
+    "type": "multiple_choice",
+    "domain": "NETWORKING",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "What device forwards packets between networks?",
+    "data": {
+      "choices": [
+        "Router",
+        "Switch",
+        "Access Point",
+        "Repeater"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Routers move packets between different networks."
+  },
+  {
+    "id": "networking_0055",
+    "type": "multiple_choice",
+    "domain": "NETWORKING",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "Which protocol translates domain names to IP addresses?",
+    "data": {
+      "choices": [
+        "DNS",
+        "DHCP",
+        "SMTP",
+        "SNMP"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "DNS resolves human-readable domain names into IP addresses."
+  },
+  {
+    "id": "networking_0056",
+    "type": "multiple_choice",
+    "domain": "NETWORKING",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "What device forwards packets between networks?",
+    "data": {
+      "choices": [
+        "Router",
+        "Switch",
+        "Access Point",
+        "Repeater"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Routers move packets between different networks."
+  },
+  {
+    "id": "networking_0057",
+    "type": "multiple_choice",
+    "domain": "NETWORKING",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "What device forwards packets between networks?",
+    "data": {
+      "choices": [
+        "Router",
+        "Switch",
+        "Access Point",
+        "Repeater"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Routers move packets between different networks."
+  },
+  {
+    "id": "networking_0058",
+    "type": "multiple_choice",
+    "domain": "NETWORKING",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "Which port does HTTPS use?",
+    "data": {
+      "choices": [
+        "443",
+        "80",
+        "21",
+        "25"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "HTTPS uses TCP port 443 for secure web traffic."
+  },
+  {
+    "id": "networking_0059",
+    "type": "multiple_choice",
+    "domain": "NETWORKING",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "Which protocol translates domain names to IP addresses?",
+    "data": {
+      "choices": [
+        "DNS",
+        "DHCP",
+        "SMTP",
+        "SNMP"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "DNS resolves human-readable domain names into IP addresses."
+  },
+  {
+    "id": "networking_0060",
+    "type": "multiple_choice",
+    "domain": "NETWORKING",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "What device forwards packets between networks?",
+    "data": {
+      "choices": [
+        "Router",
+        "Switch",
+        "Access Point",
+        "Repeater"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Routers move packets between different networks."
+  },
+  {
+    "id": "networking_0061",
+    "type": "multiple_choice",
+    "domain": "NETWORKING",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "Which port does HTTPS use?",
+    "data": {
+      "choices": [
+        "443",
+        "80",
+        "21",
+        "25"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "HTTPS uses TCP port 443 for secure web traffic."
+  },
+  {
+    "id": "networking_0062",
+    "type": "multiple_choice",
+    "domain": "NETWORKING",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "What does DHCP primarily provide?",
+    "data": {
+      "choices": [
+        "Automatic IP configuration",
+        "File transfer",
+        "Email delivery",
+        "Encryption"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "DHCP dynamically assigns IP addresses and network settings."
+  },
+  {
+    "id": "networking_0063",
+    "type": "multiple_choice",
+    "domain": "NETWORKING",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "Which protocol translates domain names to IP addresses?",
+    "data": {
+      "choices": [
+        "DNS",
+        "DHCP",
+        "SMTP",
+        "SNMP"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "DNS resolves human-readable domain names into IP addresses."
+  },
+  {
+    "id": "networking_0064",
+    "type": "multiple_choice",
+    "domain": "NETWORKING",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "Which port does HTTPS use?",
+    "data": {
+      "choices": [
+        "443",
+        "80",
+        "21",
+        "25"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "HTTPS uses TCP port 443 for secure web traffic."
+  },
+  {
+    "id": "networking_0065",
+    "type": "multiple_choice",
+    "domain": "NETWORKING",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "Which port does HTTPS use?",
+    "data": {
+      "choices": [
+        "443",
+        "80",
+        "21",
+        "25"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "HTTPS uses TCP port 443 for secure web traffic."
+  },
+  {
+    "id": "networking_0066",
+    "type": "multiple_choice",
+    "domain": "NETWORKING",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "Which OSI layer handles IP addressing?",
+    "data": {
+      "choices": [
+        "Network Layer",
+        "Transport Layer",
+        "Session Layer",
+        "Application Layer"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "The Network layer manages routing and IP addressing."
+  },
+  {
+    "id": "networking_0067",
+    "type": "multiple_choice",
+    "domain": "NETWORKING",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "Which OSI layer handles IP addressing?",
+    "data": {
+      "choices": [
+        "Network Layer",
+        "Transport Layer",
+        "Session Layer",
+        "Application Layer"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "The Network layer manages routing and IP addressing."
+  },
+  {
+    "id": "networking_0068",
+    "type": "multiple_choice",
+    "domain": "NETWORKING",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "What does DHCP primarily provide?",
+    "data": {
+      "choices": [
+        "Automatic IP configuration",
+        "File transfer",
+        "Email delivery",
+        "Encryption"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "DHCP dynamically assigns IP addresses and network settings."
+  },
+  {
+    "id": "networking_0069",
+    "type": "multiple_choice",
+    "domain": "NETWORKING",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "Which OSI layer handles IP addressing?",
+    "data": {
+      "choices": [
+        "Network Layer",
+        "Transport Layer",
+        "Session Layer",
+        "Application Layer"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "The Network layer manages routing and IP addressing."
+  },
+  {
+    "id": "networking_0070",
+    "type": "multiple_choice",
+    "domain": "NETWORKING",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "Which port does HTTPS use?",
+    "data": {
+      "choices": [
+        "443",
+        "80",
+        "21",
+        "25"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "HTTPS uses TCP port 443 for secure web traffic."
+  },
+  {
+    "id": "networking_0071",
+    "type": "multiple_choice",
+    "domain": "NETWORKING",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "What does DHCP primarily provide?",
+    "data": {
+      "choices": [
+        "Automatic IP configuration",
+        "File transfer",
+        "Email delivery",
+        "Encryption"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "DHCP dynamically assigns IP addresses and network settings."
+  },
+  {
+    "id": "networking_0072",
+    "type": "multiple_choice",
+    "domain": "NETWORKING",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "What does DHCP primarily provide?",
+    "data": {
+      "choices": [
+        "Automatic IP configuration",
+        "File transfer",
+        "Email delivery",
+        "Encryption"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "DHCP dynamically assigns IP addresses and network settings."
+  },
+  {
+    "id": "networking_0073",
+    "type": "multiple_choice",
+    "domain": "NETWORKING",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "What does DHCP primarily provide?",
+    "data": {
+      "choices": [
+        "Automatic IP configuration",
+        "File transfer",
+        "Email delivery",
+        "Encryption"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "DHCP dynamically assigns IP addresses and network settings."
+  },
+  {
+    "id": "networking_0074",
+    "type": "multiple_choice",
+    "domain": "NETWORKING",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "Which protocol translates domain names to IP addresses?",
+    "data": {
+      "choices": [
+        "DNS",
+        "DHCP",
+        "SMTP",
+        "SNMP"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "DNS resolves human-readable domain names into IP addresses."
+  },
+  {
+    "id": "networking_0075",
+    "type": "multiple_choice",
+    "domain": "NETWORKING",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "What device forwards packets between networks?",
+    "data": {
+      "choices": [
+        "Router",
+        "Switch",
+        "Access Point",
+        "Repeater"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Routers move packets between different networks."
+  },
+  {
+    "id": "networking_0076",
+    "type": "multiple_choice",
+    "domain": "NETWORKING",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "What does DHCP primarily provide?",
+    "data": {
+      "choices": [
+        "Automatic IP configuration",
+        "File transfer",
+        "Email delivery",
+        "Encryption"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "DHCP dynamically assigns IP addresses and network settings."
+  },
+  {
+    "id": "networking_0077",
+    "type": "multiple_choice",
+    "domain": "NETWORKING",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "Which port does HTTPS use?",
+    "data": {
+      "choices": [
+        "443",
+        "80",
+        "21",
+        "25"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "HTTPS uses TCP port 443 for secure web traffic."
+  },
+  {
+    "id": "networking_0078",
+    "type": "multiple_choice",
+    "domain": "NETWORKING",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "Which OSI layer handles IP addressing?",
+    "data": {
+      "choices": [
+        "Network Layer",
+        "Transport Layer",
+        "Session Layer",
+        "Application Layer"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "The Network layer manages routing and IP addressing."
+  },
+  {
+    "id": "networking_0079",
+    "type": "multiple_choice",
+    "domain": "NETWORKING",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "Which port does HTTPS use?",
+    "data": {
+      "choices": [
+        "443",
+        "80",
+        "21",
+        "25"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "HTTPS uses TCP port 443 for secure web traffic."
+  },
+  {
+    "id": "networking_0080",
+    "type": "multiple_choice",
+    "domain": "NETWORKING",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "Which port does HTTPS use?",
+    "data": {
+      "choices": [
+        "443",
+        "80",
+        "21",
+        "25"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "HTTPS uses TCP port 443 for secure web traffic."
+  },
+  {
+    "id": "networking_0081",
+    "type": "multiple_choice",
+    "domain": "NETWORKING",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "Which OSI layer handles IP addressing?",
+    "data": {
+      "choices": [
+        "Network Layer",
+        "Transport Layer",
+        "Session Layer",
+        "Application Layer"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "The Network layer manages routing and IP addressing."
+  },
+  {
+    "id": "networking_0082",
+    "type": "multiple_choice",
+    "domain": "NETWORKING",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "What device forwards packets between networks?",
+    "data": {
+      "choices": [
+        "Router",
+        "Switch",
+        "Access Point",
+        "Repeater"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Routers move packets between different networks."
+  },
+  {
+    "id": "networking_0083",
+    "type": "multiple_choice",
+    "domain": "NETWORKING",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "Which OSI layer handles IP addressing?",
+    "data": {
+      "choices": [
+        "Network Layer",
+        "Transport Layer",
+        "Session Layer",
+        "Application Layer"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "The Network layer manages routing and IP addressing."
+  },
+  {
+    "id": "networking_0084",
+    "type": "multiple_choice",
+    "domain": "NETWORKING",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "Which protocol translates domain names to IP addresses?",
+    "data": {
+      "choices": [
+        "DNS",
+        "DHCP",
+        "SMTP",
+        "SNMP"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "DNS resolves human-readable domain names into IP addresses."
+  },
+  {
+    "id": "networking_0085",
+    "type": "multiple_choice",
+    "domain": "NETWORKING",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "Which OSI layer handles IP addressing?",
+    "data": {
+      "choices": [
+        "Network Layer",
+        "Transport Layer",
+        "Session Layer",
+        "Application Layer"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "The Network layer manages routing and IP addressing."
+  },
+  {
+    "id": "networking_0086",
+    "type": "multiple_choice",
+    "domain": "NETWORKING",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "Which port does HTTPS use?",
+    "data": {
+      "choices": [
+        "443",
+        "80",
+        "21",
+        "25"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "HTTPS uses TCP port 443 for secure web traffic."
+  },
+  {
+    "id": "networking_0087",
+    "type": "multiple_choice",
+    "domain": "NETWORKING",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "Which port does HTTPS use?",
+    "data": {
+      "choices": [
+        "443",
+        "80",
+        "21",
+        "25"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "HTTPS uses TCP port 443 for secure web traffic."
+  },
+  {
+    "id": "networking_0088",
+    "type": "multiple_choice",
+    "domain": "NETWORKING",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "What does DHCP primarily provide?",
+    "data": {
+      "choices": [
+        "Automatic IP configuration",
+        "File transfer",
+        "Email delivery",
+        "Encryption"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "DHCP dynamically assigns IP addresses and network settings."
+  },
+  {
+    "id": "networking_0089",
+    "type": "multiple_choice",
+    "domain": "NETWORKING",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "Which protocol translates domain names to IP addresses?",
+    "data": {
+      "choices": [
+        "DNS",
+        "DHCP",
+        "SMTP",
+        "SNMP"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "DNS resolves human-readable domain names into IP addresses."
+  },
+  {
+    "id": "networking_0090",
+    "type": "multiple_choice",
+    "domain": "NETWORKING",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "Which port does HTTPS use?",
+    "data": {
+      "choices": [
+        "443",
+        "80",
+        "21",
+        "25"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "HTTPS uses TCP port 443 for secure web traffic."
+  },
+  {
+    "id": "networking_0091",
+    "type": "multiple_choice",
+    "domain": "NETWORKING",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "What device forwards packets between networks?",
+    "data": {
+      "choices": [
+        "Router",
+        "Switch",
+        "Access Point",
+        "Repeater"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Routers move packets between different networks."
+  },
+  {
+    "id": "networking_0092",
+    "type": "multiple_choice",
+    "domain": "NETWORKING",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "What does DHCP primarily provide?",
+    "data": {
+      "choices": [
+        "Automatic IP configuration",
+        "File transfer",
+        "Email delivery",
+        "Encryption"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "DHCP dynamically assigns IP addresses and network settings."
+  },
+  {
+    "id": "networking_0093",
+    "type": "multiple_choice",
+    "domain": "NETWORKING",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "Which port does HTTPS use?",
+    "data": {
+      "choices": [
+        "443",
+        "80",
+        "21",
+        "25"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "HTTPS uses TCP port 443 for secure web traffic."
+  },
+  {
+    "id": "networking_0094",
+    "type": "multiple_choice",
+    "domain": "NETWORKING",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "Which protocol translates domain names to IP addresses?",
+    "data": {
+      "choices": [
+        "DNS",
+        "DHCP",
+        "SMTP",
+        "SNMP"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "DNS resolves human-readable domain names into IP addresses."
+  },
+  {
+    "id": "networking_0095",
+    "type": "multiple_choice",
+    "domain": "NETWORKING",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "Which protocol translates domain names to IP addresses?",
+    "data": {
+      "choices": [
+        "DNS",
+        "DHCP",
+        "SMTP",
+        "SNMP"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "DNS resolves human-readable domain names into IP addresses."
+  },
+  {
+    "id": "networking_0096",
+    "type": "multiple_choice",
+    "domain": "NETWORKING",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "Which OSI layer handles IP addressing?",
+    "data": {
+      "choices": [
+        "Network Layer",
+        "Transport Layer",
+        "Session Layer",
+        "Application Layer"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "The Network layer manages routing and IP addressing."
+  },
+  {
+    "id": "networking_0097",
+    "type": "multiple_choice",
+    "domain": "NETWORKING",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "What device forwards packets between networks?",
+    "data": {
+      "choices": [
+        "Router",
+        "Switch",
+        "Access Point",
+        "Repeater"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Routers move packets between different networks."
+  },
+  {
+    "id": "networking_0098",
+    "type": "multiple_choice",
+    "domain": "NETWORKING",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "What device forwards packets between networks?",
+    "data": {
+      "choices": [
+        "Router",
+        "Switch",
+        "Access Point",
+        "Repeater"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Routers move packets between different networks."
+  },
+  {
+    "id": "networking_0099",
+    "type": "multiple_choice",
+    "domain": "NETWORKING",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "What does DHCP primarily provide?",
+    "data": {
+      "choices": [
+        "Automatic IP configuration",
+        "File transfer",
+        "Email delivery",
+        "Encryption"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "DHCP dynamically assigns IP addresses and network settings."
+  },
+  {
+    "id": "networking_0100",
+    "type": "multiple_choice",
+    "domain": "NETWORKING",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "Which OSI layer handles IP addressing?",
+    "data": {
+      "choices": [
+        "Network Layer",
+        "Transport Layer",
+        "Session Layer",
+        "Application Layer"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "The Network layer manages routing and IP addressing."
+  },
+  {
+    "id": "security_0101",
+    "type": "multiple_choice",
+    "domain": "SECURITY",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "What is phishing?",
+    "data": {
+      "choices": [
+        "Fraudulent attempt to obtain sensitive information",
+        "Encrypting data",
+        "Monitoring traffic",
+        "Updating software"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Phishing tricks users into revealing credentials or sensitive information."
+  },
+  {
+    "id": "security_0102",
+    "type": "multiple_choice",
+    "domain": "SECURITY",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "What is phishing?",
+    "data": {
+      "choices": [
+        "Fraudulent attempt to obtain sensitive information",
+        "Encrypting data",
+        "Monitoring traffic",
+        "Updating software"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Phishing tricks users into revealing credentials or sensitive information."
+  },
+  {
+    "id": "security_0103",
+    "type": "multiple_choice",
+    "domain": "SECURITY",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "What is phishing?",
+    "data": {
+      "choices": [
+        "Fraudulent attempt to obtain sensitive information",
+        "Encrypting data",
+        "Monitoring traffic",
+        "Updating software"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Phishing tricks users into revealing credentials or sensitive information."
+  },
+  {
+    "id": "security_0104",
+    "type": "multiple_choice",
+    "domain": "SECURITY",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "What is a vulnerability scan?",
+    "data": {
+      "choices": [
+        "Automated search for security weaknesses",
+        "Network routing process",
+        "User login procedure",
+        "Encryption method"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Vulnerability scanners identify potential security flaws."
+  },
+  {
+    "id": "security_0105",
+    "type": "multiple_choice",
+    "domain": "SECURITY",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "What is phishing?",
+    "data": {
+      "choices": [
+        "Fraudulent attempt to obtain sensitive information",
+        "Encrypting data",
+        "Monitoring traffic",
+        "Updating software"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Phishing tricks users into revealing credentials or sensitive information."
+  },
+  {
+    "id": "security_0106",
+    "type": "multiple_choice",
+    "domain": "SECURITY",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "Which encryption type uses the same key for encryption and decryption?",
+    "data": {
+      "choices": [
+        "Symmetric encryption",
+        "Asymmetric encryption",
+        "Hashing",
+        "Tokenization"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Symmetric encryption uses a single shared key."
+  },
+  {
+    "id": "security_0107",
+    "type": "multiple_choice",
+    "domain": "SECURITY",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "What is phishing?",
+    "data": {
+      "choices": [
+        "Fraudulent attempt to obtain sensitive information",
+        "Encrypting data",
+        "Monitoring traffic",
+        "Updating software"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Phishing tricks users into revealing credentials or sensitive information."
+  },
+  {
+    "id": "security_0108",
+    "type": "multiple_choice",
+    "domain": "SECURITY",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "What is the purpose of a firewall?",
+    "data": {
+      "choices": [
+        "Filter network traffic",
+        "Store passwords",
+        "Backup files",
+        "Host applications"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Firewalls control traffic entering and leaving a network."
+  },
+  {
+    "id": "security_0109",
+    "type": "multiple_choice",
+    "domain": "SECURITY",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "What type of attack attempts to overwhelm a system with traffic?",
+    "data": {
+      "choices": [
+        "DDoS",
+        "Phishing",
+        "SQL Injection",
+        "Man-in-the-middle"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "A Distributed Denial of Service attack floods systems with traffic."
+  },
+  {
+    "id": "security_0110",
+    "type": "multiple_choice",
+    "domain": "SECURITY",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "What is a vulnerability scan?",
+    "data": {
+      "choices": [
+        "Automated search for security weaknesses",
+        "Network routing process",
+        "User login procedure",
+        "Encryption method"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Vulnerability scanners identify potential security flaws."
+  },
+  {
+    "id": "security_0111",
+    "type": "multiple_choice",
+    "domain": "SECURITY",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "What type of attack attempts to overwhelm a system with traffic?",
+    "data": {
+      "choices": [
+        "DDoS",
+        "Phishing",
+        "SQL Injection",
+        "Man-in-the-middle"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "A Distributed Denial of Service attack floods systems with traffic."
+  },
+  {
+    "id": "security_0112",
+    "type": "multiple_choice",
+    "domain": "SECURITY",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "What type of attack attempts to overwhelm a system with traffic?",
+    "data": {
+      "choices": [
+        "DDoS",
+        "Phishing",
+        "SQL Injection",
+        "Man-in-the-middle"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "A Distributed Denial of Service attack floods systems with traffic."
+  },
+  {
+    "id": "security_0113",
+    "type": "multiple_choice",
+    "domain": "SECURITY",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "What is a vulnerability scan?",
+    "data": {
+      "choices": [
+        "Automated search for security weaknesses",
+        "Network routing process",
+        "User login procedure",
+        "Encryption method"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Vulnerability scanners identify potential security flaws."
+  },
+  {
+    "id": "security_0114",
+    "type": "multiple_choice",
+    "domain": "SECURITY",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "Which encryption type uses the same key for encryption and decryption?",
+    "data": {
+      "choices": [
+        "Symmetric encryption",
+        "Asymmetric encryption",
+        "Hashing",
+        "Tokenization"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Symmetric encryption uses a single shared key."
+  },
+  {
+    "id": "security_0115",
+    "type": "multiple_choice",
+    "domain": "SECURITY",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "What is phishing?",
+    "data": {
+      "choices": [
+        "Fraudulent attempt to obtain sensitive information",
+        "Encrypting data",
+        "Monitoring traffic",
+        "Updating software"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Phishing tricks users into revealing credentials or sensitive information."
+  },
+  {
+    "id": "security_0116",
+    "type": "multiple_choice",
+    "domain": "SECURITY",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "What is a vulnerability scan?",
+    "data": {
+      "choices": [
+        "Automated search for security weaknesses",
+        "Network routing process",
+        "User login procedure",
+        "Encryption method"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Vulnerability scanners identify potential security flaws."
+  },
+  {
+    "id": "security_0117",
+    "type": "multiple_choice",
+    "domain": "SECURITY",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "What is a vulnerability scan?",
+    "data": {
+      "choices": [
+        "Automated search for security weaknesses",
+        "Network routing process",
+        "User login procedure",
+        "Encryption method"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Vulnerability scanners identify potential security flaws."
+  },
+  {
+    "id": "security_0118",
+    "type": "multiple_choice",
+    "domain": "SECURITY",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "What type of attack attempts to overwhelm a system with traffic?",
+    "data": {
+      "choices": [
+        "DDoS",
+        "Phishing",
+        "SQL Injection",
+        "Man-in-the-middle"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "A Distributed Denial of Service attack floods systems with traffic."
+  },
+  {
+    "id": "security_0119",
+    "type": "multiple_choice",
+    "domain": "SECURITY",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "Which encryption type uses the same key for encryption and decryption?",
+    "data": {
+      "choices": [
+        "Symmetric encryption",
+        "Asymmetric encryption",
+        "Hashing",
+        "Tokenization"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Symmetric encryption uses a single shared key."
+  },
+  {
+    "id": "security_0120",
+    "type": "multiple_choice",
+    "domain": "SECURITY",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "What type of attack attempts to overwhelm a system with traffic?",
+    "data": {
+      "choices": [
+        "DDoS",
+        "Phishing",
+        "SQL Injection",
+        "Man-in-the-middle"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "A Distributed Denial of Service attack floods systems with traffic."
+  },
+  {
+    "id": "security_0121",
+    "type": "multiple_choice",
+    "domain": "SECURITY",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "What is the purpose of a firewall?",
+    "data": {
+      "choices": [
+        "Filter network traffic",
+        "Store passwords",
+        "Backup files",
+        "Host applications"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Firewalls control traffic entering and leaving a network."
+  },
+  {
+    "id": "security_0122",
+    "type": "multiple_choice",
+    "domain": "SECURITY",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "What type of attack attempts to overwhelm a system with traffic?",
+    "data": {
+      "choices": [
+        "DDoS",
+        "Phishing",
+        "SQL Injection",
+        "Man-in-the-middle"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "A Distributed Denial of Service attack floods systems with traffic."
+  },
+  {
+    "id": "security_0123",
+    "type": "multiple_choice",
+    "domain": "SECURITY",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "Which encryption type uses the same key for encryption and decryption?",
+    "data": {
+      "choices": [
+        "Symmetric encryption",
+        "Asymmetric encryption",
+        "Hashing",
+        "Tokenization"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Symmetric encryption uses a single shared key."
+  },
+  {
+    "id": "security_0124",
+    "type": "multiple_choice",
+    "domain": "SECURITY",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "What is phishing?",
+    "data": {
+      "choices": [
+        "Fraudulent attempt to obtain sensitive information",
+        "Encrypting data",
+        "Monitoring traffic",
+        "Updating software"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Phishing tricks users into revealing credentials or sensitive information."
+  },
+  {
+    "id": "security_0125",
+    "type": "multiple_choice",
+    "domain": "SECURITY",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "What is phishing?",
+    "data": {
+      "choices": [
+        "Fraudulent attempt to obtain sensitive information",
+        "Encrypting data",
+        "Monitoring traffic",
+        "Updating software"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Phishing tricks users into revealing credentials or sensitive information."
+  },
+  {
+    "id": "security_0126",
+    "type": "multiple_choice",
+    "domain": "SECURITY",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "What type of attack attempts to overwhelm a system with traffic?",
+    "data": {
+      "choices": [
+        "DDoS",
+        "Phishing",
+        "SQL Injection",
+        "Man-in-the-middle"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "A Distributed Denial of Service attack floods systems with traffic."
+  },
+  {
+    "id": "security_0127",
+    "type": "multiple_choice",
+    "domain": "SECURITY",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "What type of attack attempts to overwhelm a system with traffic?",
+    "data": {
+      "choices": [
+        "DDoS",
+        "Phishing",
+        "SQL Injection",
+        "Man-in-the-middle"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "A Distributed Denial of Service attack floods systems with traffic."
+  },
+  {
+    "id": "security_0128",
+    "type": "multiple_choice",
+    "domain": "SECURITY",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "What type of attack attempts to overwhelm a system with traffic?",
+    "data": {
+      "choices": [
+        "DDoS",
+        "Phishing",
+        "SQL Injection",
+        "Man-in-the-middle"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "A Distributed Denial of Service attack floods systems with traffic."
+  },
+  {
+    "id": "security_0129",
+    "type": "multiple_choice",
+    "domain": "SECURITY",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "What type of attack attempts to overwhelm a system with traffic?",
+    "data": {
+      "choices": [
+        "DDoS",
+        "Phishing",
+        "SQL Injection",
+        "Man-in-the-middle"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "A Distributed Denial of Service attack floods systems with traffic."
+  },
+  {
+    "id": "security_0130",
+    "type": "multiple_choice",
+    "domain": "SECURITY",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "What is the purpose of a firewall?",
+    "data": {
+      "choices": [
+        "Filter network traffic",
+        "Store passwords",
+        "Backup files",
+        "Host applications"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Firewalls control traffic entering and leaving a network."
+  },
+  {
+    "id": "security_0131",
+    "type": "multiple_choice",
+    "domain": "SECURITY",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "What is a vulnerability scan?",
+    "data": {
+      "choices": [
+        "Automated search for security weaknesses",
+        "Network routing process",
+        "User login procedure",
+        "Encryption method"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Vulnerability scanners identify potential security flaws."
+  },
+  {
+    "id": "security_0132",
+    "type": "multiple_choice",
+    "domain": "SECURITY",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "What is the purpose of a firewall?",
+    "data": {
+      "choices": [
+        "Filter network traffic",
+        "Store passwords",
+        "Backup files",
+        "Host applications"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Firewalls control traffic entering and leaving a network."
+  },
+  {
+    "id": "security_0133",
+    "type": "multiple_choice",
+    "domain": "SECURITY",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "What type of attack attempts to overwhelm a system with traffic?",
+    "data": {
+      "choices": [
+        "DDoS",
+        "Phishing",
+        "SQL Injection",
+        "Man-in-the-middle"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "A Distributed Denial of Service attack floods systems with traffic."
+  },
+  {
+    "id": "security_0134",
+    "type": "multiple_choice",
+    "domain": "SECURITY",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "What is the purpose of a firewall?",
+    "data": {
+      "choices": [
+        "Filter network traffic",
+        "Store passwords",
+        "Backup files",
+        "Host applications"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Firewalls control traffic entering and leaving a network."
+  },
+  {
+    "id": "security_0135",
+    "type": "multiple_choice",
+    "domain": "SECURITY",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "What type of attack attempts to overwhelm a system with traffic?",
+    "data": {
+      "choices": [
+        "DDoS",
+        "Phishing",
+        "SQL Injection",
+        "Man-in-the-middle"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "A Distributed Denial of Service attack floods systems with traffic."
+  },
+  {
+    "id": "security_0136",
+    "type": "multiple_choice",
+    "domain": "SECURITY",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "Which encryption type uses the same key for encryption and decryption?",
+    "data": {
+      "choices": [
+        "Symmetric encryption",
+        "Asymmetric encryption",
+        "Hashing",
+        "Tokenization"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Symmetric encryption uses a single shared key."
+  },
+  {
+    "id": "security_0137",
+    "type": "multiple_choice",
+    "domain": "SECURITY",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "What type of attack attempts to overwhelm a system with traffic?",
+    "data": {
+      "choices": [
+        "DDoS",
+        "Phishing",
+        "SQL Injection",
+        "Man-in-the-middle"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "A Distributed Denial of Service attack floods systems with traffic."
+  },
+  {
+    "id": "security_0138",
+    "type": "multiple_choice",
+    "domain": "SECURITY",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "What is a vulnerability scan?",
+    "data": {
+      "choices": [
+        "Automated search for security weaknesses",
+        "Network routing process",
+        "User login procedure",
+        "Encryption method"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Vulnerability scanners identify potential security flaws."
+  },
+  {
+    "id": "security_0139",
+    "type": "multiple_choice",
+    "domain": "SECURITY",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "What is a vulnerability scan?",
+    "data": {
+      "choices": [
+        "Automated search for security weaknesses",
+        "Network routing process",
+        "User login procedure",
+        "Encryption method"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Vulnerability scanners identify potential security flaws."
+  },
+  {
+    "id": "security_0140",
+    "type": "multiple_choice",
+    "domain": "SECURITY",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "What is phishing?",
+    "data": {
+      "choices": [
+        "Fraudulent attempt to obtain sensitive information",
+        "Encrypting data",
+        "Monitoring traffic",
+        "Updating software"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Phishing tricks users into revealing credentials or sensitive information."
+  },
+  {
+    "id": "security_0141",
+    "type": "multiple_choice",
+    "domain": "SECURITY",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "What is a vulnerability scan?",
+    "data": {
+      "choices": [
+        "Automated search for security weaknesses",
+        "Network routing process",
+        "User login procedure",
+        "Encryption method"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Vulnerability scanners identify potential security flaws."
+  },
+  {
+    "id": "security_0142",
+    "type": "multiple_choice",
+    "domain": "SECURITY",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "What type of attack attempts to overwhelm a system with traffic?",
+    "data": {
+      "choices": [
+        "DDoS",
+        "Phishing",
+        "SQL Injection",
+        "Man-in-the-middle"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "A Distributed Denial of Service attack floods systems with traffic."
+  },
+  {
+    "id": "security_0143",
+    "type": "multiple_choice",
+    "domain": "SECURITY",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "Which encryption type uses the same key for encryption and decryption?",
+    "data": {
+      "choices": [
+        "Symmetric encryption",
+        "Asymmetric encryption",
+        "Hashing",
+        "Tokenization"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Symmetric encryption uses a single shared key."
+  },
+  {
+    "id": "security_0144",
+    "type": "multiple_choice",
+    "domain": "SECURITY",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "What is the purpose of a firewall?",
+    "data": {
+      "choices": [
+        "Filter network traffic",
+        "Store passwords",
+        "Backup files",
+        "Host applications"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Firewalls control traffic entering and leaving a network."
+  },
+  {
+    "id": "security_0145",
+    "type": "multiple_choice",
+    "domain": "SECURITY",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "What type of attack attempts to overwhelm a system with traffic?",
+    "data": {
+      "choices": [
+        "DDoS",
+        "Phishing",
+        "SQL Injection",
+        "Man-in-the-middle"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "A Distributed Denial of Service attack floods systems with traffic."
+  },
+  {
+    "id": "security_0146",
+    "type": "multiple_choice",
+    "domain": "SECURITY",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "What is a vulnerability scan?",
+    "data": {
+      "choices": [
+        "Automated search for security weaknesses",
+        "Network routing process",
+        "User login procedure",
+        "Encryption method"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Vulnerability scanners identify potential security flaws."
+  },
+  {
+    "id": "security_0147",
+    "type": "multiple_choice",
+    "domain": "SECURITY",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "What type of attack attempts to overwhelm a system with traffic?",
+    "data": {
+      "choices": [
+        "DDoS",
+        "Phishing",
+        "SQL Injection",
+        "Man-in-the-middle"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "A Distributed Denial of Service attack floods systems with traffic."
+  },
+  {
+    "id": "security_0148",
+    "type": "multiple_choice",
+    "domain": "SECURITY",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "What is the purpose of a firewall?",
+    "data": {
+      "choices": [
+        "Filter network traffic",
+        "Store passwords",
+        "Backup files",
+        "Host applications"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Firewalls control traffic entering and leaving a network."
+  },
+  {
+    "id": "security_0149",
+    "type": "multiple_choice",
+    "domain": "SECURITY",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "What is the purpose of a firewall?",
+    "data": {
+      "choices": [
+        "Filter network traffic",
+        "Store passwords",
+        "Backup files",
+        "Host applications"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Firewalls control traffic entering and leaving a network."
+  },
+  {
+    "id": "security_0150",
+    "type": "multiple_choice",
+    "domain": "SECURITY",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "Which encryption type uses the same key for encryption and decryption?",
+    "data": {
+      "choices": [
+        "Symmetric encryption",
+        "Asymmetric encryption",
+        "Hashing",
+        "Tokenization"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Symmetric encryption uses a single shared key."
+  },
+  {
+    "id": "compute_0151",
+    "type": "multiple_choice",
+    "domain": "COMPUTE",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "What is serverless computing?",
+    "data": {
+      "choices": [
+        "Running code without managing servers",
+        "Hosting websites only",
+        "Physical server hosting",
+        "Manual VM management"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Serverless platforms automatically manage infrastructure."
+  },
+  {
+    "id": "compute_0152",
+    "type": "multiple_choice",
+    "domain": "COMPUTE",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "What is serverless computing?",
+    "data": {
+      "choices": [
+        "Running code without managing servers",
+        "Hosting websites only",
+        "Physical server hosting",
+        "Manual VM management"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Serverless platforms automatically manage infrastructure."
+  },
+  {
+    "id": "compute_0153",
+    "type": "multiple_choice",
+    "domain": "COMPUTE",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "Which service provides virtual machines in AWS?",
+    "data": {
+      "choices": [
+        "EC2",
+        "S3",
+        "Lambda",
+        "CloudFront"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Amazon EC2 provides scalable virtual machines."
+  },
+  {
+    "id": "compute_0154",
+    "type": "multiple_choice",
+    "domain": "COMPUTE",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "Which service provides virtual machines in AWS?",
+    "data": {
+      "choices": [
+        "EC2",
+        "S3",
+        "Lambda",
+        "CloudFront"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Amazon EC2 provides scalable virtual machines."
+  },
+  {
+    "id": "compute_0155",
+    "type": "multiple_choice",
+    "domain": "COMPUTE",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "What does autoscaling do?",
+    "data": {
+      "choices": [
+        "Automatically adjusts compute resources",
+        "Encrypts data",
+        "Manages DNS",
+        "Creates backups"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Autoscaling increases or decreases compute resources based on demand."
+  },
+  {
+    "id": "compute_0156",
+    "type": "multiple_choice",
+    "domain": "COMPUTE",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "What does autoscaling do?",
+    "data": {
+      "choices": [
+        "Automatically adjusts compute resources",
+        "Encrypts data",
+        "Manages DNS",
+        "Creates backups"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Autoscaling increases or decreases compute resources based on demand."
+  },
+  {
+    "id": "compute_0157",
+    "type": "multiple_choice",
+    "domain": "COMPUTE",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "What does autoscaling do?",
+    "data": {
+      "choices": [
+        "Automatically adjusts compute resources",
+        "Encrypts data",
+        "Manages DNS",
+        "Creates backups"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Autoscaling increases or decreases compute resources based on demand."
+  },
+  {
+    "id": "compute_0158",
+    "type": "multiple_choice",
+    "domain": "COMPUTE",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "Which hypervisor runs directly on hardware?",
+    "data": {
+      "choices": [
+        "Type 1 hypervisor",
+        "Type 2 hypervisor",
+        "Application hypervisor",
+        "Software hypervisor"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Type 1 hypervisors run directly on physical hardware."
+  },
+  {
+    "id": "compute_0159",
+    "type": "multiple_choice",
+    "domain": "COMPUTE",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "What does autoscaling do?",
+    "data": {
+      "choices": [
+        "Automatically adjusts compute resources",
+        "Encrypts data",
+        "Manages DNS",
+        "Creates backups"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Autoscaling increases or decreases compute resources based on demand."
+  },
+  {
+    "id": "compute_0160",
+    "type": "multiple_choice",
+    "domain": "COMPUTE",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "Which service provides virtual machines in AWS?",
+    "data": {
+      "choices": [
+        "EC2",
+        "S3",
+        "Lambda",
+        "CloudFront"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Amazon EC2 provides scalable virtual machines."
+  },
+  {
+    "id": "compute_0161",
+    "type": "multiple_choice",
+    "domain": "COMPUTE",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "What is serverless computing?",
+    "data": {
+      "choices": [
+        "Running code without managing servers",
+        "Hosting websites only",
+        "Physical server hosting",
+        "Manual VM management"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Serverless platforms automatically manage infrastructure."
+  },
+  {
+    "id": "compute_0162",
+    "type": "multiple_choice",
+    "domain": "COMPUTE",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "What is serverless computing?",
+    "data": {
+      "choices": [
+        "Running code without managing servers",
+        "Hosting websites only",
+        "Physical server hosting",
+        "Manual VM management"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Serverless platforms automatically manage infrastructure."
+  },
+  {
+    "id": "compute_0163",
+    "type": "multiple_choice",
+    "domain": "COMPUTE",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "What is serverless computing?",
+    "data": {
+      "choices": [
+        "Running code without managing servers",
+        "Hosting websites only",
+        "Physical server hosting",
+        "Manual VM management"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Serverless platforms automatically manage infrastructure."
+  },
+  {
+    "id": "compute_0164",
+    "type": "multiple_choice",
+    "domain": "COMPUTE",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "Which hypervisor runs directly on hardware?",
+    "data": {
+      "choices": [
+        "Type 1 hypervisor",
+        "Type 2 hypervisor",
+        "Application hypervisor",
+        "Software hypervisor"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Type 1 hypervisors run directly on physical hardware."
+  },
+  {
+    "id": "compute_0165",
+    "type": "multiple_choice",
+    "domain": "COMPUTE",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "Which service provides virtual machines in AWS?",
+    "data": {
+      "choices": [
+        "EC2",
+        "S3",
+        "Lambda",
+        "CloudFront"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Amazon EC2 provides scalable virtual machines."
+  },
+  {
+    "id": "compute_0166",
+    "type": "multiple_choice",
+    "domain": "COMPUTE",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "What does autoscaling do?",
+    "data": {
+      "choices": [
+        "Automatically adjusts compute resources",
+        "Encrypts data",
+        "Manages DNS",
+        "Creates backups"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Autoscaling increases or decreases compute resources based on demand."
+  },
+  {
+    "id": "compute_0167",
+    "type": "multiple_choice",
+    "domain": "COMPUTE",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "Which hypervisor runs directly on hardware?",
+    "data": {
+      "choices": [
+        "Type 1 hypervisor",
+        "Type 2 hypervisor",
+        "Application hypervisor",
+        "Software hypervisor"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Type 1 hypervisors run directly on physical hardware."
+  },
+  {
+    "id": "compute_0168",
+    "type": "multiple_choice",
+    "domain": "COMPUTE",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "Which hypervisor runs directly on hardware?",
+    "data": {
+      "choices": [
+        "Type 1 hypervisor",
+        "Type 2 hypervisor",
+        "Application hypervisor",
+        "Software hypervisor"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Type 1 hypervisors run directly on physical hardware."
+  },
+  {
+    "id": "compute_0169",
+    "type": "multiple_choice",
+    "domain": "COMPUTE",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "Which service provides virtual machines in AWS?",
+    "data": {
+      "choices": [
+        "EC2",
+        "S3",
+        "Lambda",
+        "CloudFront"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Amazon EC2 provides scalable virtual machines."
+  },
+  {
+    "id": "compute_0170",
+    "type": "multiple_choice",
+    "domain": "COMPUTE",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "Which hypervisor runs directly on hardware?",
+    "data": {
+      "choices": [
+        "Type 1 hypervisor",
+        "Type 2 hypervisor",
+        "Application hypervisor",
+        "Software hypervisor"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Type 1 hypervisors run directly on physical hardware."
+  },
+  {
+    "id": "compute_0171",
+    "type": "multiple_choice",
+    "domain": "COMPUTE",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "Which service provides virtual machines in AWS?",
+    "data": {
+      "choices": [
+        "EC2",
+        "S3",
+        "Lambda",
+        "CloudFront"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Amazon EC2 provides scalable virtual machines."
+  },
+  {
+    "id": "compute_0172",
+    "type": "multiple_choice",
+    "domain": "COMPUTE",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "What is serverless computing?",
+    "data": {
+      "choices": [
+        "Running code without managing servers",
+        "Hosting websites only",
+        "Physical server hosting",
+        "Manual VM management"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Serverless platforms automatically manage infrastructure."
+  },
+  {
+    "id": "compute_0173",
+    "type": "multiple_choice",
+    "domain": "COMPUTE",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "What does autoscaling do?",
+    "data": {
+      "choices": [
+        "Automatically adjusts compute resources",
+        "Encrypts data",
+        "Manages DNS",
+        "Creates backups"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Autoscaling increases or decreases compute resources based on demand."
+  },
+  {
+    "id": "compute_0174",
+    "type": "multiple_choice",
+    "domain": "COMPUTE",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "Which hypervisor runs directly on hardware?",
+    "data": {
+      "choices": [
+        "Type 1 hypervisor",
+        "Type 2 hypervisor",
+        "Application hypervisor",
+        "Software hypervisor"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Type 1 hypervisors run directly on physical hardware."
+  },
+  {
+    "id": "compute_0175",
+    "type": "multiple_choice",
+    "domain": "COMPUTE",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "What is serverless computing?",
+    "data": {
+      "choices": [
+        "Running code without managing servers",
+        "Hosting websites only",
+        "Physical server hosting",
+        "Manual VM management"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Serverless platforms automatically manage infrastructure."
+  },
+  {
+    "id": "compute_0176",
+    "type": "multiple_choice",
+    "domain": "COMPUTE",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "What is serverless computing?",
+    "data": {
+      "choices": [
+        "Running code without managing servers",
+        "Hosting websites only",
+        "Physical server hosting",
+        "Manual VM management"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Serverless platforms automatically manage infrastructure."
+  },
+  {
+    "id": "compute_0177",
+    "type": "multiple_choice",
+    "domain": "COMPUTE",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "Which hypervisor runs directly on hardware?",
+    "data": {
+      "choices": [
+        "Type 1 hypervisor",
+        "Type 2 hypervisor",
+        "Application hypervisor",
+        "Software hypervisor"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Type 1 hypervisors run directly on physical hardware."
+  },
+  {
+    "id": "compute_0178",
+    "type": "multiple_choice",
+    "domain": "COMPUTE",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "What is containerization primarily used for?",
+    "data": {
+      "choices": [
+        "Packaging applications with dependencies",
+        "Encrypting traffic",
+        "Managing users",
+        "Routing packets"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Containers package applications with their required runtime."
+  },
+  {
+    "id": "compute_0179",
+    "type": "multiple_choice",
+    "domain": "COMPUTE",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "Which service provides virtual machines in AWS?",
+    "data": {
+      "choices": [
+        "EC2",
+        "S3",
+        "Lambda",
+        "CloudFront"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Amazon EC2 provides scalable virtual machines."
+  },
+  {
+    "id": "compute_0180",
+    "type": "multiple_choice",
+    "domain": "COMPUTE",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "What does autoscaling do?",
+    "data": {
+      "choices": [
+        "Automatically adjusts compute resources",
+        "Encrypts data",
+        "Manages DNS",
+        "Creates backups"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Autoscaling increases or decreases compute resources based on demand."
+  },
+  {
+    "id": "compute_0181",
+    "type": "multiple_choice",
+    "domain": "COMPUTE",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "What is serverless computing?",
+    "data": {
+      "choices": [
+        "Running code without managing servers",
+        "Hosting websites only",
+        "Physical server hosting",
+        "Manual VM management"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Serverless platforms automatically manage infrastructure."
+  },
+  {
+    "id": "compute_0182",
+    "type": "multiple_choice",
+    "domain": "COMPUTE",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "What is containerization primarily used for?",
+    "data": {
+      "choices": [
+        "Packaging applications with dependencies",
+        "Encrypting traffic",
+        "Managing users",
+        "Routing packets"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Containers package applications with their required runtime."
+  },
+  {
+    "id": "compute_0183",
+    "type": "multiple_choice",
+    "domain": "COMPUTE",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "Which hypervisor runs directly on hardware?",
+    "data": {
+      "choices": [
+        "Type 1 hypervisor",
+        "Type 2 hypervisor",
+        "Application hypervisor",
+        "Software hypervisor"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Type 1 hypervisors run directly on physical hardware."
+  },
+  {
+    "id": "compute_0184",
+    "type": "multiple_choice",
+    "domain": "COMPUTE",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "What does autoscaling do?",
+    "data": {
+      "choices": [
+        "Automatically adjusts compute resources",
+        "Encrypts data",
+        "Manages DNS",
+        "Creates backups"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Autoscaling increases or decreases compute resources based on demand."
+  },
+  {
+    "id": "compute_0185",
+    "type": "multiple_choice",
+    "domain": "COMPUTE",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "Which hypervisor runs directly on hardware?",
+    "data": {
+      "choices": [
+        "Type 1 hypervisor",
+        "Type 2 hypervisor",
+        "Application hypervisor",
+        "Software hypervisor"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Type 1 hypervisors run directly on physical hardware."
+  },
+  {
+    "id": "compute_0186",
+    "type": "multiple_choice",
+    "domain": "COMPUTE",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "Which service provides virtual machines in AWS?",
+    "data": {
+      "choices": [
+        "EC2",
+        "S3",
+        "Lambda",
+        "CloudFront"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Amazon EC2 provides scalable virtual machines."
+  },
+  {
+    "id": "compute_0187",
+    "type": "multiple_choice",
+    "domain": "COMPUTE",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "What is containerization primarily used for?",
+    "data": {
+      "choices": [
+        "Packaging applications with dependencies",
+        "Encrypting traffic",
+        "Managing users",
+        "Routing packets"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Containers package applications with their required runtime."
+  },
+  {
+    "id": "compute_0188",
+    "type": "multiple_choice",
+    "domain": "COMPUTE",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "Which service provides virtual machines in AWS?",
+    "data": {
+      "choices": [
+        "EC2",
+        "S3",
+        "Lambda",
+        "CloudFront"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Amazon EC2 provides scalable virtual machines."
+  },
+  {
+    "id": "compute_0189",
+    "type": "multiple_choice",
+    "domain": "COMPUTE",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "Which hypervisor runs directly on hardware?",
+    "data": {
+      "choices": [
+        "Type 1 hypervisor",
+        "Type 2 hypervisor",
+        "Application hypervisor",
+        "Software hypervisor"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Type 1 hypervisors run directly on physical hardware."
+  },
+  {
+    "id": "compute_0190",
+    "type": "multiple_choice",
+    "domain": "COMPUTE",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "What is containerization primarily used for?",
+    "data": {
+      "choices": [
+        "Packaging applications with dependencies",
+        "Encrypting traffic",
+        "Managing users",
+        "Routing packets"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Containers package applications with their required runtime."
+  },
+  {
+    "id": "compute_0191",
+    "type": "multiple_choice",
+    "domain": "COMPUTE",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "Which service provides virtual machines in AWS?",
+    "data": {
+      "choices": [
+        "EC2",
+        "S3",
+        "Lambda",
+        "CloudFront"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Amazon EC2 provides scalable virtual machines."
+  },
+  {
+    "id": "compute_0192",
+    "type": "multiple_choice",
+    "domain": "COMPUTE",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "What is serverless computing?",
+    "data": {
+      "choices": [
+        "Running code without managing servers",
+        "Hosting websites only",
+        "Physical server hosting",
+        "Manual VM management"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Serverless platforms automatically manage infrastructure."
+  },
+  {
+    "id": "compute_0193",
+    "type": "multiple_choice",
+    "domain": "COMPUTE",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "What is serverless computing?",
+    "data": {
+      "choices": [
+        "Running code without managing servers",
+        "Hosting websites only",
+        "Physical server hosting",
+        "Manual VM management"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Serverless platforms automatically manage infrastructure."
+  },
+  {
+    "id": "compute_0194",
+    "type": "multiple_choice",
+    "domain": "COMPUTE",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "What is serverless computing?",
+    "data": {
+      "choices": [
+        "Running code without managing servers",
+        "Hosting websites only",
+        "Physical server hosting",
+        "Manual VM management"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Serverless platforms automatically manage infrastructure."
+  },
+  {
+    "id": "compute_0195",
+    "type": "multiple_choice",
+    "domain": "COMPUTE",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "What is containerization primarily used for?",
+    "data": {
+      "choices": [
+        "Packaging applications with dependencies",
+        "Encrypting traffic",
+        "Managing users",
+        "Routing packets"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Containers package applications with their required runtime."
+  },
+  {
+    "id": "compute_0196",
+    "type": "multiple_choice",
+    "domain": "COMPUTE",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "What is serverless computing?",
+    "data": {
+      "choices": [
+        "Running code without managing servers",
+        "Hosting websites only",
+        "Physical server hosting",
+        "Manual VM management"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Serverless platforms automatically manage infrastructure."
+  },
+  {
+    "id": "compute_0197",
+    "type": "multiple_choice",
+    "domain": "COMPUTE",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "What is serverless computing?",
+    "data": {
+      "choices": [
+        "Running code without managing servers",
+        "Hosting websites only",
+        "Physical server hosting",
+        "Manual VM management"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Serverless platforms automatically manage infrastructure."
+  },
+  {
+    "id": "compute_0198",
+    "type": "multiple_choice",
+    "domain": "COMPUTE",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "Which hypervisor runs directly on hardware?",
+    "data": {
+      "choices": [
+        "Type 1 hypervisor",
+        "Type 2 hypervisor",
+        "Application hypervisor",
+        "Software hypervisor"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Type 1 hypervisors run directly on physical hardware."
+  },
+  {
+    "id": "compute_0199",
+    "type": "multiple_choice",
+    "domain": "COMPUTE",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "Which service provides virtual machines in AWS?",
+    "data": {
+      "choices": [
+        "EC2",
+        "S3",
+        "Lambda",
+        "CloudFront"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Amazon EC2 provides scalable virtual machines."
+  },
+  {
+    "id": "compute_0200",
+    "type": "multiple_choice",
+    "domain": "COMPUTE",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "Which service provides virtual machines in AWS?",
+    "data": {
+      "choices": [
+        "EC2",
+        "S3",
+        "Lambda",
+        "CloudFront"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Amazon EC2 provides scalable virtual machines."
+  },
+  {
+    "id": "storage_0201",
+    "type": "multiple_choice",
+    "domain": "STORAGE",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "Which storage type stores data as objects?",
+    "data": {
+      "choices": [
+        "Object storage",
+        "Block storage",
+        "File storage",
+        "Tape storage"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Object storage stores data as objects with metadata."
+  },
+  {
+    "id": "storage_0202",
+    "type": "multiple_choice",
+    "domain": "STORAGE",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "Which storage type stores data as objects?",
+    "data": {
+      "choices": [
+        "Object storage",
+        "Block storage",
+        "File storage",
+        "Tape storage"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Object storage stores data as objects with metadata."
+  },
+  {
+    "id": "storage_0203",
+    "type": "multiple_choice",
+    "domain": "STORAGE",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "Which storage type is commonly used for virtual machine disks?",
+    "data": {
+      "choices": [
+        "Block storage",
+        "Object storage",
+        "Tape storage",
+        "Cold storage"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Block storage provides low-latency disk access."
+  },
+  {
+    "id": "storage_0204",
+    "type": "multiple_choice",
+    "domain": "STORAGE",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "What is the purpose of backups?",
+    "data": {
+      "choices": [
+        "Restore data after loss",
+        "Improve CPU speed",
+        "Encrypt traffic",
+        "Balance network load"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Backups protect against data loss."
+  },
+  {
+    "id": "storage_0205",
+    "type": "multiple_choice",
+    "domain": "STORAGE",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "What is the purpose of backups?",
+    "data": {
+      "choices": [
+        "Restore data after loss",
+        "Improve CPU speed",
+        "Encrypt traffic",
+        "Balance network load"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Backups protect against data loss."
+  },
+  {
+    "id": "storage_0206",
+    "type": "multiple_choice",
+    "domain": "STORAGE",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "What is the purpose of backups?",
+    "data": {
+      "choices": [
+        "Restore data after loss",
+        "Improve CPU speed",
+        "Encrypt traffic",
+        "Balance network load"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Backups protect against data loss."
+  },
+  {
+    "id": "storage_0207",
+    "type": "multiple_choice",
+    "domain": "STORAGE",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "What is RAID primarily used for?",
+    "data": {
+      "choices": [
+        "Data redundancy and performance",
+        "Network routing",
+        "Encryption",
+        "Application hosting"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "RAID improves storage reliability or performance."
+  },
+  {
+    "id": "storage_0208",
+    "type": "multiple_choice",
+    "domain": "STORAGE",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "Which storage type stores data as objects?",
+    "data": {
+      "choices": [
+        "Object storage",
+        "Block storage",
+        "File storage",
+        "Tape storage"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Object storage stores data as objects with metadata."
+  },
+  {
+    "id": "storage_0209",
+    "type": "multiple_choice",
+    "domain": "STORAGE",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "What is RAID primarily used for?",
+    "data": {
+      "choices": [
+        "Data redundancy and performance",
+        "Network routing",
+        "Encryption",
+        "Application hosting"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "RAID improves storage reliability or performance."
+  },
+  {
+    "id": "storage_0210",
+    "type": "multiple_choice",
+    "domain": "STORAGE",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "What is the purpose of backups?",
+    "data": {
+      "choices": [
+        "Restore data after loss",
+        "Improve CPU speed",
+        "Encrypt traffic",
+        "Balance network load"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Backups protect against data loss."
+  },
+  {
+    "id": "storage_0211",
+    "type": "multiple_choice",
+    "domain": "STORAGE",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "Which technology allows snapshots of storage volumes?",
+    "data": {
+      "choices": [
+        "Snapshotting",
+        "Load balancing",
+        "Caching",
+        "Routing"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Snapshots capture point-in-time copies of storage."
+  },
+  {
+    "id": "storage_0212",
+    "type": "multiple_choice",
+    "domain": "STORAGE",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "Which technology allows snapshots of storage volumes?",
+    "data": {
+      "choices": [
+        "Snapshotting",
+        "Load balancing",
+        "Caching",
+        "Routing"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Snapshots capture point-in-time copies of storage."
+  },
+  {
+    "id": "storage_0213",
+    "type": "multiple_choice",
+    "domain": "STORAGE",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "Which technology allows snapshots of storage volumes?",
+    "data": {
+      "choices": [
+        "Snapshotting",
+        "Load balancing",
+        "Caching",
+        "Routing"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Snapshots capture point-in-time copies of storage."
+  },
+  {
+    "id": "storage_0214",
+    "type": "multiple_choice",
+    "domain": "STORAGE",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "What is RAID primarily used for?",
+    "data": {
+      "choices": [
+        "Data redundancy and performance",
+        "Network routing",
+        "Encryption",
+        "Application hosting"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "RAID improves storage reliability or performance."
+  },
+  {
+    "id": "storage_0215",
+    "type": "multiple_choice",
+    "domain": "STORAGE",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "Which technology allows snapshots of storage volumes?",
+    "data": {
+      "choices": [
+        "Snapshotting",
+        "Load balancing",
+        "Caching",
+        "Routing"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Snapshots capture point-in-time copies of storage."
+  },
+  {
+    "id": "storage_0216",
+    "type": "multiple_choice",
+    "domain": "STORAGE",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "What is the purpose of backups?",
+    "data": {
+      "choices": [
+        "Restore data after loss",
+        "Improve CPU speed",
+        "Encrypt traffic",
+        "Balance network load"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Backups protect against data loss."
+  },
+  {
+    "id": "storage_0217",
+    "type": "multiple_choice",
+    "domain": "STORAGE",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "Which storage type is commonly used for virtual machine disks?",
+    "data": {
+      "choices": [
+        "Block storage",
+        "Object storage",
+        "Tape storage",
+        "Cold storage"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Block storage provides low-latency disk access."
+  },
+  {
+    "id": "storage_0218",
+    "type": "multiple_choice",
+    "domain": "STORAGE",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "Which technology allows snapshots of storage volumes?",
+    "data": {
+      "choices": [
+        "Snapshotting",
+        "Load balancing",
+        "Caching",
+        "Routing"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Snapshots capture point-in-time copies of storage."
+  },
+  {
+    "id": "storage_0219",
+    "type": "multiple_choice",
+    "domain": "STORAGE",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "What is RAID primarily used for?",
+    "data": {
+      "choices": [
+        "Data redundancy and performance",
+        "Network routing",
+        "Encryption",
+        "Application hosting"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "RAID improves storage reliability or performance."
+  },
+  {
+    "id": "storage_0220",
+    "type": "multiple_choice",
+    "domain": "STORAGE",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "Which technology allows snapshots of storage volumes?",
+    "data": {
+      "choices": [
+        "Snapshotting",
+        "Load balancing",
+        "Caching",
+        "Routing"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Snapshots capture point-in-time copies of storage."
+  },
+  {
+    "id": "storage_0221",
+    "type": "multiple_choice",
+    "domain": "STORAGE",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "Which technology allows snapshots of storage volumes?",
+    "data": {
+      "choices": [
+        "Snapshotting",
+        "Load balancing",
+        "Caching",
+        "Routing"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Snapshots capture point-in-time copies of storage."
+  },
+  {
+    "id": "storage_0222",
+    "type": "multiple_choice",
+    "domain": "STORAGE",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "Which storage type is commonly used for virtual machine disks?",
+    "data": {
+      "choices": [
+        "Block storage",
+        "Object storage",
+        "Tape storage",
+        "Cold storage"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Block storage provides low-latency disk access."
+  },
+  {
+    "id": "storage_0223",
+    "type": "multiple_choice",
+    "domain": "STORAGE",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "What is the purpose of backups?",
+    "data": {
+      "choices": [
+        "Restore data after loss",
+        "Improve CPU speed",
+        "Encrypt traffic",
+        "Balance network load"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Backups protect against data loss."
+  },
+  {
+    "id": "storage_0224",
+    "type": "multiple_choice",
+    "domain": "STORAGE",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "What is RAID primarily used for?",
+    "data": {
+      "choices": [
+        "Data redundancy and performance",
+        "Network routing",
+        "Encryption",
+        "Application hosting"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "RAID improves storage reliability or performance."
+  },
+  {
+    "id": "storage_0225",
+    "type": "multiple_choice",
+    "domain": "STORAGE",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "What is RAID primarily used for?",
+    "data": {
+      "choices": [
+        "Data redundancy and performance",
+        "Network routing",
+        "Encryption",
+        "Application hosting"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "RAID improves storage reliability or performance."
+  },
+  {
+    "id": "storage_0226",
+    "type": "multiple_choice",
+    "domain": "STORAGE",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "What is the purpose of backups?",
+    "data": {
+      "choices": [
+        "Restore data after loss",
+        "Improve CPU speed",
+        "Encrypt traffic",
+        "Balance network load"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Backups protect against data loss."
+  },
+  {
+    "id": "storage_0227",
+    "type": "multiple_choice",
+    "domain": "STORAGE",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "Which storage type stores data as objects?",
+    "data": {
+      "choices": [
+        "Object storage",
+        "Block storage",
+        "File storage",
+        "Tape storage"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Object storage stores data as objects with metadata."
+  },
+  {
+    "id": "storage_0228",
+    "type": "multiple_choice",
+    "domain": "STORAGE",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "What is the purpose of backups?",
+    "data": {
+      "choices": [
+        "Restore data after loss",
+        "Improve CPU speed",
+        "Encrypt traffic",
+        "Balance network load"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Backups protect against data loss."
+  },
+  {
+    "id": "storage_0229",
+    "type": "multiple_choice",
+    "domain": "STORAGE",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "Which technology allows snapshots of storage volumes?",
+    "data": {
+      "choices": [
+        "Snapshotting",
+        "Load balancing",
+        "Caching",
+        "Routing"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Snapshots capture point-in-time copies of storage."
+  },
+  {
+    "id": "storage_0230",
+    "type": "multiple_choice",
+    "domain": "STORAGE",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "What is the purpose of backups?",
+    "data": {
+      "choices": [
+        "Restore data after loss",
+        "Improve CPU speed",
+        "Encrypt traffic",
+        "Balance network load"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Backups protect against data loss."
+  },
+  {
+    "id": "storage_0231",
+    "type": "multiple_choice",
+    "domain": "STORAGE",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "What is RAID primarily used for?",
+    "data": {
+      "choices": [
+        "Data redundancy and performance",
+        "Network routing",
+        "Encryption",
+        "Application hosting"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "RAID improves storage reliability or performance."
+  },
+  {
+    "id": "storage_0232",
+    "type": "multiple_choice",
+    "domain": "STORAGE",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "What is the purpose of backups?",
+    "data": {
+      "choices": [
+        "Restore data after loss",
+        "Improve CPU speed",
+        "Encrypt traffic",
+        "Balance network load"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Backups protect against data loss."
+  },
+  {
+    "id": "storage_0233",
+    "type": "multiple_choice",
+    "domain": "STORAGE",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "Which storage type is commonly used for virtual machine disks?",
+    "data": {
+      "choices": [
+        "Block storage",
+        "Object storage",
+        "Tape storage",
+        "Cold storage"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Block storage provides low-latency disk access."
+  },
+  {
+    "id": "storage_0234",
+    "type": "multiple_choice",
+    "domain": "STORAGE",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "What is the purpose of backups?",
+    "data": {
+      "choices": [
+        "Restore data after loss",
+        "Improve CPU speed",
+        "Encrypt traffic",
+        "Balance network load"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Backups protect against data loss."
+  },
+  {
+    "id": "storage_0235",
+    "type": "multiple_choice",
+    "domain": "STORAGE",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "What is the purpose of backups?",
+    "data": {
+      "choices": [
+        "Restore data after loss",
+        "Improve CPU speed",
+        "Encrypt traffic",
+        "Balance network load"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Backups protect against data loss."
+  },
+  {
+    "id": "storage_0236",
+    "type": "multiple_choice",
+    "domain": "STORAGE",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "Which storage type stores data as objects?",
+    "data": {
+      "choices": [
+        "Object storage",
+        "Block storage",
+        "File storage",
+        "Tape storage"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Object storage stores data as objects with metadata."
+  },
+  {
+    "id": "storage_0237",
+    "type": "multiple_choice",
+    "domain": "STORAGE",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "What is the purpose of backups?",
+    "data": {
+      "choices": [
+        "Restore data after loss",
+        "Improve CPU speed",
+        "Encrypt traffic",
+        "Balance network load"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Backups protect against data loss."
+  },
+  {
+    "id": "storage_0238",
+    "type": "multiple_choice",
+    "domain": "STORAGE",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "Which storage type is commonly used for virtual machine disks?",
+    "data": {
+      "choices": [
+        "Block storage",
+        "Object storage",
+        "Tape storage",
+        "Cold storage"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Block storage provides low-latency disk access."
+  },
+  {
+    "id": "storage_0239",
+    "type": "multiple_choice",
+    "domain": "STORAGE",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "What is RAID primarily used for?",
+    "data": {
+      "choices": [
+        "Data redundancy and performance",
+        "Network routing",
+        "Encryption",
+        "Application hosting"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "RAID improves storage reliability or performance."
+  },
+  {
+    "id": "storage_0240",
+    "type": "multiple_choice",
+    "domain": "STORAGE",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "Which technology allows snapshots of storage volumes?",
+    "data": {
+      "choices": [
+        "Snapshotting",
+        "Load balancing",
+        "Caching",
+        "Routing"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Snapshots capture point-in-time copies of storage."
+  },
+  {
+    "id": "storage_0241",
+    "type": "multiple_choice",
+    "domain": "STORAGE",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "Which technology allows snapshots of storage volumes?",
+    "data": {
+      "choices": [
+        "Snapshotting",
+        "Load balancing",
+        "Caching",
+        "Routing"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Snapshots capture point-in-time copies of storage."
+  },
+  {
+    "id": "storage_0242",
+    "type": "multiple_choice",
+    "domain": "STORAGE",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "Which storage type is commonly used for virtual machine disks?",
+    "data": {
+      "choices": [
+        "Block storage",
+        "Object storage",
+        "Tape storage",
+        "Cold storage"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Block storage provides low-latency disk access."
+  },
+  {
+    "id": "storage_0243",
+    "type": "multiple_choice",
+    "domain": "STORAGE",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "Which technology allows snapshots of storage volumes?",
+    "data": {
+      "choices": [
+        "Snapshotting",
+        "Load balancing",
+        "Caching",
+        "Routing"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Snapshots capture point-in-time copies of storage."
+  },
+  {
+    "id": "storage_0244",
+    "type": "multiple_choice",
+    "domain": "STORAGE",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "What is the purpose of backups?",
+    "data": {
+      "choices": [
+        "Restore data after loss",
+        "Improve CPU speed",
+        "Encrypt traffic",
+        "Balance network load"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Backups protect against data loss."
+  },
+  {
+    "id": "storage_0245",
+    "type": "multiple_choice",
+    "domain": "STORAGE",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "What is RAID primarily used for?",
+    "data": {
+      "choices": [
+        "Data redundancy and performance",
+        "Network routing",
+        "Encryption",
+        "Application hosting"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "RAID improves storage reliability or performance."
+  },
+  {
+    "id": "storage_0246",
+    "type": "multiple_choice",
+    "domain": "STORAGE",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "What is the purpose of backups?",
+    "data": {
+      "choices": [
+        "Restore data after loss",
+        "Improve CPU speed",
+        "Encrypt traffic",
+        "Balance network load"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Backups protect against data loss."
+  },
+  {
+    "id": "storage_0247",
+    "type": "multiple_choice",
+    "domain": "STORAGE",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "Which storage type stores data as objects?",
+    "data": {
+      "choices": [
+        "Object storage",
+        "Block storage",
+        "File storage",
+        "Tape storage"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Object storage stores data as objects with metadata."
+  },
+  {
+    "id": "storage_0248",
+    "type": "multiple_choice",
+    "domain": "STORAGE",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "Which storage type stores data as objects?",
+    "data": {
+      "choices": [
+        "Object storage",
+        "Block storage",
+        "File storage",
+        "Tape storage"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Object storage stores data as objects with metadata."
+  },
+  {
+    "id": "storage_0249",
+    "type": "multiple_choice",
+    "domain": "STORAGE",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "Which storage type stores data as objects?",
+    "data": {
+      "choices": [
+        "Object storage",
+        "Block storage",
+        "File storage",
+        "Tape storage"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Object storage stores data as objects with metadata."
+  },
+  {
+    "id": "storage_0250",
+    "type": "multiple_choice",
+    "domain": "STORAGE",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "Which technology allows snapshots of storage volumes?",
+    "data": {
+      "choices": [
+        "Snapshotting",
+        "Load balancing",
+        "Caching",
+        "Routing"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Snapshots capture point-in-time copies of storage."
+  },
+  {
+    "id": "azure_0251",
+    "type": "multiple_choice",
+    "domain": "AZURE",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "Which service runs event-driven serverless code?",
+    "data": {
+      "choices": [
+        "Azure Functions",
+        "Azure VM",
+        "Azure App Gateway",
+        "Azure Storage"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Azure Functions runs serverless workloads."
+  },
+  {
+    "id": "azure_0252",
+    "type": "multiple_choice",
+    "domain": "AZURE",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "What does Azure Monitor do?",
+    "data": {
+      "choices": [
+        "Collects and analyzes telemetry",
+        "Hosts websites",
+        "Routes traffic",
+        "Stores backups"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Azure Monitor provides performance and monitoring insights."
+  },
+  {
+    "id": "azure_0253",
+    "type": "multiple_choice",
+    "domain": "AZURE",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "Which service runs event-driven serverless code?",
+    "data": {
+      "choices": [
+        "Azure Functions",
+        "Azure VM",
+        "Azure App Gateway",
+        "Azure Storage"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Azure Functions runs serverless workloads."
+  },
+  {
+    "id": "azure_0254",
+    "type": "multiple_choice",
+    "domain": "AZURE",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "Which Azure service stores unstructured data?",
+    "data": {
+      "choices": [
+        "Azure Blob Storage",
+        "Azure SQL Database",
+        "Azure Functions",
+        "Azure CDN"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Blob Storage stores large amounts of unstructured data."
+  },
+  {
+    "id": "azure_0255",
+    "type": "multiple_choice",
+    "domain": "AZURE",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "What does Azure Monitor do?",
+    "data": {
+      "choices": [
+        "Collects and analyzes telemetry",
+        "Hosts websites",
+        "Routes traffic",
+        "Stores backups"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Azure Monitor provides performance and monitoring insights."
+  },
+  {
+    "id": "azure_0256",
+    "type": "multiple_choice",
+    "domain": "AZURE",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "Which Azure service stores unstructured data?",
+    "data": {
+      "choices": [
+        "Azure Blob Storage",
+        "Azure SQL Database",
+        "Azure Functions",
+        "Azure CDN"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Blob Storage stores large amounts of unstructured data."
+  },
+  {
+    "id": "azure_0257",
+    "type": "multiple_choice",
+    "domain": "AZURE",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "What does Azure Monitor do?",
+    "data": {
+      "choices": [
+        "Collects and analyzes telemetry",
+        "Hosts websites",
+        "Routes traffic",
+        "Stores backups"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Azure Monitor provides performance and monitoring insights."
+  },
+  {
+    "id": "azure_0258",
+    "type": "multiple_choice",
+    "domain": "AZURE",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "Which Azure service provides virtual machines?",
+    "data": {
+      "choices": [
+        "Azure Virtual Machines",
+        "Azure Blob Storage",
+        "Azure DNS",
+        "Azure Monitor"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Azure Virtual Machines provide scalable compute instances."
+  },
+  {
+    "id": "azure_0259",
+    "type": "multiple_choice",
+    "domain": "AZURE",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "Which Azure service stores unstructured data?",
+    "data": {
+      "choices": [
+        "Azure Blob Storage",
+        "Azure SQL Database",
+        "Azure Functions",
+        "Azure CDN"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Blob Storage stores large amounts of unstructured data."
+  },
+  {
+    "id": "azure_0260",
+    "type": "multiple_choice",
+    "domain": "AZURE",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "What is Azure Active Directory used for?",
+    "data": {
+      "choices": [
+        "Identity and access management",
+        "Object storage",
+        "Network routing",
+        "Email hosting"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Azure AD manages identities and authentication."
+  },
+  {
+    "id": "azure_0261",
+    "type": "multiple_choice",
+    "domain": "AZURE",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "Which Azure service stores unstructured data?",
+    "data": {
+      "choices": [
+        "Azure Blob Storage",
+        "Azure SQL Database",
+        "Azure Functions",
+        "Azure CDN"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Blob Storage stores large amounts of unstructured data."
+  },
+  {
+    "id": "azure_0262",
+    "type": "multiple_choice",
+    "domain": "AZURE",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "Which Azure service provides virtual machines?",
+    "data": {
+      "choices": [
+        "Azure Virtual Machines",
+        "Azure Blob Storage",
+        "Azure DNS",
+        "Azure Monitor"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Azure Virtual Machines provide scalable compute instances."
+  },
+  {
+    "id": "azure_0263",
+    "type": "multiple_choice",
+    "domain": "AZURE",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "Which service runs event-driven serverless code?",
+    "data": {
+      "choices": [
+        "Azure Functions",
+        "Azure VM",
+        "Azure App Gateway",
+        "Azure Storage"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Azure Functions runs serverless workloads."
+  },
+  {
+    "id": "azure_0264",
+    "type": "multiple_choice",
+    "domain": "AZURE",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "Which service runs event-driven serverless code?",
+    "data": {
+      "choices": [
+        "Azure Functions",
+        "Azure VM",
+        "Azure App Gateway",
+        "Azure Storage"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Azure Functions runs serverless workloads."
+  },
+  {
+    "id": "azure_0265",
+    "type": "multiple_choice",
+    "domain": "AZURE",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "Which Azure service stores unstructured data?",
+    "data": {
+      "choices": [
+        "Azure Blob Storage",
+        "Azure SQL Database",
+        "Azure Functions",
+        "Azure CDN"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Blob Storage stores large amounts of unstructured data."
+  },
+  {
+    "id": "azure_0266",
+    "type": "multiple_choice",
+    "domain": "AZURE",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "Which service runs event-driven serverless code?",
+    "data": {
+      "choices": [
+        "Azure Functions",
+        "Azure VM",
+        "Azure App Gateway",
+        "Azure Storage"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Azure Functions runs serverless workloads."
+  },
+  {
+    "id": "azure_0267",
+    "type": "multiple_choice",
+    "domain": "AZURE",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "What does Azure Monitor do?",
+    "data": {
+      "choices": [
+        "Collects and analyzes telemetry",
+        "Hosts websites",
+        "Routes traffic",
+        "Stores backups"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Azure Monitor provides performance and monitoring insights."
+  },
+  {
+    "id": "azure_0268",
+    "type": "multiple_choice",
+    "domain": "AZURE",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "Which Azure service stores unstructured data?",
+    "data": {
+      "choices": [
+        "Azure Blob Storage",
+        "Azure SQL Database",
+        "Azure Functions",
+        "Azure CDN"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Blob Storage stores large amounts of unstructured data."
+  },
+  {
+    "id": "azure_0269",
+    "type": "multiple_choice",
+    "domain": "AZURE",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "What does Azure Monitor do?",
+    "data": {
+      "choices": [
+        "Collects and analyzes telemetry",
+        "Hosts websites",
+        "Routes traffic",
+        "Stores backups"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Azure Monitor provides performance and monitoring insights."
+  },
+  {
+    "id": "azure_0270",
+    "type": "multiple_choice",
+    "domain": "AZURE",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "Which service runs event-driven serverless code?",
+    "data": {
+      "choices": [
+        "Azure Functions",
+        "Azure VM",
+        "Azure App Gateway",
+        "Azure Storage"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Azure Functions runs serverless workloads."
+  },
+  {
+    "id": "azure_0271",
+    "type": "multiple_choice",
+    "domain": "AZURE",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "What is Azure Active Directory used for?",
+    "data": {
+      "choices": [
+        "Identity and access management",
+        "Object storage",
+        "Network routing",
+        "Email hosting"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Azure AD manages identities and authentication."
+  },
+  {
+    "id": "azure_0272",
+    "type": "multiple_choice",
+    "domain": "AZURE",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "Which Azure service provides virtual machines?",
+    "data": {
+      "choices": [
+        "Azure Virtual Machines",
+        "Azure Blob Storage",
+        "Azure DNS",
+        "Azure Monitor"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Azure Virtual Machines provide scalable compute instances."
+  },
+  {
+    "id": "azure_0273",
+    "type": "multiple_choice",
+    "domain": "AZURE",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "What is Azure Active Directory used for?",
+    "data": {
+      "choices": [
+        "Identity and access management",
+        "Object storage",
+        "Network routing",
+        "Email hosting"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Azure AD manages identities and authentication."
+  },
+  {
+    "id": "azure_0274",
+    "type": "multiple_choice",
+    "domain": "AZURE",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "Which service runs event-driven serverless code?",
+    "data": {
+      "choices": [
+        "Azure Functions",
+        "Azure VM",
+        "Azure App Gateway",
+        "Azure Storage"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Azure Functions runs serverless workloads."
+  },
+  {
+    "id": "azure_0275",
+    "type": "multiple_choice",
+    "domain": "AZURE",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "Which Azure service provides virtual machines?",
+    "data": {
+      "choices": [
+        "Azure Virtual Machines",
+        "Azure Blob Storage",
+        "Azure DNS",
+        "Azure Monitor"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Azure Virtual Machines provide scalable compute instances."
+  },
+  {
+    "id": "azure_0276",
+    "type": "multiple_choice",
+    "domain": "AZURE",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "Which Azure service stores unstructured data?",
+    "data": {
+      "choices": [
+        "Azure Blob Storage",
+        "Azure SQL Database",
+        "Azure Functions",
+        "Azure CDN"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Blob Storage stores large amounts of unstructured data."
+  },
+  {
+    "id": "azure_0277",
+    "type": "multiple_choice",
+    "domain": "AZURE",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "Which Azure service provides virtual machines?",
+    "data": {
+      "choices": [
+        "Azure Virtual Machines",
+        "Azure Blob Storage",
+        "Azure DNS",
+        "Azure Monitor"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Azure Virtual Machines provide scalable compute instances."
+  },
+  {
+    "id": "azure_0278",
+    "type": "multiple_choice",
+    "domain": "AZURE",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "What is Azure Active Directory used for?",
+    "data": {
+      "choices": [
+        "Identity and access management",
+        "Object storage",
+        "Network routing",
+        "Email hosting"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Azure AD manages identities and authentication."
+  },
+  {
+    "id": "azure_0279",
+    "type": "multiple_choice",
+    "domain": "AZURE",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "Which Azure service provides virtual machines?",
+    "data": {
+      "choices": [
+        "Azure Virtual Machines",
+        "Azure Blob Storage",
+        "Azure DNS",
+        "Azure Monitor"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Azure Virtual Machines provide scalable compute instances."
+  },
+  {
+    "id": "azure_0280",
+    "type": "multiple_choice",
+    "domain": "AZURE",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "What is Azure Active Directory used for?",
+    "data": {
+      "choices": [
+        "Identity and access management",
+        "Object storage",
+        "Network routing",
+        "Email hosting"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Azure AD manages identities and authentication."
+  },
+  {
+    "id": "azure_0281",
+    "type": "multiple_choice",
+    "domain": "AZURE",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "Which Azure service provides virtual machines?",
+    "data": {
+      "choices": [
+        "Azure Virtual Machines",
+        "Azure Blob Storage",
+        "Azure DNS",
+        "Azure Monitor"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Azure Virtual Machines provide scalable compute instances."
+  },
+  {
+    "id": "azure_0282",
+    "type": "multiple_choice",
+    "domain": "AZURE",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "What is Azure Active Directory used for?",
+    "data": {
+      "choices": [
+        "Identity and access management",
+        "Object storage",
+        "Network routing",
+        "Email hosting"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Azure AD manages identities and authentication."
+  },
+  {
+    "id": "azure_0283",
+    "type": "multiple_choice",
+    "domain": "AZURE",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "Which Azure service stores unstructured data?",
+    "data": {
+      "choices": [
+        "Azure Blob Storage",
+        "Azure SQL Database",
+        "Azure Functions",
+        "Azure CDN"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Blob Storage stores large amounts of unstructured data."
+  },
+  {
+    "id": "azure_0284",
+    "type": "multiple_choice",
+    "domain": "AZURE",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "Which Azure service stores unstructured data?",
+    "data": {
+      "choices": [
+        "Azure Blob Storage",
+        "Azure SQL Database",
+        "Azure Functions",
+        "Azure CDN"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Blob Storage stores large amounts of unstructured data."
+  },
+  {
+    "id": "azure_0285",
+    "type": "multiple_choice",
+    "domain": "AZURE",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "Which Azure service provides virtual machines?",
+    "data": {
+      "choices": [
+        "Azure Virtual Machines",
+        "Azure Blob Storage",
+        "Azure DNS",
+        "Azure Monitor"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Azure Virtual Machines provide scalable compute instances."
+  },
+  {
+    "id": "azure_0286",
+    "type": "multiple_choice",
+    "domain": "AZURE",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "Which service runs event-driven serverless code?",
+    "data": {
+      "choices": [
+        "Azure Functions",
+        "Azure VM",
+        "Azure App Gateway",
+        "Azure Storage"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Azure Functions runs serverless workloads."
+  },
+  {
+    "id": "azure_0287",
+    "type": "multiple_choice",
+    "domain": "AZURE",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "Which Azure service stores unstructured data?",
+    "data": {
+      "choices": [
+        "Azure Blob Storage",
+        "Azure SQL Database",
+        "Azure Functions",
+        "Azure CDN"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Blob Storage stores large amounts of unstructured data."
+  },
+  {
+    "id": "azure_0288",
+    "type": "multiple_choice",
+    "domain": "AZURE",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "What is Azure Active Directory used for?",
+    "data": {
+      "choices": [
+        "Identity and access management",
+        "Object storage",
+        "Network routing",
+        "Email hosting"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Azure AD manages identities and authentication."
+  },
+  {
+    "id": "azure_0289",
+    "type": "multiple_choice",
+    "domain": "AZURE",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "Which Azure service stores unstructured data?",
+    "data": {
+      "choices": [
+        "Azure Blob Storage",
+        "Azure SQL Database",
+        "Azure Functions",
+        "Azure CDN"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Blob Storage stores large amounts of unstructured data."
+  },
+  {
+    "id": "azure_0290",
+    "type": "multiple_choice",
+    "domain": "AZURE",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "What does Azure Monitor do?",
+    "data": {
+      "choices": [
+        "Collects and analyzes telemetry",
+        "Hosts websites",
+        "Routes traffic",
+        "Stores backups"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Azure Monitor provides performance and monitoring insights."
+  },
+  {
+    "id": "azure_0291",
+    "type": "multiple_choice",
+    "domain": "AZURE",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "What does Azure Monitor do?",
+    "data": {
+      "choices": [
+        "Collects and analyzes telemetry",
+        "Hosts websites",
+        "Routes traffic",
+        "Stores backups"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Azure Monitor provides performance and monitoring insights."
+  },
+  {
+    "id": "azure_0292",
+    "type": "multiple_choice",
+    "domain": "AZURE",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "Which service runs event-driven serverless code?",
+    "data": {
+      "choices": [
+        "Azure Functions",
+        "Azure VM",
+        "Azure App Gateway",
+        "Azure Storage"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Azure Functions runs serverless workloads."
+  },
+  {
+    "id": "azure_0293",
+    "type": "multiple_choice",
+    "domain": "AZURE",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "What does Azure Monitor do?",
+    "data": {
+      "choices": [
+        "Collects and analyzes telemetry",
+        "Hosts websites",
+        "Routes traffic",
+        "Stores backups"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Azure Monitor provides performance and monitoring insights."
+  },
+  {
+    "id": "azure_0294",
+    "type": "multiple_choice",
+    "domain": "AZURE",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "What does Azure Monitor do?",
+    "data": {
+      "choices": [
+        "Collects and analyzes telemetry",
+        "Hosts websites",
+        "Routes traffic",
+        "Stores backups"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Azure Monitor provides performance and monitoring insights."
+  },
+  {
+    "id": "azure_0295",
+    "type": "multiple_choice",
+    "domain": "AZURE",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "Which service runs event-driven serverless code?",
+    "data": {
+      "choices": [
+        "Azure Functions",
+        "Azure VM",
+        "Azure App Gateway",
+        "Azure Storage"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Azure Functions runs serverless workloads."
+  },
+  {
+    "id": "azure_0296",
+    "type": "multiple_choice",
+    "domain": "AZURE",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "Which Azure service provides virtual machines?",
+    "data": {
+      "choices": [
+        "Azure Virtual Machines",
+        "Azure Blob Storage",
+        "Azure DNS",
+        "Azure Monitor"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Azure Virtual Machines provide scalable compute instances."
+  },
+  {
+    "id": "azure_0297",
+    "type": "multiple_choice",
+    "domain": "AZURE",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "What does Azure Monitor do?",
+    "data": {
+      "choices": [
+        "Collects and analyzes telemetry",
+        "Hosts websites",
+        "Routes traffic",
+        "Stores backups"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Azure Monitor provides performance and monitoring insights."
+  },
+  {
+    "id": "azure_0298",
+    "type": "multiple_choice",
+    "domain": "AZURE",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "Which Azure service provides virtual machines?",
+    "data": {
+      "choices": [
+        "Azure Virtual Machines",
+        "Azure Blob Storage",
+        "Azure DNS",
+        "Azure Monitor"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Azure Virtual Machines provide scalable compute instances."
+  },
+  {
+    "id": "azure_0299",
+    "type": "multiple_choice",
+    "domain": "AZURE",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "What is Azure Active Directory used for?",
+    "data": {
+      "choices": [
+        "Identity and access management",
+        "Object storage",
+        "Network routing",
+        "Email hosting"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Azure AD manages identities and authentication."
+  },
+  {
+    "id": "azure_0300",
+    "type": "multiple_choice",
+    "domain": "AZURE",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "What does Azure Monitor do?",
+    "data": {
+      "choices": [
+        "Collects and analyzes telemetry",
+        "Hosts websites",
+        "Routes traffic",
+        "Stores backups"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Azure Monitor provides performance and monitoring insights."
+  },
+  {
+    "id": "aws_0301",
+    "type": "multiple_choice",
+    "domain": "AWS",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "Which AWS service distributes content globally?",
+    "data": {
+      "choices": [
+        "CloudFront",
+        "EC2",
+        "VPC",
+        "EBS"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "CloudFront is AWS's CDN."
+  },
+  {
+    "id": "aws_0302",
+    "type": "multiple_choice",
+    "domain": "AWS",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "Which AWS service runs code without servers?",
+    "data": {
+      "choices": [
+        "Lambda",
+        "EC2",
+        "S3",
+        "Route53"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "AWS Lambda is a serverless compute service."
+  },
+  {
+    "id": "aws_0303",
+    "type": "multiple_choice",
+    "domain": "AWS",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "Which AWS service runs code without servers?",
+    "data": {
+      "choices": [
+        "Lambda",
+        "EC2",
+        "S3",
+        "Route53"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "AWS Lambda is a serverless compute service."
+  },
+  {
+    "id": "aws_0304",
+    "type": "multiple_choice",
+    "domain": "AWS",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "What does AWS IAM manage?",
+    "data": {
+      "choices": [
+        "Users and permissions",
+        "Virtual machines",
+        "Object storage",
+        "Backups"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "IAM manages authentication and authorization."
+  },
+  {
+    "id": "aws_0305",
+    "type": "multiple_choice",
+    "domain": "AWS",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "Which AWS service provides object storage?",
+    "data": {
+      "choices": [
+        "S3",
+        "EC2",
+        "Lambda",
+        "RDS"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Amazon S3 is AWS object storage."
+  },
+  {
+    "id": "aws_0306",
+    "type": "multiple_choice",
+    "domain": "AWS",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "Which AWS service provides object storage?",
+    "data": {
+      "choices": [
+        "S3",
+        "EC2",
+        "Lambda",
+        "RDS"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Amazon S3 is AWS object storage."
+  },
+  {
+    "id": "aws_0307",
+    "type": "multiple_choice",
+    "domain": "AWS",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "Which AWS service distributes content globally?",
+    "data": {
+      "choices": [
+        "CloudFront",
+        "EC2",
+        "VPC",
+        "EBS"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "CloudFront is AWS's CDN."
+  },
+  {
+    "id": "aws_0308",
+    "type": "multiple_choice",
+    "domain": "AWS",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "Which AWS service provides object storage?",
+    "data": {
+      "choices": [
+        "S3",
+        "EC2",
+        "Lambda",
+        "RDS"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Amazon S3 is AWS object storage."
+  },
+  {
+    "id": "aws_0309",
+    "type": "multiple_choice",
+    "domain": "AWS",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "Which AWS service manages relational databases?",
+    "data": {
+      "choices": [
+        "RDS",
+        "S3",
+        "CloudFront",
+        "IAM"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Amazon RDS manages relational databases."
+  },
+  {
+    "id": "aws_0310",
+    "type": "multiple_choice",
+    "domain": "AWS",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "Which AWS service distributes content globally?",
+    "data": {
+      "choices": [
+        "CloudFront",
+        "EC2",
+        "VPC",
+        "EBS"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "CloudFront is AWS's CDN."
+  },
+  {
+    "id": "aws_0311",
+    "type": "multiple_choice",
+    "domain": "AWS",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "Which AWS service runs code without servers?",
+    "data": {
+      "choices": [
+        "Lambda",
+        "EC2",
+        "S3",
+        "Route53"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "AWS Lambda is a serverless compute service."
+  },
+  {
+    "id": "aws_0312",
+    "type": "multiple_choice",
+    "domain": "AWS",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "Which AWS service manages relational databases?",
+    "data": {
+      "choices": [
+        "RDS",
+        "S3",
+        "CloudFront",
+        "IAM"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Amazon RDS manages relational databases."
+  },
+  {
+    "id": "aws_0313",
+    "type": "multiple_choice",
+    "domain": "AWS",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "Which AWS service manages relational databases?",
+    "data": {
+      "choices": [
+        "RDS",
+        "S3",
+        "CloudFront",
+        "IAM"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Amazon RDS manages relational databases."
+  },
+  {
+    "id": "aws_0314",
+    "type": "multiple_choice",
+    "domain": "AWS",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "Which AWS service manages relational databases?",
+    "data": {
+      "choices": [
+        "RDS",
+        "S3",
+        "CloudFront",
+        "IAM"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Amazon RDS manages relational databases."
+  },
+  {
+    "id": "aws_0315",
+    "type": "multiple_choice",
+    "domain": "AWS",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "Which AWS service distributes content globally?",
+    "data": {
+      "choices": [
+        "CloudFront",
+        "EC2",
+        "VPC",
+        "EBS"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "CloudFront is AWS's CDN."
+  },
+  {
+    "id": "aws_0316",
+    "type": "multiple_choice",
+    "domain": "AWS",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "Which AWS service manages relational databases?",
+    "data": {
+      "choices": [
+        "RDS",
+        "S3",
+        "CloudFront",
+        "IAM"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Amazon RDS manages relational databases."
+  },
+  {
+    "id": "aws_0317",
+    "type": "multiple_choice",
+    "domain": "AWS",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "Which AWS service manages relational databases?",
+    "data": {
+      "choices": [
+        "RDS",
+        "S3",
+        "CloudFront",
+        "IAM"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Amazon RDS manages relational databases."
+  },
+  {
+    "id": "aws_0318",
+    "type": "multiple_choice",
+    "domain": "AWS",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "Which AWS service distributes content globally?",
+    "data": {
+      "choices": [
+        "CloudFront",
+        "EC2",
+        "VPC",
+        "EBS"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "CloudFront is AWS's CDN."
+  },
+  {
+    "id": "aws_0319",
+    "type": "multiple_choice",
+    "domain": "AWS",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "Which AWS service distributes content globally?",
+    "data": {
+      "choices": [
+        "CloudFront",
+        "EC2",
+        "VPC",
+        "EBS"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "CloudFront is AWS's CDN."
+  },
+  {
+    "id": "aws_0320",
+    "type": "multiple_choice",
+    "domain": "AWS",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "Which AWS service runs code without servers?",
+    "data": {
+      "choices": [
+        "Lambda",
+        "EC2",
+        "S3",
+        "Route53"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "AWS Lambda is a serverless compute service."
+  },
+  {
+    "id": "aws_0321",
+    "type": "multiple_choice",
+    "domain": "AWS",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "Which AWS service distributes content globally?",
+    "data": {
+      "choices": [
+        "CloudFront",
+        "EC2",
+        "VPC",
+        "EBS"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "CloudFront is AWS's CDN."
+  },
+  {
+    "id": "aws_0322",
+    "type": "multiple_choice",
+    "domain": "AWS",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "Which AWS service runs code without servers?",
+    "data": {
+      "choices": [
+        "Lambda",
+        "EC2",
+        "S3",
+        "Route53"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "AWS Lambda is a serverless compute service."
+  },
+  {
+    "id": "aws_0323",
+    "type": "multiple_choice",
+    "domain": "AWS",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "Which AWS service provides object storage?",
+    "data": {
+      "choices": [
+        "S3",
+        "EC2",
+        "Lambda",
+        "RDS"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Amazon S3 is AWS object storage."
+  },
+  {
+    "id": "aws_0324",
+    "type": "multiple_choice",
+    "domain": "AWS",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "Which AWS service manages relational databases?",
+    "data": {
+      "choices": [
+        "RDS",
+        "S3",
+        "CloudFront",
+        "IAM"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Amazon RDS manages relational databases."
+  },
+  {
+    "id": "aws_0325",
+    "type": "multiple_choice",
+    "domain": "AWS",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "Which AWS service manages relational databases?",
+    "data": {
+      "choices": [
+        "RDS",
+        "S3",
+        "CloudFront",
+        "IAM"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Amazon RDS manages relational databases."
+  },
+  {
+    "id": "aws_0326",
+    "type": "multiple_choice",
+    "domain": "AWS",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "Which AWS service manages relational databases?",
+    "data": {
+      "choices": [
+        "RDS",
+        "S3",
+        "CloudFront",
+        "IAM"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Amazon RDS manages relational databases."
+  },
+  {
+    "id": "aws_0327",
+    "type": "multiple_choice",
+    "domain": "AWS",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "Which AWS service provides object storage?",
+    "data": {
+      "choices": [
+        "S3",
+        "EC2",
+        "Lambda",
+        "RDS"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Amazon S3 is AWS object storage."
+  },
+  {
+    "id": "aws_0328",
+    "type": "multiple_choice",
+    "domain": "AWS",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "Which AWS service manages relational databases?",
+    "data": {
+      "choices": [
+        "RDS",
+        "S3",
+        "CloudFront",
+        "IAM"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Amazon RDS manages relational databases."
+  },
+  {
+    "id": "aws_0329",
+    "type": "multiple_choice",
+    "domain": "AWS",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "Which AWS service provides object storage?",
+    "data": {
+      "choices": [
+        "S3",
+        "EC2",
+        "Lambda",
+        "RDS"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Amazon S3 is AWS object storage."
+  },
+  {
+    "id": "aws_0330",
+    "type": "multiple_choice",
+    "domain": "AWS",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "Which AWS service runs code without servers?",
+    "data": {
+      "choices": [
+        "Lambda",
+        "EC2",
+        "S3",
+        "Route53"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "AWS Lambda is a serverless compute service."
+  },
+  {
+    "id": "aws_0331",
+    "type": "multiple_choice",
+    "domain": "AWS",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "Which AWS service manages relational databases?",
+    "data": {
+      "choices": [
+        "RDS",
+        "S3",
+        "CloudFront",
+        "IAM"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Amazon RDS manages relational databases."
+  },
+  {
+    "id": "aws_0332",
+    "type": "multiple_choice",
+    "domain": "AWS",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "Which AWS service manages relational databases?",
+    "data": {
+      "choices": [
+        "RDS",
+        "S3",
+        "CloudFront",
+        "IAM"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Amazon RDS manages relational databases."
+  },
+  {
+    "id": "aws_0333",
+    "type": "multiple_choice",
+    "domain": "AWS",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "Which AWS service provides object storage?",
+    "data": {
+      "choices": [
+        "S3",
+        "EC2",
+        "Lambda",
+        "RDS"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Amazon S3 is AWS object storage."
+  },
+  {
+    "id": "aws_0334",
+    "type": "multiple_choice",
+    "domain": "AWS",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "What does AWS IAM manage?",
+    "data": {
+      "choices": [
+        "Users and permissions",
+        "Virtual machines",
+        "Object storage",
+        "Backups"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "IAM manages authentication and authorization."
+  },
+  {
+    "id": "aws_0335",
+    "type": "multiple_choice",
+    "domain": "AWS",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "Which AWS service manages relational databases?",
+    "data": {
+      "choices": [
+        "RDS",
+        "S3",
+        "CloudFront",
+        "IAM"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Amazon RDS manages relational databases."
+  },
+  {
+    "id": "aws_0336",
+    "type": "multiple_choice",
+    "domain": "AWS",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "Which AWS service distributes content globally?",
+    "data": {
+      "choices": [
+        "CloudFront",
+        "EC2",
+        "VPC",
+        "EBS"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "CloudFront is AWS's CDN."
+  },
+  {
+    "id": "aws_0337",
+    "type": "multiple_choice",
+    "domain": "AWS",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "Which AWS service distributes content globally?",
+    "data": {
+      "choices": [
+        "CloudFront",
+        "EC2",
+        "VPC",
+        "EBS"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "CloudFront is AWS's CDN."
+  },
+  {
+    "id": "aws_0338",
+    "type": "multiple_choice",
+    "domain": "AWS",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "Which AWS service manages relational databases?",
+    "data": {
+      "choices": [
+        "RDS",
+        "S3",
+        "CloudFront",
+        "IAM"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Amazon RDS manages relational databases."
+  },
+  {
+    "id": "aws_0339",
+    "type": "multiple_choice",
+    "domain": "AWS",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "What does AWS IAM manage?",
+    "data": {
+      "choices": [
+        "Users and permissions",
+        "Virtual machines",
+        "Object storage",
+        "Backups"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "IAM manages authentication and authorization."
+  },
+  {
+    "id": "aws_0340",
+    "type": "multiple_choice",
+    "domain": "AWS",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "Which AWS service runs code without servers?",
+    "data": {
+      "choices": [
+        "Lambda",
+        "EC2",
+        "S3",
+        "Route53"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "AWS Lambda is a serverless compute service."
+  },
+  {
+    "id": "aws_0341",
+    "type": "multiple_choice",
+    "domain": "AWS",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "Which AWS service runs code without servers?",
+    "data": {
+      "choices": [
+        "Lambda",
+        "EC2",
+        "S3",
+        "Route53"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "AWS Lambda is a serverless compute service."
+  },
+  {
+    "id": "aws_0342",
+    "type": "multiple_choice",
+    "domain": "AWS",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "Which AWS service manages relational databases?",
+    "data": {
+      "choices": [
+        "RDS",
+        "S3",
+        "CloudFront",
+        "IAM"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Amazon RDS manages relational databases."
+  },
+  {
+    "id": "aws_0343",
+    "type": "multiple_choice",
+    "domain": "AWS",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "Which AWS service provides object storage?",
+    "data": {
+      "choices": [
+        "S3",
+        "EC2",
+        "Lambda",
+        "RDS"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Amazon S3 is AWS object storage."
+  },
+  {
+    "id": "aws_0344",
+    "type": "multiple_choice",
+    "domain": "AWS",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "Which AWS service manages relational databases?",
+    "data": {
+      "choices": [
+        "RDS",
+        "S3",
+        "CloudFront",
+        "IAM"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Amazon RDS manages relational databases."
+  },
+  {
+    "id": "aws_0345",
+    "type": "multiple_choice",
+    "domain": "AWS",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "Which AWS service runs code without servers?",
+    "data": {
+      "choices": [
+        "Lambda",
+        "EC2",
+        "S3",
+        "Route53"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "AWS Lambda is a serverless compute service."
+  },
+  {
+    "id": "aws_0346",
+    "type": "multiple_choice",
+    "domain": "AWS",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "What does AWS IAM manage?",
+    "data": {
+      "choices": [
+        "Users and permissions",
+        "Virtual machines",
+        "Object storage",
+        "Backups"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "IAM manages authentication and authorization."
+  },
+  {
+    "id": "aws_0347",
+    "type": "multiple_choice",
+    "domain": "AWS",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "Which AWS service provides object storage?",
+    "data": {
+      "choices": [
+        "S3",
+        "EC2",
+        "Lambda",
+        "RDS"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Amazon S3 is AWS object storage."
+  },
+  {
+    "id": "aws_0348",
+    "type": "multiple_choice",
+    "domain": "AWS",
+    "stage": 1,
+    "difficulty": 1,
+    "xp": 15,
+    "timer": 30,
+    "prompt": "Which AWS service runs code without servers?",
+    "data": {
+      "choices": [
+        "Lambda",
+        "EC2",
+        "S3",
+        "Route53"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "AWS Lambda is a serverless compute service."
+  },
+  {
+    "id": "aws_0349",
+    "type": "multiple_choice",
+    "domain": "AWS",
+    "stage": 1,
+    "difficulty": 2,
+    "xp": 20,
+    "timer": 35,
+    "prompt": "Which AWS service provides object storage?",
+    "data": {
+      "choices": [
+        "S3",
+        "EC2",
+        "Lambda",
+        "RDS"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Amazon S3 is AWS object storage."
+  },
+  {
+    "id": "aws_0350",
+    "type": "multiple_choice",
+    "domain": "AWS",
+    "stage": 1,
+    "difficulty": 3,
+    "xp": 25,
+    "timer": 40,
+    "prompt": "Which AWS service provides object storage?",
+    "data": {
+      "choices": [
+        "S3",
+        "EC2",
+        "Lambda",
+        "RDS"
+      ],
+      "correctIndex": 0
+    },
+    "explanation": "Amazon S3 is AWS object storage."
+  }
+]
