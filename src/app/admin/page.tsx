@@ -271,22 +271,12 @@ function LocalPrototypeAdmin(){
                         type="number"
                         min={0}
                         max={100}
-                        onChange={(e) => {
-                          const val = Number(e.target.value);
-                          setUserDraft((d) => {
-                            const existing = (d.trackProgress ?? selectedUser?.trackProgress) as Record<string, number> | undefined;
-                            const base = {
-                              azure_m365: existing?.azure_m365 ?? 0,
-                              aws: existing?.aws ?? 0,
-                              helpdesk: existing?.helpdesk ?? 0,
-                              desktop: existing?.desktop ?? 0,
-                            };
-                            return {
-                              ...d,
-                              trackProgress: { ...base, [t]: val },
-                            };
-                          });
-                        }}
+                        onChange={(e) =>
+                          setUserDraft((d) => ({
+                            ...d,
+                            trackProgress: { ...(d.trackProgress ?? (selectedUser?.trackProgress ?? {})), [t]: Number(e.target.value) },
+                          }))
+                        }
                       />
                     </label>
                   ))}
