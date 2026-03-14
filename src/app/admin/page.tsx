@@ -22,8 +22,6 @@ import {
   type LocalUser,
 } from "@/lib/userStore";
 
-const PIN = "13371337"; // TODO: move server-side later
-
 type QuestionSet = { id: string; domain: string; name: string; status: string; createdAt: string; _count?: { questions?: number; placements?: number } };
 type Question = {
   id: string;
@@ -594,7 +592,7 @@ function Toast({ msg }:{ msg: string }){
 
 export default function AdminPage(){
   const [ok, setOk] = useState(false);
-  const [pin, setPin] = useState("");
+  const [authChecked, setAuthChecked] = useState(false);
   const [tab, setTab] = useState<"questions" | "users" | "local">("questions");
   const [bulkImporting, setBulkImporting] = useState(false);
 
@@ -632,8 +630,26 @@ export default function AdminPage(){
   const bulkFileRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
-    const saved = sessionStorage.getItem("lu_admin_ok");
-    if (saved === "1") setOk(true);
+    let mounted = true;
+    (async () => {
+      try {
+        const r = await fetch("/api/auth/me", { cache: "no-store" as any });
+        const j = await r.json().catch(() => null);
+        if (!mounted) return;
+        if (!r.ok || !j?.user?.isAdmin) {
+          window.location.href = "/dashboard";
+          return;
+        }
+        setOk(true);
+      } catch {
+        if (!mounted) return;
+        window.location.href = "/dashboard";
+        return;
+      } finally {
+        if (mounted) setAuthChecked(true);
+      }
+    })();
+    return () => { mounted = false; };
   }, []);
 
   function popToast(msg: string){
@@ -764,12 +780,6 @@ export default function AdminPage(){
     }
   }
 
-  async function submitPin(){
-    setErr(null);
-    if (pin !== PIN) { setErr("Invalid PIN"); return; }
-    sessionStorage.setItem("lu_admin_ok","1");
-    setOk(true);
-  }
 
   // ===== Users =====
   async function refreshUsers(){
@@ -935,7 +945,7 @@ export default function AdminPage(){
 
   const selectedSetObj = useMemo(() => sets.find(s => s.id === selectedSet) || null, [sets, selectedSet]);
 
-  if (!ok){
+  if (!authChecked || !ok){
     return (
       <div style={{ maxWidth: 520, margin: "0 auto", padding: 18 }}>
         <div className="topbar">
@@ -946,16 +956,7 @@ export default function AdminPage(){
               <small>Admin</small>
             </div>
           </div>
-          <span className="badge">🔒 PIN required</span>
-        </div>
-
-        <div className="card" style={{ marginTop: 14 }}>
-          <div style={{ fontWeight: 800, marginBottom: 6 }}>Enter admin PIN</div>
-          <div className="row" style={{ alignItems:"center" }}>
-            <input value={pin} onChange={e => setPin(e.target.value)} placeholder="13371337" />
-            <button className="primary" onClick={submitPin} style={{ width: 140 }}>Unlock</button>
-          </div>
-          {err ? <div style={{ marginTop: 10 }}><small style={{ color:"#ffb4b4" }}>{err}</small></div> : null}
+          <span className="badge">Checking access…</span>
         </div>
       </div>
     );
@@ -977,7 +978,7 @@ export default function AdminPage(){
           <button onClick={() => setTab("local")} className={tab==="local" ? "primary" : ""}>Local (Prototype)</button>
           <button onClick={() => setTab("users")} className={tab==="users" ? "primary" : ""}>DB Users</button>
           <button onClick={() => (window.location.href = "/admin/content")} className="primary">Content Studio</button>
-          <button className="danger" onClick={() => { sessionStorage.removeItem("lu_admin_ok"); location.reload(); }}>Lock</button>
+          <button className="danger" onClick={() => { window.location.href = "/dashboard"; }}>Back</button>
         </div>
       </div>
 
