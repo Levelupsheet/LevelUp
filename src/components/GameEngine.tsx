@@ -34,6 +34,28 @@ const FALLBACK_BY_LANE: Record<GameLane, DiabloQuestion[]> = {
   CERTIFICATIONS: [{ id: "fallback_cert", type: "multiple_choice", prompt: "No certification set is currently assigned. Where should you fix that?", choices: ["Admin placements", "Registry Editor", "Services", "Disk Management"], correctIndex: 0, explanation: "Assign a published question set to the certification lane in Admin.", domainId: "general", level: 1 }],
 };
 
+
+function getRecentKey(lane: GameLane, startingPosition?: string | null, certExam?: string | null) {
+  return `lu_recent_${lane}_${startingPosition || "all"}_${certExam || "all"}`;
+}
+
+function readRecentIds(key: string): string[] {
+  try {
+    const raw = localStorage.getItem(key);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed.map((v) => String(v)) : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeRecentIds(key: string, ids: string[]) {
+  try {
+    const unique = Array.from(new Set(ids.map((v) => String(v)))).slice(-100);
+    localStorage.setItem(key, JSON.stringify(unique));
+  } catch {}
+}
+
 function mapQuestion(q: any, idx: number): DiabloQuestion {
   const tags = Array.isArray(q?.tags) ? q.tags : [];
   const type = normalizeQuestionType(q?.type);
@@ -76,6 +98,10 @@ export default function GameEngine(props: Props) {
       search.set("lane", lane);
       search.set("questionCount", String(effectiveCount));
       search.set("shuffle", "1");
+      search.set("nonce", String(Date.now()));
+      const recentKey = getRecentKey(lane, startingPosition, certExam);
+      const excludeIds = readRecentIds(recentKey);
+      if (excludeIds.length) search.set("excludeIds", excludeIds.join(","));
       if (startingPosition) search.set("startingPosition", startingPosition);
       if (certExam) search.set("certExam", certExam);
       const res = await fetch(`/api/content/active?${search.toString()}`, { cache: "no-store" as any });
@@ -83,6 +109,7 @@ export default function GameEngine(props: Props) {
       const mapped = Array.isArray(json?.questions) ? json.questions.map(mapQuestion) : [];
       if (mapped.length) {
         setQuestions(mapped);
+        writeRecentIds(getRecentKey(lane, startingPosition, certExam), mapped.map((q) => String(q.id)));
         setSetLabel(json?.set?.name ? `${title} · ${json.set.name}` : subtitle || title);
       } else {
         setQuestions(FALLBACK_BY_LANE[lane]);

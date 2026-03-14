@@ -579,6 +579,29 @@ function ConfettiBurst() {
   );
 }
 
+
+async function tryLoadDbInterviewQuestions(count: number) {
+  try {
+    const res = await fetch(`/api/content/active?lane=INTERVIEW&questionCount=${count}&shuffle=1&nonce=${Date.now()}`, { cache: "no-store" as any });
+    const json = await res.json().catch(() => null);
+    if (!res.ok || !Array.isArray(json?.questions) || !json.questions.length) return null;
+    return json.questions.map((q: any) => ({
+      track: "azure_m365",
+      stage: 1,
+      kind: "mcq",
+      difficulty: Number(q?.difficulty || q?.level || 1) >= 3 ? "hard" : Number(q?.difficulty || q?.level || 1) >= 2 ? "medium" : "easy",
+      question: String(q?.prompt || ""),
+      options: Array.isArray(q?.choices) ? q.choices : [],
+      correctIndex: typeof q?.correctIndex === "number" ? q.correctIndex : 0,
+      idealAnswer: q?.explanation || undefined,
+      tags: Array.isArray(q?.tags) ? q.tags : [],
+      rubricKeywords: [],
+    }));
+  } catch {
+    return null;
+  }
+}
+
 export default function MockInterviewModal(props: { open: boolean; onClose: () => void }) {
   const { open, onClose } = props;
 
@@ -678,12 +701,18 @@ export default function MockInterviewModal(props: { open: boolean; onClose: () =
   }
 
 
-  function start(nextStage: 1 | 2) {
+  async function start(nextStage: 1 | 2) {
     setStage(nextStage);
     resetSession();
+    const count = nextStage === 1 ? 12 : 8;
+    const dbQuestions = await tryLoadDbInterviewQuestions(count);
+    if (dbQuestions?.length) {
+      setSessionQuestions(dbQuestions as any);
+      setStep("quiz");
+      return;
+    }
     const src = nextStage === 1 ? BANK_STAGE1 : BANK_STAGE2;
     const pool = src.filter((q) => q.track === track);
-    const count = nextStage === 1 ? 12 : 8;
     setSessionQuestions(pickN(pool, count));
     setStep("quiz");
   }

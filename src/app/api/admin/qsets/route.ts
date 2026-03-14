@@ -7,8 +7,9 @@ export async function GET() {
   if (!admin.ok) return admin.response;
   try{
     const sets = await prisma.questionSet.findMany({
-      orderBy: { createdAt: "desc" },
-      take: 50,
+      orderBy: [{ updatedAt: "desc" }, { createdAt: "desc" }],
+      take: 200,
+      include: { _count: { select: { questions: true, placements: true } } },
     });
     return NextResponse.json({ sets });
   }catch(e:any){
@@ -21,12 +22,12 @@ export async function POST(req: Request) {
   if (!admin.ok) return admin.response;
   try{
     const body = await req.json();
-    const domain = body.domain || "NETWORKING";
-    const name = body.name || "Networking Set";
+    const domain = String(body.domain || "NETWORKING").toUpperCase();
+    const name = String(body.name || "Networking Set").trim();
     const status = body.status || "DRAFT";
 
     const set = await prisma.questionSet.create({
-      data: { domain, name, status },
+      data: { domain: domain as any, name, status },
     });
     return NextResponse.json({ set });
   }catch(e:any){

@@ -14,7 +14,7 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
     const setId = String(body?.setId || "");
-    const lane = body?.lane as "TEST_NOW" | "TRAINING" | "CERTIFICATIONS";
+    const lane = body?.lane as "TEST_NOW" | "TRAINING" | "CERTIFICATIONS" | "INTERVIEW";
     const startingPosition = body?.startingPosition ?? null;
     const certExam = body?.certExam ?? null;
 

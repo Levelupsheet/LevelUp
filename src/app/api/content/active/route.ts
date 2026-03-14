@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { normalizeDifficultyLevel, sampleQuestions, shuffleQuestionPayload } from "@/lib/questionTransforms";
@@ -13,6 +15,7 @@ export async function GET(req: Request) {
   const certExam = url.searchParams.get("certExam");
   const questionCountParam = Number(url.searchParams.get("questionCount") || "0");
   const shouldShuffle = !["0", "false", "no"].includes((url.searchParams.get("shuffle") || "true").toLowerCase());
+  const excludeIds = (url.searchParams.get("excludeIds") || "").split(",").map((v) => v.trim()).filter(Boolean);
 
   if (!lane) {
     return NextResponse.json({ error: "lane is required" }, { status: 400 });
@@ -59,7 +62,9 @@ export async function GET(req: Request) {
     };
   });
 
-  const sampled = sampleQuestions(mapped, Number.isFinite(questionCountParam) ? questionCountParam : 0);
+  const filtered = excludeIds.length ? mapped.filter((q) => !excludeIds.includes(String(q.id))) : mapped;
+  const fallbackPool = filtered.length >= (Number.isFinite(questionCountParam) ? questionCountParam : 0) ? filtered : [...filtered, ...mapped.filter((q) => !filtered.some((f) => f.id === q.id))];
+  const sampled = sampleQuestions(fallbackPool, Number.isFinite(questionCountParam) ? questionCountParam : 0);
   const questions = shouldShuffle ? sampled.map((q) => shuffleQuestionPayload(q)) : sampled;
 
   return NextResponse.json({

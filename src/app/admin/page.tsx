@@ -24,7 +24,7 @@ import {
 
 const PIN = "13371337"; // TODO: move server-side later
 
-type QuestionSet = { id: string; domain: string; name: string; status: string; createdAt: string };
+type QuestionSet = { id: string; domain: string; name: string; status: string; createdAt: string; _count?: { questions?: number; placements?: number } };
 type Question = {
   id: string;
   setId: string;
@@ -596,6 +596,7 @@ export default function AdminPage(){
   const [ok, setOk] = useState(false);
   const [pin, setPin] = useState("");
   const [tab, setTab] = useState<"questions" | "users" | "local">("questions");
+  const [bulkImporting, setBulkImporting] = useState(false);
 
   const [err, setErr] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
@@ -628,6 +629,7 @@ export default function AdminPage(){
   const [uploadPreview, setUploadPreview] = useState<any[] | null>(null);
 
   const fileRef = useRef<HTMLInputElement | null>(null);
+  const bulkFileRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     const saved = sessionStorage.getItem("lu_admin_ok");
@@ -637,6 +639,129 @@ export default function AdminPage(){
   function popToast(msg: string){
     setToast(msg);
     setTimeout(() => setToast(null), 2200);
+  }
+
+  function normalizeDomain(value: unknown): string {
+    const raw = String(value || "GENERAL").trim().toUpperCase().replace(/[^A-Z0-9]+/g, "_");
+    const allowed = ["IDENTITY","NETWORKING","SECURITY","COMPUTE","STORAGE","AZURE","AWS","WINDOWS","GENERAL"];
+    return allowed.includes(raw) ? raw : "GENERAL";
+  }
+
+  function inferPlacementMeta(q: any) {
+    const tags = Array.isArray(q?.tags) ? q.tags.map((v: any) => String(v).toLowerCase()) : [];
+    const text = [q?.track, q?.path, q?.startingPosition, q?.certExam, q?.exam, ...(Array.isArray(q?.tags) ? q.tags : [])]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase();
+    const lane = text.includes("interview")
+      ? "INTERVIEW"
+      : (q?.certExam || q?.exam || tags.some((t: string) => ["a_plus", "security_plus", "az_900", "cert", "certification"].includes(t)))
+        ? "CERTIFICATIONS"
+        : (q?.startingPosition || q?.path || tags.some((t: string) => ["helpdesk", "desktop", "cloud", "training"].includes(t)))
+          ? "TRAINING"
+          : "TEST_NOW";
+
+    let startingPosition = String(q?.startingPosition || q?.path || "").toUpperCase();
+    if (!startingPosition) {
+      if (text.includes("helpdesk")) startingPosition = "HELPDESK_SUPPORT";
+      else if (text.includes("desktop")) startingPosition = "DESKTOP_TECHNICIAN";
+      else if (text.includes("cloud")) startingPosition = "CLOUD_ENGINEER";
+    }
+
+    let certExam = String(q?.certExam || q?.exam || "").toUpperCase();
+    if (!certExam) {
+      if (text.includes("a+") || text.includes("a_plus")) certExam = "A_PLUS";
+      else if (text.includes("security+") || text.includes("security_plus")) certExam = "SECURITY_PLUS";
+      else if (text.includes("az-900") || text.includes("az_900")) certExam = "AZ_900";
+    }
+
+    return { lane, startingPosition, certExam, domain: normalizeDomain(q?.domain) };
+  }
+
+  async function createSetRecord(name: string, domain: string) {
+    const r = await fetch("/api/admin/qsets", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ domain, name, status: "DRAFT" }),
+    });
+    const j = await r.json();
+    if (!r.ok) throw new Error(j?.error || `Failed to create set ${name}`);
+    return j.set as QuestionSet;
+  }
+
+  async function bulkImportAndAssign(file: File) {
+    setErr(null);
+    setAssignMsg(null);
+    setBulkImporting(true);
+    try {
+      const text = await file.text();
+      const parsed = safeJsonParse<any>(text, null);
+      const qList = Array.isArray(parsed) ? parsed : (Array.isArray(parsed?.questions) ? parsed.questions : null);
+      if (!qList || !qList.length) throw new Error("JSON must be an array or { questions: [...] }");
+
+      const groups = new Map<string, { setName: string; domain: string; lane: string; startingPosition?: string; certExam?: string; questions: any[] }>();
+      for (const q of qList) {
+        const meta = inferPlacementMeta(q);
+        const key = [meta.lane, meta.startingPosition || "all", meta.certExam || "all", meta.domain].join("::");
+        if (!groups.has(key)) {
+          const label = [meta.lane.replaceAll("_", " "), meta.startingPosition?.replaceAll("_", " "), meta.certExam?.replaceAll("_", " "), meta.domain].filter(Boolean).join(" • ");
+          groups.set(key, {
+            setName: `Auto ${label}`,
+            domain: meta.domain,
+            lane: meta.lane,
+            startingPosition: meta.startingPosition || undefined,
+            certExam: meta.certExam || undefined,
+            questions: [],
+          });
+        }
+        groups.get(key)!.questions.push(q);
+      }
+
+      let createdCount = 0;
+      let importedCount = 0;
+      let assignedCount = 0;
+      let firstSetId = "";
+      for (const group of groups.values()) {
+        const set = await createSetRecord(group.setName, group.domain);
+        if (!firstSetId) firstSetId = set.id;
+        createdCount += 1;
+
+        const importRes = await fetch("/api/admin/questions", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ setId: set.id, questions: group.questions }),
+        });
+        const importJson = await importRes.json();
+        if (!importRes.ok) throw new Error(importJson?.error || `Failed importing ${group.setName}`);
+        importedCount += Number(importJson?.inserted || 0);
+
+        if (group.lane !== "INTERVIEW") {
+          const placeBody: any = { setId: set.id, lane: group.lane };
+          if (group.lane === "TRAINING" && group.startingPosition) placeBody.startingPosition = group.startingPosition;
+          if (group.lane === "CERTIFICATIONS" && group.certExam) placeBody.certExam = group.certExam;
+          const placeRes = await fetch("/api/admin/placements", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(placeBody),
+          });
+          const placeJson = await placeRes.json();
+          if (!placeRes.ok) throw new Error(placeJson?.error || `Failed assigning ${group.setName}`);
+          assignedCount += 1;
+        }
+      }
+
+      await refreshSets();
+      if (firstSetId) {
+        setSelectedSet(firstSetId);
+        await refreshQuestions(firstSetId);
+      }
+      popToast("Bulk import complete");
+      setAssignMsg(`Created ${createdCount} set(s), imported ${importedCount} question(s), assigned ${assignedCount} live placement(s). Interview-tagged questions were grouped into their own set.`);
+    } catch (e: any) {
+      setErr(e?.message || "Bulk import failed");
+    } finally {
+      setBulkImporting(false);
+    }
   }
 
   async function submitPin(){
@@ -672,7 +797,7 @@ export default function AdminPage(){
   }
 
   // ===== Question Sets / Questions =====
-  async function assignPlacement(lane: "TEST_NOW" | "TRAINING" | "CERTIFICATIONS") {
+  async function assignPlacement(lane: "TEST_NOW" | "TRAINING" | "CERTIFICATIONS" | "INTERVIEW") {
     try {
       setAssignMsg(null);
       const body: any = { setId: selectedSet, lane };
@@ -694,11 +819,13 @@ export default function AdminPage(){
 
   async function refreshSets(){
     setErr(null);
-    const r = await fetch("/api/admin/qsets");
+    const r = await fetch("/api/admin/qsets", { cache: "no-store" as any });
     const j = await r.json();
     if (!r.ok) { setErr(j?.error || "Failed to load sets"); return; }
-    setSets(j.sets || []);
-    if (!selectedSet && j.sets?.[0]?.id) setSelectedSet(j.sets[0].id);
+    const nextSets = j.sets || [];
+    setSets(nextSets);
+    if (selectedSet && nextSets.some((s: QuestionSet) => s.id === selectedSet)) return;
+    if (nextSets?.[0]?.id) setSelectedSet(nextSets[0].id);
   }
 
   async function refreshQuestions(setId: string){
@@ -726,15 +853,11 @@ export default function AdminPage(){
 
   async function createSet(){
     setErr(null);
-    const r = await fetch("/api/admin/qsets", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ domain: "NETWORKING", name: newSetName, status: "DRAFT" }),
-    });
-    const j = await r.json();
-    if (!r.ok) { setErr(j?.error || "Failed to create set"); return; }
+    const set = await createSetRecord(newSetName, "GENERAL");
+    setSelectedSet(set.id);
     popToast("Set created");
     await refreshSets();
+    await refreshQuestions(set.id);
   }
 
   async function saveSingleQuestion(){
@@ -755,7 +878,13 @@ export default function AdminPage(){
 
   async function uploadJsonFile(file: File){
     setErr(null);
-    if (!selectedSet) { setErr("Select a set first"); return; }
+    let activeSetId = selectedSet;
+    if (!activeSetId) {
+      const autoSet = await createSetRecord(file.name.replace(/\.json$/i, ""), "GENERAL");
+      activeSetId = autoSet.id;
+      setSelectedSet(autoSet.id);
+      await refreshSets();
+    }
     const text = await file.text();
     const parsed = safeJsonParse<any>(text, null);
     if (!parsed) { setErr("Could not parse JSON file"); return; }
@@ -769,13 +898,13 @@ export default function AdminPage(){
     const r = await fetch("/api/admin/questions", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ setId: selectedSet, questions: qList }),
+      body: JSON.stringify({ setId: activeSetId, questions: qList }),
     });
     const j = await r.json();
     if (!r.ok) { setErr(j?.error || "Upload failed"); return; }
 
     popToast(`Imported ${j.inserted ?? 0} question(s)`);
-    await refreshQuestions(selectedSet);
+    await refreshQuestions(activeSetId);
   }
 
   function moveQuestion(idx: number, dir: -1 | 1){
@@ -947,6 +1076,7 @@ export default function AdminPage(){
             <div className="row" style={{ gap: 8, flexWrap:"wrap" }}>
               <button onClick={refreshSets}>Refresh sets</button>
               <button onClick={() => fileRef.current?.click()} className="primary">Import questions JSON</button>
+              <button onClick={() => bulkFileRef.current?.click()} disabled={bulkImporting}>{bulkImporting ? "Bulk importing…" : "Bulk import & auto-assign"}</button>
               <button onClick={() => (window.location.href = "/admin/content")} className="secondaryBtn">Open Content Studio</button>
             </div>
           </div>
@@ -957,15 +1087,16 @@ export default function AdminPage(){
               <label style={{ display:"grid", gap: 6 }}>
                 <small>Select set</small>
                 <select value={selectedSet} onChange={(e) => setSelectedSet(e.target.value)}>
+                  <option value="">-- Select a question set --</option>
                   {sets.map((s) => (
-                    <option key={s.id} value={s.id}>{s.name} • {s.status}</option>
+                    <option key={s.id} value={s.id}>{s.name} • {s.status} • {s._count?.questions ?? 0} q</option>
                   ))}
                 </select>
               </label>
               <div className="row" style={{ marginTop: 10, flexWrap:"wrap" }}>
                 <span className="badge">Sets: {sets.length}</span>
                 {selectedSetObj ? <span className="badge">Domain: {selectedSetObj.domain}</span> : null}
-                {selectedSetObj ? <span className="badge">Questions: {questions.length}</span> : null}
+                {selectedSetObj ? <span className="badge">Questions: {selectedSetObj._count?.questions ?? questions.length}</span> : null}
               </div>
               <div style={{ marginTop: 12, display:"grid", gridTemplateColumns:"1fr auto", gap: 10, alignItems:"end" }}>
                 <label style={{ display:"grid", gap: 6 }}>
@@ -988,6 +1119,17 @@ export default function AdminPage(){
                   e.currentTarget.value = "";
                 }}
               />
+              <input
+                ref={bulkFileRef}
+                type="file"
+                accept="application/json,.json"
+                style={{ display: "none" }}
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (f) bulkImportAndAssign(f);
+                  e.currentTarget.value = "";
+                }}
+              />
             </div>
 
             <div className="card" style={{ background:"rgba(255,255,255,0.03)" }}>
@@ -997,6 +1139,7 @@ export default function AdminPage(){
                   <button onClick={() => assignPlacement("TEST_NOW")} disabled={!selectedSet}>Set as Test Now</button>
                   <button onClick={() => assignPlacement("TRAINING")} disabled={!selectedSet}>Set as Training</button>
                   <button onClick={() => assignPlacement("CERTIFICATIONS")} disabled={!selectedSet}>Set as Certification</button>
+                  <button onClick={() => assignPlacement("INTERVIEW")} disabled={!selectedSet}>Set as Interview</button>
                 </div>
                 <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(180px, 1fr))", gap: 10 }}>
                   <label style={{ display:"grid", gap: 6 }}>
@@ -1016,6 +1159,7 @@ export default function AdminPage(){
                     </select>
                   </label>
                 </div>
+                <small style={{ opacity: 0.78 }}>Placements assign a full set to a live mode. For per-mode targeting, use the bulk importer to auto-create separate sets by tag/domain.</small>
                 {assignMsg ? <small style={{ opacity: 0.92 }}>{assignMsg}</small> : null}
               </div>
             </div>

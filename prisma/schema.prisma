@@ -227,7 +227,15 @@ model MarketingEvent {
 
 
 enum QuestionDomain {
+  IDENTITY
   NETWORKING
+  SECURITY
+  COMPUTE
+  STORAGE
+  AZURE
+  AWS
+  WINDOWS
+  GENERAL
 }
 
 enum QuestionSetStatus {
@@ -241,6 +249,7 @@ enum ContentLane {
   TEST_NOW
   TRAINING
   CERTIFICATIONS
+  INTERVIEW
 }
 
 enum QuestionType {
