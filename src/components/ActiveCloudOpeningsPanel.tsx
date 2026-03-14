@@ -18,8 +18,7 @@ type JobOpening = {
 
 function compactSummary(job: JobOpening) {
   const base = String(job.summaryShort || job.description || "")
-    .replace(/[
-]+/g, " ")
+    .replace(/[\r\n]+/g, " ")
     .replace(/[•*]+/g, " ")
     .replace(/\s+/g, " ")
     .trim();

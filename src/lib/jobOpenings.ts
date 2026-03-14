@@ -21,11 +21,9 @@ function shorten(line: string, max = 110) {
 }
 
 export function summarizeJobDescription(input: JobOpeningInput) {
-  const description = String(input.description || "").replace(/
-/g, "");
+  const description = String(input.description || "").replace(/\r?\n/g, "");
   const rawLines = description
-    .split("
-")
+    .split("\n")
     .map(cleanLine)
     .filter(Boolean)
     .filter((line) => line.length > 18);
@@ -43,12 +41,11 @@ export function summarizeJobDescription(input: JobOpeningInput) {
   const first = picks[0] || `${input.title || 'Role'} at ${input.companyName || 'Company'}`;
   const second = picks[1] || metaBits || 'See full description for responsibilities, requirements, and application details.';
 
-  const summaryShort = `${shorten(first, 68)}${second ? ` • ${shorten(second, 58)}` : ''}`
-    .replace(/[
-]+/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim()
-    .slice(0, 135);
+const summaryShort = `${shorten(first, 68)}${second ? ` • ${shorten(second, 58)}` : ''}`
+  .replace(/[\r\n]+/g, ' ')
+  .replace(/\s+/g, ' ')
+  .trim()
+  .slice(0, 135);
   const summaryBullets = picks.slice(0, 4);
 
   return {
