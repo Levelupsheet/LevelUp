@@ -349,31 +349,28 @@ function GeneratedQuestionCard({ question, saving, onSave }: { question: Generat
   const [prompt, setPrompt] = useState(question.prompt);
   const [explanation, setExplanation] = useState(question.explanation || "");
   const [reviewStatus, setReviewStatus] = useState(question.reviewStatus);
-  const [dataText, setDataText] = useState(JSON.stringify(question.data || {}, null, 2));
-  const [choicesText, setChoicesText] = useState(Array.isArray(question.choices) ? question.choices.join("
-") : "");
-  const [editorNotes, setEditorNotes] = useState(question.editorNotes || "");
+const [dataText, setDataText] = useState(JSON.stringify(question.data || {}, null, 2));
+const [choicesText, setChoicesText] = useState(Array.isArray(question.choices) ? question.choices.join("\n") : "");
+const [editorNotes, setEditorNotes] = useState(question.editorNotes || "");
 
   useEffect(() => {
-    setPrompt(question.prompt);
-    setExplanation(question.explanation || "");
-    setReviewStatus(question.reviewStatus);
-    setDataText(JSON.stringify(question.data || {}, null, 2));
-    setChoicesText(Array.isArray(question.choices) ? question.choices.join("
-") : "");
-    setEditorNotes(question.editorNotes || "");
-  }, [question]);
+  setPrompt(question.prompt);
+  setExplanation(question.explanation || "");
+  setReviewStatus(question.reviewStatus);
+  setDataText(JSON.stringify(question.data || {}, null, 2));
+  setChoicesText(Array.isArray(question.choices) ? question.choices.join("\n") : "");
+  setEditorNotes(question.editorNotes || "");
+}, [question]);
 
   async function save() {
-    const patch: Partial<GeneratedQuestion> = {
-      prompt,
-      explanation,
-      reviewStatus,
-      editorNotes,
-      data: JSON.parse(dataText),
-      choices: choicesText.trim() ? choicesText.split("
-").map((v) => v.trim()).filter(Boolean) : null,
-    };
+const patch: Partial<GeneratedQuestion> = {
+  prompt,
+  explanation,
+  reviewStatus,
+  editorNotes,
+  data: JSON.parse(dataText),
+  choices: choicesText.trim() ? choicesText.split("\n").map((v) => v.trim()).filter(Boolean) : null,
+};
     await onSave(question, patch);
   }
 
