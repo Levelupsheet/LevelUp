@@ -311,6 +311,7 @@ export default function DiabloQuizRunner(props: {
   const [cliValue, setCliValue] = useState("");
   const [sequenceItems, setSequenceItems] = useState<string[]>([]);
   const [multiSelected, setMultiSelected] = useState<number[]>([]);
+  const [isMobileLayout, setIsMobileLayout] = useState(false);
   const finishedOnceRef = useRef(false);
 
   const { state, question, select, clear, submit, submitManual, next, currentDomainId, currentMastery, outcome } = useCombatQuiz({
@@ -331,6 +332,13 @@ export default function DiabloQuizRunner(props: {
   }, [combatQuestions.length, timed, title]);
 
   useEffect(() => {
+    const apply = () => setIsMobileLayout(window.innerWidth < 860);
+    apply();
+    window.addEventListener("resize", apply);
+    return () => window.removeEventListener("resize", apply);
+  }, []);
+
+  useEffect(() => {
     const data = (question?.data || {}) as Record<string, unknown>;
     setFillValue("");
     setCliValue("");
@@ -347,10 +355,8 @@ export default function DiabloQuizRunner(props: {
   useEffect(() => {
     if (!state.finished || finishedOnceRef.current) return;
     finishedOnceRef.current = true;
-    const normalizedOutcome =
-      outcome === "victory" || outcome === "defeat" || outcome === "complete" ? outcome : null;
     onComplete?.({
-      outcome: normalizedOutcome,
+      outcome: outcome as DiabloQuizRunSummary['outcome'],
       xpEarned: state.xpEarned,
       correctCount: state.correctCount,
       totalQuestions: combatQuestions.length,
@@ -411,7 +417,10 @@ export default function DiabloQuizRunner(props: {
   }
 
   return (
-    <div className="modalShell" style={{ position: "relative", maxWidth: media?.width || 1240, minHeight: media?.height || 720, margin: "0 auto" }}>
+    <div
+      className="modalShell d2QuizShell"
+      style={{ position: "relative", width: "100%", maxWidth: media?.width || 1240, minHeight: "min(720px, 100dvh - 120px)", margin: "0 auto" }}
+    >
       <div className="modalHead">
         <div>
           <div className="modalTitle d2Roman">{title}</div>
@@ -424,104 +433,199 @@ export default function DiabloQuizRunner(props: {
         )}
       </div>
 
-      <div className="modalBody">
-        <div style={{ display: "grid", gridTemplateColumns: "minmax(220px, 0.85fr) minmax(520px, 1.4fr) minmax(220px, 0.85fr)", gap: 14, alignItems: "start" }}>
-          <div style={{ display: "grid", gap: 12 }}>
-            <div className={hitPulse === "player" ? "d2Shake" : ""}>
-              <D2LifeOrb value={state.playerHP} name={playerName} />
+      <div className="modalBody d2QuizBody">
+        {!isMobileLayout ? (
+          <div className="d2InterviewGrid d2QuizGrid">
+            <div style={{ display: "grid", gap: 12 }}>
+              <div className={hitPulse === "player" ? "d2Shake" : ""}>
+                <D2LifeOrb value={state.playerHP} name={playerName} />
+              </div>
+              <ModelPanel title={playerName} src={playerVideo} />
             </div>
-            <ModelPanel title={playerName} src={playerVideo} />
-          </div>
 
-          <div className={"d2QuestionCard " + (hitPulse === "enemy" ? "d2HitFlash" : "") } style={{ minHeight: 560 }}>
-            <span className="d2Rivet" style={{ left: 12, top: 12 }} />
-            <span className="d2Rivet" style={{ right: 12, top: 12 }} />
-            <span className="d2Rivet" style={{ left: 12, bottom: 12 }} />
-            <span className="d2Rivet" style={{ right: 12, bottom: 12 }} />
+            <div className={"d2QuestionCard d2QuizQuestionCard " + (hitPulse === "enemy" ? "d2HitFlash" : "") } style={{ minHeight: 560 }}>
+              <span className="d2Rivet" style={{ left: 12, top: 12 }} />
+              <span className="d2Rivet" style={{ right: 12, top: 12 }} />
+              <span className="d2Rivet" style={{ left: 12, bottom: 12 }} />
+              <span className="d2Rivet" style={{ right: 12, bottom: 12 }} />
 
-            {!finished && question ? (
-              <>
-                <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
-                  <div style={{ fontWeight: 900, letterSpacing: 0.6, opacity: 0.9 }}>
-                    Q{state.idx + 1} / {combatQuestions.length}
-                  </div>
-                  <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap", justifyContent: "flex-end" }}>
-                    {metaLeft ? <span className="badge">{metaLeft}</span> : null}
-                    {timed ? <span className="badge" style={{ fontVariantNumeric: "tabular-nums" }}>⏱ {Math.max(0, state.timeLeft)}s</span> : null}
-                    <span className="badge">{labelForType(questionType)}</span>
-                    {metaRight ? <span className="badge">{metaRight}</span> : null}
-                    <span className="badge">XP +{state.xpEarned}</span>
-                  </div>
-                </div>
-
-                <div style={{ marginTop: 12, fontSize: 22, lineHeight: 1.35, fontWeight: 900 }}>{question.prompt}</div>
-
-                <DomainRuneBar domainLabel={domainLabel} mastery={currentMastery} tier={state.tier} />
-
-                {renderQuestionInput({
-                  question,
-                  state,
-                  mcqSelected: state.selected,
-                  onSelectMcq: select,
-                  fillValue,
-                  setFillValue,
-                  cliValue,
-                  setCliValue,
-                  sequenceItems,
-                  moveSequenceItem: (from, to) => setSequenceItems((current) => reorderItem(current, from, to)),
-                  multiSelected,
-                  toggleMultiSelected: (index) => {
-                    setMultiSelected((current) => current.includes(index) ? current.filter((v) => v !== index) : [...current, index].sort((a, b) => a - b));
-                  },
-                })}
-
-                <div className="d2ActionRow" style={{ marginTop: 14 }}>
-                  {!state.locked ? (
-                    <>
-                      <button className="d2Btn" onClick={() => (usesManualSubmit ? handleManualSubmit() : submit())} disabled={!canSubmitCurrentQuestion()}>SUBMIT</button>
-                      <button
-                        className="d2Btn"
-                        onClick={() => {
-                          clear();
-                          setFillValue("");
-                          setCliValue("");
-                          setMultiSelected([]);
-                          const data = (question.data || {}) as Record<string, unknown>;
-                          const items = safeArray<string>(data.items);
-                          const correctOrder = safeArray<string>(data.correctOrder);
-                          setSequenceItems(items.length ? items : correctOrder);
-                        }}
-                      >
-                        CLEAR
-                      </button>
-                    </>
-                  ) : (
-                    <button className="d2Btn" onClick={() => next()}>NEXT</button>
-                  )}
-                </div>
-
-                {state.locked && (
-                  <div style={{ marginTop: 12 }}>
-                    <div className="card" style={{ padding: 12, background: "rgba(255,255,255,0.04)" }}>
-                      <div style={{ fontWeight: 950 }}>{state.lastWasCorrect ? "✅ Correct" : "❌ Not quite"}</div>
-                      <div className="muted" style={{ marginTop: 6 }}>{state.feedback || "Review the explanation and continue."}</div>
+              {!finished && question ? (
+                <>
+                  <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+                    <div style={{ fontWeight: 900, letterSpacing: 0.6, opacity: 0.9 }}>
+                      Q{state.idx + 1} / {combatQuestions.length}
+                    </div>
+                    <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap", justifyContent: "flex-end" }}>
+                      {metaLeft ? <span className="badge">{metaLeft}</span> : null}
+                      {timed ? <span className="badge" style={{ fontVariantNumeric: "tabular-nums" }}>⏱ {Math.max(0, state.timeLeft)}s</span> : null}
+                      <span className="badge">{labelForType(questionType)}</span>
+                      {metaRight ? <span className="badge">{metaRight}</span> : null}
+                      <span className="badge">XP +{state.xpEarned}</span>
                     </div>
                   </div>
-                )}
-              </>
-            ) : (
-              <div className="card" style={{ padding: 16, background: "rgba(255,255,255,0.04)" }}>
-                <div style={{ fontWeight: 950, fontSize: 20 }}>{outcome === "victory" ? "Victory" : outcome === "defeat" ? "Defeat" : "Run complete"}</div>
-                <div className="muted" style={{ marginTop: 8 }}>Score {state.correctCount}/{combatQuestions.length} • XP +{state.xpEarned}</div>
-              </div>
-            )}
-          </div>
 
-          <div style={{ display: "grid", gap: 12 }}>
-            <D2EnemyHealthBar value={state.enemyHP} name={enemyName.toUpperCase().slice(0, 18)} />
-            <ModelPanel title={enemyName.toUpperCase().slice(0, 18)} src={enemyVideo} mirrored />
+                  <div style={{ marginTop: 12, fontSize: 22, lineHeight: 1.35, fontWeight: 900 }}>{question.prompt}</div>
+
+                  <DomainRuneBar domainLabel={domainLabel} mastery={currentMastery} tier={state.tier} />
+
+                  {renderQuestionInput({
+                    question,
+                    state,
+                    mcqSelected: state.selected,
+                    onSelectMcq: select,
+                    fillValue,
+                    setFillValue,
+                    cliValue,
+                    setCliValue,
+                    sequenceItems,
+                    moveSequenceItem: (from, to) => setSequenceItems((current) => reorderItem(current, from, to)),
+                    multiSelected,
+                    toggleMultiSelected: (index) => {
+                      setMultiSelected((current) => current.includes(index) ? current.filter((v) => v !== index) : [...current, index].sort((a, b) => a - b));
+                    },
+                  })}
+
+                  <div className="d2ActionRow" style={{ marginTop: 14 }}>
+                    {!state.locked ? (
+                      <>
+                        <button className="d2Btn" onClick={() => (usesManualSubmit ? handleManualSubmit() : submit())} disabled={!canSubmitCurrentQuestion()}>SUBMIT</button>
+                        <button
+                          className="d2Btn"
+                          onClick={() => {
+                            clear();
+                            setFillValue("");
+                            setCliValue("");
+                            setMultiSelected([]);
+                            const data = (question.data || {}) as Record<string, unknown>;
+                            const items = safeArray<string>(data.items);
+                            const correctOrder = safeArray<string>(data.correctOrder);
+                            setSequenceItems(items.length ? items : correctOrder);
+                          }}
+                        >
+                          CLEAR
+                        </button>
+                      </>
+                    ) : (
+                      <button className="d2Btn" onClick={() => next()}>NEXT</button>
+                    )}
+                  </div>
+
+                  {state.locked && (
+                    <div style={{ marginTop: 12 }}>
+                      <div className="card" style={{ padding: 12, background: "rgba(255,255,255,0.04)" }}>
+                        <div style={{ fontWeight: 950 }}>{state.lastWasCorrect ? "✅ Correct" : "❌ Not quite"}</div>
+                        <div className="muted" style={{ marginTop: 6 }}>{state.feedback || "Review the explanation and continue."}</div>
+                      </div>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="card" style={{ padding: 16, background: "rgba(255,255,255,0.04)" }}>
+                  <div style={{ fontWeight: 950, fontSize: 20 }}>{outcome === "victory" ? "Victory" : outcome === "defeat" ? "Defeat" : "Run complete"}</div>
+                  <div className="muted" style={{ marginTop: 8 }}>Score {state.correctCount}/{combatQuestions.length} • XP +{state.xpEarned}</div>
+                </div>
+              )}
+            </div>
+
+            <div style={{ display: "grid", gap: 12 }}>
+              <D2EnemyHealthBar value={state.enemyHP} name={enemyName.toUpperCase().slice(0, 18)} />
+              <ModelPanel title={enemyName.toUpperCase().slice(0, 18)} src={enemyVideo} mirrored />
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="mobileQuizStack">
+            <div className="mobileQuizTopMeta">
+              <div className="mobileQuizProgress">Q{Math.min(state.idx + 1, combatQuestions.length)} / {combatQuestions.length}</div>
+              <div className="mobileQuizBadges">
+                {timed ? <span className="badge" style={{ fontVariantNumeric: "tabular-nums" }}>⏱ {Math.max(0, state.timeLeft)}s</span> : null}
+                <span className="badge">XP +{state.xpEarned}</span>
+              </div>
+            </div>
+
+            <div className="mobileCombatCard">
+              <D2EnemyHealthBar value={state.enemyHP} name={enemyName.toUpperCase().slice(0, 18)} />
+              <div style={{ marginTop: 10 }}>
+                <ModelPanel title={enemyName.toUpperCase().slice(0, 18)} src={enemyVideo} mirrored />
+              </div>
+            </div>
+
+            <div className={"d2QuestionCard d2QuizQuestionCard mobileQuizQuestionCard " + (hitPulse === "enemy" ? "d2HitFlash" : "")}>
+              {!finished && question ? (
+                <>
+                  <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+                    <span className="badge">{labelForType(questionType)}</span>
+                    <span className="badge">Tier {state.tier}</span>
+                  </div>
+                  <div className="mobileQuizPrompt">{question.prompt}</div>
+                  <DomainRuneBar domainLabel={domainLabel} mastery={currentMastery} tier={state.tier} />
+                  {renderQuestionInput({
+                    question,
+                    state,
+                    mcqSelected: state.selected,
+                    onSelectMcq: select,
+                    fillValue,
+                    setFillValue,
+                    cliValue,
+                    setCliValue,
+                    sequenceItems,
+                    moveSequenceItem: (from, to) => setSequenceItems((current) => reorderItem(current, from, to)),
+                    multiSelected,
+                    toggleMultiSelected: (index) => {
+                      setMultiSelected((current) => current.includes(index) ? current.filter((v) => v !== index) : [...current, index].sort((a, b) => a - b));
+                    },
+                  })}
+
+                  <div className="d2ActionRow mobileQuizActions" style={{ marginTop: 14 }}>
+                    {!state.locked ? (
+                      <>
+                        <button className="d2Btn" onClick={() => (usesManualSubmit ? handleManualSubmit() : submit())} disabled={!canSubmitCurrentQuestion()}>SUBMIT</button>
+                        <button
+                          className="d2Btn"
+                          onClick={() => {
+                            clear();
+                            setFillValue("");
+                            setCliValue("");
+                            setMultiSelected([]);
+                            const data = (question.data || {}) as Record<string, unknown>;
+                            const items = safeArray<string>(data.items);
+                            const correctOrder = safeArray<string>(data.correctOrder);
+                            setSequenceItems(items.length ? items : correctOrder);
+                          }}
+                        >
+                          CLEAR
+                        </button>
+                      </>
+                    ) : (
+                      <button className="d2Btn" onClick={() => next()}>NEXT</button>
+                    )}
+                  </div>
+                  {state.locked && (
+                    <div style={{ marginTop: 12 }}>
+                      <div className="card" style={{ padding: 12, background: "rgba(255,255,255,0.04)" }}>
+                        <div style={{ fontWeight: 950 }}>{state.lastWasCorrect ? "✅ Correct" : "❌ Not quite"}</div>
+                        <div className="muted" style={{ marginTop: 6 }}>{state.feedback || "Review the explanation and continue."}</div>
+                      </div>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="card" style={{ padding: 16, background: "rgba(255,255,255,0.04)" }}>
+                  <div style={{ fontWeight: 950, fontSize: 20 }}>{outcome === "victory" ? "Victory" : outcome === "defeat" ? "Defeat" : "Run complete"}</div>
+                  <div className="muted" style={{ marginTop: 8 }}>Score {state.correctCount}/{combatQuestions.length} • XP +{state.xpEarned}</div>
+                </div>
+              )}
+            </div>
+
+            <div className="mobileCombatCard">
+              <div className={hitPulse === "player" ? "d2Shake" : ""}>
+                <D2LifeOrb value={state.playerHP} name={playerName} />
+              </div>
+              <div style={{ marginTop: 10 }}>
+                <ModelPanel title={playerName} src={playerVideo} />
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

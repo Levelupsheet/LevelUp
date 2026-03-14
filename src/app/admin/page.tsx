@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import JobOpeningsAdmin from "@/components/admin/JobOpeningsAdmin";
 import {
   TEST_NOW_POOL_KEY,
   getAllDefaultPools,
@@ -594,7 +593,7 @@ function Toast({ msg }:{ msg: string }){
 export default function AdminPage(){
   const [ok, setOk] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
-  const [tab, setTab] = useState<"questions" | "users" | "local" | "jobs">("questions");
+  const [tab, setTab] = useState<"questions" | "users" | "local">("questions");
   const [bulkImporting, setBulkImporting] = useState(false);
 
   const [err, setErr] = useState<string | null>(null);
@@ -978,7 +977,6 @@ export default function AdminPage(){
           <button onClick={() => setTab("questions")} className={tab==="questions" ? "primary" : ""}>DB Question Bank</button>
           <button onClick={() => setTab("local")} className={tab==="local" ? "primary" : ""}>Local (Prototype)</button>
           <button onClick={() => setTab("users")} className={tab==="users" ? "primary" : ""}>DB Users</button>
-          <button onClick={() => setTab("jobs")} className={tab==="jobs" ? "primary" : ""}>Active Jobs</button>
           <button onClick={() => (window.location.href = "/admin/content")} className="primary">Content Studio</button>
           <button className="danger" onClick={() => { window.location.href = "/dashboard"; }}>Back</button>
         </div>
@@ -1067,10 +1065,6 @@ export default function AdminPage(){
             </table>
           </div>
         </div>
-      ) : null}
-
-{tab === "jobs" ? (
-        <JobOpeningsAdmin />
       ) : null}
 
       {tab === "questions" ? (

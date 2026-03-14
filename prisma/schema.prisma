@@ -398,28 +398,6 @@ model ResumeDraft {
 
 
 
-model JobOpening {
-  id             String   @id @default(cuid())
-  title          String
-  companyName    String
-  locationText   String?
-  employmentType String?
-  salaryText     String?
-  summaryShort   String
-  summaryBullets String[] @default([])
-  description    String
-  applyUrl       String
-  sourceLabel    String?
-  sourceUrl      String?
-  isActive       Boolean  @default(true)
-  sortOrder      Int      @default(0)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-
-  @@index([isActive, sortOrder, createdAt])
-}
-
-
 enum KnowledgeBlockStatus {
   DRAFT
   PROCESSED

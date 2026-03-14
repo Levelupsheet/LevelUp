@@ -2,11 +2,12 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import ProgressBar from "@/components/ProgressBar";
+import AdaptiveLearningCard from "@/components/AdaptiveLearningCard";
 import MerchModal from "@/components/MerchModal";
 import MockInterviewModal from "@/components/MockInterviewModal";
 import PracticeMiniGameModal from "@/components/PracticeMiniGameModal";
 import AvatarMenu from "@/components/AvatarMenu";
-import ActiveCloudOpeningsPanel from "@/components/ActiveCloudOpeningsPanel";
+import WhatsNextPanel from "@/components/WhatsNextPanel";
 import LootVaultModal from "@/components/LootVaultModal";
 import AuthGateCard from "@/components/AuthGateCard";
 import GoogleLoginButton from "@/components/ui/GoogleLoginButton";
@@ -31,7 +32,7 @@ type Notification = {
 
 type Badge = { id: string; label: string; issuedAt: string; expiresAt: string; code: string };
 type Offer = { id: string; title: string; salaryText: string; createdAt: string; companyName: string; roleLabel: string };
-type JobOpening = { id: string; title: string; companyName: string; locationText?: string | null; employmentType?: string | null; salaryText?: string | null; summaryShort: string; summaryBullets?: string[]; description: string; applyUrl: string; sourceLabel?: string | null };
+type LearningRow = { domain: string; mastery: number; accuracy: number; currentDifficulty: number; correctCount: number; wrongCount: number };
 
 
 function labelPos(p: string){
@@ -86,10 +87,11 @@ export default function Dashboard() {
   const [activity, setActivity] = useState<ActivityItem[]>([]);
   const [badges, setBadges] = useState<Badge[]>([]);
   const [offers, setOffers] = useState<Offer[]>([]);
-  const [jobOpenings, setJobOpenings] = useState<JobOpening[]>([]);
   const [loading, setLoading] = useState(false);
   const [hrPassed, setHrPassed] = useState<boolean>(false);
   const [lootOpen, setLootOpen] = useState(false);
+  const [learningRows, setLearningRows] = useState<LearningRow[]>([]);
+  const [overallMastery, setOverallMastery] = useState<number>(50);
 
   // Level-up detection (notification-only; user opens vault when ready)
   const prevLevelRef = useRef<number>(0);
@@ -148,7 +150,6 @@ export default function Dashboard() {
 
       setBadges(data.badges ?? []);
       setOffers(data.offers ?? []);
-      setJobOpenings(data.jobOpenings ?? []);
       setElig((prev) => prev ? { ...prev, xp: data.xp ?? prev.xp } : null);
 
       const hrRes = await fetch(`/api/interviews/hr/status?userId=${encodeURIComponent(activeUserId)}`);
@@ -156,6 +157,17 @@ export default function Dashboard() {
       let hrData: any = null;
       try { hrData = hrText ? JSON.parse(hrText) : null; } catch { hrData = null; }
       if (hrRes.ok) setHrPassed(Boolean(hrData?.passed));
+
+      try {
+        const lpRes = await fetch('/api/learning/profile', { cache: 'no-store' as any });
+        const lpText = await lpRes.text();
+        let lpData: any = null;
+        try { lpData = lpText ? JSON.parse(lpText) : null; } catch { lpData = null; }
+        if (lpRes.ok) {
+          setLearningRows(Array.isArray(lpData?.profile?.masteryByDomain) ? lpData.profile.masteryByDomain : []);
+          setOverallMastery(Number(lpData?.profile?.overallMastery ?? 50));
+        }
+      } catch {}
     } catch (e: any) {
       console.error(e.message ?? "Error");
     } finally {
@@ -317,27 +329,6 @@ export default function Dashboard() {
 
   const highlight = notes.find(n => n.type === "TECH_INTERVIEW_READY") ?? notes[0];
 
-
-  const masteryRows = useMemo(() => {
-    try {
-      const u = getActiveUser();
-      const track = u?.trackProgress ?? { azure_m365: 0, aws: 0, helpdesk: 0, desktop: 0 };
-      return [
-        { label: "Identity", value: Number(track.azure_m365 ?? 0) },
-        { label: "Networking", value: Number(track.helpdesk ?? 0) },
-        { label: "Security", value: Number(track.desktop ?? 0) },
-        { label: "AWS", value: Number(track.aws ?? 0) },
-      ];
-    } catch {
-      return [
-        { label: "Identity", value: 0 },
-        { label: "Networking", value: 0 },
-        { label: "Security", value: 0 },
-        { label: "AWS", value: 0 },
-      ];
-    }
-  }, [localXp, localLevel, userId]);
-
   const combinedNotes = useMemo(() => {
     const local = activity.map((a) => ({
       id: a.id,
@@ -350,6 +341,29 @@ export default function Dashboard() {
     const server = (notes as any[]).map((n) => ({ ...n, _source: "server" }));
     return [...local, ...server].slice(0, 8);
   }, [activity, notes]);
+
+  const spotlightDomains = useMemo(() => {
+    const preferred = ["IDENTITY", "NETWORKING", "SECURITY", "AWS"];
+    const byKey = new Map(learningRows.map((row) => [String(row.domain).toUpperCase(), row]));
+    return preferred.map((key) => ({
+      key,
+      label: key === "AWS" ? "AWS" : key.charAt(0) + key.slice(1).toLowerCase(),
+      mastery: Math.round(Number(byKey.get(key)?.mastery ?? 0)),
+    }));
+  }, [learningRows]);
+
+  const recommendedRoles = useMemo(() => {
+    const rows = [...learningRows].sort((a, b) => Number(b.mastery) - Number(a.mastery));
+    const top = rows.slice(0, 2).map((row) => String(row.domain).toUpperCase());
+    const picks: string[] = [];
+    if (top.includes("IDENTITY")) picks.push("IAM Engineer");
+    if (top.includes("SECURITY")) picks.push("Cloud Security Analyst");
+    if (top.includes("AWS") || top.includes("COMPUTE") || top.includes("STORAGE")) picks.push("Cloud Engineer");
+    if (top.includes("NETWORKING")) picks.push("Network Operations Engineer");
+    if (top.includes("WINDOWS")) picks.push("Systems Administrator");
+    if (!picks.length) picks.push("Helpdesk Support Specialist", "Cloud Support Associate");
+    return Array.from(new Set(picks)).slice(0, 3);
+  }, [learningRows]);
 
   async function markNotificationReadAndRemove(n: any) {
     if (!userId) return;
@@ -683,10 +697,21 @@ export default function Dashboard() {
               <span style={{ width: 10, height: 10, borderRadius: 999, background: (elig?.eligible ? "rgba(120,220,160,0.8)" : "rgba(255,255,255,0.25)") }} />
               <small>Eligibility for Interview Unlocked!</small>
             </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 6 }}>
-              <span style={{ width: 10, height: 10, borderRadius: 999, background: "rgba(255,255,255,0.25)" }} />
-              <small>Domain Mastery</small>
-              <span style={{ marginLeft: "auto" }}><small>● ● ●</small></span>
+          </div>
+
+          <div className="card masteryCompactCard" style={{ marginTop: 12, padding: 12 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "center" }}>
+              <h4 style={{ margin: 0 }}>Domain Mastery</h4>
+              <small>{Math.round(overallMastery)}% overall</small>
+            </div>
+            <div style={{ display: "grid", gap: 10, marginTop: 12 }}>
+              {spotlightDomains.map((row) => (
+                <div key={row.key} className="masteryCompactRow">
+                  <div className="masteryCompactLabel">{row.label}</div>
+                  <div className="masteryCompactTrack"><div className="masteryCompactFill" style={{ width: `${Math.max(0, Math.min(100, row.mastery))}%` }} /></div>
+                  <div className="masteryCompactValue">{row.mastery}%</div>
+                </div>
+              ))}
             </div>
           </div>
         </aside>
@@ -767,8 +792,33 @@ export default function Dashboard() {
             )}
           </div>
 
+          <AdaptiveLearningCard overallMastery={overallMastery} rows={learningRows} />
+
+          <div className="card" style={{ marginTop: 14 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+              <div>
+                <h3 style={{ margin: 0 }}>Career Matches</h3>
+                <div><small>Role suggestions based on your strongest mastery domains.</small></div>
+              </div>
+              <span className="badge">AI-guided</span>
+            </div>
+            <div className="careerMatchGrid" style={{ marginTop: 14 }}>
+              {recommendedRoles.map((role) => (
+                <div key={role} className="careerMatchTile">
+                  <div className="careerMatchTitle">{role}</div>
+                  <div className="careerMatchMeta">Best fit from your current learning profile.</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
           <div style={{ marginTop: 14 }}>
-            <ActiveCloudOpeningsPanel jobs={jobOpenings} />
+            <WhatsNextPanel
+              hrPassed={hrPassed}
+              techReady={hasTechReady}
+              onOpenStartNow={() => setShowLaunchModal(true)}
+              onOpenMockInterview={() => setMockInterviewOpen(true)}
+            />
           </div>
 
 
