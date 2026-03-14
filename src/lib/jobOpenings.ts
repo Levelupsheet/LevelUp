@@ -15,10 +15,9 @@ function cleanLine(s: string) {
 }
 
 export function summarizeJobDescription(input: JobOpeningInput) {
-  const description = String(input.description || "").replace(//g, "");
+  const description = String(input.description || "").replace(/\r/g, "");
   const lines = description
-    .split("
-")
+    .split("\n")
     .map(cleanLine)
     .filter(Boolean)
     .filter((line) => line.length > 18);
