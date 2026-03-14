@@ -2050,3 +2050,185 @@ button.gold{
 @media (max-width: 420px){
   .modalTitle{ font-size: clamp(22px, 7vw, 28px); }
 }
+
+/* ===== Dashboard polish: compact avatar + mastery + jobs ===== */
+.luAvatarRoot { position: relative; }
+.luAvatarBtn{
+  width: 72px;
+  height: 72px;
+  border-radius: 18px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.06);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+}
+.luAvatarImg{ width:100%; height:100%; object-fit: cover; display:block; }
+.luAvatarInitials{ font-size: 34px; font-weight: 900; }
+.luDropdown{
+  position: absolute;
+  right: 0;
+  top: calc(100% + 10px);
+  width: 240px;
+  padding: 10px;
+  border-radius: 16px;
+  background: rgba(8, 12, 22, 0.96);
+  border: 1px solid rgba(255,255,255,0.12);
+  box-shadow: 0 18px 36px rgba(0,0,0,0.35);
+  z-index: 80;
+}
+.luDropdownHeader{ padding: 8px 10px 10px; border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom: 6px; }
+.luDropdownTitle{ font-weight: 800; }
+.luDropdownSub{ font-size: 12px; opacity: 0.75; margin-top: 4px; }
+.luDropdownItem{ width:100%; text-align:left; padding:10px 12px; border-radius:12px; background:transparent; border:1px solid transparent; color:rgba(255,255,255,0.88); display:block; text-decoration:none; }
+.luDropdownItem:hover{ background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.08); }
+.luDanger{ color:#ffb4b4; }
+
+.masteryCard{ background: rgba(255,255,255,0.05); }
+.masteryHead{ display:flex; justify-content:space-between; gap:10px; margin-bottom:10px; }
+.masteryList{ display:grid; gap:10px; }
+.masteryItem{ display:grid; gap:6px; }
+.miniTrackBar{ height:8px; border-radius:999px; overflow:hidden; background: rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08); }
+.miniTrackBar > span{ display:block; height:100%; border-radius:999px; background: linear-gradient(90deg, rgba(90,190,255,0.92), rgba(255,204,96,0.82)); }
+.sectionHead{ display:flex; justify-content:space-between; gap:12px; align-items:flex-start; flex-wrap:wrap; }
+.emptyStateCard{ margin-top:12px; padding:16px; border-radius:16px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); opacity:0.82; }
+.jobScrollerGrid{ margin-top: 14px; display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap:12px; }
+.jobCard{ padding:14px; border-radius:18px; background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.03)); border:1px solid rgba(255,255,255,0.10); display:flex; flex-direction:column; gap:10px; min-height: 220px; }
+.jobCardTop{ display:flex; justify-content:space-between; gap:10px; align-items:flex-start; }
+.jobCardTitle{ font-weight:900; font-size:18px; line-height:1.15; }
+.jobCardMeta{ font-size:12px; opacity:0.78; margin-top:4px; }
+.jobCardSummary{ font-size:14px; line-height:1.45; opacity:0.92; }
+.jobMiniBullets{ display:grid; gap:6px; font-size:12px; opacity:0.82; }
+.jobCardActions{ margin-top:auto; display:flex; gap:8px; flex-wrap:wrap; }
+.luJobModal{ max-width: 820px; }
+.jobMetaPills{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px; }
+.jobBulletList{ display:grid; gap:8px; margin-bottom:14px; }
+.jobBulletItem{ padding:10px 12px; border-radius:14px; background: rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); }
+.jobDescriptionText{ white-space: pre-wrap; line-height:1.55; opacity:0.92; }
+
+@media (max-width: 900px){
+  .luAvatarBtn{ width: 54px; height: 54px; border-radius: 14px; }
+  .luAvatarInitials{ font-size: 24px; }
+}
+
+
+/* ===== Combat modal responsive patch ===== */
+.combatModalShell{
+  overflow-x:hidden;
+}
+.combatModalBody{
+  overflow-x:hidden;
+}
+.combatResponsiveGrid{
+  width:100%;
+}
+.combatResponsiveGrid > *{
+  min-width:0;
+}
+.combatQuestionCol, .combatSideCol{
+  min-width:0;
+  width:100%;
+}
+.combatQuestionCol{
+  max-width:100%;
+}
+.combatQuestionCol .badge{
+  max-width:100%;
+}
+.combatQuestionCol input,
+.combatQuestionCol textarea,
+.combatQuestionCol button,
+.combatQuestionCol label{
+  max-width:100%;
+  box-sizing:border-box;
+}
+.combatQuestionCol > *,
+.combatQuestionCol .card,
+.combatQuestionCol .d2RuneBar{
+  min-width:0;
+}
+
+@media (max-width: 980px){
+  .combatResponsiveGrid{
+    grid-template-columns: 1fr !important;
+    gap:14px !important;
+  }
+  .combatPlayerCol{ order:1; }
+  .combatQuestionCol{ order:2; min-height:0 !important; }
+  .combatEnemyCol{ order:3; }
+}
+
+@media (max-width: 900px){
+  .d2QuizShell.combatModalShell{
+    width:min(96vw, 680px) !important;
+    max-width:96vw !important;
+    min-height:auto !important;
+  }
+  .combatModalBody{
+    padding:0 2px 10px !important;
+  }
+  .combatResponsiveGrid{
+    grid-template-columns:1fr !important;
+    gap:14px !important;
+  }
+  .combatQuestionCol{
+    min-height:0 !important;
+    width:100% !important;
+  }
+  .combatQuestionCol .d2ChoiceBtn{
+    font-size:15px;
+    padding:12px;
+  }
+  .combatQuestionCol .d2ActionRow{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:10px;
+  }
+  .combatQuestionCol .d2Btn{
+    width:100%;
+  }
+}
+
+@media (max-width: 640px){
+  .d2QuizShell.combatModalShell{
+    width:96vw !important;
+    max-width:96vw !important;
+    max-height:95vh !important;
+  }
+  .combatModalBody{
+    padding:0 !important;
+  }
+  .combatResponsiveGrid{
+    grid-template-columns:1fr !important;
+    gap:12px !important;
+  }
+  .combatQuestionCol{
+    min-height:0 !important;
+  }
+  .d2QuestionCard{
+    padding:14px 12px 12px;
+    border-radius:16px;
+  }
+  .d2QuestionCard::after{ inset:8px; }
+  .d2QuestionCard .d2Rivet{ width:8px; height:8px; }
+  .d2RuneBar{ gap:4px; padding:8px; }
+  .d2ActionRow{ gap:8px; }
+  .d2Btn{ flex:1 1 auto; width:100%; }
+  .d2ChoiceBtn{ padding:12px; font-size:15px; }
+  .d2OrbFrame{ width:min(46vw, 180px) !important; height:min(46vw, 180px) !important; }
+  .d2OrbWrap{ width:100% !important; align-items:center; }
+  .d2NamePlate{ width:100%; max-width:280px; }
+  .d2EnemyCard, .d2QuestionCard, .d2OrbWrap, .card, .sidebar, .maincol, .topbar, .navTopInner{ min-width:0; }
+  .combatQuestionCol > div:first-child{ gap:8px !important; }
+  .combatQuestionCol > div:first-child .badge{ white-space:normal; }
+  .combatQuestionCol > div:first-child > div:last-child{ width:100%; justify-content:flex-start !important; }
+}
+
+@media (max-width: 420px){
+  .d2QuizShell.combatModalShell{ width:97vw !important; max-width:97vw !important; }
+  .d2QuestionCard{ padding:12px 10px 10px; }
+  .combatQuestionCol .d2ChoiceBtn{ font-size:14px; }
+  .combatQuestionCol .badge{ font-size:12px; }
+}

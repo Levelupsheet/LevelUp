@@ -13,7 +13,7 @@ export async function GET(req: Request) {
       user = await ensureUser(userId);
     }
 
-    const [notifications, badges, offers] = await Promise.all([
+    const [notifications, badges, offers, jobOpenings] = await Promise.all([
       prisma.notification.findMany({
         where: { userId, readAt: null },
         orderBy: { createdAt: "desc" },
@@ -28,6 +28,11 @@ export async function GET(req: Request) {
         where: { userId },
         orderBy: { createdAt: "desc" },
         take: 10,
+      }),
+      prisma.jobOpening.findMany({
+        where: { isActive: true },
+        orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
+        take: 20,
       }),
     ]);
 
@@ -54,6 +59,7 @@ export async function GET(req: Request) {
       notifications,
       badges,
       offers,
+      jobOpenings,
     });
   } catch (err: any) {
     // Ensure the client always receives JSON (avoids res.json() parsing crashes)

@@ -6,7 +6,7 @@ import MerchModal from "@/components/MerchModal";
 import MockInterviewModal from "@/components/MockInterviewModal";
 import PracticeMiniGameModal from "@/components/PracticeMiniGameModal";
 import AvatarMenu from "@/components/AvatarMenu";
-import WhatsNextPanel from "@/components/WhatsNextPanel";
+import ActiveCloudOpeningsPanel from "@/components/ActiveCloudOpeningsPanel";
 import LootVaultModal from "@/components/LootVaultModal";
 import AuthGateCard from "@/components/AuthGateCard";
 import GoogleLoginButton from "@/components/ui/GoogleLoginButton";
@@ -31,6 +31,7 @@ type Notification = {
 
 type Badge = { id: string; label: string; issuedAt: string; expiresAt: string; code: string };
 type Offer = { id: string; title: string; salaryText: string; createdAt: string; companyName: string; roleLabel: string };
+type JobOpening = { id: string; title: string; companyName: string; locationText?: string | null; employmentType?: string | null; salaryText?: string | null; summaryShort: string; summaryBullets?: string[]; description: string; applyUrl: string; sourceLabel?: string | null };
 
 
 function labelPos(p: string){
@@ -85,6 +86,7 @@ export default function Dashboard() {
   const [activity, setActivity] = useState<ActivityItem[]>([]);
   const [badges, setBadges] = useState<Badge[]>([]);
   const [offers, setOffers] = useState<Offer[]>([]);
+  const [jobOpenings, setJobOpenings] = useState<JobOpening[]>([]);
   const [loading, setLoading] = useState(false);
   const [hrPassed, setHrPassed] = useState<boolean>(false);
   const [lootOpen, setLootOpen] = useState(false);
@@ -146,6 +148,7 @@ export default function Dashboard() {
 
       setBadges(data.badges ?? []);
       setOffers(data.offers ?? []);
+      setJobOpenings(data.jobOpenings ?? []);
       setElig((prev) => prev ? { ...prev, xp: data.xp ?? prev.xp } : null);
 
       const hrRes = await fetch(`/api/interviews/hr/status?userId=${encodeURIComponent(activeUserId)}`);
@@ -313,6 +316,27 @@ export default function Dashboard() {
   }, [mockInterviewOpen]);
 
   const highlight = notes.find(n => n.type === "TECH_INTERVIEW_READY") ?? notes[0];
+
+
+  const masteryRows = useMemo(() => {
+    try {
+      const u = getActiveUser();
+      const track = u?.trackProgress ?? { azure_m365: 0, aws: 0, helpdesk: 0, desktop: 0 };
+      return [
+        { label: "Identity", value: Number(track.azure_m365 ?? 0) },
+        { label: "Networking", value: Number(track.helpdesk ?? 0) },
+        { label: "Security", value: Number(track.desktop ?? 0) },
+        { label: "AWS", value: Number(track.aws ?? 0) },
+      ];
+    } catch {
+      return [
+        { label: "Identity", value: 0 },
+        { label: "Networking", value: 0 },
+        { label: "Security", value: 0 },
+        { label: "AWS", value: 0 },
+      ];
+    }
+  }, [localXp, localLevel, userId]);
 
   const combinedNotes = useMemo(() => {
     const local = activity.map((a) => ({
@@ -744,12 +768,7 @@ export default function Dashboard() {
           </div>
 
           <div style={{ marginTop: 14 }}>
-            <WhatsNextPanel
-              hrPassed={hrPassed}
-              techReady={hasTechReady}
-              onOpenStartNow={() => setShowLaunchModal(true)}
-              onOpenMockInterview={() => setMockInterviewOpen(true)}
-            />
+            <ActiveCloudOpeningsPanel jobs={jobOpenings} />
           </div>
 
 
