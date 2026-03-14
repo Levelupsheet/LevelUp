@@ -209,7 +209,7 @@ function LocalPrototypeAdmin(){
         <button onClick={refreshLocal}>Refresh</button>
       </div>
 
-      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap: 14, marginTop: 12 }}>
+      <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(320px, 1fr))", gap: 14, marginTop: 12 }}>
         <div className="card" style={{ padding: 12, background:"rgba(255,255,255,0.03)" }}>
           <b>Local users</b>
           <div style={{ marginTop: 8, opacity: 0.9 }}>
@@ -229,7 +229,7 @@ function LocalPrototypeAdmin(){
                 <button onClick={removeUser} style={{ background:"rgba(239,68,68,0.14)", borderColor:"rgba(239,68,68,0.35)" }}>Delete</button>
               </div>
 
-              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap: 10, marginTop: 10 }}>
+              <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(320px, 1fr))", gap: 10, marginTop: 10 }}>
                 <label style={{ display:"grid", gap: 6 }}>
                   <small>Display name</small>
                   <input
@@ -263,7 +263,7 @@ function LocalPrototypeAdmin(){
 
               <div style={{ marginTop: 10, display:"grid", gap: 8 }}>
                 <small style={{ opacity: 0.8 }}>Track progress (0–100)</small>
-                <div style={{ display:"grid", gridTemplateColumns:"repeat(4, 1fr)", gap: 10 }}>
+                <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(120px, 1fr))", gap: 10 }}>
                   {(["azure_m365","aws","helpdesk","desktop"] as any[]).map((t) => (
                     <label key={t} style={{ display:"grid", gap: 6 }}>
                       <small>{t}</small>
@@ -271,12 +271,22 @@ function LocalPrototypeAdmin(){
                         type="number"
                         min={0}
                         max={100}
-                        onChange={(e) =>
-                          setUserDraft((d) => ({
-                            ...d,
-                            trackProgress: { ...(d.trackProgress ?? (selectedUser?.trackProgress ?? {})), [t]: Number(e.target.value) },
-                          }))
-                        }
+                        onChange={(e) => {
+                          const val = Number(e.target.value);
+                          setUserDraft((d) => {
+                            const existing = (d.trackProgress ?? selectedUser?.trackProgress) as Record<string, number> | undefined;
+                            const base = {
+                              azure_m365: existing?.azure_m365 ?? 0,
+                              aws: existing?.aws ?? 0,
+                              helpdesk: existing?.helpdesk ?? 0,
+                              desktop: existing?.desktop ?? 0,
+                            };
+                            return {
+                              ...d,
+                              trackProgress: { ...base, [t]: val },
+                            };
+                          });
+                        }}
                       />
                     </label>
                   ))}
@@ -287,7 +297,7 @@ function LocalPrototypeAdmin(){
 
             <div className="card" style={{ padding: 10, background:"rgba(255,255,255,0.02)" }}>
               <b>Create new user (local)</b>
-              <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr auto", gap: 10, marginTop: 10, alignItems:"end" }}>
+              <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(180px, 1fr))", gap: 10, marginTop: 10, alignItems:"end" }}>
                 <label style={{ display:"grid", gap: 6 }}>
                   <small>Name</small>
                   <input value={newUserName} onChange={(e) => setNewUserName(e.target.value)} placeholder="Tyrone" />
@@ -450,7 +460,7 @@ function PracticePoolsAdmin(){
         <button onClick={() => location.reload()}>Refresh</button>
       </div>
 
-      <div style={{ marginTop: 12, display:"grid", gridTemplateColumns:"360px 1fr", gap: 14 }}>
+      <div style={{ marginTop: 12, display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(320px, 1fr))", gap: 14 }}>
         <div className="card" style={{ background:"rgba(255,255,255,0.03)" }}>
           <label><small>Pool</small></label>
           <select value={poolKey} onChange={(e) => setPoolKey(e.target.value)}>
@@ -585,7 +595,7 @@ function Toast({ msg }:{ msg: string }){
 export default function AdminPage(){
   const [ok, setOk] = useState(false);
   const [pin, setPin] = useState("");
-  const [tab, setTab] = useState<"questions" | "users" | "local">("local");
+  const [tab, setTab] = useState<"questions" | "users" | "local">("questions");
 
   const [err, setErr] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
@@ -833,10 +843,11 @@ export default function AdminPage(){
           </div>
         </div>
 
-        <div className="row" style={{ alignItems:"center", gap: 10 }}>
+        <div className="row" style={{ alignItems:"center", gap: 10, flexWrap:"wrap", justifyContent:"flex-end" }}>
+          <button onClick={() => setTab("questions")} className={tab==="questions" ? "primary" : ""}>DB Question Bank</button>
           <button onClick={() => setTab("local")} className={tab==="local" ? "primary" : ""}>Local (Prototype)</button>
-          <button onClick={() => setTab("questions")} className={tab==="questions" ? "primary" : ""}>Practice Pools</button>
           <button onClick={() => setTab("users")} className={tab==="users" ? "primary" : ""}>DB Users</button>
+          <button onClick={() => (window.location.href = "/admin/content")} className="primary">Content Studio</button>
           <button className="danger" onClick={() => { sessionStorage.removeItem("lu_admin_ok"); location.reload(); }}>Lock</button>
         </div>
       </div>
@@ -927,7 +938,145 @@ export default function AdminPage(){
       ) : null}
 
       {tab === "questions" ? (
-        <PracticePoolsAdmin />
+        <div className="card" style={{ marginTop: 14 }}>
+          <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap: 12, flexWrap:"wrap" }}>
+            <div>
+              <div style={{ fontWeight: 900, fontSize: 20 }}>DB Question Bank</div>
+              <small>Create sets, import final JSON question files, and assign live placements used by the quiz and training flows.</small>
+            </div>
+            <div className="row" style={{ gap: 8, flexWrap:"wrap" }}>
+              <button onClick={refreshSets}>Refresh sets</button>
+              <button onClick={() => fileRef.current?.click()} className="primary">Import questions JSON</button>
+              <button onClick={() => (window.location.href = "/admin/content")} className="secondaryBtn">Open Content Studio</button>
+            </div>
+          </div>
+
+          <div style={{ marginTop: 14, display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(320px, 1fr))", gap: 14 }}>
+            <div className="card" style={{ background:"rgba(255,255,255,0.03)" }}>
+              <div style={{ fontWeight: 800, marginBottom: 10 }}>Question sets</div>
+              <label style={{ display:"grid", gap: 6 }}>
+                <small>Select set</small>
+                <select value={selectedSet} onChange={(e) => setSelectedSet(e.target.value)}>
+                  {sets.map((s) => (
+                    <option key={s.id} value={s.id}>{s.name} • {s.status}</option>
+                  ))}
+                </select>
+              </label>
+              <div className="row" style={{ marginTop: 10, flexWrap:"wrap" }}>
+                <span className="badge">Sets: {sets.length}</span>
+                {selectedSetObj ? <span className="badge">Domain: {selectedSetObj.domain}</span> : null}
+                {selectedSetObj ? <span className="badge">Questions: {questions.length}</span> : null}
+              </div>
+              <div style={{ marginTop: 12, display:"grid", gridTemplateColumns:"1fr auto", gap: 10, alignItems:"end" }}>
+                <label style={{ display:"grid", gap: 6 }}>
+                  <small>Create new set</small>
+                  <input value={newSetName} onChange={(e) => setNewSetName(e.target.value)} placeholder="Cloud Engineer Stage 1" />
+                </label>
+                <button onClick={createSet} className="primary">Create set</button>
+              </div>
+              <div style={{ marginTop: 12 }}>
+                <small style={{ opacity: 0.8 }}>Import format: an array of questions or <code>{'{ questions: [...] }'}</code>.</small>
+              </div>
+              <input
+                ref={fileRef}
+                type="file"
+                accept="application/json,.json"
+                style={{ display: "none" }}
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (f) uploadJsonFile(f);
+                  e.currentTarget.value = "";
+                }}
+              />
+            </div>
+
+            <div className="card" style={{ background:"rgba(255,255,255,0.03)" }}>
+              <div style={{ fontWeight: 800, marginBottom: 10 }}>Assign live placement</div>
+              <div style={{ display:"grid", gap: 10 }}>
+                <div className="row" style={{ gap: 8, flexWrap:"wrap" }}>
+                  <button onClick={() => assignPlacement("TEST_NOW")} disabled={!selectedSet}>Set as Test Now</button>
+                  <button onClick={() => assignPlacement("TRAINING")} disabled={!selectedSet}>Set as Training</button>
+                  <button onClick={() => assignPlacement("CERTIFICATIONS")} disabled={!selectedSet}>Set as Certification</button>
+                </div>
+                <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(180px, 1fr))", gap: 10 }}>
+                  <label style={{ display:"grid", gap: 6 }}>
+                    <small>Training path</small>
+                    <select value={assignStartPos} onChange={(e) => setAssignStartPos(e.target.value as any)}>
+                      <option value="HELPDESK_SUPPORT">Helpdesk Support</option>
+                      <option value="DESKTOP_TECHNICIAN">Desktop Technician</option>
+                      <option value="CLOUD_ENGINEER">Cloud Engineer</option>
+                    </select>
+                  </label>
+                  <label style={{ display:"grid", gap: 6 }}>
+                    <small>Certification exam</small>
+                    <select value={assignCertExam} onChange={(e) => setAssignCertExam(e.target.value as any)}>
+                      <option value="A_PLUS">A+</option>
+                      <option value="SECURITY_PLUS">Security+</option>
+                      <option value="AZ_900">AZ-900</option>
+                    </select>
+                  </label>
+                </div>
+                {assignMsg ? <small style={{ opacity: 0.92 }}>{assignMsg}</small> : null}
+              </div>
+            </div>
+          </div>
+
+          <div style={{ marginTop: 14, display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(320px, 1fr))", gap: 14 }}>
+            <div className="card" style={{ background:"rgba(255,255,255,0.03)" }}>
+              <div style={{ display:"flex", justifyContent:"space-between", gap: 10, flexWrap:"wrap", alignItems:"center" }}>
+                <div>
+                  <div style={{ fontWeight: 800 }}>Add one question</div>
+                  <small>Useful for quick edits after your bulk import.</small>
+                </div>
+                <button onClick={saveSingleQuestion} className="primary" disabled={!selectedSet}>Save question</button>
+              </div>
+              <textarea
+                value={qDraft}
+                onChange={(e) => setQDraft(e.target.value)}
+                style={{ width:"100%", minHeight: 260, marginTop: 10, fontFamily:"ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace", fontSize: 12 }}
+              />
+            </div>
+
+            <div className="card" style={{ background:"rgba(255,255,255,0.03)" }}>
+              <div style={{ display:"flex", justifyContent:"space-between", gap: 10, flexWrap:"wrap", alignItems:"center" }}>
+                <div>
+                  <div style={{ fontWeight: 800 }}>Questions in selected set</div>
+                  <small>{selectedSetObj ? selectedSetObj.name : "Select a set to review imported questions."}</small>
+                </div>
+                <div className="row" style={{ gap: 8, flexWrap:"wrap" }}>
+                  <button onClick={saveOrder} disabled={!dirtyOrder || !selectedSet}>Save order</button>
+                  <span className="badge">Total: {questions.length}</span>
+                </div>
+              </div>
+              <div style={{ marginTop: 12, maxHeight: 560, overflow:"auto", display:"grid", gap: 10 }}>
+                {questions.map((q, idx) => (
+                  <div key={q.id} className="card" style={{ background:"rgba(0,0,0,0.25)" }}>
+                    <div style={{ display:"flex", justifyContent:"space-between", gap: 10, flexWrap:"wrap", alignItems:"center" }}>
+                      <div style={{ fontWeight: 800 }}>{idx + 1}. {q.prompt}</div>
+                      <div className="row" style={{ gap: 8, flexWrap:"wrap" }}>
+                        <button onClick={() => moveQuestion(idx, -1)} disabled={idx === 0}>↑</button>
+                        <button onClick={() => moveQuestion(idx, 1)} disabled={idx === questions.length - 1}>↓</button>
+                      </div>
+                    </div>
+                    <div className="row" style={{ marginTop: 8, flexWrap:"wrap" }}>
+                      <span className="badge">Difficulty: {q.difficulty}</span>
+                      <span className="badge">Correct: {q.correctIndex + 1}</span>
+                    </div>
+                    <div style={{ marginTop: 10, display:"grid", gap: 6 }}>
+                      {q.choices.map((choice, choiceIndex) => (
+                        <div key={choiceIndex} style={{ padding:"8px 10px", borderRadius:12, border:"1px solid rgba(255,255,255,0.08)", background: choiceIndex === q.correctIndex ? "rgba(74, 222, 128, 0.12)" : "rgba(255,255,255,0.04)" }}>
+                          <small><b>{choiceIndex + 1}.</b> {choice}</small>
+                        </div>
+                      ))}
+                    </div>
+                    {q.explanation ? <div style={{ marginTop: 8 }}><small><b>Explanation:</b> {q.explanation}</small></div> : null}
+                  </div>
+                ))}
+                {!questions.length ? <div className="card" style={{ background:"rgba(0,0,0,0.25)" }}><small>No questions in this set yet.</small></div> : null}
+              </div>
+            </div>
+          </div>
+        </div>
       ) : null}
 
       <Modal open={!!previewQ} title="Question preview" onClose={() => setPreviewQ(null)}>

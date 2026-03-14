@@ -385,7 +385,7 @@ export default function Dashboard() {
           <a href="/admin">Admin</a>
         </nav>
 
-        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+        <div className="navActions">
           <button className="secondaryBtn" type="button" onClick={() => (window.location.href = "/start#pricing")}>Pricing</button>
           <GoogleLoginButton authenticated />
           <button className="primaryBtn" type="button" onClick={() => setShowLaunchModal(true)}>Start Now →</button>

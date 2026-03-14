@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { requireAdminRequest } from "@/app/api/_lib/adminGuard";
 import { prisma } from "@/lib/prisma";
 import { normalizeQuestionType, safeArray, uniqueSortedNumbers } from "@/lib/questionTypes";
 
@@ -123,6 +124,8 @@ function toDbQuestionPayload(input: any, sortOrder: number) {
  * Returns questions ordered by sortOrder.
  */
 export async function GET(req: Request) {
+  const admin = await requireAdminRequest();
+  if (!admin.ok) return admin.response;
   try {
     const { searchParams } = new URL(req.url);
     const setId = searchParams.get("setId");
@@ -146,6 +149,8 @@ export async function GET(req: Request) {
  *  - bulk insert:   { setId, questions: [ {...} ] }
  */
 export async function POST(req: Request) {
+  const admin = await requireAdminRequest();
+  if (!admin.ok) return admin.response;
   try {
     const body = await req.json();
     const setId = body.setId;
@@ -179,6 +184,8 @@ export async function POST(req: Request) {
  *  - { setId, order: [questionId1, questionId2, ...] } // reorders
  */
 export async function PATCH(req: Request) {
+  const admin = await requireAdminRequest();
+  if (!admin.ok) return admin.response;
   try {
     const body = await req.json();
 

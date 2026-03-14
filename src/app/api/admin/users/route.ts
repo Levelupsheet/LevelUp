@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
+import { requireAdminRequest } from "@/app/api/_lib/adminGuard";
 import { prisma } from "@/lib/prisma";
 
 export async function GET(){
+  const admin = await requireAdminRequest();
+  if (!admin.ok) return admin.response;
   try{
     const users = await prisma.user.findMany({
       orderBy: { createdAt: "desc" },
@@ -24,6 +27,8 @@ export async function GET(){
 }
 
 export async function PATCH(req: Request){
+  const admin = await requireAdminRequest();
+  if (!admin.ok) return admin.response;
   try{
     const body = await req.json();
     const { id, xp, startingPosition, moduleChoice } = body || {};

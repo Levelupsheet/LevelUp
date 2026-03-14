@@ -348,7 +348,7 @@ export default function DiabloQuizRunner(props: {
     if (!state.finished || finishedOnceRef.current) return;
     finishedOnceRef.current = true;
     onComplete?.({
-      outcome,
+      outcome: outcome as DiabloQuizRunSummary['outcome'],
       xpEarned: state.xpEarned,
       correctCount: state.correctCount,
       totalQuestions: combatQuestions.length,
@@ -409,7 +409,10 @@ export default function DiabloQuizRunner(props: {
   }
 
   return (
-    <div className="modalShell" style={{ position: "relative", maxWidth: media?.width || 1240, minHeight: media?.height || 720, margin: "0 auto" }}>
+    <div
+      className="modalShell d2QuizShell"
+      style={{ position: "relative", width: "100%", maxWidth: media?.width || 1240, minHeight: "min(720px, 100dvh - 120px)", margin: "0 auto" }}
+    >
       <div className="modalHead">
         <div>
           <div className="modalTitle d2Roman">{title}</div>
@@ -422,8 +425,8 @@ export default function DiabloQuizRunner(props: {
         )}
       </div>
 
-      <div className="modalBody">
-        <div style={{ display: "grid", gridTemplateColumns: "minmax(220px, 0.85fr) minmax(520px, 1.4fr) minmax(220px, 0.85fr)", gap: 14, alignItems: "start" }}>
+      <div className="modalBody d2QuizBody">
+        <div className="d2InterviewGrid d2QuizGrid">
           <div style={{ display: "grid", gap: 12 }}>
             <div className={hitPulse === "player" ? "d2Shake" : ""}>
               <D2LifeOrb value={state.playerHP} name={playerName} />
@@ -431,7 +434,7 @@ export default function DiabloQuizRunner(props: {
             <ModelPanel title={playerName} src={playerVideo} />
           </div>
 
-          <div className={"d2QuestionCard " + (hitPulse === "enemy" ? "d2HitFlash" : "") } style={{ minHeight: 560 }}>
+          <div className={"d2QuestionCard d2QuizQuestionCard " + (hitPulse === "enemy" ? "d2HitFlash" : "") } style={{ minHeight: 560 }}>
             <span className="d2Rivet" style={{ left: 12, top: 12 }} />
             <span className="d2Rivet" style={{ right: 12, top: 12 }} />
             <span className="d2Rivet" style={{ left: 12, bottom: 12 }} />

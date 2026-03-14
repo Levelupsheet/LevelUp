@@ -306,6 +306,56 @@ model MCQQuestion {
 }
 
 
+
+
+model KnowledgeBlock {
+  id               String               @id @default(cuid())
+  sourceBlockId    String               @unique
+  title            String
+  setName          String
+  domain           QuestionDomain
+  lane             ContentLane
+  startingPosition StartingPosition?
+  certExam         CertExam?
+  difficulty       Int                  @default(1)
+  stage            Int                  @default(1)
+  tags             String[]             @default([])
+  source           String?
+  status           KnowledgeBlockStatus @default(DRAFT)
+  contentJson      Json
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
+
+  generatedQuestions GeneratedQuestion[]
+
+  @@index([lane, status, createdAt])
+  @@index([domain, difficulty])
+}
+
+model GeneratedQuestion {
+  id               String                        @id @default(cuid())
+  knowledgeBlockId String
+  prompt           String
+  type             QuestionType
+  data             Json
+  choices          Json?
+  correctIndex     Int?
+  explanation      String?
+  difficulty       Int                           @default(1)
+  tags             String[]                      @default([])
+  sortOrder        Int                           @default(0)
+  reviewStatus     GeneratedQuestionReviewStatus @default(PENDING)
+  editorNotes      String?
+  publishedAt      DateTime?
+  createdAt        DateTime                      @default(now())
+  updatedAt        DateTime                      @updatedAt
+
+  knowledgeBlock KnowledgeBlock @relation(fields: [knowledgeBlockId], references: [id], onDelete: Cascade)
+
+  @@index([knowledgeBlockId, reviewStatus, sortOrder])
+  @@index([knowledgeBlockId, createdAt])
+}
+
 model ResumeFile {
   id         String   @id @default(cuid())
   userId     String
@@ -336,6 +386,22 @@ model ResumeDraft {
   @@index([userId, createdAt])
 }
 
+
+
+
+enum KnowledgeBlockStatus {
+  DRAFT
+  PROCESSED
+  APPROVED
+  ARCHIVED
+}
+
+enum GeneratedQuestionReviewStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  EDITED
+}
 
 enum LootBoxType {
   BRONZE

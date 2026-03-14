@@ -1,7 +1,7 @@
 "use client";
 
 import type { CSSProperties } from "react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 type KnowledgeBlock = {
   id: string;
@@ -77,6 +77,12 @@ export default function AdminContentStudioPage() {
   const [loading, setLoading] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
   const [savingId, setSavingId] = useState<string>("");
+  const importRef = useRef<HTMLInputElement | null>(null);
+
+  const selectedBlock = useMemo(
+    () => blocks.find((b) => b.id === selectedBlockId) || null,
+    [blocks, selectedBlockId]
+  );
 
   async function loadBlocks() {
     const res = await fetch("/api/admin/knowledge-blocks", { cache: "no-store" });
@@ -87,96 +93,71 @@ export default function AdminContentStudioPage() {
   }
 
   async function loadQuestions(blockId: string) {
-  if (!blockId) {
-    setQuestions([]);
-    return;
+    if (!blockId) {
+      setQuestions([]);
+      return;
+    }
+    const res = await fetch(`/api/admin/generated-questions?knowledgeBlockId=${encodeURIComponent(blockId)}`, { cache: "no-store" });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data?.error || "Failed to load generated questions");
+    setQuestions(data.questions || []);
   }
 
-  const res = await fetch(
-    `/api/admin/generated-questions?knowledgeBlockId=${encodeURIComponent(blockId)}`,
-    { cache: "no-store" }
-  );
-
-  const data = await res.json();
-  if (!res.ok) throw new Error(data?.error || "Failed to load generated questions");
-  setQuestions(data.questions || []);
-}
-
-useEffect(() => {
-  let mounted = true;
-
-  async function checkAdmin() {
-    try {
-      const res = await fetch("/api/auth/me", { cache: "no-store" as any });
-      const data = await res.json().catch(() => null);
-
-      if (!mounted) return;
-
-      if (!res.ok || !data?.user?.isAdmin) {
-        window.location.href = "/dashboard";
-        return;
+  useEffect(() => {
+    let mounted = true;
+    async function checkAdmin() {
+      try {
+        const res = await fetch("/api/auth/me", { cache: "no-store" as any });
+        const data = await res.json().catch(() => null);
+        if (!mounted) return;
+        if (!res.ok || !data?.user?.isAdmin) {
+          window.location.href = "/dashboard";
+          return;
+        }
+        await loadBlocks().catch((e) => setMessage(e.message));
+      } finally {
+        if (mounted) setAuthChecked(true);
       }
+    }
+    checkAdmin();
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
-      await loadBlocks().catch((e) => setMessage(e.message));
+  useEffect(() => {
+    if (authChecked) {
+      loadQuestions(selectedBlockId).catch((e) => setMessage(e.message));
+    }
+  }, [selectedBlockId, authChecked]);
+
+  async function importBlocks() {
+    setLoading(true);
+    setMessage("");
+    try {
+      const blocksToSave = JSON.parse(rawJson);
+      const res = await fetch("/api/admin/knowledge-blocks", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(Array.isArray(blocksToSave) ? { blocks: blocksToSave } : blocksToSave),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Import failed");
+      setMessage(`Saved ${data.count} knowledge block(s).`);
+      await loadBlocks();
+    } catch (e: any) {
+      setMessage(e?.message || "Import failed");
     } finally {
-      if (mounted) setAuthChecked(true);
+      setLoading(false);
     }
   }
 
-  checkAdmin();
-
-  return () => {
-    mounted = false;
-  };
-}, []);
-
-useEffect(() => {
-  if (authChecked) {
-    loadQuestions(selectedBlockId).catch((e) => setMessage(e.message));
+  async function importFile(file: File) {
+    const text = await file.text();
+    setRawJson(text);
+    setTab("import");
+    setMessage(`Loaded ${file.name}. Review the JSON, then click Save blocks.`);
   }
-}, [selectedBlockId, authChecked]);
-
-if (!authChecked) {
-  return (
-    <div className="page">
-      <div className="container">
-        <div className="card">Checking admin access…</div>
-      </div>
-    </div>
-  );
-}
-
-const selectedBlock = useMemo(
-  () => blocks.find((b) => b.id === selectedBlockId) || null,
-  [blocks, selectedBlockId]
-);
-
-async function importBlocks() {
-  setLoading(true);
-  setMessage("");
-
-  try {
-    const blocksToSave = JSON.parse(rawJson);
-
-    const res = await fetch("/api/admin/knowledge-blocks", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(
-        Array.isArray(blocksToSave) ? { blocks: blocksToSave } : blocksToSave
-      ),
-    });
-
-    const data = await res.json();
-    if (!res.ok) throw new Error(data?.error || "Import failed");
-
-    setMessage(`Saved ${data.count} knowledge block(s).`);
-    await loadBlocks();
-  } catch (e: any) {
-    setMessage(e?.message || "Import failed");
-  } finally {
-    setLoading(false);
-  }
-}
 
   async function generateForSelected() {
     if (!selectedBlockId) return;
@@ -243,15 +224,34 @@ async function importBlocks() {
     }
   }
 
+  if (!authChecked) {
+    return (
+      <div className="page">
+        <div className="container">
+          <div className="card">Checking admin access…</div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <main style={{ padding: 24, maxWidth: 1400, margin: "0 auto" }}>
+    <main style={{ padding: 16, maxWidth: 1400, margin: "0 auto" }}>
+      <style>{`
+        .content-grid { display:grid; grid-template-columns: minmax(260px, 320px) minmax(0, 1fr); gap:16px; align-items:start; }
+        .content-actions { display:flex; gap:8px; flex-wrap:wrap; }
+        @media (max-width: 900px) {
+          .content-grid { grid-template-columns: 1fr; }
+          .content-sidebar { position: static !important; max-height: none !important; }
+        }
+      `}</style>
       <div className="card" style={{ padding: 18 }}>
         <div style={{ display: "flex", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
           <div>
             <div style={{ fontWeight: 900, fontSize: 28 }}>Admin Content Studio</div>
             <div style={{ opacity: 0.85, marginTop: 6 }}>Upload knowledge blocks, generate typed questions, review them, then publish to the live DB-backed question bank.</div>
           </div>
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+          <div className="content-actions">
+            <button onClick={() => (window.location.href = "/admin")}>Back to admin</button>
             <button onClick={() => setTab("import")} className={tab === "import" ? "primaryBtn" : "secondaryBtn" as any}>Import</button>
             <button onClick={() => setTab("review")} className={tab === "review" ? "primaryBtn" : "secondaryBtn" as any}>Review & Publish</button>
           </div>
@@ -259,8 +259,8 @@ async function importBlocks() {
         {message ? <div style={{ marginTop: 12, padding: 12, borderRadius: 10, background: "rgba(99,102,241,0.12)", border: "1px solid rgba(99,102,241,0.28)" }}>{message}</div> : null}
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "320px 1fr", gap: 16, marginTop: 16, alignItems: "start" }}>
-        <aside className="card" style={{ padding: 14, position: "sticky", top: 18 }}>
+      <div className="content-grid" style={{ marginTop: 16 }}>
+        <aside className="card content-sidebar" style={{ padding: 14, position: "sticky", top: 18 }}>
           <div style={{ fontWeight: 800, marginBottom: 10 }}>Knowledge blocks</div>
           <div style={{ display: "grid", gap: 8, maxHeight: "70vh", overflow: "auto" }}>
             {blocks.map((block) => (
@@ -292,14 +292,26 @@ async function importBlocks() {
               <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
                 <div>
                   <div style={{ fontWeight: 800, fontSize: 20 }}>Import knowledge blocks</div>
-                  <div style={{ opacity: 0.8, marginTop: 4 }}>Paste JSON blocks here. Each block can include facts, definitions, procedures, commands, scenarios, and distractors.</div>
+                  <div style={{ opacity: 0.8, marginTop: 4 }}>Paste JSON blocks here or load a .json file. Each block can include facts, definitions, procedures, commands, scenarios, and distractors.</div>
                 </div>
-                <div style={{ display: "flex", gap: 8 }}>
+                <div className="content-actions">
                   <button onClick={() => setRawJson(SAMPLE_BLOCK)}>Load sample</button>
+                  <button onClick={() => importRef.current?.click()}>Load .json file</button>
                   <button onClick={importBlocks} className="primaryBtn" disabled={loading}>{loading ? "Saving..." : "Save blocks"}</button>
                 </div>
               </div>
-              <textarea value={rawJson} onChange={(e) => setRawJson(e.target.value)} style={{ width: "100%", minHeight: 560, marginTop: 14, borderRadius: 12, padding: 14, background: "rgba(0,0,0,0.28)", color: "inherit", border: "1px solid rgba(255,255,255,0.12)", fontFamily: "monospace", fontSize: 13 }} />
+              <input
+                ref={importRef}
+                type="file"
+                accept="application/json,.json"
+                style={{ display: "none" }}
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) importFile(file);
+                  e.currentTarget.value = "";
+                }}
+              />
+              <textarea value={rawJson} onChange={(e) => setRawJson(e.target.value)} style={{ width: "100%", minHeight: 420, marginTop: 14, borderRadius: 12, padding: 14, background: "rgba(0,0,0,0.28)", color: "inherit", border: "1px solid rgba(255,255,255,0.12)", fontFamily: "monospace", fontSize: 13 }} />
               {selectedBlock ? (
                 <div style={{ marginTop: 14, display: "flex", gap: 8, flexWrap: "wrap" }}>
                   <button onClick={generateForSelected} className="primaryBtn" disabled={loading}>Generate questions for selected block</button>
@@ -314,12 +326,11 @@ async function importBlocks() {
                   <div style={{ fontWeight: 800, fontSize: 20 }}>Review generated questions</div>
                   <div style={{ opacity: 0.8, marginTop: 4 }}>{selectedBlock ? `${selectedBlock.title} • ${questions.length} generated question(s)` : "Select a block to review"}</div>
                 </div>
-                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                <div className="content-actions">
                   <button onClick={generateForSelected} disabled={!selectedBlockId || loading}>Regenerate</button>
                   <button onClick={publishSelected} className="primaryBtn" disabled={!selectedBlockId || loading}>Publish approved questions</button>
                 </div>
               </div>
-
               <div style={{ display: "grid", gap: 12, marginTop: 16 }}>
                 {questions.map((question) => (
                   <GeneratedQuestionCard key={question.id} question={question} saving={savingId === question.id} onSave={updateQuestion} />
@@ -339,7 +350,8 @@ function GeneratedQuestionCard({ question, saving, onSave }: { question: Generat
   const [explanation, setExplanation] = useState(question.explanation || "");
   const [reviewStatus, setReviewStatus] = useState(question.reviewStatus);
   const [dataText, setDataText] = useState(JSON.stringify(question.data || {}, null, 2));
-  const [choicesText, setChoicesText] = useState(Array.isArray(question.choices) ? question.choices.join("\n") : "");
+  const [choicesText, setChoicesText] = useState(Array.isArray(question.choices) ? question.choices.join("
+") : "");
   const [editorNotes, setEditorNotes] = useState(question.editorNotes || "");
 
   useEffect(() => {
@@ -347,7 +359,8 @@ function GeneratedQuestionCard({ question, saving, onSave }: { question: Generat
     setExplanation(question.explanation || "");
     setReviewStatus(question.reviewStatus);
     setDataText(JSON.stringify(question.data || {}, null, 2));
-    setChoicesText(Array.isArray(question.choices) ? question.choices.join("\n") : "");
+    setChoicesText(Array.isArray(question.choices) ? question.choices.join("
+") : "");
     setEditorNotes(question.editorNotes || "");
   }, [question]);
 
@@ -358,7 +371,8 @@ function GeneratedQuestionCard({ question, saving, onSave }: { question: Generat
       reviewStatus,
       editorNotes,
       data: JSON.parse(dataText),
-      choices: choicesText.trim() ? choicesText.split("\n").map((v) => v.trim()).filter(Boolean) : null,
+      choices: choicesText.trim() ? choicesText.split("
+").map((v) => v.trim()).filter(Boolean) : null,
     };
     await onSave(question, patch);
   }
@@ -378,7 +392,6 @@ function GeneratedQuestionCard({ question, saving, onSave }: { question: Generat
           <button onClick={save} className="primaryBtn" disabled={saving}>{saving ? "Saving..." : "Save"}</button>
         </div>
       </div>
-
       <div style={{ display: "grid", gap: 10, marginTop: 12 }}>
         <label style={{ display: "grid", gap: 6 }}>
           <small>Prompt</small>
