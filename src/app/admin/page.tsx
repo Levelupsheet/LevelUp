@@ -56,7 +56,7 @@ function LocalPrototypeAdmin(){
 
   const poolMeta = useMemo(() => {
     const paths: PositionPath[] = ["HELPDESK_SUPPORT", "DESKTOP_TECHNICIAN", "CLOUD_ENGINEER"];
-    const certs: CertTrack[] = ["A_PLUS", "SECURITY_PLUS", "AZ_900"];
+    const certs: CertTrack[] = ["A_PLUS", "SECURITY_PLUS", "AZ_900", "AWS", "AZURE"];
     const entries: { key: string; label: string }[] = [];
     for (const p of paths) entries.push({ key: getPoolKeyForPosition(p), label: `Position • ${p}` });
     for (const c of certs) entries.push({ key: getPoolKeyForCert(c), label: `Cert • ${c}` });
@@ -607,7 +607,7 @@ export default function AdminPage(){
   const [sets, setSets] = useState<QuestionSet[]>([]);
   const [assignMsg, setAssignMsg] = useState<string | null>(null);
   const [assignStartPos, setAssignStartPos] = useState<"HELPDESK_SUPPORT" | "DESKTOP_TECHNICIAN" | "CLOUD_ENGINEER">("HELPDESK_SUPPORT");
-  const [assignCertExam, setAssignCertExam] = useState<"A_PLUS" | "SECURITY_PLUS" | "AZ_900">("A_PLUS");
+  const [assignCertExam, setAssignCertExam] = useState<"A_PLUS" | "SECURITY_PLUS" | "AZ_900" | "AWS" | "AZURE">("A_PLUS");
 
   const [selectedSet, setSelectedSet] = useState<string>("");
   const [newSetName, setNewSetName] = useState("Networking Set 1");
@@ -689,6 +689,8 @@ export default function AdminPage(){
       if (text.includes("a+") || text.includes("a_plus")) certExam = "A_PLUS";
       else if (text.includes("security+") || text.includes("security_plus")) certExam = "SECURITY_PLUS";
       else if (text.includes("az-900") || text.includes("az_900")) certExam = "AZ_900";
+      else if (text.includes("aws")) certExam = "AWS";
+      else if (text.includes("azure")) certExam = "AZURE";
     }
 
     return { lane, startingPosition, certExam, domain: normalizeDomain(q?.domain) };
@@ -1157,6 +1159,8 @@ export default function AdminPage(){
                       <option value="A_PLUS">A+</option>
                       <option value="SECURITY_PLUS">Security+</option>
                       <option value="AZ_900">AZ-900</option>
+                      <option value="AWS">AWS</option>
+                      <option value="AZURE">Azure</option>
                     </select>
                   </label>
                 </div>

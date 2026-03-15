@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import DiabloQuizRunner, { type DiabloQuestion, type DiabloQuizRunSummary } from "@/components/DiabloQuizRunner";
 import { GAME_CONFIG } from "@/engine/constants/gameConfig";
@@ -34,27 +34,11 @@ const FALLBACK_BY_LANE: Record<GameLane, DiabloQuestion[]> = {
   CERTIFICATIONS: [{ id: "fallback_cert", type: "multiple_choice", prompt: "No certification set is currently assigned. Where should you fix that?", choices: ["Admin placements", "Registry Editor", "Services", "Disk Management"], correctIndex: 0, explanation: "Assign a published question set to the certification lane in Admin.", domainId: "general", level: 1 }],
 };
 
-
 function getRecentKey(lane: GameLane, startingPosition?: string | null, certExam?: string | null) {
   return `lu_recent_${lane}_${startingPosition || "all"}_${certExam || "all"}`;
 }
-
-function readRecentIds(key: string): string[] {
-  try {
-    const raw = localStorage.getItem(key);
-    const parsed = raw ? JSON.parse(raw) : [];
-    return Array.isArray(parsed) ? parsed.map((v) => String(v)) : [];
-  } catch {
-    return [];
-  }
-}
-
-function writeRecentIds(key: string, ids: string[]) {
-  try {
-    const unique = Array.from(new Set(ids.map((v) => String(v)))).slice(-100);
-    localStorage.setItem(key, JSON.stringify(unique));
-  } catch {}
-}
+function readRecentIds(key: string): string[] { try { const raw = localStorage.getItem(key); const parsed = raw ? JSON.parse(raw) : []; return Array.isArray(parsed) ? parsed.map((v) => String(v)) : []; } catch { return []; } }
+function writeRecentIds(key: string, ids: string[]) { try { const unique = Array.from(new Set(ids.map((v) => String(v)))).slice(-100); localStorage.setItem(key, JSON.stringify(unique)); } catch {} }
 
 function mapQuestion(q: any, idx: number): DiabloQuestion {
   const tags = Array.isArray(q?.tags) ? q.tags : [];
@@ -74,7 +58,7 @@ function mapQuestion(q: any, idx: number): DiabloQuestion {
     correctIndex: typeof q?.correctIndex === "number" ? q.correctIndex : typeof (data as any)?.correctIndex === "number" ? (data as any).correctIndex : null,
     data,
     explanation: q?.explanation ?? null,
-    domainId: tags[0] ? String(tags[0]).toLowerCase() : undefined,
+    domainId: q?.domainId || (tags[0] ? String(tags[0]).toLowerCase() : undefined),
     level: q?.level === 3 || q?.difficulty === 3 ? 3 : q?.level === 2 || q?.difficulty === 2 ? 2 : 1,
   };
 }
@@ -84,46 +68,90 @@ export default function GameEngine(props: Props) {
   const [loading, setLoading] = useState(true);
   const [questions, setQuestions] = useState<DiabloQuestion[]>([]);
   const [setLabel, setSetLabel] = useState<string>(subtitle || title);
+  const [sessionId, setSessionId] = useState<string>("");
+  const [initialState, setInitialState] = useState<any>(null);
+  const progressSaveRef = useRef<number | null>(null);
 
   const effectiveCount = useMemo(
-    () => questionCount || (lane === "TEST_NOW" ? GAME_CONFIG.questionCount.testNow : lane === "CERTIFICATIONS" ? GAME_CONFIG.questionCount.certification : GAME_CONFIG.questionCount.training),
+    () => questionCount || (lane === "TEST_NOW" ? 10 : lane === "CERTIFICATIONS" ? GAME_CONFIG.questionCount.certification : GAME_CONFIG.questionCount.training),
     [lane, questionCount]
   );
+
+  const loadStandard = useCallback(async () => {
+    const search = new URLSearchParams();
+    search.set("lane", lane);
+    search.set("questionCount", String(effectiveCount));
+    search.set("shuffle", "1");
+    search.set("nonce", String(Date.now()));
+    const recentKey = getRecentKey(lane, startingPosition, certExam);
+    const excludeIds = readRecentIds(recentKey);
+    if (excludeIds.length) search.set("excludeIds", excludeIds.join(","));
+    if (startingPosition) search.set("startingPosition", startingPosition);
+    if (certExam) search.set("certExam", certExam);
+    const res = await fetch(`/api/content/active?${search.toString()}`, { cache: "no-store" as any });
+    const json = await res.json().catch(() => null);
+    const mapped = Array.isArray(json?.questions) ? json.questions.map(mapQuestion) : [];
+    if (mapped.length) {
+      setQuestions(mapped);
+      writeRecentIds(recentKey, mapped.map((q) => String(q.id)));
+      setSetLabel(json?.set?.name ? `${title} · ${json.set.name}` : subtitle || title);
+    } else {
+      setQuestions(FALLBACK_BY_LANE[lane]);
+      setSetLabel(`${title} · Sample`);
+    }
+  }, [lane, effectiveCount, startingPosition, certExam, title, subtitle]);
+
+  const loadTestNowSession = useCallback(async () => {
+    const userId = resolveClientUserId();
+    const res = await fetch("/api/test-now/session", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ userId, questionCount: effectiveCount }),
+      cache: "no-store" as any,
+    });
+    const json = await res.json().catch(() => null);
+    if (!res.ok) throw new Error(json?.error || "Failed to create Test Now session");
+    const mapped = Array.isArray(json?.questions) ? json.questions.map(mapQuestion) : [];
+    if (mapped.length) {
+      setQuestions(mapped);
+      setSessionId(String(json?.session?.id || ""));
+      setInitialState(json?.session?.state || null);
+      setSetLabel(json?.session?.goldenSpawned ? `${title} · Active Session` : `${title} · Active Session`);
+    } else {
+      setQuestions(FALLBACK_BY_LANE.TEST_NOW);
+      setSetLabel(`${title} · Sample`);
+    }
+  }, [effectiveCount, title]);
 
   const load = useCallback(async () => {
     setLoading(true);
     try {
       await hydrateAuthenticatedUser();
-      const search = new URLSearchParams();
-      search.set("lane", lane);
-      search.set("questionCount", String(effectiveCount));
-      search.set("shuffle", "1");
-      search.set("nonce", String(Date.now()));
-      const recentKey = getRecentKey(lane, startingPosition, certExam);
-      const excludeIds = readRecentIds(recentKey);
-      if (excludeIds.length) search.set("excludeIds", excludeIds.join(","));
-      if (startingPosition) search.set("startingPosition", startingPosition);
-      if (certExam) search.set("certExam", certExam);
-      const res = await fetch(`/api/content/active?${search.toString()}`, { cache: "no-store" as any });
-      const json = await res.json().catch(() => null);
-      const mapped = Array.isArray(json?.questions) ? json.questions.map(mapQuestion) : [];
-      if (mapped.length) {
-        setQuestions(mapped);
-        writeRecentIds(getRecentKey(lane, startingPosition, certExam), mapped.map((q) => String(q.id)));
-        setSetLabel(json?.set?.name ? `${title} · ${json.set.name}` : subtitle || title);
-      } else {
-        setQuestions(FALLBACK_BY_LANE[lane]);
-        setSetLabel(`${title} · Sample`);
-      }
+      if (lane === "TEST_NOW") await loadTestNowSession();
+      else await loadStandard();
     } catch {
       setQuestions(FALLBACK_BY_LANE[lane]);
       setSetLabel(`${title} · Sample`);
     } finally {
       setLoading(false);
     }
-  }, [lane, effectiveCount, startingPosition, certExam, title, subtitle]);
+  }, [lane, loadStandard, loadTestNowSession, title]);
 
   useEffect(() => { load(); }, [load]);
+
+  const saveSessionProgress = useCallback((state: any) => {
+    if (lane !== "TEST_NOW" || !sessionId) return;
+    if (progressSaveRef.current) window.clearTimeout(progressSaveRef.current);
+    progressSaveRef.current = window.setTimeout(async () => {
+      try {
+        await fetch("/api/test-now/session", {
+          method: "PATCH",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ sessionId, currentIndex: Number(state?.idx || 0), state }),
+        });
+      } catch {}
+    }, 250) as any;
+  }, [lane, sessionId]);
 
   const handleComplete = useCallback(async (summary: DiabloQuizRunSummary) => {
     const speedBonus = timed ? calculateSpeedBonus(summary.timeLeft || 0) : 0;
@@ -135,6 +163,9 @@ export default function GameEngine(props: Props) {
       addActivity(localUser.id, { type: `GAME_${lane}_COMPLETE`, title: `${title} complete`, body: `Score ${summary.correctCount}/${summary.totalQuestions} • +${awardedXp} XP` });
     } catch {}
     try {
+      if (lane === "TEST_NOW" && sessionId) {
+        await fetch("/api/test-now/session", { method: "PATCH", headers: { "content-type": "application/json" }, body: JSON.stringify({ sessionId, status: "COMPLETED", currentIndex: summary.totalQuestions, state: { ...initialState, finished: true } }) });
+      }
       await fetch("/api/game/session", {
         method: "POST",
         headers: { "content-type": "application/json" },
@@ -142,10 +173,10 @@ export default function GameEngine(props: Props) {
       });
     } catch {}
     onComplete?.({ ...summary, awardedXp });
-  }, [timed, lane, title, onComplete]);
+  }, [timed, lane, title, onComplete, sessionId, initialState]);
 
-  if (loading) return <div className="page"><div className="container" style={{ maxWidth: 1280 }}><div className="card" style={{ padding: 18 }}><div style={{ fontWeight: 800, fontSize: 18 }}>Loading {title}…</div><div className="muted" style={{ marginTop: 8 }}>Pulling randomized questions from your active database set.</div></div></div></div>;
+  if (loading) return <div className="page"><div className="container" style={{ maxWidth: 1280 }}><div className="card" style={{ padding: 18 }}><div style={{ fontWeight: 800, fontSize: 18 }}>Loading {title}…</div><div className="muted" style={{ marginTop: 8 }}>{lane === "TEST_NOW" ? "Restoring or creating your saved Test Now session." : "Pulling randomized questions from your active database set."}</div></div></div></div>;
   if (!questions.length) return <div className="page"><div className="container" style={{ maxWidth: 1120 }}><div className="card" style={{ padding: 18 }}><div style={{ fontWeight: 800, fontSize: 18 }}>No questions available</div><div className="muted" style={{ marginTop: 8 }}>Assign an active question set in Admin.</div><div style={{ marginTop: 14 }}><Link className="btn" href="/admin">Open Admin</Link></div></div></div></div>;
 
-  return <DiabloQuizRunner title={title} subtitle={setLabel} enemyName={enemyName} questions={questions} timed={timed} metaLeft={metaLeft} metaRight={metaRight} exitHref={exitHref} exitLabel={exitLabel} onExit={onExit} onComplete={handleComplete} media={{ playerIdleSrc: "/video/player-idle.mp4", playerAttackSrc: "/video/player-attack.mp4", enemyIdleSrc: "/video/enemy-idle.mp4", width: 1240, height: 760 }} />;
+  return <DiabloQuizRunner title={title} subtitle={setLabel} enemyName={enemyName} questions={questions} timed={timed} metaLeft={metaLeft} metaRight={metaRight} exitHref={exitHref} exitLabel={exitLabel} onExit={onExit} onComplete={handleComplete} onStateChange={saveSessionProgress} initialState={initialState} media={{ playerIdleSrc: "/video/player-idle.mp4", playerAttackSrc: "/video/player-attack.mp4", enemyIdleSrc: "/video/enemy-idle.mp4", width: 1240, height: 760 }} />;
 }

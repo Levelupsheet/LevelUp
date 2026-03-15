@@ -60,6 +60,8 @@ enum CertExam {
   A_PLUS
   SECURITY_PLUS
   AZ_900
+  AWS
+  AZURE
 }
 
 model User {
@@ -91,6 +93,7 @@ model User {
   lootBoxes       LootBox[]
   wallet          Wallet?
   inventory       InventoryItem[]
+  gameSessions    GameSession[]
 
 }
 
@@ -259,6 +262,7 @@ enum QuestionType {
   MULTI_SELECT
   INCIDENT
   CLI_COMMAND
+  LOG_ANALYSIS
 }
 
 model QuestionSetPlacement {
@@ -305,6 +309,10 @@ model MCQQuestion {
   explanation  String?
   difficulty   Int          @default(1)
   tags         String[]     @default([])
+  testNowEligible Boolean   @default(false)
+  isGoldenEligible Boolean  @default(false)
+  goldenWeight Int          @default(1)
+  goldenBonusXp Int         @default(50)
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
 
@@ -410,6 +418,60 @@ enum GeneratedQuestionReviewStatus {
   APPROVED
   REJECTED
   EDITED
+}
+
+enum GameSessionMode {
+  TEST_NOW
+}
+
+enum GameSessionStatus {
+  ACTIVE
+  COMPLETED
+  ABANDONED
+  EXPIRED
+}
+
+model GameSession {
+  id             String            @id @default(cuid())
+  userId         String
+  mode           GameSessionMode
+  status         GameSessionStatus @default(ACTIVE)
+  lane           ContentLane       @default(TEST_NOW)
+  setId          String?
+  placementId    String?
+  currentIndex   Int               @default(0)
+  questionCount  Int               @default(10)
+  goldenSpawned  Boolean           @default(false)
+  stateJson      Json?
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  completedAt    DateTime?
+
+  user      User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  questions GameSessionQuestion[]
+
+  @@index([userId, mode, status, createdAt])
+}
+
+model GameSessionQuestion {
+  id            String   @id @default(cuid())
+  sessionId     String
+  questionId    String?
+  orderIndex    Int
+  payloadJson   Json
+  isGolden      Boolean  @default(false)
+  goldenBonusXp Int?
+  answered      Boolean  @default(false)
+  isCorrect     Boolean?
+  selectedAnswer Json?
+  answeredAt    DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  session GameSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, orderIndex])
+  @@index([sessionId, answered, orderIndex])
 }
 
 enum LootBoxType {

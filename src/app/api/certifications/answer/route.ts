@@ -3,7 +3,7 @@ import { prisma } from "../../_lib/prisma";
 
 const Body = z.object({
   userId: z.string().min(1),
-  exam: z.enum(["A_PLUS", "SECURITY_PLUS", "AZ_900"]),
+  exam: z.enum(["A_PLUS", "SECURITY_PLUS", "AZ_900", "AWS", "AZURE"]),
   prompt: z.string().min(5),
   answer: z.string().min(10),
 });

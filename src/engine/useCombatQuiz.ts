@@ -21,6 +21,8 @@ export type CombatEngineOptions = {
   onXp?: (xpDelta: number, totalXp: number) => void;
   /** Called after submit with a full result payload. */
   onSubmit?: (result: SubmitResult) => void;
+  initialState?: Partial<CombatState> | null;
+  onStateChange?: (state: CombatState) => void;
 };
 
 export function useCombatQuiz(opts: CombatEngineOptions) {
@@ -30,19 +32,29 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
 
   const onXpRef = useRef(opts.onXp);
   const onSubmitRef = useRef(opts.onSubmit);
+  const onStateChangeRef = useRef(opts.onStateChange);
   useEffect(() => {
     onXpRef.current = opts.onXp;
     onSubmitRef.current = opts.onSubmit;
-  }, [opts.onXp, opts.onSubmit]);
+    onStateChangeRef.current = opts.onStateChange;
+  }, [opts.onXp, opts.onSubmit, opts.onStateChange]);
 
-  const [state, setState] = useState<CombatState>(() => initialCombatState(rules, timed));
+  function buildInitialState() {
+    return { ...initialCombatState(rules, timed), ...(opts.initialState || {}) } as CombatState;
+  }
+
+  const [state, setState] = useState<CombatState>(() => buildInitialState());
   const timerRef = useRef<number | null>(null);
 
   const q = opts.questions[state.idx];
 
   useEffect(() => {
-    setState(initialCombatState(rules, timed));
-  }, [questionsKey, timed, rules]);
+    setState(buildInitialState());
+  }, [questionsKey, timed, rules, opts.initialState]);
+
+  useEffect(() => {
+    onStateChangeRef.current?.(state);
+  }, [state]);
 
   const stopTimer = useCallback(() => {
     if (timerRef.current) {

@@ -4,7 +4,8 @@ export type QuestionType =
   | "sequence_order"
   | "multi_select"
   | "incident"
-  | "cli_command";
+  | "cli_command"
+  | "log_analysis";
 
 export type MultipleChoiceData = {
   choices?: string[];
@@ -43,6 +44,14 @@ export type CliCommandData = {
   allowContains?: boolean;
 };
 
+export type LogAnalysisData = {
+  logText: string;
+  answers?: string[];
+  expectedFindings?: string[];
+  placeholder?: string;
+  caseSensitive?: boolean;
+};
+
 export type QuestionData =
   | MultipleChoiceData
   | FillBlankData
@@ -50,6 +59,7 @@ export type QuestionData =
   | MultiSelectData
   | IncidentData
   | CliCommandData
+  | LogAnalysisData
   | Record<string, unknown>;
 
 export function normalizeQuestionType(value: unknown): QuestionType {
@@ -60,7 +70,8 @@ export function normalizeQuestionType(value: unknown): QuestionType {
     raw === "sequence_order" ||
     raw === "multi_select" ||
     raw === "incident" ||
-    raw === "cli_command"
+    raw === "cli_command" ||
+    raw === "log_analysis"
   ) return raw;
   return "multiple_choice";
 }

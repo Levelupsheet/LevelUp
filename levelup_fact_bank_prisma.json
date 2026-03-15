@@ -1,0 +1,2166 @@
+[
+  {
+    "id": "helpdesk-windows-001",
+    "title": "Windows Fundamentals",
+    "setName": "Windows Fundamentals",
+    "domain": "WINDOWS",
+    "lane": "POSITION_TRAINING",
+    "difficulty": 1,
+    "stage": 1,
+    "tags": [
+      "windows",
+      "helpdesk"
+    ],
+    "facts": [
+      {
+        "statement": "Windows Event Viewer stores system logs in Application, Security, and System categories",
+        "answer": "Event Viewer"
+      },
+      {
+        "statement": "Task Manager displays running processes and system resource usage",
+        "answer": "Task Manager"
+      },
+      {
+        "statement": "The System File Checker command scans and repairs protected system files",
+        "answer": "sfc /scannow"
+      },
+      {
+        "statement": "The DISM RestoreHealth option repairs the Windows image",
+        "answer": "DISM /Online /Cleanup-Image /RestoreHealth"
+      },
+      {
+        "statement": "Device Manager is used to update or troubleshoot hardware drivers",
+        "answer": "Device Manager"
+      },
+      {
+        "statement": "Safe Mode loads Windows with only essential drivers and services",
+        "answer": "Safe Mode"
+      },
+      {
+        "statement": "The Run dialog opens with the Win + R keyboard shortcut",
+        "answer": "Win + R"
+      },
+      {
+        "statement": "The msinfo32 utility shows detailed system configuration information",
+        "answer": "msinfo32"
+      },
+      {
+        "statement": "The Windows Update service is named wuauserv",
+        "answer": "wuauserv"
+      },
+      {
+        "statement": "The Settings app is the modern replacement for many Control Panel functions",
+        "answer": "Settings"
+      }
+    ],
+    "definitions": [
+      {
+        "term": "Registry",
+        "definition": "A hierarchical database that stores Windows configuration settings"
+      },
+      {
+        "term": "Safe Mode",
+        "definition": "A diagnostic startup mode that loads only essential Windows components"
+      }
+    ],
+    "procedures": [
+      {
+        "title": "Repair corrupted Windows system files",
+        "steps": [
+          "Open Command Prompt as Administrator",
+          "Run sfc /scannow",
+          "Review the results",
+          "Restart the computer if repairs were made"
+        ]
+      },
+      {
+        "title": "Check a device driver issue",
+        "steps": [
+          "Open Device Manager",
+          "Locate the affected device",
+          "Review device status",
+          "Update or reinstall the driver"
+        ]
+      }
+    ],
+    "commands": [
+      {
+        "platform": "windows",
+        "purpose": "Repair protected system files",
+        "command": "sfc /scannow"
+      },
+      {
+        "platform": "windows",
+        "purpose": "Display detailed system information",
+        "command": "msinfo32"
+      }
+    ],
+    "scenarios": [
+      {
+        "scenario": "A user reports frequent crashes after a bad update and suspects corrupted system files.",
+        "bestAction": "Run sfc /scannow and, if needed, DISM /Online /Cleanup-Image /RestoreHealth."
+      }
+    ],
+    "distractors": [
+      "Replace the keyboard battery",
+      "Restart the monitor",
+      "Clean the mouse sensor"
+    ]
+  },
+  {
+    "id": "helpdesk-active-directory-001",
+    "title": "Active Directory Basics",
+    "setName": "Active Directory Basics",
+    "domain": "ACTIVE_DIRECTORY",
+    "lane": "POSITION_TRAINING",
+    "difficulty": 1,
+    "stage": 1,
+    "tags": [
+      "active-directory",
+      "helpdesk"
+    ],
+    "facts": [
+      {
+        "statement": "Active Directory stores directory objects such as users, groups, and computers",
+        "answer": "Directory objects"
+      },
+      {
+        "statement": "Domain Controllers host the Active Directory database and authentication services",
+        "answer": "Domain Controller"
+      },
+      {
+        "statement": "Organizational Units are used to organize directory objects",
+        "answer": "OU"
+      },
+      {
+        "statement": "Group Policy provides centralized configuration management",
+        "answer": "Group Policy"
+      },
+      {
+        "statement": "Kerberos is the default authentication protocol in Active Directory",
+        "answer": "Kerberos"
+      },
+      {
+        "statement": "Active Directory Users and Computers is used to manage common domain objects",
+        "answer": "Active Directory Users and Computers"
+      },
+      {
+        "statement": "LDAP is used to query and access directory services",
+        "answer": "LDAP"
+      },
+      {
+        "statement": "SYSVOL stores logon scripts and Group Policy files",
+        "answer": "SYSVOL"
+      },
+      {
+        "statement": "Active Directory replication keeps Domain Controllers synchronized",
+        "answer": "Replication"
+      },
+      {
+        "statement": "Group Policy Objects are commonly abbreviated as GPOs",
+        "answer": "GPO"
+      }
+    ],
+    "definitions": [
+      {
+        "term": "OU",
+        "definition": "A container used to organize users, groups, and computers in Active Directory",
+        "aliases": [
+          "Organizational Unit"
+        ]
+      },
+      {
+        "term": "LDAP",
+        "definition": "A protocol used to access and query directory services",
+        "aliases": [
+          "Lightweight Directory Access Protocol"
+        ]
+      }
+    ],
+    "procedures": [
+      {
+        "title": "Create a new user in Active Directory",
+        "steps": [
+          "Open Active Directory Users and Computers",
+          "Browse to the correct OU",
+          "Select New User",
+          "Enter account details",
+          "Set the initial password"
+        ]
+      },
+      {
+        "title": "Force a Group Policy refresh",
+        "steps": [
+          "Open Command Prompt",
+          "Run gpupdate /force",
+          "Wait for policy processing",
+          "Restart or sign out if prompted"
+        ]
+      }
+    ],
+    "commands": [
+      {
+        "platform": "windows",
+        "purpose": "Force immediate Group Policy refresh",
+        "command": "gpupdate /force"
+      }
+    ],
+    "scenarios": [
+      {
+        "scenario": "A user's desktop restrictions did not update after a policy change.",
+        "bestAction": "Run gpupdate /force and verify the user and computer are in the correct OU."
+      }
+    ],
+    "distractors": [
+      "Replace the printer toner",
+      "Restart the docking station",
+      "Reset the monitor resolution"
+    ]
+  },
+  {
+    "id": "helpdesk-office365-001",
+    "title": "Microsoft 365 Fundamentals",
+    "setName": "Microsoft 365 Fundamentals",
+    "domain": "OFFICE365",
+    "lane": "POSITION_TRAINING",
+    "difficulty": 1,
+    "stage": 1,
+    "tags": [
+      "office365",
+      "microsoft365",
+      "helpdesk"
+    ],
+    "facts": [
+      {
+        "statement": "Microsoft 365 identities are managed in Microsoft Entra ID",
+        "answer": "Microsoft Entra ID"
+      },
+      {
+        "statement": "Exchange Online provides cloud-hosted email",
+        "answer": "Exchange Online"
+      },
+      {
+        "statement": "SharePoint Online is used for team sites and document collaboration",
+        "answer": "SharePoint Online"
+      },
+      {
+        "statement": "OneDrive for Business stores a user's personal work files in the cloud",
+        "answer": "OneDrive for Business"
+      },
+      {
+        "statement": "Multi-Factor Authentication adds an extra verification step during sign-in",
+        "answer": "Multi-Factor Authentication"
+      },
+      {
+        "statement": "Microsoft Teams combines chat, meetings, and file collaboration",
+        "answer": "Microsoft Teams"
+      },
+      {
+        "statement": "Licenses determine which Microsoft 365 services a user can access",
+        "answer": "Licenses"
+      },
+      {
+        "statement": "The Microsoft 365 Admin Center is used for tenant administration",
+        "answer": "Microsoft 365 Admin Center"
+      },
+      {
+        "statement": "Outlook on the web provides browser-based mailbox access",
+        "answer": "Outlook on the web"
+      },
+      {
+        "statement": "Data Loss Prevention policies help protect sensitive information",
+        "answer": "Data Loss Prevention"
+      }
+    ],
+    "definitions": [
+      {
+        "term": "MFA",
+        "definition": "A sign-in method that requires more than one form of verification",
+        "aliases": [
+          "Multi-Factor Authentication"
+        ]
+      },
+      {
+        "term": "Exchange Online",
+        "definition": "Microsoft's cloud-based email and calendaring service"
+      }
+    ],
+    "procedures": [
+      {
+        "title": "Troubleshoot a Microsoft 365 sign-in issue",
+        "steps": [
+          "Confirm the username",
+          "Check license assignment",
+          "Verify MFA status",
+          "Review sign-in logs",
+          "Reset the password if needed"
+        ]
+      },
+      {
+        "title": "Verify mailbox access",
+        "steps": [
+          "Confirm the account is licensed",
+          "Check Exchange Online service health",
+          "Test Outlook on the web access",
+          "Review mailbox permissions"
+        ]
+      }
+    ],
+    "commands": [
+      {
+        "platform": "windows",
+        "purpose": "Open Outlook on the web in a browser",
+        "command": "start https://outlook.office.com"
+      }
+    ],
+    "scenarios": [
+      {
+        "scenario": "A user can sign in to Teams but cannot access email.",
+        "bestAction": "Verify the user has an Exchange Online license and test Outlook on the web."
+      }
+    ],
+    "distractors": [
+      "Replace the laptop battery",
+      "Reconnect the HDMI cable",
+      "Clean the keyboard"
+    ]
+  },
+  {
+    "id": "helpdesk-networking-basics-001",
+    "title": "Networking Basics",
+    "setName": "Networking Basics",
+    "domain": "NETWORKING",
+    "lane": "POSITION_TRAINING",
+    "difficulty": 1,
+    "stage": 1,
+    "tags": [
+      "networking",
+      "helpdesk",
+      "fundamentals"
+    ],
+    "facts": [
+      {
+        "statement": "An IP address uniquely identifies a device on a network",
+        "answer": "IP address"
+      },
+      {
+        "statement": "DHCP automatically assigns IP addresses to clients",
+        "answer": "DHCP"
+      },
+      {
+        "statement": "DNS translates hostnames into IP addresses",
+        "answer": "DNS"
+      },
+      {
+        "statement": "A default gateway routes traffic to other networks",
+        "answer": "Default gateway"
+      },
+      {
+        "statement": "A subnet mask separates the network portion from the host portion of an IP address",
+        "answer": "Subnet mask"
+      },
+      {
+        "statement": "Ping is used to test basic network connectivity",
+        "answer": "Ping"
+      },
+      {
+        "statement": "TCP is a reliable connection-oriented protocol",
+        "answer": "TCP"
+      },
+      {
+        "statement": "UDP is a connectionless protocol with lower overhead",
+        "answer": "UDP"
+      },
+      {
+        "statement": "A MAC address uniquely identifies a network interface",
+        "answer": "MAC address"
+      },
+      {
+        "statement": "Routers connect different networks together",
+        "answer": "Router"
+      }
+    ],
+    "definitions": [
+      {
+        "term": "DNS",
+        "definition": "A service that translates hostnames into IP addresses",
+        "aliases": [
+          "Domain Name System"
+        ]
+      },
+      {
+        "term": "DHCP",
+        "definition": "A service that automatically assigns IP configuration to clients",
+        "aliases": [
+          "Dynamic Host Configuration Protocol"
+        ]
+      }
+    ],
+    "procedures": [
+      {
+        "title": "Basic connectivity troubleshooting",
+        "steps": [
+          "Verify the cable or Wi-Fi connection",
+          "Check IP configuration",
+          "Ping the default gateway",
+          "Ping an external IP",
+          "Test DNS resolution"
+        ]
+      },
+      {
+        "title": "Check a client network configuration",
+        "steps": [
+          "Open Command Prompt",
+          "Run ipconfig /all",
+          "Review the IP address",
+          "Confirm the gateway and DNS servers"
+        ]
+      }
+    ],
+    "commands": [
+      {
+        "platform": "windows",
+        "purpose": "View IP configuration",
+        "command": "ipconfig /all",
+        "aliases": [
+          "ipconfig"
+        ]
+      },
+      {
+        "platform": "windows",
+        "purpose": "Test connectivity to another host",
+        "command": "ping 8.8.8.8"
+      }
+    ],
+    "scenarios": [
+      {
+        "scenario": "A user can access internal apps by IP but not by website name.",
+        "bestAction": "Check DNS resolution and verify the configured DNS servers."
+      }
+    ],
+    "distractors": [
+      "Replace the printer paper",
+      "Restart the webcam",
+      "Swap the mouse pad"
+    ]
+  },
+  {
+    "id": "helpdesk-printers-001",
+    "title": "Printer Support Basics",
+    "setName": "Printer Support Basics",
+    "domain": "PRINTERS",
+    "lane": "POSITION_TRAINING",
+    "difficulty": 1,
+    "stage": 1,
+    "tags": [
+      "printers",
+      "helpdesk"
+    ],
+    "facts": [
+      {
+        "statement": "The Windows Print Spooler service manages print jobs",
+        "answer": "Print Spooler"
+      },
+      {
+        "statement": "A print queue stores pending print jobs",
+        "answer": "Print queue"
+      },
+      {
+        "statement": "Printer drivers translate documents into a format the printer can process",
+        "answer": "Printer drivers"
+      },
+      {
+        "statement": "Laser printers use toner cartridges",
+        "answer": "Toner"
+      },
+      {
+        "statement": "Inkjet printers use liquid ink cartridges",
+        "answer": "Ink"
+      },
+      {
+        "statement": "Network printers are often added by TCP/IP port or shared path",
+        "answer": "TCP/IP port or shared path"
+      },
+      {
+        "statement": "A stuck print job can often be fixed by clearing the print queue and restarting the spooler",
+        "answer": "Restart the spooler"
+      },
+      {
+        "statement": "Printer permissions control who can print or manage a printer",
+        "answer": "Printer permissions"
+      },
+      {
+        "statement": "Shared printers can be accessed by multiple users on a network",
+        "answer": "Shared printer"
+      },
+      {
+        "statement": "SNMP can be used to monitor printer status on a network",
+        "answer": "SNMP"
+      }
+    ],
+    "definitions": [
+      {
+        "term": "Spooler",
+        "definition": "A service that queues and manages print jobs before they are sent to a printer"
+      },
+      {
+        "term": "SNMP",
+        "definition": "A network protocol used to monitor device status",
+        "aliases": [
+          "Simple Network Management Protocol"
+        ]
+      }
+    ],
+    "procedures": [
+      {
+        "title": "Clear a stuck print job",
+        "steps": [
+          "Open the printer queue",
+          "Cancel pending jobs",
+          "Restart the Print Spooler service",
+          "Resend the print job"
+        ]
+      },
+      {
+        "title": "Install a network printer",
+        "steps": [
+          "Open Printers & scanners",
+          "Add a printer",
+          "Select TCP/IP or shared printer path",
+          "Install the correct driver",
+          "Print a test page"
+        ]
+      }
+    ],
+    "commands": [
+      {
+        "platform": "windows",
+        "purpose": "Restart the Print Spooler service",
+        "command": "net stop spooler && net start spooler"
+      }
+    ],
+    "scenarios": [
+      {
+        "scenario": "A user's document stays in the queue and never prints.",
+        "bestAction": "Clear the queue and restart the Print Spooler service."
+      }
+    ],
+    "distractors": [
+      "Reset the browser cache",
+      "Replace the Ethernet cable",
+      "Reconnect the monitor stand"
+    ]
+  },
+  {
+    "id": "helpdesk-troubleshooting-001",
+    "title": "General Troubleshooting",
+    "setName": "General Troubleshooting",
+    "domain": "TROUBLESHOOTING",
+    "lane": "POSITION_TRAINING",
+    "difficulty": 1,
+    "stage": 1,
+    "tags": [
+      "troubleshooting",
+      "helpdesk"
+    ],
+    "facts": [
+      {
+        "statement": "Effective troubleshooting starts by identifying the problem",
+        "answer": "Identify the problem"
+      },
+      {
+        "statement": "Rebooting a device can resolve temporary software issues",
+        "answer": "Reboot"
+      },
+      {
+        "statement": "Logs often reveal the root cause of a failure",
+        "answer": "Logs"
+      },
+      {
+        "statement": "Isolating variables helps identify the true cause of a problem",
+        "answer": "Isolate variables"
+      },
+      {
+        "statement": "Testing a theory helps confirm the likely root cause",
+        "answer": "Test the theory"
+      },
+      {
+        "statement": "Documenting the fix helps future incident resolution",
+        "answer": "Document the fix"
+      },
+      {
+        "statement": "Changes should be tested before full deployment",
+        "answer": "Test before deployment"
+      },
+      {
+        "statement": "Escalation is appropriate when the issue exceeds support scope",
+        "answer": "Escalation"
+      },
+      {
+        "statement": "User reports should be verified before deeper diagnostics begin",
+        "answer": "Verify symptoms"
+      },
+      {
+        "statement": "A known-good replacement can help isolate hardware faults",
+        "answer": "Known-good replacement"
+      }
+    ],
+    "definitions": [
+      {
+        "term": "Root cause",
+        "definition": "The underlying reason a problem occurs"
+      },
+      {
+        "term": "Escalation",
+        "definition": "Transferring an issue to a higher support tier when needed"
+      }
+    ],
+    "procedures": [
+      {
+        "title": "Basic troubleshooting workflow",
+        "steps": [
+          "Identify the problem",
+          "Establish a theory",
+          "Test the theory",
+          "Implement the fix",
+          "Verify full functionality",
+          "Document findings"
+        ]
+      },
+      {
+        "title": "Check a user-reported issue",
+        "steps": [
+          "Gather symptoms",
+          "Ask what changed",
+          "Reproduce the issue if possible",
+          "Review logs or error messages"
+        ]
+      }
+    ],
+    "commands": [
+      {
+        "platform": "windows",
+        "purpose": "Restart a local computer",
+        "command": "shutdown /r /t 0"
+      }
+    ],
+    "scenarios": [
+      {
+        "scenario": "A user says their application keeps crashing but provides no error details.",
+        "bestAction": "Verify the symptoms, reproduce the issue if possible, and review relevant logs."
+      }
+    ],
+    "distractors": [
+      "Upgrade the graphics card first",
+      "Replace the office chair",
+      "Clean the desk surface"
+    ]
+  },
+  {
+    "id": "desktop-powershell-001",
+    "title": "PowerShell Fundamentals",
+    "setName": "PowerShell Fundamentals",
+    "domain": "POWERSHELL",
+    "lane": "POSITION_TRAINING",
+    "difficulty": 2,
+    "stage": 2,
+    "tags": [
+      "powershell",
+      "desktop-support"
+    ],
+    "facts": [
+      {
+        "statement": "PowerShell commands are called cmdlets",
+        "answer": "Cmdlets"
+      },
+      {
+        "statement": "Cmdlets use a Verb-Noun naming convention",
+        "answer": "Verb-Noun"
+      },
+      {
+        "statement": "Get-Process lists running processes",
+        "answer": "Get-Process"
+      },
+      {
+        "statement": "Get-Service lists services on a system",
+        "answer": "Get-Service"
+      },
+      {
+        "statement": "Set-ExecutionPolicy controls script execution behavior",
+        "answer": "Set-ExecutionPolicy"
+      },
+      {
+        "statement": "PowerShell variables begin with a dollar sign",
+        "answer": "$"
+      },
+      {
+        "statement": "The pipeline passes output from one command to another",
+        "answer": "Pipeline"
+      },
+      {
+        "statement": "PowerShell script files use the .ps1 extension",
+        "answer": ".ps1"
+      },
+      {
+        "statement": "Get-Help displays help for cmdlets and concepts",
+        "answer": "Get-Help"
+      },
+      {
+        "statement": "Select-Object can be used to choose specific properties from command output",
+        "answer": "Select-Object"
+      }
+    ],
+    "definitions": [
+      {
+        "term": "Cmdlet",
+        "definition": "A lightweight PowerShell command used for administration"
+      },
+      {
+        "term": "Pipeline",
+        "definition": "A feature that passes one command's output to another command"
+      }
+    ],
+    "procedures": [
+      {
+        "title": "Find and stop a process with PowerShell",
+        "steps": [
+          "Run Get-Process",
+          "Identify the process name or ID",
+          "Run Stop-Process",
+          "Verify the process ended"
+        ]
+      },
+      {
+        "title": "Review a service state",
+        "steps": [
+          "Run Get-Service",
+          "Locate the service",
+          "Review the Status field",
+          "Start or restart it if needed"
+        ]
+      }
+    ],
+    "commands": [
+      {
+        "platform": "windows",
+        "purpose": "List running processes",
+        "command": "Get-Process"
+      },
+      {
+        "platform": "windows",
+        "purpose": "Show help for a cmdlet",
+        "command": "Get-Help Get-Service"
+      }
+    ],
+    "scenarios": [
+      {
+        "scenario": "A support tech needs to check whether the Print Spooler service is running from the command line.",
+        "bestAction": "Use Get-Service and review the status of the spooler service."
+      }
+    ],
+    "distractors": [
+      "Replace the mouse cable",
+      "Reset the monitor brightness",
+      "Reconnect the webcam"
+    ]
+  },
+  {
+    "id": "desktop-imaging-001",
+    "title": "Imaging and Deployment",
+    "setName": "Imaging and Deployment",
+    "domain": "IMAGING",
+    "lane": "POSITION_TRAINING",
+    "difficulty": 2,
+    "stage": 2,
+    "tags": [
+      "imaging",
+      "desktop-support"
+    ],
+    "facts": [
+      {
+        "statement": "A disk image is a complete snapshot of an operating system and configured software",
+        "answer": "Disk image"
+      },
+      {
+        "statement": "Sysprep removes unique system-specific data before imaging",
+        "answer": "Sysprep"
+      },
+      {
+        "statement": "A golden image is a standardized base image used for deployment",
+        "answer": "Golden image"
+      },
+      {
+        "statement": "PXE boot allows a computer to boot from a network server",
+        "answer": "PXE boot"
+      },
+      {
+        "statement": "Windows Deployment Services can deploy operating systems over the network",
+        "answer": "Windows Deployment Services"
+      },
+      {
+        "statement": "Imaging reduces manual workstation setup time",
+        "answer": "Reduced deployment time"
+      },
+      {
+        "statement": "Drivers may need to be injected into deployment images for hardware compatibility",
+        "answer": "Driver injection"
+      },
+      {
+        "statement": "Unattended files automate operating system installation settings",
+        "answer": "Unattended file"
+      },
+      {
+        "statement": "Microsoft Deployment Toolkit helps automate desktop deployments",
+        "answer": "MDT"
+      },
+      {
+        "statement": "A captured image can be reused to deploy many similarly configured devices",
+        "answer": "Captured image"
+      }
+    ],
+    "definitions": [
+      {
+        "term": "Sysprep",
+        "definition": "A Microsoft tool used to generalize a Windows installation before imaging"
+      },
+      {
+        "term": "PXE",
+        "definition": "A network boot method used to start computers from deployment servers",
+        "aliases": [
+          "Preboot Execution Environment"
+        ]
+      }
+    ],
+    "procedures": [
+      {
+        "title": "Prepare a reference image",
+        "steps": [
+          "Install Windows",
+          "Install approved applications",
+          "Apply updates",
+          "Run Sysprep",
+          "Capture the image"
+        ]
+      },
+      {
+        "title": "Deploy an image over the network",
+        "steps": [
+          "Boot the device with PXE",
+          "Connect to the deployment server",
+          "Select the approved image",
+          "Apply the image",
+          "Complete post-deployment tasks"
+        ]
+      }
+    ],
+    "commands": [
+      {
+        "platform": "windows",
+        "purpose": "Generalize Windows before capturing an image",
+        "command": "sysprep /oobe /generalize /shutdown"
+      }
+    ],
+    "scenarios": [
+      {
+        "scenario": "An organization wants all new laptops to deploy with the same approved apps and settings.",
+        "bestAction": "Create and maintain a golden image for standardized deployment."
+      }
+    ],
+    "distractors": [
+      "Reset the browser homepage",
+      "Replace the mouse pad",
+      "Delete the recycle bin"
+    ]
+  },
+  {
+    "id": "desktop-group-policy-001",
+    "title": "Group Policy Administration",
+    "setName": "Group Policy Administration",
+    "domain": "GROUP_POLICY",
+    "lane": "POSITION_TRAINING",
+    "difficulty": 2,
+    "stage": 2,
+    "tags": [
+      "group-policy",
+      "desktop-support"
+    ],
+    "facts": [
+      {
+        "statement": "Group Policy centrally manages settings for users and computers",
+        "answer": "Group Policy"
+      },
+      {
+        "statement": "GPOs can be linked to sites, domains, and organizational units",
+        "answer": "Sites, domains, and OUs"
+      },
+      {
+        "statement": "User policies apply to user accounts and computer policies apply to devices",
+        "answer": "User and computer scope"
+      },
+      {
+        "statement": "gpupdate /force refreshes policy immediately",
+        "answer": "gpupdate /force"
+      },
+      {
+        "statement": "Resultant Set of Policy shows which policies are applied",
+        "answer": "RSoP"
+      },
+      {
+        "statement": "Software can be deployed through Group Policy in some environments",
+        "answer": "Software deployment"
+      },
+      {
+        "statement": "Policy inheritance affects how settings flow from parent containers",
+        "answer": "Inheritance"
+      },
+      {
+        "statement": "Loopback processing applies user settings based on the computer's location",
+        "answer": "Loopback processing"
+      },
+      {
+        "statement": "Security settings such as password policy can be enforced with Group Policy",
+        "answer": "Security settings"
+      },
+      {
+        "statement": "A disabled or unlinked GPO will not apply to its targets",
+        "answer": "Disabled or unlinked GPO"
+      }
+    ],
+    "definitions": [
+      {
+        "term": "RSoP",
+        "definition": "A view of the policies that are actually applied to a user or computer",
+        "aliases": [
+          "Resultant Set of Policy"
+        ]
+      },
+      {
+        "term": "Loopback processing",
+        "definition": "A policy mode that applies user settings based on the computer container"
+      }
+    ],
+    "procedures": [
+      {
+        "title": "Troubleshoot a missing Group Policy setting",
+        "steps": [
+          "Confirm the GPO is linked",
+          "Check security filtering",
+          "Run gpupdate /force",
+          "Review RSoP or gpresult",
+          "Verify inheritance and precedence"
+        ]
+      },
+      {
+        "title": "Verify applied policies",
+        "steps": [
+          "Open Command Prompt",
+          "Run gpresult /r",
+          "Review computer settings",
+          "Review user settings"
+        ]
+      }
+    ],
+    "commands": [
+      {
+        "platform": "windows",
+        "purpose": "Generate applied Group Policy results",
+        "command": "gpresult /r"
+      },
+      {
+        "platform": "windows",
+        "purpose": "Force a Group Policy refresh",
+        "command": "gpupdate /force"
+      }
+    ],
+    "scenarios": [
+      {
+        "scenario": "A desktop lockdown policy is configured but one workstation still allows Control Panel access.",
+        "bestAction": "Run gpresult /r, verify GPO scope, and confirm the device is in the correct OU."
+      }
+    ],
+    "distractors": [
+      "Reinstall the touchpad driver first",
+      "Replace the printer tray",
+      "Reset the Teams cache only"
+    ]
+  },
+  {
+    "id": "desktop-networking-001",
+    "title": "Desktop Networking Support",
+    "setName": "Desktop Networking Support",
+    "domain": "NETWORKING",
+    "lane": "POSITION_TRAINING",
+    "difficulty": 2,
+    "stage": 2,
+    "tags": [
+      "networking",
+      "desktop-support"
+    ],
+    "facts": [
+      {
+        "statement": "ipconfig displays network settings on Windows",
+        "answer": "ipconfig"
+      },
+      {
+        "statement": "ipconfig /release drops the current DHCP lease",
+        "answer": "ipconfig /release"
+      },
+      {
+        "statement": "ipconfig /renew requests a new DHCP lease",
+        "answer": "ipconfig /renew"
+      },
+      {
+        "statement": "ipconfig /flushdns clears the local DNS resolver cache",
+        "answer": "ipconfig /flushdns"
+      },
+      {
+        "statement": "tracert shows the network path packets take to a destination",
+        "answer": "tracert"
+      },
+      {
+        "statement": "Ethernet is typically more stable than Wi-Fi for endpoint connectivity",
+        "answer": "Ethernet"
+      },
+      {
+        "statement": "VPNs provide secure remote access to internal resources",
+        "answer": "VPN"
+      },
+      {
+        "statement": "Checking cables and link lights is part of basic physical network troubleshooting",
+        "answer": "Physical layer check"
+      },
+      {
+        "statement": "A firewall controls inbound and outbound network traffic",
+        "answer": "Firewall"
+      },
+      {
+        "statement": "An APIPA address often indicates a DHCP issue on Windows",
+        "answer": "APIPA"
+      }
+    ],
+    "definitions": [
+      {
+        "term": "APIPA",
+        "definition": "A self-assigned private IP address used when DHCP is unavailable",
+        "aliases": [
+          "Automatic Private IP Addressing"
+        ]
+      },
+      {
+        "term": "VPN",
+        "definition": "A secure tunnel used to access private resources over an untrusted network",
+        "aliases": [
+          "Virtual Private Network"
+        ]
+      }
+    ],
+    "procedures": [
+      {
+        "title": "Resolve a DHCP issue on a desktop",
+        "steps": [
+          "Run ipconfig",
+          "Check for an APIPA address",
+          "Run ipconfig /release",
+          "Run ipconfig /renew",
+          "Verify gateway and DNS settings"
+        ]
+      },
+      {
+        "title": "Check path issues to a remote host",
+        "steps": [
+          "Ping the local gateway",
+          "Ping the destination",
+          "Run tracert",
+          "Review where the path fails"
+        ]
+      }
+    ],
+    "commands": [
+      {
+        "platform": "windows",
+        "purpose": "Release and renew a DHCP lease",
+        "command": "ipconfig /release && ipconfig /renew"
+      },
+      {
+        "platform": "windows",
+        "purpose": "Clear the DNS resolver cache",
+        "command": "ipconfig /flushdns"
+      }
+    ],
+    "scenarios": [
+      {
+        "scenario": "A workstation has a 169.254.x.x address and cannot reach the network.",
+        "bestAction": "Investigate DHCP availability and renew the IP lease."
+      }
+    ],
+    "distractors": [
+      "Replace the webcam driver",
+      "Restart the PDF viewer",
+      "Clean the laptop fan"
+    ]
+  },
+  {
+    "id": "desktop-security-001",
+    "title": "Endpoint Security Fundamentals",
+    "setName": "Endpoint Security Fundamentals",
+    "domain": "SECURITY",
+    "lane": "POSITION_TRAINING",
+    "difficulty": 2,
+    "stage": 2,
+    "tags": [
+      "security",
+      "desktop-support"
+    ],
+    "facts": [
+      {
+        "statement": "Antivirus software detects and removes known malware",
+        "answer": "Antivirus"
+      },
+      {
+        "statement": "Endpoint protection platforms monitor endpoints for malicious activity",
+        "answer": "Endpoint protection"
+      },
+      {
+        "statement": "Least privilege grants users only the access they need",
+        "answer": "Least privilege"
+      },
+      {
+        "statement": "Patch management reduces exposure to known vulnerabilities",
+        "answer": "Patch management"
+      },
+      {
+        "statement": "Phishing attempts often try to steal credentials through deceptive messages",
+        "answer": "Phishing"
+      },
+      {
+        "statement": "Disk encryption protects data on lost or stolen devices",
+        "answer": "Disk encryption"
+      },
+      {
+        "statement": "Multi-Factor Authentication adds a second sign-in factor",
+        "answer": "MFA"
+      },
+      {
+        "statement": "Firewalls block or allow traffic based on security rules",
+        "answer": "Firewall"
+      },
+      {
+        "statement": "Security logs record authentication events and other important activity",
+        "answer": "Security logs"
+      },
+      {
+        "statement": "A strong password should be long and difficult to guess",
+        "answer": "Strong password"
+      }
+    ],
+    "definitions": [
+      {
+        "term": "Least privilege",
+        "definition": "A security principle that grants only the minimum access required"
+      },
+      {
+        "term": "Phishing",
+        "definition": "A fraudulent attempt to trick users into revealing sensitive information"
+      }
+    ],
+    "procedures": [
+      {
+        "title": "Respond to a suspected phishing email",
+        "steps": [
+          "Do not click links",
+          "Report the email",
+          "Check whether credentials were entered",
+          "Reset the password if needed",
+          "Review security logs"
+        ]
+      },
+      {
+        "title": "Verify endpoint protection status",
+        "steps": [
+          "Open the security dashboard",
+          "Confirm protection is enabled",
+          "Check signature status",
+          "Run a scan if needed"
+        ]
+      }
+    ],
+    "commands": [
+      {
+        "platform": "windows",
+        "purpose": "View Windows Defender status",
+        "command": "Get-MpComputerStatus"
+      }
+    ],
+    "scenarios": [
+      {
+        "scenario": "A user clicked a suspicious email link and entered their password.",
+        "bestAction": "Reset the password immediately and review sign-in activity for suspicious access."
+      }
+    ],
+    "distractors": [
+      "Replace the HDMI cable",
+      "Restart the printer spooler",
+      "Swap the keyboard layout"
+    ]
+  },
+  {
+    "id": "cloud-iam-001",
+    "title": "Cloud IAM Fundamentals",
+    "setName": "Cloud IAM Fundamentals",
+    "domain": "IAM",
+    "lane": "POSITION_TRAINING",
+    "difficulty": 2,
+    "stage": 2,
+    "tags": [
+      "iam",
+      "cloud-admin"
+    ],
+    "facts": [
+      {
+        "statement": "IAM controls authentication and authorization in cloud platforms",
+        "answer": "IAM"
+      },
+      {
+        "statement": "IAM users represent individual identities",
+        "answer": "IAM users"
+      },
+      {
+        "statement": "IAM roles provide temporary permissions without long-term credentials",
+        "answer": "IAM roles"
+      },
+      {
+        "statement": "Policies define allowed or denied actions on cloud resources",
+        "answer": "Policies"
+      },
+      {
+        "statement": "Least privilege reduces unnecessary permissions",
+        "answer": "Least privilege"
+      },
+      {
+        "statement": "Multi-Factor Authentication protects privileged accounts",
+        "answer": "MFA"
+      },
+      {
+        "statement": "Service accounts allow applications to authenticate securely",
+        "answer": "Service accounts"
+      },
+      {
+        "statement": "API access often uses keys or tokens for programmatic authentication",
+        "answer": "Keys or tokens"
+      },
+      {
+        "statement": "Group-based access management simplifies permission assignment",
+        "answer": "Groups"
+      },
+      {
+        "statement": "Role assumption enables temporary cross-account or delegated access",
+        "answer": "Role assumption"
+      }
+    ],
+    "definitions": [
+      {
+        "term": "Role",
+        "definition": "A cloud identity that can be assumed to obtain temporary permissions"
+      },
+      {
+        "term": "Least privilege",
+        "definition": "Granting only the permissions required to perform a task"
+      }
+    ],
+    "procedures": [
+      {
+        "title": "Grant access using least privilege",
+        "steps": [
+          "Identify the required task",
+          "Create or choose a narrow policy",
+          "Assign the policy to a role or group",
+          "Test the required access",
+          "Remove unnecessary permissions"
+        ]
+      },
+      {
+        "title": "Protect an admin account",
+        "steps": [
+          "Enable MFA",
+          "Review assigned roles",
+          "Remove unused access keys",
+          "Monitor sign-in activity"
+        ]
+      }
+    ],
+    "commands": [
+      {
+        "platform": "cloud",
+        "purpose": "List current IAM user context in AWS",
+        "command": "aws sts get-caller-identity"
+      }
+    ],
+    "scenarios": [
+      {
+        "scenario": "An application needs access to storage without embedding long-term user credentials.",
+        "bestAction": "Use a service identity or role with only the required permissions."
+      }
+    ],
+    "distractors": [
+      "Increase monitor refresh rate",
+      "Replace the desk phone cable",
+      "Reboot the printer"
+    ]
+  },
+  {
+    "id": "cloud-networking-001",
+    "title": "Cloud Networking Fundamentals",
+    "setName": "Cloud Networking Fundamentals",
+    "domain": "CLOUD_NETWORKING",
+    "lane": "POSITION_TRAINING",
+    "difficulty": 2,
+    "stage": 2,
+    "tags": [
+      "networking",
+      "cloud-admin"
+    ],
+    "facts": [
+      {
+        "statement": "Virtual networks isolate cloud resources",
+        "answer": "Virtual networks"
+      },
+      {
+        "statement": "Subnets divide a virtual network into smaller address ranges",
+        "answer": "Subnets"
+      },
+      {
+        "statement": "Security groups control inbound and outbound traffic to resources",
+        "answer": "Security groups"
+      },
+      {
+        "statement": "Network ACLs provide stateless packet filtering for subnets",
+        "answer": "Network ACLs"
+      },
+      {
+        "statement": "Public IP addresses allow internet reachability",
+        "answer": "Public IP"
+      },
+      {
+        "statement": "Private IP addresses are used for internal communication",
+        "answer": "Private IP"
+      },
+      {
+        "statement": "Load balancers distribute traffic across multiple targets",
+        "answer": "Load balancer"
+      },
+      {
+        "statement": "NAT gateways allow private resources to reach the internet outbound",
+        "answer": "NAT gateway"
+      },
+      {
+        "statement": "VPNs connect on-premises networks to cloud environments securely",
+        "answer": "VPN"
+      },
+      {
+        "statement": "Cloud DNS maps domain names to cloud resources",
+        "answer": "DNS"
+      }
+    ],
+    "definitions": [
+      {
+        "term": "NAT gateway",
+        "definition": "A service that allows private resources to make outbound internet connections"
+      },
+      {
+        "term": "Security group",
+        "definition": "A stateful firewall control for cloud resources"
+      }
+    ],
+    "procedures": [
+      {
+        "title": "Expose a cloud service to the internet",
+        "steps": [
+          "Assign a public endpoint if needed",
+          "Review security group rules",
+          "Review subnet routing",
+          "Test from an external source"
+        ]
+      },
+      {
+        "title": "Restrict inbound traffic to an application",
+        "steps": [
+          "Identify required ports",
+          "Update security groups",
+          "Limit source ranges",
+          "Test allowed and denied access"
+        ]
+      }
+    ],
+    "commands": [
+      {
+        "platform": "cloud",
+        "purpose": "List AWS VPCs",
+        "command": "aws ec2 describe-vpcs"
+      }
+    ],
+    "scenarios": [
+      {
+        "scenario": "A web server in the cloud works internally but is unreachable from the internet.",
+        "bestAction": "Check whether it has a public path, valid routing, and the correct security group rules."
+      }
+    ],
+    "distractors": [
+      "Restart the office projector",
+      "Replace the USB hub",
+      "Clear the print queue"
+    ]
+  },
+  {
+    "id": "cloud-vms-001",
+    "title": "Virtual Machine Administration",
+    "setName": "Virtual Machine Administration",
+    "domain": "VMS",
+    "lane": "POSITION_TRAINING",
+    "difficulty": 2,
+    "stage": 2,
+    "tags": [
+      "vms",
+      "cloud-admin"
+    ],
+    "facts": [
+      {
+        "statement": "Virtual machines run operating systems on virtualized hardware",
+        "answer": "Virtual machines"
+      },
+      {
+        "statement": "A hypervisor manages the compute resources assigned to virtual machines",
+        "answer": "Hypervisor"
+      },
+      {
+        "statement": "VM sizes determine the amount of CPU and memory available",
+        "answer": "VM size"
+      },
+      {
+        "statement": "A VM image is a template used to launch new instances",
+        "answer": "VM image"
+      },
+      {
+        "statement": "Snapshots capture the state of a VM or its disks at a point in time",
+        "answer": "Snapshot"
+      },
+      {
+        "statement": "Auto scaling can increase or decrease VM count based on demand",
+        "answer": "Auto scaling"
+      },
+      {
+        "statement": "SSH is commonly used to access Linux VMs",
+        "answer": "SSH"
+      },
+      {
+        "statement": "RDP is commonly used to access Windows VMs",
+        "answer": "RDP"
+      },
+      {
+        "statement": "Stopping a VM may preserve its storage but halt compute charges in some platforms",
+        "answer": "Stop"
+      },
+      {
+        "statement": "Terminating a VM permanently removes the compute instance",
+        "answer": "Terminate"
+      }
+    ],
+    "definitions": [
+      {
+        "term": "Snapshot",
+        "definition": "A point-in-time copy of a VM disk or state used for backup or rollback"
+      },
+      {
+        "term": "Hypervisor",
+        "definition": "Software or firmware that manages virtual machines on physical hosts"
+      }
+    ],
+    "procedures": [
+      {
+        "title": "Connect to a Linux VM",
+        "steps": [
+          "Confirm the VM is running",
+          "Verify network access",
+          "Locate the SSH key or credentials",
+          "Connect with SSH",
+          "Validate shell access"
+        ]
+      },
+      {
+        "title": "Recover from a failed VM change",
+        "steps": [
+          "Review monitoring alerts",
+          "Check recent changes",
+          "Restore from snapshot if needed",
+          "Validate application functionality"
+        ]
+      }
+    ],
+    "commands": [
+      {
+        "platform": "linux",
+        "purpose": "Connect to a Linux VM over SSH",
+        "command": "ssh user@server-ip"
+      }
+    ],
+    "scenarios": [
+      {
+        "scenario": "A Linux VM is running but cannot be administered remotely.",
+        "bestAction": "Verify SSH access, network rules, and the VM's current power state."
+      }
+    ],
+    "distractors": [
+      "Replace the printer cartridge",
+      "Update the mouse firmware",
+      "Restart the conference room TV"
+    ]
+  },
+  {
+    "id": "cloud-storage-001",
+    "title": "Cloud Storage Fundamentals",
+    "setName": "Cloud Storage Fundamentals",
+    "domain": "STORAGE",
+    "lane": "POSITION_TRAINING",
+    "difficulty": 2,
+    "stage": 2,
+    "tags": [
+      "storage",
+      "cloud-admin"
+    ],
+    "facts": [
+      {
+        "statement": "Object storage stores data as objects in buckets or containers",
+        "answer": "Object storage"
+      },
+      {
+        "statement": "Block storage presents virtual disks to virtual machines",
+        "answer": "Block storage"
+      },
+      {
+        "statement": "File storage provides shared file systems accessible by multiple clients",
+        "answer": "File storage"
+      },
+      {
+        "statement": "Snapshots provide point-in-time backups of storage volumes",
+        "answer": "Snapshots"
+      },
+      {
+        "statement": "Storage redundancy helps protect against hardware failure",
+        "answer": "Redundancy"
+      },
+      {
+        "statement": "Lifecycle policies can move data between storage tiers automatically",
+        "answer": "Lifecycle policies"
+      },
+      {
+        "statement": "Encryption protects data at rest in cloud storage",
+        "answer": "Encryption"
+      },
+      {
+        "statement": "Access control policies determine who can read or write stored data",
+        "answer": "Access control policies"
+      },
+      {
+        "statement": "Cool or archive tiers reduce cost for infrequently accessed data",
+        "answer": "Storage tiers"
+      },
+      {
+        "statement": "A CDN can cache content closer to users for faster delivery",
+        "answer": "CDN"
+      }
+    ],
+    "definitions": [
+      {
+        "term": "Object storage",
+        "definition": "Storage that keeps data as scalable objects identified by keys"
+      },
+      {
+        "term": "Lifecycle policy",
+        "definition": "A rule that automates retention, transition, or deletion of stored data"
+      }
+    ],
+    "procedures": [
+      {
+        "title": "Protect a storage bucket",
+        "steps": [
+          "Review public access settings",
+          "Apply least-privilege access rules",
+          "Enable encryption",
+          "Enable logging if available",
+          "Test authorized access"
+        ]
+      },
+      {
+        "title": "Back up a VM disk",
+        "steps": [
+          "Identify the correct disk",
+          "Create a snapshot",
+          "Verify snapshot completion",
+          "Document retention policy"
+        ]
+      }
+    ],
+    "commands": [
+      {
+        "platform": "cloud",
+        "purpose": "List objects in an AWS S3 bucket",
+        "command": "aws s3 ls s3://bucket-name"
+      }
+    ],
+    "scenarios": [
+      {
+        "scenario": "A company needs inexpensive long-term retention for rarely accessed files.",
+        "bestAction": "Move the data to a lower-cost archive storage tier using a lifecycle policy."
+      }
+    ],
+    "distractors": [
+      "Replace the docking station",
+      "Reboot the monitor",
+      "Install a new webcam app"
+    ]
+  },
+  {
+    "id": "cloud-monitoring-001",
+    "title": "Cloud Monitoring Fundamentals",
+    "setName": "Cloud Monitoring Fundamentals",
+    "domain": "MONITORING",
+    "lane": "POSITION_TRAINING",
+    "difficulty": 2,
+    "stage": 2,
+    "tags": [
+      "monitoring",
+      "cloud-admin"
+    ],
+    "facts": [
+      {
+        "statement": "Monitoring tools track the health and performance of cloud resources",
+        "answer": "Monitoring"
+      },
+      {
+        "statement": "Metrics measure values such as CPU, memory, and network usage over time",
+        "answer": "Metrics"
+      },
+      {
+        "statement": "Logs record events, errors, and other runtime details",
+        "answer": "Logs"
+      },
+      {
+        "statement": "Alerts notify administrators when thresholds are exceeded",
+        "answer": "Alerts"
+      },
+      {
+        "statement": "Dashboards visualize service health and trends",
+        "answer": "Dashboards"
+      },
+      {
+        "statement": "Centralized logging collects logs from multiple systems into one place",
+        "answer": "Centralized logging"
+      },
+      {
+        "statement": "Automated remediation can respond to alerts without manual action",
+        "answer": "Automated remediation"
+      },
+      {
+        "statement": "Monitoring supports capacity planning by showing usage trends",
+        "answer": "Capacity planning"
+      },
+      {
+        "statement": "Availability checks can confirm whether an endpoint responds successfully",
+        "answer": "Availability checks"
+      },
+      {
+        "statement": "Monitoring shortens detection time during outages",
+        "answer": "Faster detection"
+      }
+    ],
+    "definitions": [
+      {
+        "term": "Metric",
+        "definition": "A numerical measurement collected over time"
+      },
+      {
+        "term": "Alert",
+        "definition": "A notification generated when a condition or threshold is met"
+      }
+    ],
+    "procedures": [
+      {
+        "title": "Investigate a high CPU alert",
+        "steps": [
+          "Open the monitoring dashboard",
+          "Confirm the metric spike",
+          "Review system logs",
+          "Identify the affected process or workload",
+          "Scale or remediate as needed"
+        ]
+      },
+      {
+        "title": "Set a basic resource alert",
+        "steps": [
+          "Choose the resource",
+          "Select the metric",
+          "Define a threshold",
+          "Set a notification target",
+          "Test the alert path"
+        ]
+      }
+    ],
+    "commands": [
+      {
+        "platform": "cloud",
+        "purpose": "List CloudWatch alarms in AWS",
+        "command": "aws cloudwatch describe-alarms"
+      }
+    ],
+    "scenarios": [
+      {
+        "scenario": "A production application becomes slow every afternoon.",
+        "bestAction": "Review monitoring metrics and logs to identify recurring resource or application bottlenecks."
+      }
+    ],
+    "distractors": [
+      "Replace the keyboard wrist rest",
+      "Change the desktop wallpaper",
+      "Restart the mouse service"
+    ]
+  },
+  {
+    "id": "cert-aws-001",
+    "title": "AWS Fundamentals",
+    "setName": "AWS Fundamentals",
+    "domain": "AWS",
+    "lane": "CERTIFICATIONS",
+    "difficulty": 2,
+    "stage": 2,
+    "tags": [
+      "aws",
+      "certifications"
+    ],
+    "facts": [
+      {
+        "statement": "Amazon EC2 provides scalable virtual servers",
+        "answer": "EC2"
+      },
+      {
+        "statement": "Amazon S3 stores data as objects in buckets",
+        "answer": "S3"
+      },
+      {
+        "statement": "AWS IAM manages identities and permissions",
+        "answer": "IAM"
+      },
+      {
+        "statement": "AWS Lambda runs serverless code without managing servers",
+        "answer": "Lambda"
+      },
+      {
+        "statement": "Amazon CloudWatch collects metrics, logs, and alarms",
+        "answer": "CloudWatch"
+      },
+      {
+        "statement": "Amazon VPC provides isolated virtual networking",
+        "answer": "VPC"
+      },
+      {
+        "statement": "Amazon RDS offers managed relational databases",
+        "answer": "RDS"
+      },
+      {
+        "statement": "Amazon Route 53 provides DNS services",
+        "answer": "Route 53"
+      },
+      {
+        "statement": "AWS Auto Scaling adjusts resource capacity based on demand",
+        "answer": "Auto Scaling"
+      },
+      {
+        "statement": "AWS CloudTrail records API activity for auditing",
+        "answer": "CloudTrail"
+      }
+    ],
+    "definitions": [
+      {
+        "term": "EC2",
+        "definition": "An AWS service that provides scalable virtual machines",
+        "aliases": [
+          "Elastic Compute Cloud"
+        ]
+      },
+      {
+        "term": "S3",
+        "definition": "An AWS object storage service",
+        "aliases": [
+          "Simple Storage Service"
+        ]
+      }
+    ],
+    "procedures": [
+      {
+        "title": "Launch an EC2 instance",
+        "steps": [
+          "Choose an AMI",
+          "Select an instance type",
+          "Configure networking",
+          "Review security group rules",
+          "Launch the instance"
+        ]
+      },
+      {
+        "title": "Protect an S3 bucket",
+        "steps": [
+          "Review bucket policy",
+          "Block public access if appropriate",
+          "Enable encryption",
+          "Enable logging if needed"
+        ]
+      }
+    ],
+    "commands": [
+      {
+        "platform": "cloud",
+        "purpose": "List S3 buckets",
+        "command": "aws s3 ls"
+      },
+      {
+        "platform": "cloud",
+        "purpose": "Identify the current AWS caller",
+        "command": "aws sts get-caller-identity"
+      }
+    ],
+    "scenarios": [
+      {
+        "scenario": "An application needs object storage for uploaded files.",
+        "bestAction": "Store the files in Amazon S3 with appropriate access controls."
+      }
+    ],
+    "distractors": [
+      "Install a printer driver",
+      "Change the screen saver",
+      "Reconnect the USB mouse"
+    ]
+  },
+  {
+    "id": "cert-azure-001",
+    "title": "Azure Fundamentals",
+    "setName": "Azure Fundamentals",
+    "domain": "AZURE",
+    "lane": "CERTIFICATIONS",
+    "difficulty": 2,
+    "stage": 2,
+    "tags": [
+      "azure",
+      "certifications"
+    ],
+    "facts": [
+      {
+        "statement": "Azure Virtual Machines provide on-demand compute resources",
+        "answer": "Azure Virtual Machines"
+      },
+      {
+        "statement": "Azure Blob Storage stores unstructured object data",
+        "answer": "Azure Blob Storage"
+      },
+      {
+        "statement": "Microsoft Entra ID provides identity and access management for Azure",
+        "answer": "Microsoft Entra ID"
+      },
+      {
+        "statement": "Azure Virtual Network isolates cloud resources",
+        "answer": "Azure Virtual Network"
+      },
+      {
+        "statement": "Azure Monitor collects metrics and logs for resources",
+        "answer": "Azure Monitor"
+      },
+      {
+        "statement": "Azure Resource Manager organizes and deploys Azure resources",
+        "answer": "Azure Resource Manager"
+      },
+      {
+        "statement": "Azure Functions enables serverless code execution",
+        "answer": "Azure Functions"
+      },
+      {
+        "statement": "Azure Load Balancer distributes network traffic across backend resources",
+        "answer": "Azure Load Balancer"
+      },
+      {
+        "statement": "Azure Key Vault stores secrets, keys, and certificates",
+        "answer": "Azure Key Vault"
+      },
+      {
+        "statement": "Azure App Service hosts web applications and APIs",
+        "answer": "Azure App Service"
+      }
+    ],
+    "definitions": [
+      {
+        "term": "Azure Monitor",
+        "definition": "A service used to collect, analyze, and act on telemetry from Azure resources"
+      },
+      {
+        "term": "Key Vault",
+        "definition": "An Azure service for securely storing secrets, keys, and certificates"
+      }
+    ],
+    "procedures": [
+      {
+        "title": "Deploy a basic Azure VM",
+        "steps": [
+          "Create a resource group",
+          "Choose a VM image",
+          "Set size and authentication",
+          "Configure networking",
+          "Review and create"
+        ]
+      },
+      {
+        "title": "Store a secret securely in Azure",
+        "steps": [
+          "Open Azure Key Vault",
+          "Create or select a vault",
+          "Add the secret",
+          "Grant access to required identities"
+        ]
+      }
+    ],
+    "commands": [
+      {
+        "platform": "cloud",
+        "purpose": "List Azure resource groups",
+        "command": "az group list"
+      },
+      {
+        "platform": "cloud",
+        "purpose": "List Azure VMs",
+        "command": "az vm list -o table"
+      }
+    ],
+    "scenarios": [
+      {
+        "scenario": "A team needs to store application secrets outside of code.",
+        "bestAction": "Use Azure Key Vault and grant access only to the required identities."
+      }
+    ],
+    "distractors": [
+      "Replace the monitor stand",
+      "Reset the keyboard backlight",
+      "Restart the webcam app"
+    ]
+  },
+  {
+    "id": "cert-securityplus-001",
+    "title": "Security+ Fundamentals",
+    "setName": "Security+ Fundamentals",
+    "domain": "SECURITY_PLUS",
+    "lane": "CERTIFICATIONS",
+    "difficulty": 2,
+    "stage": 2,
+    "tags": [
+      "security+",
+      "certifications"
+    ],
+    "facts": [
+      {
+        "statement": "The CIA triad stands for Confidentiality, Integrity, and Availability",
+        "answer": "Confidentiality, Integrity, Availability"
+      },
+      {
+        "statement": "Hashing is commonly used to verify data integrity",
+        "answer": "Hashing"
+      },
+      {
+        "statement": "Encryption helps protect the confidentiality of data",
+        "answer": "Encryption"
+      },
+      {
+        "statement": "Phishing is a social engineering attack used to steal information",
+        "answer": "Phishing"
+      },
+      {
+        "statement": "Multi-Factor Authentication adds an additional login verification factor",
+        "answer": "Multi-Factor Authentication"
+      },
+      {
+        "statement": "Firewalls filter network traffic based on rules",
+        "answer": "Firewalls"
+      },
+      {
+        "statement": "Intrusion Detection Systems monitor for suspicious activity",
+        "answer": "IDS"
+      },
+      {
+        "statement": "Risk assessments identify threats, vulnerabilities, and impact",
+        "answer": "Risk assessment"
+      },
+      {
+        "statement": "Security policies define an organization's required security controls",
+        "answer": "Security policies"
+      },
+      {
+        "statement": "Social engineering manipulates people into revealing sensitive information",
+        "answer": "Social engineering"
+      }
+    ],
+    "definitions": [
+      {
+        "term": "CIA triad",
+        "definition": "A core security model of confidentiality, integrity, and availability"
+      },
+      {
+        "term": "IDS",
+        "definition": "A system that detects suspicious or malicious activity",
+        "aliases": [
+          "Intrusion Detection System"
+        ]
+      }
+    ],
+    "procedures": [
+      {
+        "title": "Respond to a suspected credential theft incident",
+        "steps": [
+          "Disable or reset the compromised account",
+          "Review authentication logs",
+          "Contain affected systems",
+          "Notify security personnel",
+          "Document the incident"
+        ]
+      },
+      {
+        "title": "Perform a basic risk review",
+        "steps": [
+          "Identify assets",
+          "Identify threats",
+          "Identify vulnerabilities",
+          "Estimate impact",
+          "Recommend controls"
+        ]
+      }
+    ],
+    "commands": [
+      {
+        "platform": "linux",
+        "purpose": "List active listening ports",
+        "command": "ss -tuln"
+      }
+    ],
+    "scenarios": [
+      {
+        "scenario": "An employee receives an email asking them to verify payroll details through a suspicious link.",
+        "bestAction": "Treat it as phishing, do not click, and report it to security."
+      }
+    ],
+    "distractors": [
+      "Replace the printer USB cable",
+      "Reinstall the weather app",
+      "Increase monitor brightness"
+    ]
+  },
+  {
+    "id": "cert-aplus-001",
+    "title": "CompTIA A+ Fundamentals",
+    "setName": "CompTIA A+ Fundamentals",
+    "domain": "A_PLUS",
+    "lane": "CERTIFICATIONS",
+    "difficulty": 1,
+    "stage": 1,
+    "tags": [
+      "a+",
+      "certifications"
+    ],
+    "facts": [
+      {
+        "statement": "The CPU performs calculations and processing tasks for a computer",
+        "answer": "CPU"
+      },
+      {
+        "statement": "RAM temporarily stores active data for running processes",
+        "answer": "RAM"
+      },
+      {
+        "statement": "SSDs are generally faster than HDDs for storage access",
+        "answer": "SSD"
+      },
+      {
+        "statement": "The BIOS or UEFI initializes hardware during startup",
+        "answer": "BIOS or UEFI"
+      },
+      {
+        "statement": "USB ports connect common external peripherals",
+        "answer": "USB"
+      },
+      {
+        "statement": "The motherboard connects core internal components",
+        "answer": "Motherboard"
+      },
+      {
+        "statement": "The GPU processes graphics and visual output",
+        "answer": "GPU"
+      },
+      {
+        "statement": "A power supply converts AC power to DC power for internal components",
+        "answer": "Power supply"
+      },
+      {
+        "statement": "POST checks hardware during system startup",
+        "answer": "POST"
+      },
+      {
+        "statement": "Thermal paste improves heat transfer between a CPU and its cooler",
+        "answer": "Thermal paste"
+      }
+    ],
+    "definitions": [
+      {
+        "term": "POST",
+        "definition": "A startup hardware check performed when a computer powers on",
+        "aliases": [
+          "Power-On Self-Test"
+        ]
+      },
+      {
+        "term": "UEFI",
+        "definition": "Modern firmware that initializes hardware and starts the operating system"
+      }
+    ],
+    "procedures": [
+      {
+        "title": "Troubleshoot a no-boot desktop",
+        "steps": [
+          "Check power",
+          "Listen for beep codes or observe indicators",
+          "Verify RAM and storage connections",
+          "Review BIOS or UEFI settings",
+          "Test with known-good components"
+        ]
+      },
+      {
+        "title": "Install an SSD",
+        "steps": [
+          "Power off the system",
+          "Connect power and data cables or M.2 slot",
+          "Secure the drive",
+          "Initialize it in the operating system if needed",
+          "Verify detection"
+        ]
+      }
+    ],
+    "commands": [
+      {
+        "platform": "windows",
+        "purpose": "Open Device Manager",
+        "command": "devmgmt.msc"
+      }
+    ],
+    "scenarios": [
+      {
+        "scenario": "A desktop powers on but displays nothing and never reaches the operating system.",
+        "bestAction": "Check POST behavior and verify core hardware like RAM, video output, and motherboard connections."
+      }
+    ],
+    "distractors": [
+      "Reset the browser theme",
+      "Replace the office chair wheels",
+      "Delete old screenshots"
+    ]
+  }
+]

@@ -173,5 +173,19 @@ export function evaluateQuestionAnswer(input: {
     };
   }
 
+  if (type === "log_analysis") {
+    const caseSensitive = Boolean(data.caseSensitive);
+    const acceptable = safeArray<string>(data.answers).length
+      ? safeArray<string>(data.answers)
+      : safeArray<string>(data.expectedFindings);
+    const normalizedExpected = acceptable.map((value) => normalizeText(value, caseSensitive));
+    const guess = normalizeText(input.answer, caseSensitive);
+    const correct = Boolean(guess) && normalizedExpected.some((value) => guess === value || guess.includes(value) || value.includes(guess));
+    return {
+      correct,
+      feedback: acceptable.length ? `Expected finding: ${acceptable[0]}` : "Review the log details and try again.",
+    };
+  }
+
   return { correct: false, feedback: "Unsupported question type." };
 }

@@ -6,7 +6,7 @@ import type { DiabloQuizRunSummary } from "@/components/DiabloQuizRunner";
 
 type Kind = "position" | "cert" | "test";
 type PositionPath = "HELPDESK_SUPPORT" | "DESKTOP_TECHNICIAN" | "CLOUD_ENGINEER";
-type CertTrack = "A_PLUS" | "SECURITY_PLUS" | "AZ_900";
+type CertTrack = "A_PLUS" | "SECURITY_PLUS" | "AZ_900" | "AWS" | "AZURE";
 
 export default function PracticeMiniGameModal(props: {
   open: boolean;
@@ -54,7 +54,7 @@ export default function PracticeMiniGameModal(props: {
           {step === "setup" && (
             <div className="card" style={{ padding: 14 }}>
               {kind === "position" && <div style={{ display: "grid", gap: 10 }}><div style={{ fontWeight: 800 }}>Choose your path</div><div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>{([ ["HELPDESK_SUPPORT", "Helpdesk"], ["DESKTOP_TECHNICIAN", "Desktop"], ["CLOUD_ENGINEER", "Cloud"] ] as const).map(([k, label]) => <button key={k} className={"trackBtn" + (path === k ? " active" : "")} type="button" onClick={() => setPath(k)}>{label}</button>)}</div><small className="luHint">8 randomized MCQs per run • pulled from DB first</small></div>}
-              {kind === "cert" && <div style={{ display: "grid", gap: 10 }}><div style={{ fontWeight: 800 }}>Choose a certification pack</div><div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>{([ ["A_PLUS", "A+"], ["SECURITY_PLUS", "Security+"], ["AZ_900", "AZ-900"] ] as const).map(([k, label]) => <button key={k} className={"trackBtn" + (cert === k ? " active" : "")} type="button" onClick={() => setCert(k)}>{label}</button>)}</div><small className="luHint">8 randomized MCQs per run • pulled from DB first</small></div>}
+              {kind === "cert" && <div style={{ display: "grid", gap: 10 }}><div style={{ fontWeight: 800 }}>Choose a certification pack</div><div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>{([ ["A_PLUS", "A+"], ["SECURITY_PLUS", "Security+"], ["AZ_900", "AZ-900"], ["AWS", "AWS"], ["AZURE", "Azure"] ] as const).map(([k, label]) => <button key={k} className={"trackBtn" + (cert === k ? " active" : "")} type="button" onClick={() => setCert(k)}>{label}</button>)}</div><small className="luHint">8 randomized MCQs per run • pulled from DB first</small></div>}
               {kind === "test" && <div style={{ display: "grid", gap: 10 }}><div style={{ fontWeight: 800 }}>Quick timed check</div><small className="luHint">10 mixed questions • timer scales by question difficulty</small></div>}
               <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 14 }}><button className="primaryBtn" type="button" onClick={() => setStep("quiz")}>Start →</button></div>
             </div>

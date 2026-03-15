@@ -65,6 +65,7 @@ function labelForType(type: QuestionType) {
   if (type === "multi_select") return "Multi Select";
   if (type === "incident") return "Incident";
   if (type === "cli_command") return "CLI Command";
+  if (type === "log_analysis") return "Log Analysis";
   return "Question";
 }
 
@@ -111,6 +112,8 @@ function renderQuestionInput(args: {
   setFillValue: (value: string) => void;
   cliValue: string;
   setCliValue: (value: string) => void;
+  logValue: string;
+  setLogValue: (value: string) => void;
   sequenceItems: string[];
   moveSequenceItem: (from: number, to: number) => void;
   multiSelected: number[];
@@ -125,6 +128,8 @@ function renderQuestionInput(args: {
     setFillValue,
     cliValue,
     setCliValue,
+    logValue,
+    setLogValue,
     sequenceItems,
     moveSequenceItem,
     multiSelected,
@@ -200,6 +205,20 @@ function renderQuestionInput(args: {
     );
   }
 
+  if (type === "log_analysis") {
+    return (
+      <div style={{ marginTop: 14, display: "grid", gap: 10 }}>
+        {data.logText ? (
+          <div className="card" style={{ padding: 12, background: "rgba(255,255,255,0.04)", whiteSpace: "pre-wrap", fontFamily: "monospace", fontSize: 13 }}>
+            <div style={{ fontSize: 12, fontWeight: 900, letterSpacing: 0.6, opacity: 0.8, marginBottom: 8 }}>LOG EXCERPT</div>
+            <div>{String(data.logText)}</div>
+          </div>
+        ) : null}
+        <textarea value={logValue} onChange={(e) => setLogValue(e.target.value)} disabled={state.locked} placeholder={String(data.placeholder || "Describe the issue shown in the log")} className="input" style={{ width: "100%", minHeight: 120, resize: "vertical" }} />
+      </div>
+    );
+  }
+
   if (type === "sequence_order") {
     return (
       <div style={{ marginTop: 14, display: "grid", gap: 10 }}>
@@ -271,6 +290,8 @@ export default function DiabloQuizRunner(props: {
   onExit?: () => void;
   onComplete?: (summary: DiabloQuizRunSummary) => void;
   onXp?: (xpDelta: number, totalXp: number) => void;
+  initialState?: any;
+  onStateChange?: (state: any) => void;
   media?: QuizMediaConfig;
 }) {
   const {
@@ -287,6 +308,8 @@ export default function DiabloQuizRunner(props: {
     onExit,
     onComplete,
     onXp,
+    initialState,
+    onStateChange,
     media,
   } = props;
 
@@ -309,6 +332,7 @@ export default function DiabloQuizRunner(props: {
   const [hitPulse, setHitPulse] = useState<null | "player" | "enemy">(null);
   const [fillValue, setFillValue] = useState("");
   const [cliValue, setCliValue] = useState("");
+  const [logValue, setLogValue] = useState("");
   const [sequenceItems, setSequenceItems] = useState<string[]>([]);
   const [multiSelected, setMultiSelected] = useState<number[]>([]);
   const [isMobileLayout, setIsMobileLayout] = useState(false);
@@ -322,6 +346,8 @@ export default function DiabloQuizRunner(props: {
       setHitPulse(r.correct ? "enemy" : "player");
       window.setTimeout(() => setHitPulse(null), 450);
     },
+    initialState,
+    onStateChange,
   });
 
   const questionType = normalizeQuestionType(question?.type);
@@ -342,6 +368,7 @@ export default function DiabloQuizRunner(props: {
     const data = (question?.data || {}) as Record<string, unknown>;
     setFillValue("");
     setCliValue("");
+    setLogValue("");
     setMultiSelected([]);
     if (questionType === "sequence_order") {
       const items = safeArray<string>(data.items);
@@ -388,6 +415,7 @@ export default function DiabloQuizRunner(props: {
     if (questionType === "sequence_order") answer = sequenceItems;
     if (questionType === "multi_select") answer = multiSelected;
     if (questionType === "cli_command") answer = cliValue;
+    if (questionType === "log_analysis") answer = logValue;
 
     const result = evaluateQuestionAnswer({
       type: question.type,
@@ -413,6 +441,7 @@ export default function DiabloQuizRunner(props: {
     if (questionType === "sequence_order") return sequenceItems.length > 0;
     if (questionType === "multi_select") return multiSelected.length > 0;
     if (questionType === "cli_command") return cliValue.trim().length > 0;
+    if (questionType === "log_analysis") return logValue.trim().length > 0;
     return false;
   }
 
@@ -477,6 +506,8 @@ export default function DiabloQuizRunner(props: {
                     setFillValue,
                     cliValue,
                     setCliValue,
+                    logValue,
+                    setLogValue,
                     sequenceItems,
                     moveSequenceItem: (from, to) => setSequenceItems((current) => reorderItem(current, from, to)),
                     multiSelected,
@@ -495,6 +526,7 @@ export default function DiabloQuizRunner(props: {
                             clear();
                             setFillValue("");
                             setCliValue("");
+                            setLogValue("");
                             setMultiSelected([]);
                             const data = (question.data || {}) as Record<string, unknown>;
                             const items = safeArray<string>(data.items);
@@ -567,6 +599,8 @@ export default function DiabloQuizRunner(props: {
                     setFillValue,
                     cliValue,
                     setCliValue,
+                    logValue,
+                    setLogValue,
                     sequenceItems,
                     moveSequenceItem: (from, to) => setSequenceItems((current) => reorderItem(current, from, to)),
                     multiSelected,
@@ -585,6 +619,7 @@ export default function DiabloQuizRunner(props: {
                             clear();
                             setFillValue("");
                             setCliValue("");
+                            setLogValue("");
                             setMultiSelected([]);
                             const data = (question.data || {}) as Record<string, unknown>;
                             const items = safeArray<string>(data.items);

@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import GameEngine from "@/components/GameEngine";
 
-type Exam = "A_PLUS" | "SECURITY_PLUS" | "AZ_900";
+type Exam = "A_PLUS" | "SECURITY_PLUS" | "AZ_900" | "AWS" | "AZURE";
 
 export default function CertMCQPage() {
   const router = useRouter();
@@ -25,7 +25,7 @@ export default function CertMCQPage() {
     }
   }, [router]);
 
-  const examLabel = useMemo(() => (exam === "A_PLUS" ? "A+" : exam === "SECURITY_PLUS" ? "Security+" : "AZ-900"), [exam]);
+  const examLabel = useMemo(() => (exam === "A_PLUS" ? "A+" : exam === "SECURITY_PLUS" ? "Security+" : exam === "AZ_900" ? "AZ-900" : exam === "AZURE" ? "Azure" : "AWS"), [exam]);
 
   return (
     <div className="page">
@@ -36,6 +36,8 @@ export default function CertMCQPage() {
             <button className="btn d2Roman" onClick={() => setExam("A_PLUS")} style={{ opacity: exam === "A_PLUS" ? 1 : 0.6 }}>A+</button>
             <button className="btn d2Roman" onClick={() => setExam("SECURITY_PLUS")} style={{ opacity: exam === "SECURITY_PLUS" ? 1 : 0.6 }}>Security+</button>
             <button className="btn d2Roman" onClick={() => setExam("AZ_900")} style={{ opacity: exam === "AZ_900" ? 1 : 0.6 }}>AZ-900</button>
+            <button className="btn d2Roman" onClick={() => setExam("AWS")} style={{ opacity: exam === "AWS" ? 1 : 0.6 }}>AWS</button>
+            <button className="btn d2Roman" onClick={() => setExam("AZURE")} style={{ opacity: exam === "AZURE" ? 1 : 0.6 }}>Azure</button>
           </div>
         </div>
 
