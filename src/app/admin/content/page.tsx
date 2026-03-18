@@ -96,6 +96,10 @@ type GoldenTracking = {
   }>;
 };
 
+function asArray<T>(value: T[] | null | undefined): T[] {
+  return Array.isArray(value) ? value : [];
+}
+
 const SAMPLE_BLOCK = `[
   {
     "id": "net-foundations-001",
@@ -167,9 +171,10 @@ export default function AdminContentStudioPage() {
   async function loadBlocks() {
     const res = await fetch("/api/admin/knowledge-blocks", { cache: "no-store" });
     const data = await res.json();
-    if (!res.ok) throw new Error(data?.error || "Failed to load knowledge blocks");
-    setBlocks(data.blocks || []);
-    if (!selectedBlockId && data.blocks?.[0]?.id) setSelectedBlockId(data.blocks[0].id);
+    if (!res.ok) throw new Error((data as any)?.error || "Failed to load knowledge blocks");
+    const blocksArr = asArray(data.blocks) as KnowledgeBlock[];
+    setBlocks(blocksArr);
+    if (!selectedBlockId && blocksArr[0]?.id) setSelectedBlockId(blocksArr[0].id);
   }
 
   async function loadQuestions(blockId: string) {
@@ -180,7 +185,7 @@ export default function AdminContentStudioPage() {
     const res = await fetch(`/api/admin/generated-questions?knowledgeBlockId=${encodeURIComponent(blockId)}`, { cache: "no-store" });
     const data = await res.json();
     if (!res.ok) throw new Error(data?.error || "Failed to load generated questions");
-    setQuestions(data.questions || []);
+    setQuestions(asArray(data.questions));
   }
 
   async function loadGoldenTracking(blockId: string) {
@@ -203,7 +208,7 @@ export default function AdminContentStudioPage() {
     const res = await fetch(`/api/admin/questions?setId=${encodeURIComponent(setId)}`, { cache: "no-store" });
     const data = await res.json();
     if (!res.ok) throw new Error(data?.error || "Failed to load live questions");
-    setLiveQuestions(data.questions || []);
+    setLiveQuestions(asArray(data.questions));
     setSelectedLiveIds([]);
   }
 
@@ -412,9 +417,9 @@ export default function AdminContentStudioPage() {
 
   function toggleAllFilteredLive(checked: boolean) {
     if (checked) {
-      setSelectedLiveIds((current) => [...new Set([...current, ...filteredLiveQuestions.map((q) => q.id)])]);
+      setSelectedLiveIds((current) => [...new Set([...current, ...asArray(filteredLiveQuestions).map((q) => q.id)])]);
     } else {
-      const visible = new Set(filteredLiveQuestions.map((q) => q.id));
+      const visible = new Set(asArray(filteredLiveQuestions).map((q) => q.id));
       setSelectedLiveIds((current) => current.filter((id) => !visible.has(id)));
     }
   }
@@ -468,7 +473,7 @@ export default function AdminContentStudioPage() {
         <aside className="card content-sidebar" style={{ padding: 14, position: "sticky", top: 18 }}>
           <div style={{ fontWeight: 800, marginBottom: 10 }}>Knowledge blocks</div>
           <div style={{ display: "grid", gap: 8, maxHeight: "70vh", overflow: "auto" }}>
-            {blocks.map((block) => (
+            {asArray(blocks).map((block) => (
               <button
                 key={block.id}
                 onClick={() => setSelectedBlockId(block.id)}
@@ -563,7 +568,7 @@ export default function AdminContentStudioPage() {
                       </div>
                       <div style={{ display: "grid", gap: 10 }}>
                         <div style={{ fontWeight: 700 }}>Recent golden spawns</div>
-                        {goldenTracking.recentGoldenSpawns.length ? goldenTracking.recentGoldenSpawns.slice(0, 6).map((row) => (
+                        {asArray(goldenTracking.recentGoldenSpawns).length ? asArray(goldenTracking.recentGoldenSpawns).slice(0, 6).map((row) => (
                           <div key={row.sessionQuestionId} style={{ padding: 10, borderRadius: 10, border: "1px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.03)" }}>
                             <div style={{ fontWeight: 700 }}>Session {row.session.id} • user {row.session.userId}</div>
                             <div style={{ fontSize: 12, opacity: 0.78, marginTop: 4 }}>Spawned {new Date(row.createdAt).toLocaleString()} • status {row.session.status} • answered {row.answered ? "yes" : "no"} • correct {row.isCorrect === null ? "—" : row.isCorrect ? "yes" : "no"} • bonus {row.goldenBonusXp || 0} XP</div>
@@ -579,7 +584,7 @@ export default function AdminContentStudioPage() {
 
               {reviewPanel === "generated" ? (
                 <div style={{ display: "grid", gap: 12, marginTop: 16 }}>
-                  {questions.map((question) => (
+                  {asArray(questions).map((question) => (
                     <GeneratedQuestionCard key={question.id} question={question} saving={savingId === question.id} onSave={updateQuestion} />
                   ))}
                   {!questions.length ? <div style={{ opacity: 0.75 }}>No generated questions for this block yet.</div> : null}
@@ -613,7 +618,7 @@ export default function AdminContentStudioPage() {
                   </div>
 
                   <div className="live-grid">
-                    {filteredLiveQuestions.map((question) => (
+                    {asArray(filteredLiveQuestions).map((question) => (
                       <LiveQuestionCard
                         key={question.id}
                         question={question}
