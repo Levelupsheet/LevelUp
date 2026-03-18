@@ -35,10 +35,6 @@ type Question = {
   sortOrder?: number;
   createdAt: string;
 };
-function asArray<T>(value: T[] | null | undefined): T[] {
-  return Array.isArray(value) ? value : [];
-}
-
 type AdminUser = {
   id: string;
   email: string;
@@ -49,6 +45,19 @@ type AdminUser = {
   createdAt: string;
   lastActiveAt?: string | null;
 };
+
+function asArray<T>(value: T[] | null | undefined): T[] {
+  return Array.isArray(value) ? value : [];
+}
+
+function normalizeQuestionRow(q: any): Question {
+  return {
+    ...q,
+    choices: Array.isArray(q?.choices) ? q.choices : safeJsonParse<string[]>(q?.choices, []),
+    tags: Array.isArray(q?.tags) ? q.tags : safeJsonParse<string[]>(q?.tags, []),
+    correctIndex: typeof q?.correctIndex === "number" ? q.correctIndex : Number(q?.correctIndex ?? 0) || 0,
+  };
+}
 
 function LocalPrototypeAdmin(){
   const [users, setUsers] = useState(() => {
@@ -222,7 +231,7 @@ function LocalPrototypeAdmin(){
             <div className="card" style={{ padding: 10, background:"rgba(255,255,255,0.02)" }}>
               <div style={{ display:"flex", gap: 10, flexWrap:"wrap", alignItems:"center" }}>
                 <select value={selectedUserId} onChange={(e) => setSelectedUserId(e.target.value)} style={{ minWidth: 260 }}>
-                  {asArray(users).map((u) => (
+                  {users.map((u) => (
                     <option key={u.id} value={u.id}>{u.email ? `${u.displayName} • ${u.email}` : u.displayName}</option>
                   ))}
                 </select>
@@ -266,7 +275,7 @@ function LocalPrototypeAdmin(){
               <div style={{ marginTop: 10, display:"grid", gap: 8 }}>
                 <small style={{ opacity: 0.8 }}>Track progress (0–100)</small>
                 <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(120px, 1fr))", gap: 10 }}>
-                  {asArray(["azure_m365","aws","helpdesk","desktop"] as any[]).map((t) => (
+                  {(["azure_m365","aws","helpdesk","desktop"] as any[]).map((t) => (
                     <label key={t} style={{ display:"grid", gap: 6 }}>
                       <small>{t}</small>
                       <input
@@ -321,7 +330,7 @@ function LocalPrototypeAdmin(){
                 <tr><th>User ID</th><th>Display</th><th>Email</th><th>XP</th><th>Level</th></tr>
               </thead>
               <tbody>
-                {asArray(users).map((u) => (
+                {users.map((u) => (
                   <tr key={u.id}>
                     <td><small>{u.id}</small></td>
                     <td>{u.displayName}</td>
@@ -339,7 +348,7 @@ function LocalPrototypeAdmin(){
           <b>Question pools</b>
           <div style={{ display:"flex", gap: 10, alignItems:"center", marginTop: 10, flexWrap:"wrap" }}>
             <select value={poolKey} onChange={(e) => setPoolKey(e.target.value)} style={{ minWidth: 320 }}>
-              {asArray(poolMeta).map((p) => (
+              {poolMeta.map((p) => (
                 <option key={p.key} value={p.key}>{p.label}</option>
               ))}
             </select>
@@ -423,7 +432,7 @@ function PracticePoolsAdmin(){
     parsed.lane = lane;
     parsed.track = track;
 
-    const updated = asArray(pool).map((x) => (x.id === editing.id ? { ...x, ...parsed, id: editing.id } : x));
+    const updated = pool.map((x) => (x.id === editing.id ? { ...x, ...parsed, id: editing.id } : x));
     try {
       localStorage.setItem(storageKey, JSON.stringify(updated));
       setMsg("Saved override (localStorage)." );
@@ -466,7 +475,7 @@ function PracticePoolsAdmin(){
         <div className="card" style={{ background:"rgba(255,255,255,0.03)" }}>
           <label><small>Pool</small></label>
           <select value={poolKey} onChange={(e) => setPoolKey(e.target.value)}>
-            {asArray(allPools).map((k) => (
+            {allPools.map((k) => (
               <option key={k} value={k}>{k}</option>
             ))}
           </select>
@@ -496,7 +505,7 @@ function PracticePoolsAdmin(){
             </div>
           </div>
           <div style={{ marginTop: 12, maxHeight: 520, overflow:"auto", display:"grid", gap: 10 }}>
-            {asArray(visible).map((q, idx) => (
+            {visible.map((q, idx) => (
               <div key={q.id} className="card" style={{ background:"rgba(0,0,0,0.25)" }}>
                 <div style={{ display:"flex", alignItems:"start", justifyContent:"space-between", gap: 12 }}>
                   <div style={{ fontWeight: 800, flex: 1 }}>{idx + 1}. {q.prompt}</div>
@@ -504,10 +513,10 @@ function PracticePoolsAdmin(){
                 </div>
                 <div className="row" style={{ marginTop: 8, flexWrap: "wrap" }}>
                   <span className="badge">Correct: {q.correctIndex + 1}</span>
-                  {asArray(q.tags).map((t) => <span className="badge" key={t}>#{t}</span>)}
+                  {q.tags?.map((t) => <span className="badge" key={t}>#{t}</span>)}
                 </div>
                 <div style={{ marginTop: 10, display:"grid", gap: 6 }}>
-                  {asArray(q.choices).map((c, i) => (
+                  {q.choices?.map((c, i) => (
                     <div key={i} style={{
                       padding: "8px 10px",
                       borderRadius: 12,
@@ -850,10 +859,7 @@ export default function AdminPage(){
     const r = await fetch(`/api/admin/questions?setId=${encodeURIComponent(setId)}`);
     const j = await r.json();
     if (!r.ok) { setErr(j?.error || "Failed to load questions"); return; }
-    setQuestions(asArray(j.questions).map((q: any) => ({
-      ...q,
-      choices: Array.isArray(q.choices) ? q.choices : safeJsonParse<string[]>(q.choices, []),
-    })));
+    setQuestions(asArray(j?.questions).map((q: any) => normalizeQuestionRow(q)));
     setDirtyOrder(false);
   }
 
@@ -937,7 +943,7 @@ export default function AdminPage(){
   async function saveOrder(){
     setErr(null);
     if (!selectedSet) return;
-    const order = asArray(questions).map(q => q.id);
+    const order = questions.map(q => q.id);
     const r = await fetch("/api/admin/questions", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -1022,7 +1028,7 @@ export default function AdminPage(){
                 </tr>
               </thead>
               <tbody>
-                {asArray(users).map(u => {
+                {users.map(u => {
                   const edit = userEdits[u.id] || {};
                   return (
                     <tr key={u.id}>
@@ -1095,7 +1101,7 @@ export default function AdminPage(){
                 <small>Select set</small>
                 <select value={selectedSet} onChange={(e) => setSelectedSet(e.target.value)}>
                   <option value="">-- Select a question set --</option>
-                  {asArray(sets).map((s) => (
+                  {sets.map((s) => (
                     <option key={s.id} value={s.id}>{s.name} • {s.status} • {s._count?.questions ?? 0} q</option>
                   ))}
                 </select>
@@ -1202,7 +1208,7 @@ export default function AdminPage(){
                 </div>
               </div>
               <div style={{ marginTop: 12, maxHeight: 560, overflow:"auto", display:"grid", gap: 10 }}>
-                {asArray(questions).map((q, idx) => (
+                {questions.map((q, idx) => (
                   <div key={q.id} className="card" style={{ background:"rgba(0,0,0,0.25)" }}>
                     <div style={{ display:"flex", justifyContent:"space-between", gap: 10, flexWrap:"wrap", alignItems:"center" }}>
                       <div style={{ fontWeight: 800 }}>{idx + 1}. {q.prompt}</div>
@@ -1260,7 +1266,7 @@ export default function AdminPage(){
           <div style={{ display:"grid", gap: 10 }}>
             <small>Showing a quick preview of what was imported. (Your file may contain more.)</small>
             <div style={{ maxHeight: 420, overflow:"auto" }}>
-              {asArray(uploadPreview).map((q, i) => (
+              {uploadPreview.map((q, i) => (
                 <div key={i} className="card" style={{ marginBottom: 10, background:"rgba(255,255,255,0.03)" }}>
                   <div style={{ fontWeight: 800 }}>{i+1}. {q.prompt || "(missing prompt)"}</div>
                   <small>choices: {Array.isArray(q.choices) ? q.choices.length : 0} • correctIndex: {q.correctIndex}</small>
