@@ -68,7 +68,7 @@ async function buildNewSession(userId: string, questionCount = 10) {
   const goldenPool = pool.filter((q: any) => q.isGoldenEligible);
   const shouldSpawnGolden = goldenPool.length > 0 && Math.random() < 0.12;
   let goldenQuestionId: string | null = null;
-  let finalQuestions = [...selected];
+  let finalQuestions: any[] = [...selected];
 
   if (shouldSpawnGolden) {
     const weighted = goldenPool.flatMap((q: any) => Array.from({ length: Math.max(1, Number(q.goldenWeight || 1)) }, () => q));
@@ -76,7 +76,7 @@ async function buildNewSession(userId: string, questionCount = 10) {
     if (picked) {
       const replacementIndex = Math.floor(Math.random() * finalQuestions.length);
       finalQuestions[replacementIndex] = { ...shuffleQuestionPayload(picked), isGolden: true, goldenBonusXp: picked.goldenBonusXp || 50 } as any;
-      goldenQuestionId = String(finalQuestions[replacementIndex].id);
+      goldenQuestionId = String((finalQuestions[replacementIndex] as any).id);
     }
   }
 
