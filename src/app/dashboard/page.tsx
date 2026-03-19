@@ -12,6 +12,7 @@ import LootVaultModal from "@/components/LootVaultModal";
 import AuthGateCard from "@/components/AuthGateCard";
 import GoogleLoginButton from "@/components/ui/GoogleLoginButton";
 import { getActiveUser, setActiveUserId, syncAuthenticatedUser } from "@/lib/userStore";
+import { XP_PER_LEVEL, xpIntoCurrentLevel } from "@/lib/progression";
 import { addActivity, getActivities, clearActivitiesByType, clearActivities, removeActivity, type ActivityItem } from "@/lib/activityStore";
 
 type Eligibility = {
@@ -101,9 +102,9 @@ export default function Dashboard() {
 
   // Prefer local XP (from interviews / practice) so the dashboard reacts immediately.
   const xp = useMemo(() => (localXp ?? elig?.xp ?? 0), [localXp, elig]);
-  // Show progress within the CURRENT level (each level = 500 XP).
-  const levelSpan = 500;
-  const xpIntoLevel = Math.max(0, xp - (Math.max(1, localLevel) - 1) * levelSpan);
+  // Show progress within the CURRENT level.
+  const levelSpan = XP_PER_LEVEL;
+  const xpIntoLevel = xpIntoCurrentLevel(xp);
   const levelMax = levelSpan;
 
   function setLaunchGate(target: "position-training" | "cert-mcq" | "test-now") {
@@ -165,7 +166,8 @@ export default function Dashboard() {
         try { lpData = lpText ? JSON.parse(lpText) : null; } catch { lpData = null; }
         if (lpRes.ok) {
           setLearningRows(Array.isArray(lpData?.profile?.masteryByDomain) ? lpData.profile.masteryByDomain : []);
-          setOverallMastery(Number(lpData?.profile?.overallMastery ?? 50));
+          const rows: any[] = Array.isArray(lpData?.profile?.masteryByDomain) ? lpData.profile.masteryByDomain : [];
+          setOverallMastery(Number(lpData?.profile?.overallMastery ?? (rows.length ? rows.reduce((sum, row) => sum + Number((row as any)?.mastery || 0), 0) / rows.length : 0)));
         }
       } catch {}
     } catch (e: any) {
@@ -347,7 +349,7 @@ export default function Dashboard() {
     const byKey = new Map(learningRows.map((row) => [String(row.domain).toUpperCase(), row]));
     return preferred.map((key) => ({
       key,
-      label: key === "AWS" ? "AWS" : key.charAt(0) + key.slice(1).toLowerCase(),
+      label: key === "AWS" ? "AWS" : key === "IDENTITY" ? "Identity" : key === "NETWORKING" ? "Networking" : key === "SECURITY" ? "Security" : key.charAt(0) + key.slice(1).toLowerCase(),
       mastery: Math.round(Number(byKey.get(key)?.mastery ?? 0)),
     }));
   }, [learningRows]);

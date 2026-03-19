@@ -69,8 +69,8 @@ function labelForType(type: QuestionType) {
   return "Question";
 }
 
-function ModelPanel(props: { title: string; src?: string; mirrored?: boolean }) {
-  const { title, src, mirrored = false } = props;
+function ModelPanel(props: { title: string; src?: string; mirrored?: boolean; loop?: boolean; onEnded?: () => void; height?: number | string }) {
+  const { title, src, mirrored = false, loop = true, onEnded, height = 230 } = props;
   return (
     <div className="card" style={{ padding: 10, background: "rgba(255,255,255,0.04)", minHeight: 250 }}>
       <div style={{ fontSize: 12, fontWeight: 900, letterSpacing: 0.6, opacity: 0.88, marginBottom: 8 }}>{title}</div>
@@ -79,16 +79,17 @@ function ModelPanel(props: { title: string; src?: string; mirrored?: boolean }) 
           <video
             key={src}
             autoPlay
-            loop
+            loop={loop}
             muted
             playsInline
             preload="metadata"
-            style={{ display: "block", width: "100%", height: 230, objectFit: "cover", transform: mirrored ? "scaleX(-1)" : undefined }}
+            onEnded={onEnded}
+            style={{ display: "block", width: "100%", height, objectFit: "cover", transform: mirrored ? "scaleX(-1)" : undefined }}
           >
             <source src={src} type="video/mp4" />
           </video>
         ) : (
-          <div style={{ height: 230, display: "grid", placeItems: "center", opacity: 0.7 }}>Video slot ready</div>
+          <div style={{ height, display: "grid", placeItems: "center", opacity: 0.7 }}>Video slot ready</div>
         )}
       </div>
     </div>
@@ -344,7 +345,9 @@ export default function DiabloQuizRunner(props: {
     onXp,
     onSubmit: (r) => {
       setHitPulse(r.correct ? "enemy" : "player");
-      window.setTimeout(() => setHitPulse(null), 450);
+      if ((r.correct && !media?.enemyHitSrc) || (!r.correct && !media?.playerHitSrc)) {
+        window.setTimeout(() => setHitPulse(null), 900);
+      }
     },
     initialState,
     onStateChange,
@@ -405,6 +408,8 @@ export default function DiabloQuizRunner(props: {
   const domainLabel = labelForDomain(currentDomainId);
   const finished = Boolean(forceFinish) || state.finished;
 
+  const isEnemyHitVideo = hitPulse === "enemy" && Boolean(media?.enemyHitSrc);
+  const isPlayerHitVideo = hitPulse === "player" && Boolean(media?.playerHitSrc);
   const playerVideo = hitPulse === "enemy" ? media?.playerAttackSrc || media?.playerIdleSrc : hitPulse === "player" ? media?.playerHitSrc || media?.playerIdleSrc : media?.playerIdleSrc;
   const enemyVideo = hitPulse === "enemy" ? media?.enemyHitSrc || media?.enemyIdleSrc : media?.enemyIdleSrc;
 
@@ -448,7 +453,7 @@ export default function DiabloQuizRunner(props: {
   return (
     <div
       className="modalShell d2QuizShell"
-      style={{ position: "relative", width: "100%", maxWidth: media?.width || 1240, minHeight: "min(720px, 100dvh - 120px)", margin: "0 auto" }}
+      style={{ position: "relative", width: "min(96vw, 1800px)", maxWidth: media?.width || 1600, minHeight: "min(860px, calc(100dvh - 48px))", margin: "0 auto" }}
     >
       <div className="modalHead">
         <div>
@@ -469,7 +474,7 @@ export default function DiabloQuizRunner(props: {
               <div className={hitPulse === "player" ? "d2Shake" : ""}>
                 <D2LifeOrb value={state.playerHP} name={playerName} />
               </div>
-              <ModelPanel title={playerName} src={playerVideo} />
+              <ModelPanel title={playerName} src={playerVideo} loop={!isPlayerHitVideo} onEnded={isPlayerHitVideo ? () => setHitPulse(null) : undefined} height="clamp(260px, 30vh, 420px)" />
             </div>
 
             <div className={"d2QuestionCard d2QuizQuestionCard " + (hitPulse === "enemy" ? "d2HitFlash" : "") } style={{ minHeight: 560 }}>
@@ -561,7 +566,7 @@ export default function DiabloQuizRunner(props: {
 
             <div style={{ display: "grid", gap: 12 }}>
               <D2EnemyHealthBar value={state.enemyHP} name={enemyName.toUpperCase().slice(0, 18)} />
-              <ModelPanel title={enemyName.toUpperCase().slice(0, 18)} src={enemyVideo} mirrored />
+              <ModelPanel title={enemyName.toUpperCase().slice(0, 18)} src={enemyVideo} mirrored loop={!isEnemyHitVideo} onEnded={isEnemyHitVideo ? () => setHitPulse(null) : undefined} height="clamp(260px, 30vh, 420px)" />
             </div>
           </div>
         ) : (
@@ -577,7 +582,7 @@ export default function DiabloQuizRunner(props: {
             <div className="mobileCombatCard">
               <D2EnemyHealthBar value={state.enemyHP} name={enemyName.toUpperCase().slice(0, 18)} />
               <div style={{ marginTop: 10 }}>
-                <ModelPanel title={enemyName.toUpperCase().slice(0, 18)} src={enemyVideo} mirrored />
+                <ModelPanel title={enemyName.toUpperCase().slice(0, 18)} src={enemyVideo} mirrored loop={!isEnemyHitVideo} onEnded={isEnemyHitVideo ? () => setHitPulse(null) : undefined} height={230} />
               </div>
             </div>
 
@@ -656,7 +661,7 @@ export default function DiabloQuizRunner(props: {
                 <D2LifeOrb value={state.playerHP} name={playerName} />
               </div>
               <div style={{ marginTop: 10 }}>
-                <ModelPanel title={playerName} src={playerVideo} />
+                <ModelPanel title={playerName} src={playerVideo} loop={!isPlayerHitVideo} onEnded={isPlayerHitVideo ? () => setHitPulse(null) : undefined} height="clamp(260px, 30vh, 420px)" />
               </div>
             </div>
           </div>

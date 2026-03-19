@@ -1,16 +1,11 @@
 import { NextResponse } from "next/server";
 import { prisma } from "../../_lib/prisma";
 import { ensureUser } from "../../_lib/ensureUser";
+import { levelFromXp } from "@/lib/progression";
 
 // Creates pending loot boxes (typically on level-up) and a notification.
 // Server-side verification: grants ONLY when XP crosses a level threshold.
 // Level is derived from XP: level = floor(xp / 500) + 1
-const XP_PER_LEVEL = 500;
-
-function levelFromXp(xp: number) {
-  const safe = Number.isFinite(xp) ? Math.max(0, Math.floor(xp)) : 0;
-  return Math.floor(safe / XP_PER_LEVEL) + 1;
-}
 
 export async function POST(req: Request) {
   try {

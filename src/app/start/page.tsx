@@ -3,6 +3,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import MerchModal from "@/components/MerchModal";
+import { levelBandLabel } from "@/lib/progression";
 
 
 function trackEnterApp(source: string) {
@@ -285,7 +286,7 @@ export default function Home() {
                           <span aria-hidden="true" className="badge" style={{ width: 28, textAlign: "center" }}>{idx + 1}</span>
                           <b style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{u?.displayName ?? "—"}</b>
                         </div>
-                        <div className="muted" style={{ marginTop: 4, fontSize: 12 }}>{u ? `Lvl ${u.level} • ${u.rank}` : "Loading..."}</div>
+                        <div className="muted" style={{ marginTop: 4, fontSize: 12 }}>{u ? levelBandLabel(Number(u.level || 1)) : "Loading..."}</div>
                       </div>
                       <div style={{ textAlign: "right" }}>
                         <div style={{ fontWeight: 800, fontVariantNumeric: "tabular-nums" }}>{u ? `${u.xp} XP` : ""}</div>
@@ -304,7 +305,7 @@ export default function Home() {
                   <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center" }}>
                     <div style={{ minWidth: 0 }}>
                       <div style={{ fontWeight: 900, fontSize: 15, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{lbSelected.displayName}</div>
-                      <div className="muted" style={{ marginTop: 4, fontSize: 12 }}>Lvl {lbSelected.level} • {lbSelected.rank}</div>
+                      <div className="muted" style={{ marginTop: 4, fontSize: 12 }}>{levelBandLabel(Number(lbSelected.level || 1))}</div>
                     </div>
                     <div style={{ textAlign: "right" }}>
                       <div style={{ fontWeight: 900 }}>{lbSelected.xp} XP</div>
