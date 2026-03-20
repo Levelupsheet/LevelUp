@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/app/api/_lib/prisma";
-import { levelFromXp, levelTitleFromLevel } from "@/lib/progression";
 
 // Ensure this endpoint is never statically cached.
 export const dynamic = "force-dynamic";
@@ -9,7 +8,10 @@ export const revalidate = 0;
 // Top candidates leaderboard (minimal v1)
 // Returns the top 3 users by XP.
 
-
+function levelFromXp(xp: number) {
+  const safe = Number.isFinite(xp) ? xp : 0;
+  return Math.floor(safe / 500) + 1;
+}
 
 export async function GET(req: Request) {
   try {
@@ -75,7 +77,7 @@ export async function GET(req: Request) {
           displayName: u.displayName ?? u.id,
           xp: xpEffective,
           level: levelFromXp(xpEffective),
-          rank: levelTitleFromLevel(levelFromXp(xpEffective)),
+          rank: u.rank,
           lastActiveAt: u.lastActiveAt,
           createdAt: u.createdAt,
         };

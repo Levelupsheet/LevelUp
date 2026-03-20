@@ -1,7 +1,5 @@
 "use client";
 
-import { levelFromXp } from "@/lib/progression";
-
 export type TrackId = "azure_m365" | "aws" | "helpdesk" | "desktop";
 
 export type LocalUser = {
@@ -9,7 +7,7 @@ export type LocalUser = {
   displayName: string;
   email?: string;
   xp: number;
-  level: number;
+  level: number; // 1..5 (local only for now)
   trackProgress: Record<TrackId, number>; // 0..100
   createdAt: string;
 };
@@ -31,7 +29,12 @@ function nowIso() {
 }
 
 function computeLevel(xp: number) {
-  return levelFromXp(xp);
+  // Simple 1..5 curve. Easy to tweak later.
+  if (xp >= 2000) return 5;
+  if (xp >= 1500) return 4;
+  if (xp >= 1000) return 3;
+  if (xp >= 500) return 2;
+  return 1;
 }
 
 export function getUsers(): LocalUser[] {
