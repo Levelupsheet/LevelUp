@@ -91,7 +91,7 @@ export default function Dashboard() {
   const [hrPassed, setHrPassed] = useState<boolean>(false);
   const [lootOpen, setLootOpen] = useState(false);
   const [learningRows, setLearningRows] = useState<LearningRow[]>([]);
-  const [overallMastery, setOverallMastery] = useState<number>(0);
+  const [overallMastery, setOverallMastery] = useState<number>(50);
 
   // Level-up detection (notification-only; user opens vault when ready)
   const prevLevelRef = useRef<number>(0);
@@ -143,7 +143,7 @@ export default function Dashboard() {
       let data: any = null;
       try { data = text ? JSON.parse(text) : null; } catch { data = null; }
       if (!res.ok) throw new Error(data?.error ?? data?.detail ?? text ?? "Failed");
-      setNotes(data.notifications ?? []);
+      setNotes(Array.isArray(data.notifications) ? data.notifications.filter((n: any, i: number, arr: any[]) => n?.type !== "LOOT_BOX_EARNED" ? true : arr.findIndex((x: any) => x?.type === n?.type) === i) : []);
       setUser(data.user ?? null);
       setTokenBalance(Number(data.tokenBalance ?? data.user?.tokenBalance ?? 0) || 0);
       if (!data.user?.startingPosition) { setPositionChangeMode(false); setPendingPos(null); setShowPositionModal(true); }
@@ -165,7 +165,7 @@ export default function Dashboard() {
         try { lpData = lpText ? JSON.parse(lpText) : null; } catch { lpData = null; }
         if (lpRes.ok) {
           setLearningRows(Array.isArray(lpData?.profile?.masteryByDomain) ? lpData.profile.masteryByDomain : []);
-          setOverallMastery(Number(lpData?.profile?.overallMastery ?? 0));
+          setOverallMastery(Number(lpData?.profile?.overallMastery ?? 50));
         }
       } catch {}
     } catch (e: any) {
@@ -289,14 +289,6 @@ export default function Dashboard() {
     const gained = next - prev;
     prevLevelRef.current = next;
 
-    // Immediate local notification (will be cleared on click/claim)
-    addActivity(userId, {
-      type: "LOOT_BOX_EARNED",
-      title: "Reward unlocked!",
-      body: `You reached Level ${next}. Loot box earned (${gained}). Open when you're ready.`,
-    });
-    setActivity(getActivities(userId));
-
     // Server-backed loot + persistent notification (server mints only when XP crosses level threshold)
     fetch("/api/loot/earn", {
       method: "POST",
@@ -343,7 +335,7 @@ export default function Dashboard() {
   }, [activity, notes]);
 
   const spotlightDomains = useMemo(() => {
-    const preferred = ["IDENTITY", "NETWORKING", "SECURITY", "AWS", "AZURE", "WINDOWS"];
+    const preferred = ["IDENTITY", "NETWORKING", "SECURITY", "AWS"];
     const byKey = new Map(learningRows.map((row) => [String(row.domain).toUpperCase(), row]));
     return preferred.map((key) => ({
       key,
@@ -553,7 +545,7 @@ export default function Dashboard() {
         open={positionTrainingOpen}
         kind="position"
         defaultPath={(user?.startingPosition as any) ?? "HELPDESK_SUPPORT"}
-        onClose={() => setPositionTrainingOpen(false)}
+        onClose={() => { setPositionTrainingOpen(false); try { userId && refresh(userId); } catch {} }}
         onXpChange={(xp, level) => {
           setLocalXp(xp);
           setLocalLevel(level);
@@ -578,7 +570,7 @@ export default function Dashboard() {
       <PracticeMiniGameModal
         open={certPracticeOpen}
         kind="cert"
-        onClose={() => setCertPracticeOpen(false)}
+        onClose={() => { setCertPracticeOpen(false); try { userId && refresh(userId); } catch {} }}
         onXpChange={(xp, level) => {
           setLocalXp(xp);
           setLocalLevel(level);
@@ -588,7 +580,7 @@ export default function Dashboard() {
       <PracticeMiniGameModal
         open={testNowOpen}
         kind="test"
-        onClose={() => setTestNowOpen(false)}
+        onClose={() => { setTestNowOpen(false); try { userId && refresh(userId); } catch {} }}
         onXpChange={(xp, level) => {
           setLocalXp(xp);
           setLocalLevel(level);
@@ -753,9 +745,9 @@ export default function Dashboard() {
                     className={"card " + (n.type === "TECH_INTERVIEW_READY" ? "notifHighlight" : "")}
                     role="button"
                     tabIndex={0}
-                    onClick={() => markNotificationReadAndRemove(n)}
+                    onClick={() => { if (n.type !== "LOOT_BOX_EARNED") markNotificationReadAndRemove(n); }}
                     onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ") markNotificationReadAndRemove(n);
+                      if ((e.key === "Enter" || e.key === " ") && n.type !== "LOOT_BOX_EARNED") markNotificationReadAndRemove(n);
                     }}
                     style={{ cursor: "pointer" }}
                     title="Click to mark as read"

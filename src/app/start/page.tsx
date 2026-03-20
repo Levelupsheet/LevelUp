@@ -352,12 +352,15 @@ export default function Home() {
 
       <section id="features" className="section" data-reveal data-delay="0">
         <h2 className="sectionTitle">What you get</h2>
+        <p className="sectionSub">
+          Built to feel like a 2026 product: clean, fast, and motivating — with subtle gamification that keeps you moving.
+        </p>
 
         <div className="grid3">
           <div className="featureCard" data-reveal data-delay="0"><b>Interview simulations</b><p className="muted" style={{ marginTop: 8 }}>HR screen → Tech panel flow with unlocks.</p></div>
           <div className="featureCard" data-reveal data-delay="90"><b>Certification prep</b><p className="muted" style={{ marginTop: 8 }}>Practice tests for A+, Security+, and AZ-900.</p></div>
           <div className="featureCard" data-reveal data-delay="180"><b>Career outlook</b><p className="muted" style={{ marginTop: 8 }}>See next roles, salary ranges, and recommended certs.</p></div>
-          <div className="featureCard" data-reveal data-delay="270"><b>XP + levels</b><p className="muted" style={{ marginTop: 8 }}>Progress you can feel: XP bars, ranks, and badges.</p></div>
+          <div className="featureCard" data-reveal data-delay="270"><b>XP + levels</b><p className="muted" style={{ marginTop: 8 }}>XP bars, ranks, and badges.</p></div>
           <div className="featureCard" data-reveal data-delay="360"><b>Personalized path</b><p className="muted" style={{ marginTop: 8 }}>Start where you are, and grow into Desktop and Cloud.</p></div>
           <div className="featureCard" data-reveal data-delay="450"><b>Offer PDFs</b><p className="muted" style={{ marginTop: 8 }}>Generate downloadable mock offer letters (Premium).</p></div>
         </div>
@@ -421,7 +424,7 @@ export default function Home() {
             <div>
               <h2 className="sectionTitle" style={{ marginBottom: 8 }}>Sweep Stakes</h2>
               <p className="sectionSub" style={{ marginBottom: 0 }}>
-                Win real prizes while you level up. Earn entries through progress, challenges, and leaderboards.
+                Win real prizes while you level up. Earn entries through progress and challenges.
               </p>
             </div>
             <div className="trustRow" aria-label="Signals">
@@ -441,7 +444,7 @@ export default function Home() {
             <div className="featureCard" data-reveal data-delay="210">
               <b>Monthly sweepstakes</b>
               <p className="muted" style={{ marginTop: 8 }}>
-                Each month features real prizes. Higher ranks and diamond loot can unlock bonus entries.
+                Each month features real prizes.
               </p>
             </div>
             <div className="featureCard" data-reveal data-delay="300">
@@ -463,7 +466,7 @@ export default function Home() {
         <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
           <div>
             <h2 className="sectionTitle">Merch</h2>
-            
+            <p className="sectionSub">LevelUp Pro gear — auto-scrolls, pause on hover.</p>
           </div>
           <button className="secondaryBtn" onClick={() => setMerchOpen(true)}>View all merch</button>
         </div>

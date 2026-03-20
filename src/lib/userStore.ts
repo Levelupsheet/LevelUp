@@ -7,7 +7,7 @@ export type LocalUser = {
   displayName: string;
   email?: string;
   xp: number;
-  level: number;
+  level: number; // 1..5 (local only for now)
   trackProgress: Record<TrackId, number>; // 0..100
   createdAt: string;
 };
@@ -28,11 +28,13 @@ function nowIso() {
   return new Date().toISOString();
 }
 
-export const XP_PER_LEVEL = 500;
-
 function computeLevel(xp: number) {
-  const safeXp = Number.isFinite(xp) ? Math.max(0, Math.floor(xp)) : 0;
-  return Math.floor(safeXp / XP_PER_LEVEL) + 1;
+  // Simple 1..5 curve. Easy to tweak later.
+  if (xp >= 2000) return 5;
+  if (xp >= 1500) return 4;
+  if (xp >= 1000) return 3;
+  if (xp >= 500) return 2;
+  return 1;
 }
 
 export function getUsers(): LocalUser[] {
@@ -42,7 +44,7 @@ export function getUsers(): LocalUser[] {
   // Lightweight migration: older saves didn't include `level`.
   return list.map((u) => {
     const xp = typeof u?.xp === "number" ? u.xp : 0;
-    const level = computeLevel(xp);
+    const level = typeof u?.level === "number" ? u.level : computeLevel(xp);
     return {
       id: String(u?.id ?? "demo-user"),
       displayName: String(u?.displayName ?? "demo-user"),
