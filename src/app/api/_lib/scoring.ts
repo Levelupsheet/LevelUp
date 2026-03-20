@@ -71,18 +71,3 @@ export function interviewPassFail(opts: { hrAvg?: number; techAvg?: number }): {
 function clamp01(n: number) {
   return Math.max(0, Math.min(1, n));
 }
-
-
-export function careerBandFromLevel(level: number): string {
-  const safe = Math.max(1, Math.floor(Number(level) || 1));
-  if (safe >= 13) return "PRO";
-  if (safe >= 9) return "Architect";
-  if (safe >= 6) return "Engineer";
-  if (safe >= 3) return "Administrator";
-  return "Student";
-}
-
-export function levelFromXp500(xp: number): number {
-  const safe = Number.isFinite(xp) ? Math.max(0, Math.floor(xp)) : 0;
-  return Math.floor(safe / 500) + 1;
-}

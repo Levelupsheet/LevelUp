@@ -40,7 +40,7 @@ export default function PracticeMiniGameModal(props: {
 
   return (
     <div className="luModalOverlay" onMouseDown={onClose}>
-      <div className="luModal" role="dialog" aria-modal="true" aria-label={title} onMouseDown={(e) => e.stopPropagation()} style={{ maxWidth: step === "quiz" ? 1320 : 980 }}>
+      <div className="luModal quizModalResponsive" role="dialog" aria-modal="true" aria-label={title} onMouseDown={(e) => e.stopPropagation()} style={{ maxWidth: step === "quiz" ? 1680 : 980, width: step === "quiz" ? "min(96vw, 1680px)" : "min(92vw, 980px)", minHeight: step === "quiz" ? "min(92dvh, 980px)" : undefined }}>
         <div className="luVideoBg" aria-hidden="true">
           <video className="luVideoEl" autoPlay loop muted playsInline preload="metadata"><source src="/video/blackhole-loop.mp4" type="video/mp4" /></video>
           <div className="luVideoVignette" />
