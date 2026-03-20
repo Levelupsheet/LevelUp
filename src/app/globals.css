@@ -2130,49 +2130,37 @@ button.gold{
 }
 
 
-/* responsive learning rows */
-.learningRow{ display:grid; grid-template-columns:minmax(110px,1fr) minmax(120px,2fr) auto auto; gap:12px; align-items:center; }
-.learningRowTrack{ height:10px; border-radius:999px; background:rgba(255,255,255,0.08); overflow:hidden; min-width:0; }
-.learningRowFill{ height:100%; border-radius:999px; background:linear-gradient(90deg, rgba(99,102,241,0.85), rgba(34,197,94,0.9)); }
-.learningRowValue{ min-width:46px; text-align:right; }
-.learningRowMeta{ white-space:nowrap; }
-.modelPanelVideo{ object-position:center center; }
-
+/* V8 mobile/layout polish patch */
+.quizModalResponsive{
+  width: min(96vw, 1680px);
+}
+@media (min-width: 1440px){
+  .quizModalResponsive{ width: min(98vw, 1780px) !important; }
+  .d2QuizShell{ max-width: 1700px !important; }
+  .d2QuizGrid{ grid-template-columns: 320px minmax(0,1fr) 320px !important; gap: 24px; }
+  .d2QuestionCard{ min-height: 640px; }
+}
+.mobileCombatRow{ display:grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.mobileCombatRow .card{ min-width: 0; }
 @media (max-width: 860px){
+  .luModalOverlay{ padding: 0 !important; }
+  .quizModalResponsive{ width: 100vw !important; max-width: 100vw !important; min-height: 100dvh !important; height: 100dvh !important; border-radius: 0 !important; border-left: 0 !important; border-right: 0 !important; }
+  .luModalBody{ padding: 10px; }
+  .mobileCombatRow{ grid-template-columns: 1fr; }
+  .mobileCombatCard .d2EnemyCard, .mobileCombatCard .d2OrbWrap, .mobileCombatCard .card{ min-width: 0; }
+  .mobileCombatCard video{ height: 180px !important; object-position: center top; }
+  .mobileQuizQuestionCard{ order: 1; }
+  .mobileCombatRow{ order: 2; }
+  .maincol{ width: 100%; }
+  .topbar{ gap: 8px; }
+}
+@media (max-width: 640px){
+  .dashboardGrid, .shell{ display:flex !important; flex-direction: column !important; }
   .sidebar{ order: 2; }
   .maincol{ order: 1; }
-  .topbar{ align-items:flex-start; }
-  .kpiRow > *{ max-width:100%; }
-}
-
-@media (max-width: 640px){
-  .luModalOverlay{ padding: 0; align-items: stretch; justify-content: stretch; }
-  .luModal{ width: 100vw !important; min-width: 100vw; height: 100dvh; max-height: 100dvh; border-radius: 0; }
-  .luModalBody{ padding: 10px; overflow: auto; -webkit-overflow-scrolling: touch; max-height: calc(100dvh - 72px); }
-  .luModalHeader{ padding: 10px 12px; }
-  .navTopInner{ padding: 10px; }
-  .brandLock{ min-width:0; }
-  .brandText small{ display:none; }
-  .navActions > .card{ padding: 8px 10px !important; }
-  .sidebar .card, .maincol .card, .topbar{ border-radius: 16px; }
-  .mobileQuizStack{ gap: 10px; }
-  .mobileCombatCard{ grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); gap: 10px; align-items: start; }
-  .mobileCombatCard .modelPanel{ min-height: 0 !important; }
-  .mobileCombatCard .modelPanelVideo{ height: 128px !important; }
-  .mobileCombatCard .card:first-child{ padding: 8px; }
-  .mobileCombatCard .card:first-child .d2OrbFrame{ width: min(34vw, 132px) !important; height: min(34vw, 132px) !important; }
-  .mobileQuizQuestionCard{ padding: 12px !important; }
-  .mobileQuizPrompt{ font-size: clamp(16px, 5.7vw, 22px); line-height: 1.22; }
-  .d2RuneBar{ gap: 4px; padding: 7px; }
-  .learningRow{ grid-template-columns:minmax(84px,1fr) minmax(0,1fr) auto; gap:8px; }
-  .learningRowMeta{ grid-column: 2 / 4; justify-self:end; font-size: 11px !important; white-space: normal; text-align: right; line-height: 1.2; }
-  .masteryCompactRow{ grid-template-columns: 82px minmax(0,1fr) 44px; gap: 6px; }
-}
-
-@media (min-width: 1280px){
-  .appContainer{ max-width: min(1480px, 96vw); padding: 22px; }
-  .shell{ gap: 22px; }
-  .sidebar{ width: 300px; min-width: 280px; }
-  .d2QuizShell{ max-width: min(1580px, 96vw) !important; }
-  .d2QuizGrid{ grid-template-columns: 320px minmax(0, 1fr) 320px !important; gap: 18px !important; }
+  .topbar .kpiRow{ display:grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; }
+  .topbar .kpiRow > *{ min-width: 0; }
+  .hero, .section, .cinematicSection{ padding-left: 12px; padding-right: 12px; }
+  .grid3{ grid-template-columns: 1fr !important; }
+  .merchTrack{ animation-duration: 40s; }
 }

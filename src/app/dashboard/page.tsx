@@ -91,7 +91,7 @@ export default function Dashboard() {
   const [hrPassed, setHrPassed] = useState<boolean>(false);
   const [lootOpen, setLootOpen] = useState(false);
   const [learningRows, setLearningRows] = useState<LearningRow[]>([]);
-  const [overallMastery, setOverallMastery] = useState<number>(50);
+  const [overallMastery, setOverallMastery] = useState<number>(0);
 
   // Level-up detection (notification-only; user opens vault when ready)
   const prevLevelRef = useRef<number>(0);
@@ -165,7 +165,7 @@ export default function Dashboard() {
         try { lpData = lpText ? JSON.parse(lpText) : null; } catch { lpData = null; }
         if (lpRes.ok) {
           setLearningRows(Array.isArray(lpData?.profile?.masteryByDomain) ? lpData.profile.masteryByDomain : []);
-          setOverallMastery(Number(lpData?.profile?.overallMastery ?? 50));
+          setOverallMastery(Number(lpData?.profile?.overallMastery ?? 0));
         }
       } catch {}
     } catch (e: any) {
@@ -343,7 +343,7 @@ export default function Dashboard() {
   }, [activity, notes]);
 
   const spotlightDomains = useMemo(() => {
-    const preferred = ["IDENTITY", "NETWORKING", "SECURITY", "AWS"];
+    const preferred = ["IDENTITY", "NETWORKING", "SECURITY", "AWS", "AZURE", "WINDOWS"];
     const byKey = new Map(learningRows.map((row) => [String(row.domain).toUpperCase(), row]));
     return preferred.map((key) => ({
       key,

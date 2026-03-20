@@ -28,13 +28,13 @@ export default function AdaptiveLearningCard(props: {
       </div>
       <div style={{ display: "grid", gap: 10, marginTop: 14 }}>
         {rows.length ? rows.map((row) => (
-          <div key={row.domain} className="learningRow">
-            <div className="learningRowLabel" style={{ fontWeight: 800 }}>{domainLabel(row.domain)}</div>
-            <div className="learningRowTrack">
-              <div className="learningRowFill" style={{ width: `${Math.max(0, Math.min(100, row.mastery))}%` }} />
+          <div key={row.domain} style={{ display: "grid", gridTemplateColumns: "minmax(120px, 1fr) minmax(140px, 2fr) auto auto", gap: 12, alignItems: "center" }}>
+            <div style={{ fontWeight: 800 }}>{domainLabel(row.domain)}</div>
+            <div style={{ height: 10, borderRadius: 999, background: "rgba(255,255,255,0.08)", overflow: "hidden" }}>
+              <div style={{ width: `${Math.max(0, Math.min(100, row.mastery))}%`, height: "100%", borderRadius: 999, background: "linear-gradient(90deg, rgba(99,102,241,0.85), rgba(34,197,94,0.9))" }} />
             </div>
-            <div className="learningRowValue" style={{ fontWeight: 900, fontVariantNumeric: "tabular-nums" }}>{Math.round(row.mastery)}%</div>
-            <div className="learningRowMeta muted" style={{ fontSize: 12 }}>Acc {Math.round(row.accuracy)}% · D{row.currentDifficulty}</div>
+            <div style={{ fontWeight: 900, fontVariantNumeric: "tabular-nums" }}>{Math.round(row.mastery)}%</div>
+            <div className="muted" style={{ fontSize: 12 }}>Acc {Math.round(row.accuracy)}% · D{row.currentDifficulty}</div>
           </div>
         )) : <div className="muted">Complete a run to start building your adaptive learning profile.</div>}
       </div>

@@ -69,10 +69,10 @@ function labelForType(type: QuestionType) {
   return "Question";
 }
 
-function ModelPanel(props: { title: string; src?: string; mirrored?: boolean; compact?: boolean }) {
-  const { title, src, mirrored = false, compact = false } = props;
+function ModelPanel(props: { title: string; src?: string; mirrored?: boolean }) {
+  const { title, src, mirrored = false } = props;
   return (
-    <div className={"card modelPanel" + (compact ? " modelPanelCompact" : "")} style={{ padding: 10, background: "rgba(255,255,255,0.04)", minHeight: compact ? 0 : 250 }}>
+    <div className="card" style={{ padding: 10, background: "rgba(255,255,255,0.04)", minHeight: 250 }}>
       <div style={{ fontSize: 12, fontWeight: 900, letterSpacing: 0.6, opacity: 0.88, marginBottom: 8 }}>{title}</div>
       <div style={{ borderRadius: 16, overflow: "hidden", border: "1px solid rgba(255,255,255,0.08)", background: "rgba(5,10,20,0.85)" }}>
         {src ? (
@@ -83,12 +83,12 @@ function ModelPanel(props: { title: string; src?: string; mirrored?: boolean; co
             muted
             playsInline
             preload="metadata"
-            className="modelPanelVideo" style={{ display: "block", width: "100%", height: compact ? 160 : 230, objectFit: "cover", transform: mirrored ? "scaleX(-1)" : undefined }}
+            style={{ display: "block", width: "100%", height: 230, objectFit: "cover", transform: mirrored ? "scaleX(-1)" : undefined }}
           >
             <source src={src} type="video/mp4" />
           </video>
         ) : (
-          <div style={{ height: compact ? 160 : 230, display: "grid", placeItems: "center", opacity: 0.7 }}>Video slot ready</div>
+          <div style={{ height: 230, display: "grid", placeItems: "center", opacity: 0.7 }}>Video slot ready</div>
         )}
       </div>
     </div>
@@ -344,7 +344,7 @@ export default function DiabloQuizRunner(props: {
     onXp,
     onSubmit: (r) => {
       setHitPulse(r.correct ? "enemy" : "player");
-      window.setTimeout(() => setHitPulse(null), 450);
+      window.setTimeout(() => setHitPulse(null), r.correct ? 1200 : 700);
     },
     initialState,
     onStateChange,
@@ -469,7 +469,7 @@ export default function DiabloQuizRunner(props: {
               <div className={hitPulse === "player" ? "d2Shake" : ""}>
                 <D2LifeOrb value={state.playerHP} name={playerName} />
               </div>
-              <ModelPanel title={playerName} src={playerVideo} compact />
+              <ModelPanel title={playerName} src={playerVideo} />
             </div>
 
             <div className={"d2QuestionCard d2QuizQuestionCard " + (hitPulse === "enemy" ? "d2HitFlash" : "") } style={{ minHeight: 560 }}>
@@ -574,14 +574,7 @@ export default function DiabloQuizRunner(props: {
               </div>
             </div>
 
-            <div className="mobileCombatCard">
-              <D2EnemyHealthBar value={state.enemyHP} name={enemyName.toUpperCase().slice(0, 18)} />
-              <div style={{ marginTop: 10 }}>
-                <ModelPanel title={enemyName.toUpperCase().slice(0, 18)} src={enemyVideo} />
-              </div>
-            </div>
-
-            <div className={"d2QuestionCard d2QuizQuestionCard mobileQuizQuestionCard " + (hitPulse === "enemy" ? "d2HitFlash" : "")}>
+            <div className={"d2QuestionCard d2QuizQuestionCard mobileQuizQuestionCard " + (hitPulse === "enemy" ? "d2HitFlash" : "") }>
               {!finished && question ? (
                 <>
                   <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
@@ -651,12 +644,21 @@ export default function DiabloQuizRunner(props: {
               )}
             </div>
 
-            <div className="mobileCombatCard">
-              <div className={hitPulse === "player" ? "d2Shake" : ""}>
-                <D2LifeOrb value={state.playerHP} name={playerName} />
+            <div className="mobileCombatRow">
+              <div className="mobileCombatCard">
+                <D2EnemyHealthBar value={state.enemyHP} name={enemyName.toUpperCase().slice(0, 18)} />
+                <div style={{ marginTop: 10 }}>
+                  <ModelPanel title={enemyName.toUpperCase().slice(0, 18)} src={enemyVideo} />
+                </div>
               </div>
-              <div style={{ marginTop: 10 }}>
-                <ModelPanel title={playerName} src={playerVideo} compact />
+
+              <div className="mobileCombatCard">
+                <div className={hitPulse === "player" ? "d2Shake" : ""}>
+                  <D2LifeOrb value={state.playerHP} name={playerName} />
+                </div>
+                <div style={{ marginTop: 10 }}>
+                  <ModelPanel title={playerName} src={playerVideo} />
+                </div>
               </div>
             </div>
           </div>
