@@ -865,7 +865,7 @@ function Toast({ msg }:{ msg: string }){
 export default function AdminPage(){
   const [ok, setOk] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
-  const [tab, setTab] = useState<"questions" | "users" | "local">("questions");
+  const [tab, setTab] = useState<"questions" | "users" | "local" | "career">("questions");
   const [bulkImporting, setBulkImporting] = useState(false);
 
   const [err, setErr] = useState<string | null>(null);
@@ -1246,6 +1246,7 @@ export default function AdminPage(){
 
         <div className="row" style={{ alignItems:"center", gap: 10, flexWrap:"wrap", justifyContent:"flex-end" }}>
           <button onClick={() => setTab("questions")} className={tab==="questions" ? "primary" : ""}>DB Question Bank</button>
+          <button onClick={() => setTab("career")} className={tab==="career" ? "primary" : ""}>Career Matches</button>
           <button onClick={() => setTab("local")} className={tab==="local" ? "primary" : ""}>Local (Prototype)</button>
           <button onClick={() => setTab("users")} className={tab==="users" ? "primary" : ""}>DB Users</button>
           <button onClick={() => (window.location.href = "/admin/content")} className="primary">Content Studio</button>
@@ -1257,6 +1258,10 @@ export default function AdminPage(){
         <div className="card" style={{ marginTop: 14, borderColor:"rgba(255,80,80,0.35)", background:"rgba(255,80,80,0.08)" }}>
           <b>Error:</b> {err}
         </div>
+      ) : null}
+
+      {tab === "career" ? (
+        <CareerMatchesAdmin />
       ) : null}
 
       {tab === "local" ? (
