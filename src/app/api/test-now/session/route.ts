@@ -4,6 +4,7 @@ import { ensureUser } from "@/app/api/_lib/ensureUser";
 import { getRequestUserId } from "@/app/api/_lib/authUser";
 import { normalizeDifficultyLevel, sampleQuestions, shuffleQuestionPayload } from "@/lib/questionTransforms";
 import { normalizeQuestionType } from "@/lib/questionTypes";
+import { awardRaffleEntries } from "@/lib/raffle";
 
 function mapQuestion(q: any) {
   const rawData = q.data && typeof q.data === "object" ? q.data : {};
@@ -156,6 +157,8 @@ export async function PATCH(req: Request) {
         for (const row of answered) {
           const sessionQuestionId = String(row?.sessionQuestionId || "").trim();
           if (!sessionQuestionId) continue;
+          const existingQuestion = await tx.gameSessionQuestion.findUnique({ where: { id: sessionQuestionId }, include: { session: true } });
+          if (!existingQuestion) continue;
           await tx.gameSessionQuestion.update({
             where: { id: sessionQuestionId },
             data: {
@@ -165,6 +168,21 @@ export async function PATCH(req: Request) {
               answeredAt: new Date(),
             },
           });
+          if (existingQuestion.isGolden && row?.isCorrect === true) {
+            const auditKey = `golden-question:${existingQuestion.session.userId}:${sessionQuestionId}`;
+            const seen = await (tx as any).raffleEntry.findUnique?.({ where: { auditKey } }).catch(() => null);
+            if (!seen) {
+              await awardRaffleEntries(tx as any, {
+                userId: existingQuestion.session.userId,
+                source: "GOLDEN_QUESTION",
+                quantity: 1,
+                meta: { sessionId: existingQuestion.sessionId, sessionQuestionId, source: "test_now" } as any,
+                sourceRefType: "QUESTION",
+                sourceRefId: sessionQuestionId,
+                auditKey,
+              });
+            }
+          }
         }
       }
       await tx.gameSession.update({

@@ -9,6 +9,7 @@ import PracticeMiniGameModal from "@/components/PracticeMiniGameModal";
 import AvatarMenu from "@/components/AvatarMenu";
 import WhatsNextPanel from "@/components/WhatsNextPanel";
 import LootVaultModal from "@/components/LootVaultModal";
+import SweepstakesDetailModal from "@/components/SweepstakesDetailModal";
 import AuthGateCard from "@/components/AuthGateCard";
 import GoogleLoginButton from "@/components/ui/GoogleLoginButton";
 import { getActiveUser, setActiveUserId, syncAuthenticatedUser } from "@/lib/userStore";
@@ -35,6 +36,7 @@ type Badge = { id: string; label: string; issuedAt: string; expiresAt: string; c
 type Offer = { id: string; title: string; salaryText: string; createdAt: string; companyName: string; roleLabel: string };
 type LearningRow = { domain: string; mastery: number; accuracy: number; currentDifficulty: number; correctCount: number; wrongCount: number };
 type CareerMatchRow = { id: string; title: string; domain: string; description: string; url: string; location?: string; salary?: string; minLevel: number; minMastery: number };
+type SweepstakesCampaign = { id: string; slug: string; title: string; status: string; startsAt: string; endsAt: string; drawnAt?: string | null; prizePoolLabel?: string | null; totalEntries: number; totalParticipants: number; winner?: { userId: string; displayName: string; drawnAt?: string | null } | null; leaderboard: Array<{ userId: string; displayName: string; quantity: number; tickets: number; lastEntryAt?: string | null; isWinner?: boolean }> };
 
 
 function labelPos(p: string){
@@ -95,6 +97,9 @@ export default function Dashboard() {
   const [learningRows, setLearningRows] = useState<LearningRow[]>([]);
   const [overallMastery, setOverallMastery] = useState<number>(0);
   const [careerMatches, setCareerMatches] = useState<CareerMatchRow[]>([]);
+  const [sweepCampaign, setSweepCampaign] = useState<SweepstakesCampaign | null>(null);
+  const [sweepUser, setSweepUser] = useState<any>(null);
+  const [sweepOpen, setSweepOpen] = useState(false);
 
   // Level-up detection (notification-only; user opens vault when ready)
   const prevLevelRef = useRef<number>(0);
@@ -181,6 +186,14 @@ export default function Dashboard() {
             const cmData = await cmRes.json().catch(() => null);
             if (cmRes.ok) setCareerMatches(Array.isArray(cmData?.rows) ? cmData.rows : []);
           } catch {}
+        }
+      } catch {}
+      try {
+        const swRes = await fetch('/api/sweepstakes/summary', { cache: 'no-store' as any });
+        const swData = await swRes.json().catch(() => null);
+        if (swRes.ok) {
+          setSweepCampaign(swData?.campaign || null);
+          setSweepUser(swData?.user || null);
         }
       } catch {}
     } catch (e: any) {
@@ -800,6 +813,23 @@ export default function Dashboard() {
             )}
           </div>
 
+          {sweepCampaign ? (
+            <div className="card" style={{ marginTop: 14 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+                <div>
+                  <h3 style={{ margin: 0 }}>Live Sweepstakes</h3>
+                  <div><small>{sweepCampaign.prizePoolLabel || "Prize pool TBD"} • {sweepCampaign.totalEntries} entries • {sweepCampaign.totalParticipants} participants</small></div>
+                </div>
+                <button className="primary" onClick={() => setSweepOpen(true)}>{sweepCampaign.winner ? "View winner" : "Open live drawing"}</button>
+              </div>
+              <div style={{ marginTop: 12, display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                {sweepUser ? <span className="badge">Your entries: {Number(sweepUser.campaignEntries || 0)}</span> : null}
+                {sweepUser ? <span className="badge">Remaining this week: {Number(sweepUser.remainingThisWeek || 0)}</span> : null}
+                {sweepCampaign.winner ? <span className="badge">Winner: {sweepCampaign.winner.displayName}</span> : <span className="badge">Golden questions can add entries</span>}
+              </div>
+            </div>
+          ) : null}
+
           <AdaptiveLearningCard overallMastery={overallMastery} rows={learningRows} />
 
           <div className="card" style={{ marginTop: 14 }}>
@@ -845,6 +875,7 @@ export default function Dashboard() {
     </main>
       <MerchModal open={merchOpen} onClose={() => setMerchOpen(false)} />
       <MockInterviewModal open={mockInterviewOpen} onClose={() => setMockInterviewOpen(false)} />
+      <SweepstakesDetailModal open={sweepOpen} onClose={() => setSweepOpen(false)} campaign={sweepCampaign as any} currentUserId={userId} />
 </>
   );
 }
