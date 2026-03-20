@@ -27,7 +27,7 @@ export async function POST(req: Request) {
     }
 
     const totalCost = tokenCost * quantity;
-    const result = await prisma.$transaction(async (tx: any) => {
+    const result = (await prisma.$transaction(async (tx: any): Promise<{ award: any }> => {
       const wallet = (await tx.wallet.findUnique({ where: { userId } }).catch(() => null)) || { tokenBalance: 0 };
       const balance = Number(wallet?.tokenBalance || 0);
       if (balance < totalCost) throw new Error('Not enough tokens');
@@ -50,7 +50,7 @@ export async function POST(req: Request) {
       });
 
       return { award };
-    });
+    })) as { award: any };
 
     const wallet = await prisma.wallet.findUnique({ where: { userId } }).catch(() => null);
     return Response.json({ ok: true, awarded: result.award.awarded, tokenBalance: Number(wallet?.tokenBalance || 0) });

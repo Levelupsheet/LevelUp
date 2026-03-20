@@ -21,6 +21,7 @@ type Campaign = {
   rulesUrl?: string | null;
   winner?: { displayName: string } | null;
   leaderboard?: Array<{ userId: string; displayName: string; quantity: number; isWinner?: boolean }>;
+  totalEntries?: number;
 };
 
 function toLocalInput(v?: string | null) {
