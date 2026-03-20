@@ -46,7 +46,7 @@ type AdminUser = {
   lastActiveAt?: string | null;
 };
 
-type CareerMatchRow = { id: string; title: string; domain: string; minLevel: number; minMastery: number; description: string; url: string; location?: string; salary?: string };
+type CareerMatchRow = { id: string; title: string; company?: string; domain: string; minLevel: number; minMastery: number; description: string; url: string; location?: string; salary?: string; isActive?: boolean };
 
 function asArray<T>(value: T[] | null | undefined): T[] {
   return Array.isArray(value) ? value : [];
@@ -588,6 +588,240 @@ function PracticePoolsAdmin(){
       </Modal>
 
       {msg ? <Toast msg={msg} /> : null}
+    </div>
+  );
+}
+
+function CareerMatchesAdmin(){
+  const [rows, setRows] = useState<CareerMatchRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [msg, setMsg] = useState<string | null>(null);
+  const blank = (): CareerMatchRow => ({
+    id: `career-${Date.now()}`,
+    title: "",
+    company: "",
+    domain: "AWS",
+    minLevel: 7,
+    minMastery: 40,
+    description: "",
+    url: "",
+    location: "Remote",
+    salary: "",
+    isActive: true,
+  });
+  const [draft, setDraft] = useState<CareerMatchRow>(blank());
+  const [editingId, setEditingId] = useState<string | null>(null);
+
+  async function loadCareerMatches(){
+    setLoading(true);
+    setMsg(null);
+    try {
+      const res = await fetch('/api/admin/career-matches', { cache: 'no-store' as any });
+      const data = await res.json().catch(() => null);
+      if (!res.ok) throw new Error(data?.error || 'Failed to load career matches');
+      setRows(asArray(data?.rows));
+    } catch (e: any) {
+      setMsg(e?.message || 'Failed to load career matches');
+      setRows([]);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => { loadCareerMatches(); }, []);
+
+  function resetDraft(){
+    setDraft(blank());
+    setEditingId(null);
+  }
+
+  function editRow(row: CareerMatchRow){
+    setDraft({ ...row, company: row.company || '', location: row.location || '', salary: row.salary || '', isActive: row.isActive !== false });
+    setEditingId(row.id);
+    setMsg(null);
+  }
+
+  function upsertDraft(){
+    setMsg(null);
+    if (!draft.title.trim()) return setMsg('Title is required.');
+    if (!draft.url.trim()) return setMsg('Apply URL is required.');
+    if (!draft.description.trim()) return setMsg('Description is required.');
+    const normalized: CareerMatchRow = {
+      ...draft,
+      id: String(draft.id || `career-${Date.now()}`),
+      title: draft.title.trim(),
+      company: (draft.company || '').trim() || undefined,
+      domain: String(draft.domain || 'GENERAL').toUpperCase(),
+      minLevel: Math.max(1, Number(draft.minLevel || 7)),
+      minMastery: Math.max(0, Math.min(100, Number(draft.minMastery || 40))),
+      description: draft.description.trim(),
+      url: draft.url.trim(),
+      location: (draft.location || '').trim() || undefined,
+      salary: (draft.salary || '').trim() || undefined,
+      isActive: draft.isActive !== false,
+    };
+    setRows((prev) => {
+      const next = prev.some((r) => r.id === normalized.id)
+        ? prev.map((r) => (r.id === normalized.id ? normalized : r))
+        : [normalized, ...prev];
+      return next;
+    });
+    setMsg(editingId ? 'Updated row in editor. Click Save career matches to publish.' : 'Added row to editor. Click Save career matches to publish.');
+    resetDraft();
+  }
+
+  function removeRow(id: string){
+    setRows((prev) => prev.filter((r) => r.id !== id));
+    if (editingId === id) resetDraft();
+    setMsg('Removed row from editor. Click Save career matches to publish.');
+  }
+
+  async function saveRows(){
+    setMsg(null);
+    try {
+      const res = await fetch('/api/admin/career-matches', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ rows }),
+      });
+      const data = await res.json().catch(() => null);
+      if (!res.ok) throw new Error(data?.error || 'Failed to save career matches');
+      setRows(asArray(data?.rows));
+      setMsg('Career matches saved. Users will only see active roles once they meet the level and mastery thresholds.');
+    } catch (e: any) {
+      setMsg(e?.message || 'Failed to save career matches');
+    }
+  }
+
+  async function exportJson(){
+    const payload = JSON.stringify(rows, null, 2);
+    const blob = new Blob([payload], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'career-matches.json';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }
+
+  return (
+    <div className="card" style={{ marginTop: 14 }}>
+      <div style={{ display:'flex', justifyContent:'space-between', gap: 12, flexWrap:'wrap', alignItems:'center' }}>
+        <div>
+          <div style={{ fontWeight: 900, fontSize: 20 }}>Career matches</div>
+          <small>Paste real job links here. Roles stay hidden until a user reaches the required level and mastery for that domain.</small>
+        </div>
+        <div className="row" style={{ gap: 8, flexWrap:'wrap' }}>
+          <button onClick={loadCareerMatches}>Reload</button>
+          <button onClick={exportJson}>Export JSON</button>
+          <button onClick={saveRows} className="primary">Save career matches</button>
+        </div>
+      </div>
+
+      <div style={{ marginTop: 12, display:'grid', gridTemplateColumns:'minmax(320px, 440px) 1fr', gap: 14 }}>
+        <div className="card" style={{ background:'rgba(255,255,255,0.03)' }}>
+          <div style={{ display:'flex', justifyContent:'space-between', gap: 10, alignItems:'center', flexWrap:'wrap' }}>
+            <b>{editingId ? 'Edit role' : 'Add role'}</b>
+            {editingId ? <button onClick={resetDraft}>Clear editor</button> : null}
+          </div>
+          <div style={{ display:'grid', gap: 10, marginTop: 10 }}>
+            <label style={{ display:'grid', gap: 6 }}>
+              <small>Job title</small>
+              <input value={draft.title} onChange={(e) => setDraft((d) => ({ ...d, title: e.target.value }))} placeholder="Azure Cloud Support Engineer" />
+            </label>
+            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap: 10 }}>
+              <label style={{ display:'grid', gap: 6 }}>
+                <small>Company</small>
+                <input value={draft.company || ''} onChange={(e) => setDraft((d) => ({ ...d, company: e.target.value }))} placeholder="Contoso" />
+              </label>
+              <label style={{ display:'grid', gap: 6 }}>
+                <small>Domain</small>
+                <select value={draft.domain} onChange={(e) => setDraft((d) => ({ ...d, domain: e.target.value }))}>
+                  <option value="AWS">AWS</option>
+                  <option value="AZURE">AZURE</option>
+                  <option value="NETWORKING">NETWORKING</option>
+                  <option value="WINDOWS">WINDOWS</option>
+                  <option value="SECURITY">SECURITY</option>
+                  <option value="IDENTITY">IDENTITY</option>
+                  <option value="HELPDESK">HELPDESK</option>
+                  <option value="DESKTOP">DESKTOP</option>
+                </select>
+              </label>
+            </div>
+            <label style={{ display:'grid', gap: 6 }}>
+              <small>Apply URL</small>
+              <input value={draft.url} onChange={(e) => setDraft((d) => ({ ...d, url: e.target.value }))} placeholder="https://company.com/jobs/123" />
+            </label>
+            <label style={{ display:'grid', gap: 6 }}>
+              <small>Short description</small>
+              <textarea value={draft.description} onChange={(e) => setDraft((d) => ({ ...d, description: e.target.value }))} style={{ minHeight: 90 }} placeholder="Support Azure workloads, networking, monitoring, and IAM." />
+            </label>
+            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap: 10 }}>
+              <label style={{ display:'grid', gap: 6 }}>
+                <small>Location</small>
+                <input value={draft.location || ''} onChange={(e) => setDraft((d) => ({ ...d, location: e.target.value }))} placeholder="Remote" />
+              </label>
+              <label style={{ display:'grid', gap: 6 }}>
+                <small>Salary text</small>
+                <input value={draft.salary || ''} onChange={(e) => setDraft((d) => ({ ...d, salary: e.target.value }))} placeholder="$85k-$115k" />
+              </label>
+            </div>
+            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap: 10 }}>
+              <label style={{ display:'grid', gap: 6 }}>
+                <small>Minimum level</small>
+                <input type="number" min={1} value={draft.minLevel} onChange={(e) => setDraft((d) => ({ ...d, minLevel: Number(e.target.value) }))} />
+              </label>
+              <label style={{ display:'grid', gap: 6 }}>
+                <small>Minimum mastery %</small>
+                <input type="number" min={0} max={100} value={draft.minMastery} onChange={(e) => setDraft((d) => ({ ...d, minMastery: Number(e.target.value) }))} />
+              </label>
+            </div>
+            <label style={{ display:'flex', alignItems:'center', gap: 8 }}>
+              <input type="checkbox" checked={draft.isActive !== false} onChange={(e) => setDraft((d) => ({ ...d, isActive: e.target.checked }))} />
+              <small>Role is active and can appear on the dashboard</small>
+            </label>
+            <div className="row" style={{ gap: 8, flexWrap:'wrap' }}>
+              <button className="primary" onClick={upsertDraft}>{editingId ? 'Update role in editor' : 'Add role to editor'}</button>
+              <button onClick={resetDraft}>Clear</button>
+            </div>
+            {msg ? <small style={{ opacity: 0.9 }}>{msg}</small> : null}
+          </div>
+        </div>
+
+        <div className="card" style={{ background:'rgba(255,255,255,0.03)' }}>
+          <div style={{ display:'flex', justifyContent:'space-between', gap: 10, flexWrap:'wrap', alignItems:'center' }}>
+            <div>
+              <b>Saved roles</b>
+              <div><small>Only active rows are eligible. Users won’t see anything until they meet both the level and domain-mastery threshold.</small></div>
+            </div>
+            <span className="badge">Rows: {rows.length}</span>
+          </div>
+          <div style={{ marginTop: 12, maxHeight: 560, overflow:'auto', display:'grid', gap: 10 }}>
+            {loading ? <small>Loading…</small> : rows.map((row) => (
+              <div key={row.id} className="card" style={{ background:'rgba(0,0,0,0.25)' }}>
+                <div style={{ display:'flex', justifyContent:'space-between', gap: 10, flexWrap:'wrap', alignItems:'center' }}>
+                  <div>
+                    <div style={{ fontWeight: 800 }}>{row.title}</div>
+                    <small>{row.company ? `${row.company} • ` : ''}{row.domain} • lvl {row.minLevel}+ • mastery {row.minMastery}%+</small>
+                  </div>
+                  <div className="row" style={{ gap: 8, flexWrap:'wrap' }}>
+                    <span className="badge">{row.isActive === false ? 'Inactive' : 'Active'}</span>
+                    <button onClick={() => editRow(row)}>Edit</button>
+                    <button onClick={() => removeRow(row.id)} style={{ background:'rgba(239,68,68,0.14)', borderColor:'rgba(239,68,68,0.35)' }}>Delete</button>
+                  </div>
+                </div>
+                <div style={{ marginTop: 8 }}><small>{row.description}</small></div>
+                <div className="row" style={{ marginTop: 8, flexWrap:'wrap', gap: 8 }}>
+                  {row.location ? <span className="badge">{row.location}</span> : null}
+                  {row.salary ? <span className="badge">{row.salary}</span> : null}
+                  <a href={row.url} target="_blank" rel="noreferrer"><small>Open apply link</small></a>
+                </div>
+              </div>
+            ))}
+            {!loading && !rows.length ? <small>No career matches yet. Add one on the left.</small> : null}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

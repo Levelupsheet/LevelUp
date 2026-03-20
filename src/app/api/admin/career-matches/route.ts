@@ -11,7 +11,8 @@ export async function POST(req: Request) {
     const body = await req.json();
     const rows = Array.isArray(body?.rows) ? body.rows : [];
     await writeCareerMatches(rows as any);
-    return NextResponse.json({ ok: true, rows });
+    const saved = await readCareerMatches();
+    return NextResponse.json({ ok: true, rows: saved });
   } catch (e: any) {
     return NextResponse.json({ ok: false, error: e?.message || "Failed to save career matches" }, { status: 500 });
   }
