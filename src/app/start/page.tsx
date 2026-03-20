@@ -3,6 +3,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import MerchModal from "@/components/MerchModal";
+import { levelBandLabel } from "@/lib/progression";
 
 
 function trackEnterApp(source: string) {
@@ -219,7 +220,7 @@ export default function Home() {
             </div>
 
             <p className="muted" style={{ marginTop: 12, fontSize: 13 }}>
-              Pro: <b>$5.99/mo</b> • Premium: <b>$19.99/mo</b> • Cancel anytime
+              Pro: <b>$8.99/mo</b> • Premium: <b>$14.99/mo</b> • Cancel anytime
             </p>
           </div>
 
@@ -285,7 +286,7 @@ export default function Home() {
                           <span aria-hidden="true" className="badge" style={{ width: 28, textAlign: "center" }}>{idx + 1}</span>
                           <b style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{u?.displayName ?? "—"}</b>
                         </div>
-                        <div className="muted" style={{ marginTop: 4, fontSize: 12 }}>{u ? `Lvl ${u.level} • ${u.rank}` : "Loading..."}</div>
+                        <div className="muted" style={{ marginTop: 4, fontSize: 12 }}>{u ? levelBandLabel(Number(u.level || 1)) : "Loading..."}</div>
                       </div>
                       <div style={{ textAlign: "right" }}>
                         <div style={{ fontWeight: 800, fontVariantNumeric: "tabular-nums" }}>{u ? `${u.xp} XP` : ""}</div>
@@ -304,7 +305,7 @@ export default function Home() {
                   <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center" }}>
                     <div style={{ minWidth: 0 }}>
                       <div style={{ fontWeight: 900, fontSize: 15, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{lbSelected.displayName}</div>
-                      <div className="muted" style={{ marginTop: 4, fontSize: 12 }}>Lvl {lbSelected.level} • {lbSelected.rank}</div>
+                      <div className="muted" style={{ marginTop: 4, fontSize: 12 }}>{levelBandLabel(Number(lbSelected.level || 1))}</div>
                     </div>
                     <div style={{ textAlign: "right" }}>
                       <div style={{ fontWeight: 900 }}>{lbSelected.xp} XP</div>
@@ -352,6 +353,9 @@ export default function Home() {
 
       <section id="features" className="section" data-reveal data-delay="0">
         <h2 className="sectionTitle">What you get</h2>
+        <p className="sectionSub">
+          Built to feel like a 2026 product: clean, fast, and motivating — with subtle gamification that keeps you moving.
+        </p>
 
         <div className="grid3">
           <div className="featureCard" data-reveal data-delay="0"><b>Interview simulations</b><p className="muted" style={{ marginTop: 8 }}>HR screen → Tech panel flow with unlocks.</p></div>
@@ -383,7 +387,7 @@ export default function Home() {
 
           <div className="priceCard priceCardPro" data-reveal data-delay="120">
             <b>Pro</b>
-            <div className="priceTag">$5.99<span className="muted" style={{ fontSize: 14 }}>/mo</span></div>
+            <div className="priceTag">$8.99<span className="muted" style={{ fontSize: 14 }}>/mo</span></div>
             <div className="muted">Best value</div>
             <ul style={{ marginTop: 12 }}>
               <li>Unlimited daily practice</li>
@@ -391,12 +395,12 @@ export default function Home() {
               <li>Career outlook + salary insights</li>
               <li>More interview unlocks</li>
             </ul>
-            <button className="gold" style={{ width: "100%" }} onClick={() => setPlanModal({ plan: "Pro", price: "$5.99/mo" })}>Go Pro</button>
+            <button className="gold" style={{ width: "100%" }} onClick={() => setPlanModal({ plan: "Pro", price: "$8.99/mo" })}>Go Pro</button>
           </div>
 
           <div className="priceCard" data-reveal data-delay="240">
             <b>Premium</b>
-            <div className="priceTag">$19.99<span className="muted" style={{ fontSize: 14 }}>/mo</span></div>
+            <div className="priceTag">$14.99<span className="muted" style={{ fontSize: 14 }}>/mo</span></div>
             <div className="muted">For serious accelerators</div>
             <ul style={{ marginTop: 12 }}>
               <li>AI mock tech interview panel (coming)</li>
@@ -404,7 +408,7 @@ export default function Home() {
               <li>Mock offer letters + badges</li>
               <li>Early access features</li>
             </ul>
-            <button className="primary" style={{ width: "100%" }} onClick={() => setPlanModal({ plan: "Pro", price: "$5.99/mo" })}>Go Premium</button>
+            <button className="primary" style={{ width: "100%" }} onClick={() => setPlanModal({ plan: "Premium", price: "$14.99/mo" })}>Go Premium</button>
           </div>
         </div>
 
@@ -463,7 +467,7 @@ export default function Home() {
         <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
           <div>
             <h2 className="sectionTitle">Merch</h2>
-            
+            <p className="sectionSub">LevelUp Pro gear — auto-scrolls, pause on hover.</p>
           </div>
           <button className="secondaryBtn" onClick={() => setMerchOpen(true)}>View all merch</button>
         </div>

@@ -1,0 +1,41 @@
+import fs from "fs/promises";
+import path from "path";
+
+export type CareerMatch = {
+  id: string;
+  title: string;
+  domain: string;
+  minLevel: number;
+  minMastery: number;
+  description: string;
+  url: string;
+  location?: string;
+  salary?: string;
+};
+
+export const DEFAULT_CAREER_MATCHES: CareerMatch[] = [
+  { id: "az-support-1", title: "Azure Support Engineer", domain: "AZURE", minLevel: 7, minMastery: 40, description: "Support Azure environments, troubleshoot identity, networking, and VM issues.", url: "https://learn.microsoft.com/azure/", location: "Remote / Hybrid", salary: "$70k-$105k" },
+  { id: "aws-support-1", title: "AWS Cloud Support Associate", domain: "AWS", minLevel: 7, minMastery: 40, description: "Assist with AWS services including IAM, EC2, S3, VPC, and monitoring.", url: "https://aws.amazon.com/careers/", location: "Remote / Hybrid", salary: "$72k-$108k" },
+  { id: "net-ops-1", title: "Network Operations Engineer", domain: "NETWORKING", minLevel: 7, minMastery: 40, description: "Monitor connectivity, routing, switching, DNS, DHCP, and VPN services.", url: "https://www.cisco.com/c/en/us/about/careers.html", location: "Remote / Hybrid", salary: "$68k-$98k" },
+  { id: "identity-1", title: "IAM Administrator", domain: "IDENTITY", minLevel: 7, minMastery: 40, description: "Manage identity platforms, MFA, conditional access, and role-based access controls.", url: "https://www.okta.com/company/careers/", location: "Remote / Hybrid", salary: "$75k-$110k" },
+  { id: "sec-1", title: "Cloud Security Analyst", domain: "SECURITY", minLevel: 7, minMastery: 40, description: "Investigate security events, review access policies, and harden cloud environments.", url: "https://www.splunk.com/en_us/careers.html", location: "Remote / Hybrid", salary: "$80k-$120k" },
+  { id: "win-1", title: "Windows Systems Administrator", domain: "WINDOWS", minLevel: 7, minMastery: 40, description: "Support Windows endpoints, patching, Group Policy, and Active Directory operations.", url: "https://jobs.microsoft.com/", location: "Remote / Hybrid", salary: "$65k-$95k" },
+];
+
+const DATA_DIR = path.join(process.cwd(), "data");
+const DATA_FILE = path.join(DATA_DIR, "career-matches.json");
+
+export async function readCareerMatches(): Promise<CareerMatch[]> {
+  try {
+    const raw = await fs.readFile(DATA_FILE, "utf8");
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : DEFAULT_CAREER_MATCHES;
+  } catch {
+    return DEFAULT_CAREER_MATCHES;
+  }
+}
+
+export async function writeCareerMatches(rows: CareerMatch[]) {
+  await fs.mkdir(DATA_DIR, { recursive: true });
+  await fs.writeFile(DATA_FILE, JSON.stringify(rows, null, 2), "utf8");
+}

@@ -2128,39 +2128,3 @@ button.gold{
   .d2OrbFrame{ width: min(52vw, 200px) !important; height: min(52vw, 200px) !important; }
   .luDropdown{ right: -6px; }
 }
-
-
-/* V8 mobile/layout polish patch */
-.quizModalResponsive{
-  width: min(96vw, 1680px);
-}
-@media (min-width: 1440px){
-  .quizModalResponsive{ width: min(98vw, 1780px) !important; }
-  .d2QuizShell{ max-width: 1700px !important; }
-  .d2QuizGrid{ grid-template-columns: 320px minmax(0,1fr) 320px !important; gap: 24px; }
-  .d2QuestionCard{ min-height: 640px; }
-}
-.mobileCombatRow{ display:grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.mobileCombatRow .card{ min-width: 0; }
-@media (max-width: 860px){
-  .luModalOverlay{ padding: 0 !important; }
-  .quizModalResponsive{ width: 100vw !important; max-width: 100vw !important; min-height: 100dvh !important; height: 100dvh !important; border-radius: 0 !important; border-left: 0 !important; border-right: 0 !important; }
-  .luModalBody{ padding: 10px; }
-  .mobileCombatRow{ grid-template-columns: 1fr; }
-  .mobileCombatCard .d2EnemyCard, .mobileCombatCard .d2OrbWrap, .mobileCombatCard .card{ min-width: 0; }
-  .mobileCombatCard video{ height: 180px !important; object-position: center top; }
-  .mobileQuizQuestionCard{ order: 1; }
-  .mobileCombatRow{ order: 2; }
-  .maincol{ width: 100%; }
-  .topbar{ gap: 8px; }
-}
-@media (max-width: 640px){
-  .dashboardGrid, .shell{ display:flex !important; flex-direction: column !important; }
-  .sidebar{ order: 2; }
-  .maincol{ order: 1; }
-  .topbar .kpiRow{ display:grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; }
-  .topbar .kpiRow > *{ min-width: 0; }
-  .hero, .section, .cinematicSection{ padding-left: 12px; padding-right: 12px; }
-  .grid3{ grid-template-columns: 1fr !important; }
-  .merchTrack{ animation-duration: 40s; }
-}

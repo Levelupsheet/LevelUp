@@ -12,6 +12,7 @@ import LootVaultModal from "@/components/LootVaultModal";
 import AuthGateCard from "@/components/AuthGateCard";
 import GoogleLoginButton from "@/components/ui/GoogleLoginButton";
 import { getActiveUser, setActiveUserId, syncAuthenticatedUser } from "@/lib/userStore";
+import { XP_PER_LEVEL, xpIntoCurrentLevel, levelFromXp } from "@/lib/progression";
 import { addActivity, getActivities, clearActivitiesByType, clearActivities, removeActivity, type ActivityItem } from "@/lib/activityStore";
 
 type Eligibility = {
@@ -33,6 +34,7 @@ type Notification = {
 type Badge = { id: string; label: string; issuedAt: string; expiresAt: string; code: string };
 type Offer = { id: string; title: string; salaryText: string; createdAt: string; companyName: string; roleLabel: string };
 type LearningRow = { domain: string; mastery: number; accuracy: number; currentDifficulty: number; correctCount: number; wrongCount: number };
+type CareerMatchRow = { id: string; title: string; domain: string; description: string; url: string; location?: string; salary?: string; minLevel: number; minMastery: number };
 
 
 function labelPos(p: string){
@@ -92,6 +94,7 @@ export default function Dashboard() {
   const [lootOpen, setLootOpen] = useState(false);
   const [learningRows, setLearningRows] = useState<LearningRow[]>([]);
   const [overallMastery, setOverallMastery] = useState<number>(0);
+  const [careerMatches, setCareerMatches] = useState<CareerMatchRow[]>([]);
 
   // Level-up detection (notification-only; user opens vault when ready)
   const prevLevelRef = useRef<number>(0);
@@ -101,9 +104,9 @@ export default function Dashboard() {
 
   // Prefer local XP (from interviews / practice) so the dashboard reacts immediately.
   const xp = useMemo(() => (localXp ?? elig?.xp ?? 0), [localXp, elig]);
-  // Show progress within the CURRENT level (each level = 500 XP).
-  const levelSpan = 500;
-  const xpIntoLevel = Math.max(0, xp - (Math.max(1, localLevel) - 1) * levelSpan);
+  // Show progress within the CURRENT level.
+  const levelSpan = XP_PER_LEVEL;
+  const xpIntoLevel = xpIntoCurrentLevel(xp);
   const levelMax = levelSpan;
 
   function setLaunchGate(target: "position-training" | "cert-mcq" | "test-now") {
@@ -122,7 +125,7 @@ export default function Dashboard() {
       try {
         const u = getActiveUser();
         setLocalXp(u.xp ?? 0);
-        setLocalLevel((u as any).level ?? 1);
+        setLocalLevel(levelFromXp(u.xp ?? 0));
         setUserLabel(u.displayName);
         setActivity(getActivities(u.id));
 
@@ -164,8 +167,20 @@ export default function Dashboard() {
         let lpData: any = null;
         try { lpData = lpText ? JSON.parse(lpText) : null; } catch { lpData = null; }
         if (lpRes.ok) {
-          setLearningRows(Array.isArray(lpData?.profile?.masteryByDomain) ? lpData.profile.masteryByDomain : []);
-          setOverallMastery(Number(lpData?.profile?.overallMastery ?? 0));
+          const rows: any[] = Array.isArray(lpData?.profile?.masteryByDomain) ? lpData.profile.masteryByDomain : [];
+          setLearningRows(rows);
+          const overall = Number(lpData?.profile?.overallMastery ?? (rows.length ? rows.reduce((sum, row) => sum + Number((row as any)?.mastery || 0), 0) / rows.length : 0));
+          setOverallMastery(overall);
+          try {
+            const domains = rows.filter((r: any) => Number(r?.mastery || 0) >= 40).map((r: any) => String(r.domain || '').toUpperCase());
+            const params = new URLSearchParams();
+            params.set('level', String(localLevel || (getActiveUser() as any)?.level || 1));
+            params.set('domains', domains.join(','));
+            for (const row of rows) params.set(`m_${String(row.domain || '').toUpperCase()}`, String(Number(row?.mastery || 0)));
+            const cmRes = await fetch(`/api/career-matches?${params.toString()}`, { cache: 'no-store' as any });
+            const cmData = await cmRes.json().catch(() => null);
+            if (cmRes.ok) setCareerMatches(Array.isArray(cmData?.rows) ? cmData.rows : []);
+          } catch {}
         }
       } catch {}
     } catch (e: any) {
@@ -261,7 +276,7 @@ export default function Dashboard() {
         setUserLabel(synced.displayName);
         setUserAvatar(authUser.picture ?? null);
         setLocalXp(synced.xp ?? 0);
-        setLocalLevel((synced as any).level ?? 1);
+        setLocalLevel(levelFromXp(synced.xp ?? 0));
         setActivity(getActivities(synced.id));
         setAuthChecked(true);
       } catch {
@@ -321,7 +336,7 @@ export default function Dashboard() {
     try {
       const u = getActiveUser();
       setLocalXp(u.xp ?? 0);
-      setLocalLevel((u as any).level ?? 1);
+      setLocalLevel(levelFromXp(u.xp ?? 0));
       setUserLabel(u.displayName);
       setActivity(getActivities(u.id));
     } catch {}
@@ -343,27 +358,20 @@ export default function Dashboard() {
   }, [activity, notes]);
 
   const spotlightDomains = useMemo(() => {
-    const preferred = ["IDENTITY", "NETWORKING", "SECURITY", "AWS", "AZURE", "WINDOWS"];
-    const byKey = new Map(learningRows.map((row) => [String(row.domain).toUpperCase(), row]));
+    const preferred = ["IDENTITY", "NETWORKING", "SECURITY", "AWS"];
+    const byKey = new Map<string, LearningRow>(learningRows.map((row) => [String(row.domain).toUpperCase(), row] as [string, LearningRow]));
     return preferred.map((key) => ({
       key,
-      label: key === "AWS" ? "AWS" : key.charAt(0) + key.slice(1).toLowerCase(),
+      label: key === "AWS" ? "AWS" : key === "IDENTITY" ? "Identity" : key === "NETWORKING" ? "Networking" : key === "SECURITY" ? "Security" : key.charAt(0) + key.slice(1).toLowerCase(),
       mastery: Math.round(Number(byKey.get(key)?.mastery ?? 0)),
     }));
   }, [learningRows]);
 
   const recommendedRoles = useMemo(() => {
-    const rows = [...learningRows].sort((a, b) => Number(b.mastery) - Number(a.mastery));
-    const top = rows.slice(0, 2).map((row) => String(row.domain).toUpperCase());
-    const picks: string[] = [];
-    if (top.includes("IDENTITY")) picks.push("IAM Engineer");
-    if (top.includes("SECURITY")) picks.push("Cloud Security Analyst");
-    if (top.includes("AWS") || top.includes("COMPUTE") || top.includes("STORAGE")) picks.push("Cloud Engineer");
-    if (top.includes("NETWORKING")) picks.push("Network Operations Engineer");
-    if (top.includes("WINDOWS")) picks.push("Systems Administrator");
-    if (!picks.length) picks.push("Helpdesk Support Specialist", "Cloud Support Associate");
-    return Array.from(new Set(picks)).slice(0, 3);
-  }, [learningRows]);
+    if ((localLevel || 1) < 7) return [] as CareerMatchRow[];
+    if (careerMatches.length) return careerMatches;
+    return [] as CareerMatchRow[];
+  }, [careerMatches, localLevel]);
 
   async function markNotificationReadAndRemove(n: any) {
     if (!userId) return;
@@ -798,17 +806,23 @@ export default function Dashboard() {
             <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
               <div>
                 <h3 style={{ margin: 0 }}>Career Matches</h3>
-                <div><small>Role suggestions based on your strongest mastery domains.</small></div>
+                <div><small>{(localLevel || 1) >= 7 ? "Open roles appear when a mastery domain reaches 40%+." : "Reach level 7 to unlock career matches based on your mastery."}</small></div>
               </div>
               <span className="badge">AI-guided</span>
             </div>
             <div className="careerMatchGrid" style={{ marginTop: 14 }}>
-              {recommendedRoles.map((role) => (
-                <div key={role} className="careerMatchTile">
-                  <div className="careerMatchTitle">{role}</div>
-                  <div className="careerMatchMeta">Best fit from your current learning profile.</div>
+              {recommendedRoles.length ? recommendedRoles.map((role) => (
+                <a key={role.id} className="careerMatchTile" href={role.url} target="_blank" rel="noreferrer" style={{ textDecoration: 'none', color: 'inherit' }}>
+                  <div className="careerMatchTitle">{role.title}</div>
+                  <div className="careerMatchMeta">{role.description}</div>
+                  <div className="careerMatchMeta" style={{ marginTop: 8 }}><b>{role.domain}</b>{role.location ? ` • ${role.location}` : ''}{role.salary ? ` • ${role.salary}` : ''}</div>
+                </a>
+              )) : (
+                <div className="careerMatchTile">
+                  <div className="careerMatchTitle">Career matches locked</div>
+                  <div className="careerMatchMeta">Continue leveling and build a domain above 40% mastery to reveal tailored job links here.</div>
                 </div>
-              ))}
+              )}
             </div>
           </div>
 

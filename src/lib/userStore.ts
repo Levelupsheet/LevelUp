@@ -1,5 +1,7 @@
 "use client";
 
+import { levelFromXp } from "@/lib/progression";
+
 export type TrackId = "azure_m365" | "aws" | "helpdesk" | "desktop";
 
 export type LocalUser = {
@@ -28,11 +30,8 @@ function nowIso() {
   return new Date().toISOString();
 }
 
-export const XP_PER_LEVEL = 500;
-
 function computeLevel(xp: number) {
-  const safeXp = Number.isFinite(xp) ? Math.max(0, Math.floor(xp)) : 0;
-  return Math.floor(safeXp / XP_PER_LEVEL) + 1;
+  return levelFromXp(xp);
 }
 
 export function getUsers(): LocalUser[] {

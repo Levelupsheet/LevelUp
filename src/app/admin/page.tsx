@@ -46,6 +46,8 @@ type AdminUser = {
   lastActiveAt?: string | null;
 };
 
+type CareerMatchRow = { id: string; title: string; domain: string; minLevel: number; minMastery: number; description: string; url: string; location?: string; salary?: string };
+
 function asArray<T>(value: T[] | null | undefined): T[] {
   return Array.isArray(value) ? value : [];
 }
@@ -81,6 +83,8 @@ function LocalPrototypeAdmin(){
   const [editor, setEditor] = useState<string>("[]");
   const [savedMsg, setSavedMsg] = useState<string>("");
   const importRef = useRef<HTMLInputElement | null>(null);
+  const [careerEditor, setCareerEditor] = useState<string>("[]");
+  const [careerMsg, setCareerMsg] = useState<string>("");
 
   // Local user editing
   const [selectedUserId, setSelectedUserId] = useState<string>("demo-user");
@@ -117,6 +121,13 @@ function LocalPrototypeAdmin(){
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [poolKey]);
 
+  useEffect(() => {
+    fetch('/api/admin/career-matches', { cache: 'no-store' as any })
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error('career matches'))))
+      .then((data) => setCareerEditor(JSON.stringify(Array.isArray(data?.rows) ? data.rows : [], null, 2)))
+      .catch(() => setCareerEditor('[]'));
+  }, []);
+
   function save(){
     setSavedMsg("");
     try {
@@ -134,6 +145,20 @@ function LocalPrototypeAdmin(){
     try { localStorage.removeItem(poolKey); } catch {}
     loadPool(poolKey);
     setSavedMsg("Reset to default.");
+  }
+
+  async function saveCareerMatches(){
+    setCareerMsg("");
+    try {
+      const parsed = JSON.parse(careerEditor);
+      if (!Array.isArray(parsed)) throw new Error('Career matches JSON must be an array');
+      const res = await fetch('/api/admin/career-matches', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ rows: parsed }) });
+      const data = await res.json().catch(() => null);
+      if (!res.ok) throw new Error(data?.error || 'Failed to save career matches');
+      setCareerMsg('Saved career matches.');
+    } catch (e: any) {
+      setCareerMsg(`Could not save career matches: ${e?.message ?? 'invalid JSON'}`);
+    }
   }
 
   function onImportFile(file: File) {
