@@ -353,9 +353,6 @@ export default function Home() {
 
       <section id="features" className="section" data-reveal data-delay="0">
         <h2 className="sectionTitle">What you get</h2>
-        <p className="sectionSub">
-          Built to feel like a 2026 product: clean, fast, and motivating — with subtle gamification that keeps you moving.
-        </p>
 
         <div className="grid3">
           <div className="featureCard" data-reveal data-delay="0"><b>Interview simulations</b><p className="muted" style={{ marginTop: 8 }}>HR screen → Tech panel flow with unlocks.</p></div>
@@ -467,7 +464,6 @@ export default function Home() {
         <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
           <div>
             <h2 className="sectionTitle">Merch</h2>
-            <p className="sectionSub">LevelUp Pro gear — auto-scrolls, pause on hover.</p>
           </div>
           <button className="secondaryBtn" onClick={() => setMerchOpen(true)}>View all merch</button>
         </div>

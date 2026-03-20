@@ -92,8 +92,8 @@ export function computeAccuracy(correctCount: number, wrongCount: number): numbe
 export function nextMasteryValue(current: number, correct: boolean, difficulty: number) {
   const safeCurrent = Number.isFinite(current) ? current : 50;
   const safeDifficulty = Math.max(1, Math.min(5, Math.round(Number(difficulty) || 1)));
-  const gain = 2.5 + safeDifficulty * 1.75;
-  const loss = 1.75 + safeDifficulty * 1.25;
+  const gain = 0.8 + safeDifficulty * 0.45;
+  const loss = 0.4 + safeDifficulty * 0.3;
   return Math.max(0, Math.min(100, Number((safeCurrent + (correct ? gain : -loss)).toFixed(1))));
 }
 
@@ -119,7 +119,7 @@ export function buildAdaptiveQuestionPlan<T extends { id: string; domainId?: str
 
   const scored = args.questions.map((question, index) => {
     const domain = domainEnumToId(question.domainId || "general");
-    const mastery = Number(masteryByDomain[domain] ?? 50);
+    const mastery = Number(masteryByDomain[domain] ?? 0);
     const targetDifficulty = masteryToTargetDifficulty(mastery);
     const level = Math.max(1, Math.min(3, Number(question.level || 1))) as 1 | 2 | 3;
     const recent = recency.get(question.id);

@@ -47,6 +47,7 @@ type AdminUser = {
 };
 
 type CareerMatchRow = { id: string; title: string; company?: string; domain: string; minLevel: number; minMastery: number; description: string; url: string; location?: string; salary?: string; isActive?: boolean };
+type LootVaultRow = { id: string; name: string; type: string; costTokens: number; description: string; isActive?: boolean; sweepstakesEntries?: number; fulfillmentUrl?: string };
 
 function asArray<T>(value: T[] | null | undefined): T[] {
   return Array.isArray(value) ? value : [];
@@ -62,100 +63,116 @@ function normalizeQuestionRow(q: any): Question {
 }
 
 
-function SweepstakesAdmin(){
-  const [campaign, setCampaign] = useState<any>(null);
-  const [rows, setRows] = useState<any[]>([]);
+function LootVaultAdmin(){
+  const [rows, setRows] = useState<LootVaultRow[]>([]);
+  const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState<string>("");
-  const [saving, setSaving] = useState(false);
-  const [draft, setDraft] = useState<any>({ title: "", prizePoolLabel: "", prizePoolCents: 0, termsUrl: "" });
+  const [err, setErr] = useState<string | null>(null);
 
   async function load(){
-    setMsg("");
-    const [campaignRes, summaryRes] = await Promise.all([
-      fetch('/api/admin/sweepstakes/campaign', { cache: 'no-store' as any }),
-      fetch('/api/sweepstakes/summary', { cache: 'no-store' as any }),
-    ]);
-    const campaignData = await campaignRes.json().catch(() => null);
-    const summaryData = await summaryRes.json().catch(() => null);
-    if (campaignRes.ok) {
-      setCampaign(campaignData?.campaign || null);
-      setDraft({
-        title: campaignData?.campaign?.title || "",
-        prizePoolLabel: campaignData?.campaign?.prizePoolLabel || "",
-        prizePoolCents: Number(campaignData?.campaign?.prizePoolCents || 0),
-        termsUrl: campaignData?.campaign?.termsUrl || "",
-      });
-    }
-    if (summaryRes.ok) setRows(Array.isArray(summaryData?.campaign?.leaderboard) ? summaryData.campaign.leaderboard : []);
+    setLoading(true); setErr(null);
+    try {
+      const res = await fetch('/api/admin/loot-vault', { cache: 'no-store' as any });
+      const data = await res.json().catch(() => null);
+      if (!res.ok) throw new Error(data?.error || 'Failed to load loot vault rewards');
+      setRows(asArray(data?.rows));
+    } catch (e: any) {
+      setErr(e?.message || 'Failed to load loot vault rewards');
+    } finally { setLoading(false); }
   }
 
-  useEffect(() => { load().catch((e) => setMsg(e?.message || 'Failed to load sweepstakes')); }, []);
+  useEffect(() => { load(); }, []);
 
+  function updateRow(id: string, patch: Partial<LootVaultRow>){
+    setRows(prev => prev.map(r => r.id === id ? { ...r, ...patch } : r));
+  }
+  function addRow(){
+    setRows(prev => ([...prev, { id: `reward-${Date.now()}`, name: 'New reward', type: 'SWEEPSTAKES_ENTRY', costTokens: 100, description: '', isActive: true, sweepstakesEntries: 1 }]));
+  }
+  function removeRow(id: string){
+    setRows(prev => prev.filter(r => r.id !== id));
+  }
   async function save(){
-    setSaving(true);
-    setMsg('');
-    try {
-      const res = await fetch('/api/admin/sweepstakes/campaign', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(draft) });
-      const data = await res.json().catch(() => null);
-      if (!res.ok) throw new Error(data?.error || 'Failed to save campaign');
-      setMsg('Saved sweepstakes settings.');
-      await load();
-    } catch (e:any) {
-      setMsg(e?.message || 'Failed to save campaign');
-    } finally { setSaving(false); }
-  }
-
-  async function drawWinner(){
-    setSaving(true);
-    setMsg('');
-    try {
-      const res = await fetch('/api/admin/sweepstakes/draw', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ campaignId: campaign?.id }) });
-      const data = await res.json().catch(() => null);
-      if (!res.ok) throw new Error(data?.error || 'Failed to draw winner');
-      setMsg(data?.winner?.user?.displayName ? `Winner selected: ${data.winner.user.displayName}` : 'Winner selected.');
-      await load();
-    } catch (e:any) {
-      setMsg(e?.message || 'Failed to draw winner');
-    } finally { setSaving(false); }
+    setMsg(''); setErr(null);
+    const res = await fetch('/api/admin/loot-vault', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ rows }) });
+    const data = await res.json().catch(() => null);
+    if (!res.ok) { setErr(data?.error || 'Failed to save loot vault rewards'); return; }
+    setMsg('Loot vault rewards saved. These can be tied to sweepstakes and future redemptions.');
+    await load();
   }
 
   return (
     <div className="card" style={{ marginTop: 14 }}>
       <div style={{ display:'flex', justifyContent:'space-between', gap:12, alignItems:'center', flexWrap:'wrap' }}>
         <div>
-          <div style={{ fontWeight: 900, fontSize: 20 }}>Sweepstakes</div>
-          <small>Manage the live drawing, prize pool label, and manually trigger a draw if needed.</small>
+          <div style={{ fontWeight: 900, fontSize: 20 }}>Loot Vault</div>
+          <small>Manage sweepstakes-linked rewards, cash-out options, merch, and token redemptions.</small>
         </div>
-        <div style={{ display:'flex', gap:10, flexWrap:'wrap' }}>
-          <button onClick={() => load()}>Refresh</button>
-          <button className="primary" disabled={saving} onClick={save}>Save campaign</button>
-          <button className="danger" disabled={saving || !campaign} onClick={drawWinner}>Draw winner now</button>
+        <div className="row" style={{ gap: 8, flexWrap:'wrap' }}>
+          <button onClick={addRow}>Add reward</button>
+          <button onClick={() => { window.location.href = '/admin/sweepstakes'; }}>Open Sweepstakes Admin</button>
+          <button className="primary" onClick={save}>Save rewards</button>
         </div>
       </div>
-      {msg ? <div style={{ marginTop: 10, opacity: 0.85 }}>{msg}</div> : null}
-      <div className="grid2" style={{ marginTop: 14 }}>
-        <div className="card">
-          <div style={{ fontWeight: 800, marginBottom: 10 }}>Campaign settings</div>
-          <label>Title<input value={draft.title || ''} onChange={(e) => setDraft((d:any) => ({ ...d, title: e.target.value }))} /></label>
-          <label style={{ display:'block', marginTop:10 }}>Prize pool label<input value={draft.prizePoolLabel || ''} onChange={(e) => setDraft((d:any) => ({ ...d, prizePoolLabel: e.target.value }))} /></label>
-          <label style={{ display:'block', marginTop:10 }}>Prize pool cents<input type="number" value={draft.prizePoolCents || 0} onChange={(e) => setDraft((d:any) => ({ ...d, prizePoolCents: Number(e.target.value || 0) }))} /></label>
-          <label style={{ display:'block', marginTop:10 }}>Terms URL<input value={draft.termsUrl || ''} onChange={(e) => setDraft((d:any) => ({ ...d, termsUrl: e.target.value }))} /></label>
-          {campaign ? <div style={{ marginTop: 12, opacity: 0.8 }}>Current: {campaign.status} • {new Date(campaign.startsAt).toLocaleString()} → {new Date(campaign.endsAt).toLocaleString()}</div> : null}
-        </div>
-        <div className="card">
-          <div style={{ fontWeight: 800, marginBottom: 10 }}>Entry leaderboard</div>
-          <div style={{ display:'grid', gap:8 }}>
-            {rows.length ? rows.slice(0, 12).map((row) => (
-              <div key={row.userId} style={{ border:'1px solid rgba(255,255,255,0.1)', borderRadius:12, padding:10, display:'flex', justifyContent:'space-between', gap:10 }}>
-                <div>
-                  <div style={{ fontWeight:700 }}>{row.displayName}</div>
-                  <div style={{ opacity:0.75, marginTop:4 }}>{row.quantity} entries • {row.tickets} grants</div>
-                </div>
-                {row.isWinner ? <span className="badge">Winner</span> : null}
-              </div>
-            )) : <small>No entries yet.</small>}
+      {err ? <div className="card" style={{ marginTop: 12, borderColor:'rgba(255,80,80,0.35)', background:'rgba(255,80,80,0.08)' }}>{err}</div> : null}
+      {msg ? <div className="card" style={{ marginTop: 12, borderColor:'rgba(80,255,120,0.25)', background:'rgba(80,255,120,0.08)' }}>{msg}</div> : null}
+      <div style={{ marginTop: 12, display:'grid', gap: 12 }}>
+        {loading ? <div>Loading loot vault rewards…</div> : rows.map((row) => (
+          <div key={row.id} className="card" style={{ padding: 12 }}>
+            <div style={{ display:'grid', gap: 10, gridTemplateColumns:'1.1fr 0.9fr 0.7fr 0.7fr auto', alignItems:'end' }}>
+              <label><small>Name</small><input value={row.name} onChange={(e)=>updateRow(row.id,{ name:e.target.value })} /></label>
+              <label><small>Type</small><input value={row.type} onChange={(e)=>updateRow(row.id,{ type:e.target.value.toUpperCase() })} /></label>
+              <label><small>Token cost</small><input type="number" value={row.costTokens} onChange={(e)=>updateRow(row.id,{ costTokens:Number(e.target.value||0) })} /></label>
+              <label><small>Sweepstakes entries</small><input type="number" value={row.sweepstakesEntries ?? 0} onChange={(e)=>updateRow(row.id,{ sweepstakesEntries:Number(e.target.value||0) })} /></label>
+              <button className="danger" onClick={() => removeRow(row.id)}>Delete</button>
+            </div>
+            <div style={{ marginTop: 10, display:'grid', gap: 10, gridTemplateColumns:'1fr 1fr auto', alignItems:'end' }}>
+              <label><small>Description</small><input value={row.description} onChange={(e)=>updateRow(row.id,{ description:e.target.value })} /></label>
+              <label><small>Fulfillment URL (optional)</small><input value={row.fulfillmentUrl || ''} onChange={(e)=>updateRow(row.id,{ fulfillmentUrl:e.target.value })} /></label>
+              <label style={{ display:'flex', gap:8, alignItems:'center', paddingBottom:6 }}><input type='checkbox' checked={row.isActive !== false} onChange={(e)=>updateRow(row.id,{ isActive:e.target.checked })} /> Active</label>
+            </div>
           </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function SweepstakesAdminInline(){
+  const [rows, setRows] = useState<any[]>([]);
+  const [msg, setMsg] = useState('');
+  async function load() {
+    const res = await fetch('/api/admin/sweepstakes/campaign', { cache: 'no-store' as any });
+    const data = await res.json().catch(() => ({}));
+    if (data?.ok) {
+      setRows(Array.isArray(data?.campaigns) ? data.campaigns : data?.campaign ? [data.campaign] : []);
+      setMsg('');
+    } else {
+      setMsg(data?.error || 'Failed to load sweepstakes');
+    }
+  }
+  useEffect(() => { load(); }, []);
+  return (
+    <div className="card" style={{ marginTop: 14 }}>
+      <div style={{ display:'flex', justifyContent:'space-between', gap:10, alignItems:'center', flexWrap:'wrap' }}>
+        <div>
+          <div style={{ fontWeight: 900, fontSize: 20 }}>Sweepstakes</div>
+          <small>Manage live and past drawings, token-cost entries, golden-question entry rules, and winners.</small>
         </div>
+        <div style={{ display:'flex', gap:10, flexWrap:'wrap' }}>
+          <button onClick={load}>Refresh</button>
+          <button className="primary" onClick={() => { window.location.href = '/admin/sweepstakes'; }}>Open Sweepstakes Admin</button>
+        </div>
+      </div>
+      {msg ? <div style={{ marginTop:10 }}><small>{msg}</small></div> : null}
+      <div style={{ display:'grid', gap:10, marginTop:12 }}>
+        {rows.length ? rows.slice(0, 6).map((row) => (
+          <div key={row.id} className="featureCard" style={{ padding:12 }}>
+            <div style={{ fontWeight:700 }}>{row.title}</div>
+            <small>{row.status} • {row.startsAt ? new Date(row.startsAt).toLocaleString() : '—'} → {row.endsAt ? new Date(row.endsAt).toLocaleString() : '—'}</small>
+            <div style={{ marginTop:6 }}><small>Winner: {row?.winner?.displayName || 'Pending'} • Entries: {row?.totalEntries || 0}</small></div>
+          </div>
+        )) : <small>No drawings yet.</small>}
       </div>
     </div>
   );
@@ -965,7 +982,7 @@ function Toast({ msg }:{ msg: string }){
 export default function AdminPage(){
   const [ok, setOk] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
-  const [tab, setTab] = useState<"questions" | "users" | "local" | "career" | "sweepstakes">("questions");
+  const [tab, setTab] = useState<"questions" | "users" | "local" | "career" | "loot" | "sweepstakes">("questions");
   const [bulkImporting, setBulkImporting] = useState(false);
 
   const [err, setErr] = useState<string | null>(null);
@@ -1347,6 +1364,7 @@ export default function AdminPage(){
         <div className="row" style={{ alignItems:"center", gap: 10, flexWrap:"wrap", justifyContent:"flex-end" }}>
           <button onClick={() => setTab("questions")} className={tab==="questions" ? "primary" : ""}>DB Question Bank</button>
           <button onClick={() => setTab("career")} className={tab==="career" ? "primary" : ""}>Career Matches</button>
+          <button onClick={() => setTab("loot")} className={tab==="loot" ? "primary" : ""}>Loot Vault</button>
           <button onClick={() => setTab("sweepstakes")} className={tab==="sweepstakes" ? "primary" : ""}>Sweepstakes</button>
           <button onClick={() => setTab("local")} className={tab==="local" ? "primary" : ""}>Local (Prototype)</button>
           <button onClick={() => setTab("users")} className={tab==="users" ? "primary" : ""}>DB Users</button>
@@ -1365,8 +1383,12 @@ export default function AdminPage(){
         <CareerMatchesAdmin />
       ) : null}
 
+      {tab === "loot" ? (
+        <LootVaultAdmin />
+      ) : null}
+
       {tab === "sweepstakes" ? (
-        <SweepstakesAdmin />
+        <SweepstakesAdminInline />
       ) : null}
 
       {tab === "local" ? (

@@ -4,6 +4,7 @@ import { ensureUser } from "@/app/api/_lib/ensureUser";
 import { getRequestUserId } from "@/app/api/_lib/authUser";
 import { normalizeDifficultyLevel, sampleQuestions, shuffleQuestionPayload } from "@/lib/questionTransforms";
 import { normalizeQuestionType } from "@/lib/questionTypes";
+import { getSweepstakesCampaignMetaMap } from "@/lib/sweepstakesCampaignMeta";
 import { awardRaffleEntries } from "@/lib/raffle";
 
 function mapQuestion(q: any) {
@@ -157,8 +158,6 @@ export async function PATCH(req: Request) {
         for (const row of answered) {
           const sessionQuestionId = String(row?.sessionQuestionId || "").trim();
           if (!sessionQuestionId) continue;
-          const existingQuestion = await tx.gameSessionQuestion.findUnique({ where: { id: sessionQuestionId }, include: { session: true } });
-          if (!existingQuestion) continue;
           await tx.gameSessionQuestion.update({
             where: { id: sessionQuestionId },
             data: {
@@ -168,21 +167,6 @@ export async function PATCH(req: Request) {
               answeredAt: new Date(),
             },
           });
-          if (existingQuestion.isGolden && row?.isCorrect === true) {
-            const auditKey = `golden-question:${existingQuestion.session.userId}:${sessionQuestionId}`;
-            const seen = await (tx as any).raffleEntry.findUnique?.({ where: { auditKey } }).catch(() => null);
-            if (!seen) {
-              await awardRaffleEntries(tx as any, {
-                userId: existingQuestion.session.userId,
-                source: "GOLDEN_QUESTION",
-                quantity: 1,
-                meta: { sessionId: existingQuestion.sessionId, sessionQuestionId, source: "test_now" } as any,
-                sourceRefType: "QUESTION",
-                sourceRefId: sessionQuestionId,
-                auditKey,
-              });
-            }
-          }
         }
       }
       await tx.gameSession.update({
@@ -196,6 +180,35 @@ export async function PATCH(req: Request) {
       });
     });
     const session = await (prisma as any).gameSession.findUnique({ where: { id: sessionId }, include: { questions: { orderBy: { orderIndex: "asc" } } } });
+
+    if (status === "COMPLETED" && session) {
+      const activeCampaign = await (prisma as any).sweepstakesCampaign.findFirst({
+        where: { status: "ACTIVE", isLive: true, startsAt: { lte: new Date() }, endsAt: { gte: new Date() } },
+        orderBy: { startsAt: "desc" },
+      }).catch(() => null);
+      if (activeCampaign) {
+        const metaMap = await getSweepstakesCampaignMetaMap().catch(() => new Map());
+        const meta = metaMap.get(String(activeCampaign.id));
+        if (meta?.allowGoldenQuestion) {
+          await prisma.$transaction(async (tx: any) => {
+            const fresh = await tx.gameSession.findUnique({ where: { id: sessionId }, include: { questions: { orderBy: { orderIndex: "asc" } } } });
+            for (const q of fresh?.questions || []) {
+              if (!q?.isGolden || !q?.isCorrect) continue;
+              await awardRaffleEntries(tx as any, {
+                userId: fresh.userId,
+                source: "GOLDEN_QUESTION",
+                quantity: 1,
+                campaignId: activeCampaign.id,
+                sourceRefType: "QUESTION",
+                sourceRefId: String(q.id),
+                auditKey: `golden-question:${String(q.id)}`,
+                meta: { sessionId: fresh.id, questionId: q.questionId } as any,
+              });
+            }
+          }).catch(() => null);
+        }
+      }
+    }
     return NextResponse.json(serializeSession(session));
   } catch (e: any) {
     return NextResponse.json({ error: e?.message || "Failed to update Test Now session" }, { status: 500 });

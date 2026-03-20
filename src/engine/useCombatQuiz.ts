@@ -106,7 +106,7 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
       const playerHP = clamp(s.playerHP - rules.playerDamageByTier[effTier], 0, rules.startHP);
       const enemyHP = s.enemyHP;
 
-      const prevMastery = s.mastery[domainId] ?? 50;
+      const prevMastery = s.mastery[domainId] ?? 0;
       const nextMastery = clamp(prevMastery - rules.masteryLossWrong, 0, 100);
 
       const mastery = { ...s.mastery, [domainId]: nextMastery };
@@ -164,7 +164,7 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
       const playerHP = clamp(correct ? s.playerHP : s.playerHP - rules.playerDamageByTier[effTier], 0, rules.startHP);
       const enemyHP = clamp(correct ? s.enemyHP - rules.enemyDamageByTier[effTier] : s.enemyHP, 0, rules.startHP);
 
-      const prevMastery = s.mastery[domainId] ?? 50;
+      const prevMastery = s.mastery[domainId] ?? 0;
       const masteryDelta = correct ? rules.masteryGainBase * effTier : -rules.masteryLossWrong;
       const nextMastery = clamp(prevMastery + masteryDelta, 0, 100);
 
@@ -222,7 +222,7 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
       const playerHP = clamp(correct ? s.playerHP : s.playerHP - rules.playerDamageByTier[effTier], 0, rules.startHP);
       const enemyHP = clamp(correct ? s.enemyHP - rules.enemyDamageByTier[effTier] : s.enemyHP, 0, rules.startHP);
 
-      const prevMastery = s.mastery[domainId] ?? 50;
+      const prevMastery = s.mastery[domainId] ?? 0;
       const masteryDelta = correct ? rules.masteryGainBase * effTier : -rules.masteryLossWrong;
       const nextMastery = clamp(prevMastery + masteryDelta, 0, 100);
       const mastery = { ...s.mastery, [domainId]: nextMastery };
@@ -284,7 +284,7 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
   }, [rules, timed, stopTimer]);
 
   const currentDomainId = useMemo(() => (q ? inferDomainId(q) : "general"), [q]);
-  const currentMastery = state.mastery[currentDomainId] ?? 50;
+  const currentMastery = state.mastery[currentDomainId] ?? 0;
   const masteryAvg = useMemo(() => masteryAverage(state.mastery), [state.mastery]);
 
   const outcome = useMemo(() => {

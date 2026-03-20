@@ -54,7 +54,7 @@ export async function POST(req: Request) {
     });
 
     // Update per-domain mastery (domain XP is a smaller slice of awarded XP)
-    const domainXP = Math.round(score.xpAwarded * 0.6);
+    const domainXP = Math.max(2, Math.round(score.xpAwarded * 0.15));
     await prisma.userDomain.upsert({
       where: { userId_domain: { userId: user.id, domain: body.domain } },
       update: { xp: { increment: domainXP }, lastPracticedAt: new Date() },
@@ -65,7 +65,7 @@ export async function POST(req: Request) {
 
     // Count domains that have crossed a mastery threshold
     const masteredDomains = await prisma.userDomain.count({
-      where: { userId: user.id, xp: { gte: 120 } }, // MVP threshold
+      where: { userId: user.id, xp: { gte: 2000 } }, // MVP threshold
     });
 
     const snapshot = {

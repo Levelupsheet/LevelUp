@@ -80,7 +80,11 @@ export async function POST(req: Request) {
 
       const pendingCount = await tx.lootBox.count({ where: { userId, status: "PENDING" } });
 
-      // Create a persistent notification only when we actually granted something
+      // Create a persistent notification only when we actually granted something.
+      // Dedupe by clearing any unread loot notices before inserting the current aggregate one.
+      await tx.notification.deleteMany({
+        where: { userId, type: "LOOT_BOX_EARNED", readAt: null },
+      });
       await tx.notification.create({
         data: {
           userId,

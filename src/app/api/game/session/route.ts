@@ -42,18 +42,20 @@ export async function POST(req: Request) {
       }
 
       for (const [domain, info] of domainMap.entries()) {
-        const targetXp = Math.max(0, Math.round(info.mastery * 4 + info.questions * 8 + info.level * 6));
-        const existingDomain = await tx.userDomain.findUnique({ where: { userId_domain: { userId, domain } } });
+        const domainXpIncrement = Math.max(
+          2,
+          Math.round(info.questions * (1 + info.level) + (Math.max(0, Math.min(100, info.mastery)) / 100) * 4)
+        );
         await tx.userDomain.upsert({
           where: { userId_domain: { userId, domain } },
           update: {
-            xp: existingDomain ? Math.max(existingDomain.xp, targetXp) : targetXp,
+            xp: { increment: domainXpIncrement },
             lastPracticedAt: new Date(),
           },
           create: {
             userId,
             domain,
-            xp: targetXp,
+            xp: domainXpIncrement,
             lastPracticedAt: new Date(),
           },
         });
