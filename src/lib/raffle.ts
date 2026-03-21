@@ -1,6 +1,7 @@
 import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
-import { ensureSweepstakesCoreTables, findActiveSweepstakesCampaign, findSweepstakesCampaignById, findSweepstakesCampaignBySlug, insertSweepstakesCampaign, listRaffleEntriesForCampaignWindow, updateSweepstakesWinner } from "@/lib/sweepstakesSql";
+import { ensureSweepstakesCoreTables, findActiveSweepstakesCampaign, findSweepstakesCampaignById, findSweepstakesCampaignBySlug, insertSweepstakesCampaign, listRaffleEntriesForCampaignWindow, updateSweepstakesWinner, listSweepstakesCampaigns } from "@/lib/sweepstakesSql";
+import { getSweepstakesCampaignMetaMap, upsertSweepstakesCampaignMeta } from "@/lib/sweepstakesCampaignMeta";
 
 export const RAFFLE_WEEKLY_ENTRY_LIMIT = 5;
 
@@ -69,6 +70,47 @@ export async function getOrCreateActiveSweepstakes(tx: typeof prisma = prisma) {
   }, tx as any);
 }
 
+
+export async function getOrCreateActiveGoldenSweepstakes(tx: typeof prisma = prisma) {
+  await ensureSweepstakesCoreTables(tx as any);
+  const now = new Date();
+  const rows = await listSweepstakesCampaigns(tx as any).catch(() => [] as any[]);
+  const metaMap = await getSweepstakesCampaignMetaMap().catch(() => new Map());
+  const activeGolden = (Array.isArray(rows) ? rows : []).find((row: any) => {
+    const meta = metaMap.get(String(row?.id || ''));
+    return Boolean(meta?.allowGoldenQuestion) && row?.status === 'ACTIVE' && Boolean(row?.isLive) && row?.startsAt && new Date(row.startsAt) <= now && row?.endsAt && new Date(row.endsAt) >= now;
+  });
+  if (activeGolden) return activeGolden;
+
+  const startsAt = now;
+  const endsAt = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);
+  const slug = `golden-${now.toISOString().slice(0,10)}-${now.getTime().toString().slice(-6)}`;
+  const title = `Golden Sweepstakes ${now.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+  const campaign = await insertSweepstakesCampaign({
+    id: typeof crypto.randomUUID === 'function' ? crypto.randomUUID() : `sw_${Date.now()}_${Math.random().toString(36).slice(2,8)}`,
+    slug,
+    title,
+    status: 'ACTIVE',
+    isLive: true,
+    startsAt,
+    endsAt,
+    prizePoolCents: 0,
+    prizePoolLabel: 'Golden Sweepstakes Entry Draw',
+    termsUrl: null,
+  }, tx as any);
+
+  await upsertSweepstakesCampaignMeta({
+    campaignId: String(campaign.id),
+    tokenCost: 0,
+    allowTokenEntry: false,
+    allowGoldenQuestion: true,
+    prizeValueUsd: 0,
+    rulesText: 'Golden sweepstakes entries are awarded from qualifying golden questions. One golden question entry per eligible session/level rules.',
+    shortDescription: 'Auto-created golden question draw',
+  }).catch(() => null);
+
+  return campaign;
+}
 async function insertOrUpdateExistingSweepstakes(id: string, input: { title: string; slug?: string; status: string; isLive: boolean; startsAt: Date; endsAt: Date; prizePoolCents: number; prizePoolLabel?: string | null; }, tx: any) {
   await tx.$executeRawUnsafe(`
     UPDATE "SweepstakesCampaign"

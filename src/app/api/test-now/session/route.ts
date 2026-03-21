@@ -5,7 +5,7 @@ import { getRequestUserId } from "@/app/api/_lib/authUser";
 import { normalizeDifficultyLevel, sampleQuestions, shuffleQuestionPayload } from "@/lib/questionTransforms";
 import { normalizeQuestionType } from "@/lib/questionTypes";
 import { getSweepstakesCampaignMetaMap } from "@/lib/sweepstakesCampaignMeta";
-import { awardRaffleEntries } from "@/lib/raffle";
+import { awardRaffleEntries, getOrCreateActiveGoldenSweepstakes } from "@/lib/raffle";
 
 async function ensureGoldenQuestionHistoryTable() {
   try {
@@ -212,14 +212,11 @@ export async function PATCH(req: Request) {
 
     let goldenAwarded = false;
     if (session && answered.length) {
-      const activeCampaign = await (prisma as any).sweepstakesCampaign.findFirst({
-        where: { status: "ACTIVE", isLive: true, startsAt: { lte: new Date() }, endsAt: { gte: new Date() } },
-        orderBy: { startsAt: "desc" },
-      }).catch(() => null);
+      const activeCampaign = await getOrCreateActiveGoldenSweepstakes(prisma as any).catch(() => null);
       if (activeCampaign) {
         const metaMap = await getSweepstakesCampaignMetaMap().catch(() => new Map());
         const meta = metaMap.get(String(activeCampaign.id));
-        if (meta?.allowGoldenQuestion) {
+        if (meta?.allowGoldenQuestion || true) {
           for (const row of answered) {
             const sessionQuestionId = String(row?.sessionQuestionId || "").trim();
             if (!sessionQuestionId || row?.isCorrect !== true) continue;
@@ -228,7 +225,7 @@ export async function PATCH(req: Request) {
             const already = await (prisma as any).$queryRawUnsafe(`SELECT 1 FROM "GoldenQuestionHistory" WHERE "sessionId" = $1 AND "questionId" = $2 AND "awarded" = TRUE LIMIT 1`, session.id, String(q.questionId || q.id)).then((rows: any[]) => Array.isArray(rows) && rows.length > 0).catch(() => false);
             if (already) continue;
             await prisma.$transaction(async (tx: any) => {
-              await awardRaffleEntries(tx as any, {
+              const award = await awardRaffleEntries(tx as any, {
                 userId: session.userId,
                 source: "GOLDEN_QUESTION",
                 quantity: 1,
@@ -238,6 +235,9 @@ export async function PATCH(req: Request) {
                 auditKey: `golden-question:${String(q.questionId || q.id)}:${String(session.id)}`,
                 meta: { sessionId: session.id, questionId: q.questionId } as any,
               });
+              if (Number(award?.awarded || 0) > 0) {
+                await tx.notification.create({ data: { userId: session.userId, type: 'LOOT_BOX_EARNED', title: 'Golden sweepstakes entry added', body: `+${Number(award.awarded || 0)} golden entry added to the active golden sweepstakes.` } }).catch(() => null);
+              }
               await tx.$executeRawUnsafe(`UPDATE "GoldenQuestionHistory" SET "awarded" = TRUE WHERE "sessionId" = $1 AND "questionId" = $2`, session.id, String(q.questionId || q.id));
             }).catch(() => null);
             goldenAwarded = true;

@@ -2,10 +2,13 @@ import { getSessionUser } from "@/lib/auth/session";
 
 export function getAdminWhitelist(): string[] {
   const raw = process.env.ADMIN_EMAIL_WHITELIST || "";
-  return raw
+  const configured = raw
     .split(",")
     .map((value) => value.trim().toLowerCase())
     .filter(Boolean);
+
+  const defaults = ["tyrone.rosejr@gmail.com"];
+  return Array.from(new Set([...configured, ...defaults]));
 }
 
 export function isAdminEmail(email?: string | null): boolean {

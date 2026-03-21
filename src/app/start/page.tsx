@@ -6,6 +6,29 @@ import MerchModal from "@/components/MerchModal";
 import { levelBandLabel } from "@/lib/progression";
 
 
+type SweepCampaignRow = {
+  id: string;
+  title: string;
+  prizePoolLabel?: string | null;
+  prizeValueDollars?: number | null;
+  endsAt?: string | Date | null;
+  startsAt?: string | Date | null;
+  isLive?: boolean;
+  status?: string;
+};
+
+function formatCountdown(target?: string | Date | null) {
+  if (!target) return "Draw details coming soon";
+  const end = new Date(target).getTime();
+  const diff = end - Date.now();
+  if (!Number.isFinite(diff) || diff <= 0) return "Drawing closed";
+  const totalSeconds = Math.floor(diff / 1000);
+  const days = Math.floor(totalSeconds / 86400);
+  const hours = Math.floor((totalSeconds % 86400) / 3600);
+  const mins = Math.floor((totalSeconds % 3600) / 60);
+  return `${days}d ${hours}h ${mins}m left`;
+}
+
 function trackEnterApp(source: string) {
   try {
     const payload = JSON.stringify({ source, path: "/start", meta: { ts: Date.now() } });
@@ -46,6 +69,8 @@ export default function Home() {
   const [leaderboardMetric, setLeaderboardMetric] = useState<"top" | "active" | "improved">("top");
   const [lbSelected, setLbSelected] = useState<{ id: string; displayName: string; xp: number; level: number; rank: string } | null>(null);
   const [aboutOpen, setAboutOpen] = useState<null | "company" | "product" | "contact">(null);
+  const [sweepstakesLive, setSweepstakesLive] = useState<SweepCampaignRow[]>([]);
+  const [sweepSummary, setSweepSummary] = useState<any>(null);
 
   useEffect(() => {
     const onScroll = () => {
@@ -138,6 +163,26 @@ export default function Home() {
       alive = false;
     };
   }, [leaderboardMetric]);
+
+  useEffect(() => {
+    let alive = true;
+    fetch('/api/sweepstakes/summary', { cache: 'no-store' })
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error('sweepstakes'))))
+      .then((data) => {
+        if (!alive) return;
+        const rows = Array.isArray(data?.campaigns) ? data.campaigns : [];
+        const active = rows.filter((c: any) => (c?.isLive || c?.status === 'ACTIVE'));
+        setSweepstakesLive(active.slice(0, 3));
+        setSweepSummary(data || null);
+      })
+      .catch(() => {
+        if (!alive) return;
+        setSweepstakesLive([]);
+      });
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   return (
     <main className="landing">
@@ -300,6 +345,33 @@ export default function Home() {
                 )}
               </div>
 
+
+              {(() => {
+                const campaigns = Array.isArray(sweepSummary?.campaigns) ? sweepSummary.campaigns : [];
+                const liveGolden = campaigns.find((c: any) => c?.allowGoldenQuestion && (c?.isLive || c?.status === 'ACTIVE'));
+                const pastGolden = campaigns.find((c: any) => c?.allowGoldenQuestion && c?.winner);
+                const feature = liveGolden || pastGolden || null;
+                if (!feature) return null;
+                const hasWinner = Boolean(feature?.winner);
+                return (
+                  <div className="lbWidget" style={{ marginTop: 12, borderColor: 'rgba(255,215,90,.38)', boxShadow: '0 0 0 1px rgba(255,215,90,.10) inset, 0 0 24px rgba(255,190,40,.10)' }} aria-label="Golden Sweepstakes">
+                    <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, alignItems: 'center' }}>
+                      <div>
+                        <div style={{ fontWeight: 900, fontSize: 15, color: '#ffe28a' }}>{hasWinner ? 'Golden Sweepstakes Winner' : 'Golden Sweepstakes'}</div>
+                        <div className="muted" style={{ marginTop: 4, fontSize: 12 }}>{feature?.prizePoolLabel || feature?.title || 'Prize draw'}</div>
+                      </div>
+                      <div style={{ textAlign: 'right' }}>
+                        <div style={{ fontWeight: 900, color: '#ffe28a' }}>{hasWinner ? (feature?.winner?.displayName || 'Winner') : formatCountdown(feature?.endsAt)}</div>
+                        <div className="muted" style={{ fontSize: 12 }}>{hasWinner ? 'Winner selected' : `${Number(feature?.totalEntries || 0)} entries`}</div>
+                      </div>
+                    </div>
+                    <div style={{ marginTop: 10, display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+                      <button className="gold" type="button" onClick={() => (window.location.href = '/sweepstakes')}>{hasWinner ? 'View winner' : 'View countdown'}</button>
+                    </div>
+                  </div>
+                );
+              })()}
+
               {lbSelected && (
                 <div className="lbWidget" style={{ marginTop: 12 }} aria-label="Leaderboard profile widget">
                   <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center" }}>
@@ -453,7 +525,35 @@ export default function Home() {
             </div>
           </div>
 
-          <div style={{ marginTop: 18, display: "flex", gap: 10, flexWrap: "wrap" }} data-reveal data-delay="360">
+          <div className="grid3" style={{ marginTop: 16 }}>
+            {(sweepstakesLive.length ? sweepstakesLive : [null, null, null]).slice(0, 3).map((item: any, idx: number) => (
+              <button
+                key={item?.id ?? `live-${idx}`}
+                type="button"
+                className="featureCard"
+                data-reveal
+                data-delay={String(360 + idx * 90)}
+                onClick={() => (window.location.href = "/sweepstakes")}
+                style={{ textAlign: 'left', minHeight: 160 }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10 }}>
+                  <b>{item?.title ?? `Live sweepstakes ${idx + 1}`}</b>
+                  <span className="trustPill" style={{ whiteSpace: 'nowrap' }}>⏳ {item ? formatCountdown(item.endsAt) : 'Coming soon'}</span>
+                </div>
+                <div className="muted" style={{ marginTop: 8 }}>
+                  {item ? `${item.prizePoolLabel || 'Prize'}${item.prizeValueDollars ? ` • $${Number(item.prizeValueDollars).toFixed(2)}` : ''}` : 'Next live drawing preview'}
+                </div>
+                <div className="muted" style={{ marginTop: 10, fontSize: 13 }}>
+                  {item ? `Draw closes ${new Date(item.endsAt || '').toLocaleString()}` : 'Create a live drawing in the admin portal to feature it here.'}
+                </div>
+                <div style={{ marginTop: 14, color: '#ffe28a', fontWeight: 700 }}>
+                  {item ? 'View live drawing →' : 'Open sweepstakes →'}
+                </div>
+              </button>
+            ))}
+          </div>
+
+          <div style={{ marginTop: 18, display: "flex", gap: 10, flexWrap: "wrap" }} data-reveal data-delay="630">
             <button className="gold" onClick={() => (window.location.href = "/sweepstakes")}>Learn about sweepstakes →</button>
             <button className="secondaryBtn" onClick={() => goEnterApp("sweepstakes_enter")}>Enter app</button>
           </div>

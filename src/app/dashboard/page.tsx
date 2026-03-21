@@ -35,6 +35,7 @@ type Badge = { id: string; label: string; issuedAt: string; expiresAt: string; c
 type Offer = { id: string; title: string; salaryText: string; createdAt: string; companyName: string; roleLabel: string };
 type LearningRow = { domain: string; mastery: number; accuracy: number; currentDifficulty: number; correctCount: number; wrongCount: number };
 type CareerMatchRow = { id: string; title: string; domain: string; description: string; url: string; location?: string; salary?: string; minLevel: number; minMastery: number };
+type SweepstakesSummary = { current?: any | null; user?: any | null; campaigns?: any[] }
 
 
 function labelPos(p: string){
@@ -96,6 +97,7 @@ export default function Dashboard() {
   const [learningRows, setLearningRows] = useState<LearningRow[]>([]);
   const [overallMastery, setOverallMastery] = useState<number>(0);
   const [careerMatches, setCareerMatches] = useState<CareerMatchRow[]>([]);
+  const [sweepSummary, setSweepSummary] = useState<SweepstakesSummary | null>(null);
 
   // Level-up detection (notification-only; user opens vault when ready)
   const prevLevelRef = useRef<number>(0);
@@ -184,6 +186,11 @@ export default function Dashboard() {
           } catch {}
         }
       } catch {}
+      try {
+        const swRes = await fetch(`/api/sweepstakes/summary`, { cache: "no-store" as any });
+        const swData = await swRes.json().catch(() => null);
+        if (swRes.ok) setSweepSummary(swData || null);
+      } catch {}
     } catch (e: any) {
       console.error(e.message ?? "Error");
     } finally {
@@ -265,6 +272,8 @@ export default function Dashboard() {
           return;
         }
 
+        const emailNorm = String(authUser.email || "").trim().toLowerCase();
+        setIsAdminUser(Boolean(authUser.isAdmin) || emailNorm === "tyrone.rosejr@gmail.com");
         const synced = syncAuthenticatedUser({
           id: authUser.id,
           displayName: authUser.name || authUser.email,
@@ -764,6 +773,25 @@ export default function Dashboard() {
               <p><small>No notifications yet.</small></p>
             )}
           </div>
+
+
+
+          {sweepSummary?.current ? (
+            <div className="card" style={{ marginTop: 14, borderColor: 'rgba(255,215,90,.22)', boxShadow: '0 0 0 1px rgba(255,215,90,.06) inset' }}>
+              <div style={{ display:'flex', justifyContent:'space-between', gap:12, alignItems:'center', flexWrap:'wrap' }}>
+                <div>
+                  <h3 style={{ margin: 0 }}>Active sweepstakes</h3>
+                  <div><small>{sweepSummary.current.title} • {sweepSummary.current.prizePoolLabel || 'Prize drawing'}</small></div>
+                </div>
+                <a className="secondaryBtn" href="/sweepstakes">Open sweepstakes</a>
+              </div>
+              <div style={{ marginTop: 10, display:'flex', gap:10, flexWrap:'wrap' }}>
+                <span className="badge">Your entries: {Number(sweepSummary?.user?.campaignEntries || 0)}</span>
+                <span className="badge">Tokens: {Number(sweepSummary?.user?.tokenBalance || 0)}</span>
+                <span className="badge">Draw closes: {sweepSummary.current?.endsAt ? new Date(sweepSummary.current.endsAt).toLocaleString() : 'TBD'}</span>
+              </div>
+            </div>
+          ) : null}
 
           <AdaptiveLearningCard overallMastery={overallMastery} rows={learningRows} />
 
