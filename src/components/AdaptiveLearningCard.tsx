@@ -44,28 +44,29 @@ export default function AdaptiveLearningCard(props: {
           const accuracy = clamp(row.accuracy);
           const totalAnswered = Math.max(0, Number(row.correctCount || 0) + Number(row.wrongCount || 0));
           const tone = masteryTone(mastery);
+          const hasAnswers = totalAnswered > 0;
           return (
-            <div key={row.domain} className="adaptiveRow">
-              <div className="adaptiveRowTop">
+            <div key={row.domain} className="adaptiveRow" style={{ border: '1px solid rgba(255,255,255,.08)', borderRadius: 14, padding: 12, background: 'rgba(255,255,255,.02)' }}>
+              <div className="adaptiveRowTop" style={{ display:'flex', justifyContent:'space-between', gap:10, alignItems:'center', flexWrap:'wrap' }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
-                  <div className="adaptiveDomainLabel">{domainLabel(row.domain)}</div>
-                  <span className="adaptiveMiniBadge" style={{ borderColor: `${tone.color}55`, color: tone.color }}>
+                  <div className="adaptiveDomainLabel" style={{ fontWeight: 800, fontSize: 15 }}>{domainLabel(row.domain)}</div>
+                  <span className="adaptiveMiniBadge" style={{ border: `1px solid ${tone.color}55`, color: tone.color, borderRadius: 999, padding: '4px 10px', fontSize: 12, fontWeight: 700 }}>
                     {mastery}% mastery
                   </span>
                 </div>
-                <div className="adaptiveMetaRight">
-                  <span>{row.correctCount} correct</span>
+                <div className="adaptiveMetaRight" style={{ display:'flex', alignItems:'center', gap:8, flexWrap:'wrap', color:'rgba(255,255,255,.72)', fontSize:12 }}>
+                  <span>{hasAnswers ? `${row.correctCount} correct` : 'No graded answers yet'}</span>
                   <span>•</span>
                   <span>{accuracy}% accuracy</span>
                   <span>•</span>
                   <span>D{row.currentDifficulty}</span>
                 </div>
               </div>
-              <div className="adaptiveTrack">
-                <div className="adaptiveFill" style={{ width: `${mastery}%`, background: tone.bg }} />
+              <div className="adaptiveTrack" style={{ height: 14, borderRadius: 999, background:'rgba(255,255,255,.08)', overflow:'hidden', marginTop:10 }}>
+                <div className="adaptiveFill" style={{ width: `${mastery}%`, height:'100%', background: tone.bg, borderRadius: 999 }} />
               </div>
-              <div className="adaptiveRowBottom">
-                <div className="adaptiveCounts">{row.correctCount} / {Math.max(totalAnswered, 0)} answers correct</div>
+              <div className="adaptiveRowBottom" style={{ display:'flex', justifyContent:'space-between', gap:10, flexWrap:'wrap', color:'rgba(255,255,255,.72)', fontSize:12, marginTop:8 }}>
+                <div className="adaptiveCounts">{hasAnswers ? `${row.correctCount} / ${totalAnswered} answered correctly` : 'Keep practicing to build measured accuracy.'}</div>
                 <div className="adaptiveCounts">{row.wrongCount} missed</div>
               </div>
             </div>

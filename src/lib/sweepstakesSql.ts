@@ -3,8 +3,52 @@ import { prisma } from '@/lib/prisma';
 type DbLike = any;
 const dbClient = (db?: DbLike) => db || prisma;
 
+export async function ensureSweepstakesCoreTables(db?: DbLike) {
+  const p = dbClient(db);
+  await p.$executeRawUnsafe(`
+    DO $$
+    BEGIN
+      IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'SweepstakesCampaignStatus') THEN
+        CREATE TYPE "SweepstakesCampaignStatus" AS ENUM ('DRAFT', 'ACTIVE', 'CLOSED', 'DRAWN');
+      END IF;
+    END $$;
+  `);
+
+  await p.$executeRawUnsafe(`
+    CREATE TABLE IF NOT EXISTS "SweepstakesCampaign" (
+      "id" TEXT NOT NULL,
+      "slug" TEXT NOT NULL,
+      "title" TEXT NOT NULL,
+      "status" "SweepstakesCampaignStatus" NOT NULL DEFAULT 'DRAFT',
+      "isLive" BOOLEAN NOT NULL DEFAULT false,
+      "startsAt" TIMESTAMP(3) NOT NULL,
+      "endsAt" TIMESTAMP(3) NOT NULL,
+      "drawnAt" TIMESTAMP(3),
+      "winnerEntryId" TEXT,
+      "winnerUserId" TEXT,
+      "prizePoolCents" INTEGER NOT NULL DEFAULT 0,
+      "prizePoolLabel" TEXT,
+      "termsUrl" TEXT,
+      "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      CONSTRAINT "SweepstakesCampaign_pkey" PRIMARY KEY ("id")
+    )
+  `);
+
+  await p.$executeRawUnsafe(`
+    CREATE UNIQUE INDEX IF NOT EXISTS "SweepstakesCampaign_slug_key"
+    ON "SweepstakesCampaign"("slug")
+  `);
+
+  await p.$executeRawUnsafe(`
+    CREATE INDEX IF NOT EXISTS "SweepstakesCampaign_status_startsAt_endsAt_idx"
+    ON "SweepstakesCampaign"("status", "startsAt", "endsAt")
+  `);
+}
+
 export async function ensureSweepstakesMetaTable(db?: DbLike) {
   const p = dbClient(db);
+  await ensureSweepstakesCoreTables(p);
   await p.$executeRawUnsafe(`
     CREATE TABLE IF NOT EXISTS "SweepstakesCampaignMeta" (
       "campaignId" TEXT PRIMARY KEY,
@@ -25,6 +69,7 @@ export async function ensureSweepstakesMetaTable(db?: DbLike) {
 
 export async function listSweepstakesCampaigns(db?: DbLike): Promise<any[]> {
   const p = dbClient(db);
+  await ensureSweepstakesCoreTables(p);
   const rows = await p.$queryRawUnsafe(`
     SELECT * FROM "SweepstakesCampaign"
     ORDER BY "startsAt" DESC, "createdAt" DESC
@@ -34,6 +79,7 @@ export async function listSweepstakesCampaigns(db?: DbLike): Promise<any[]> {
 
 export async function findSweepstakesCampaignById(id: string, db?: DbLike) {
   const p = dbClient(db);
+  await ensureSweepstakesCoreTables(p);
   const rows = await p.$queryRawUnsafe(`
     SELECT * FROM "SweepstakesCampaign" WHERE "id" = $1 LIMIT 1
   `, id);
@@ -42,6 +88,7 @@ export async function findSweepstakesCampaignById(id: string, db?: DbLike) {
 
 export async function findSweepstakesCampaignBySlug(slug: string, db?: DbLike) {
   const p = dbClient(db);
+  await ensureSweepstakesCoreTables(p);
   const rows = await p.$queryRawUnsafe(`
     SELECT * FROM "SweepstakesCampaign" WHERE "slug" = $1 LIMIT 1
   `, slug);
@@ -50,6 +97,7 @@ export async function findSweepstakesCampaignBySlug(slug: string, db?: DbLike) {
 
 export async function findActiveSweepstakesCampaign(db?: DbLike) {
   const p = dbClient(db);
+  await ensureSweepstakesCoreTables(p);
   const rows = await p.$queryRawUnsafe(`
     SELECT * FROM "SweepstakesCampaign"
     WHERE "status" = 'ACTIVE'
@@ -75,6 +123,7 @@ export async function insertSweepstakesCampaign(input: {
   termsUrl?: string | null;
 }, db?: DbLike) {
   const p = dbClient(db);
+  await ensureSweepstakesCoreTables(p);
   await p.$executeRawUnsafe(`
     INSERT INTO "SweepstakesCampaign"
       ("id", "slug", "title", "status", "isLive", "startsAt", "endsAt", "prizePoolCents", "prizePoolLabel", "termsUrl")
@@ -107,6 +156,7 @@ export async function updateSweepstakesCampaign(input: {
   termsUrl?: string | null;
 }, db?: DbLike) {
   const p = dbClient(db);
+  await ensureSweepstakesCoreTables(p);
   await p.$executeRawUnsafe(`
     UPDATE "SweepstakesCampaign"
     SET "title" = $2,
@@ -141,6 +191,7 @@ export async function updateSweepstakesWinner(input: {
   drawnAt?: Date;
 }, db?: DbLike) {
   const p = dbClient(db);
+  await ensureSweepstakesCoreTables(p);
   await p.$executeRawUnsafe(`
     UPDATE "SweepstakesCampaign"
     SET "winnerEntryId" = $2,
