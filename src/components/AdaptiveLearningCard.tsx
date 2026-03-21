@@ -2,6 +2,15 @@
 
 import { domainLabel } from "@/lib/learningProfile";
 
+const DOMAIN_COLORS: Record<string, { fill: string; soft: string; badge: string }> = {
+  AWS: { fill: 'linear-gradient(90deg,#60a5fa,#3b82f6)', soft: 'rgba(59,130,246,.18)', badge: '#93c5fd' },
+  AZURE: { fill: 'linear-gradient(90deg,#22d3ee,#06b6d4)', soft: 'rgba(6,182,212,.18)', badge: '#67e8f9' },
+  NETWORKING: { fill: 'linear-gradient(90deg,#34d399,#22c55e)', soft: 'rgba(34,197,94,.18)', badge: '#86efac' },
+  SECURITY: { fill: 'linear-gradient(90deg,#f59e0b,#eab308)', soft: 'rgba(234,179,8,.18)', badge: '#fde68a' },
+  IDENTITY: { fill: 'linear-gradient(90deg,#a78bfa,#8b5cf6)', soft: 'rgba(139,92,246,.18)', badge: '#c4b5fd' },
+  WINDOWS: { fill: 'linear-gradient(90deg,#fb7185,#f43f5e)', soft: 'rgba(244,63,94,.18)', badge: '#fda4af' },
+};
+
 type DomainRow = {
   domain: string;
   mastery: number;
@@ -15,12 +24,11 @@ function clamp(v: number) {
   return Math.max(0, Math.min(100, Number.isFinite(v) ? v : 0));
 }
 
-function masteryTone(mastery: number) {
+function masteryTone(domain: string, mastery: number) {
   const v = clamp(mastery);
-  if (v >= 80) return { color: "#eab308", track: "rgba(234,179,8,.18)", bg: "linear-gradient(90deg,#f59e0b,#eab308)" };
-  if (v >= 55) return { color: "#22c55e", track: "rgba(34,197,94,.16)", bg: "linear-gradient(90deg,#34d399,#22c55e)" };
-  if (v >= 30) return { color: "#38bdf8", track: "rgba(56,189,248,.16)", bg: "linear-gradient(90deg,#38bdf8,#6366f1)" };
-  return { color: "#94a3b8", track: "rgba(148,163,184,.14)", bg: "linear-gradient(90deg,#64748b,#94a3b8)" };
+  const domainTone = DOMAIN_COLORS[String(domain || '').toUpperCase()] || { fill: 'linear-gradient(90deg,#64748b,#94a3b8)', soft: 'rgba(148,163,184,.14)', badge: '#cbd5e1' };
+  if (v <= 0) return { color: '#94a3b8', track: 'rgba(148,163,184,.14)', bg: 'linear-gradient(90deg,#64748b,#94a3b8)', badge: '#94a3b8' };
+  return { color: domainTone.badge, track: domainTone.soft, bg: domainTone.fill, badge: domainTone.badge };
 }
 
 export default function AdaptiveLearningCard(props: {
@@ -43,13 +51,16 @@ export default function AdaptiveLearningCard(props: {
           const mastery = clamp(row.mastery);
           const accuracy = clamp(row.accuracy);
           const totalAnswered = Math.max(0, Number(row.correctCount || 0) + Number(row.wrongCount || 0));
-          const tone = masteryTone(mastery);
+          const tone = masteryTone(row.domain, mastery);
           const hasAnswers = totalAnswered > 0;
           return (
             <div key={row.domain} style={{ border: '1px solid rgba(255,255,255,.08)', borderRadius: 14, padding: 12, background: 'rgba(255,255,255,.02)' }}>
               <div style={{ display:'grid', gridTemplateColumns:'minmax(110px,160px) 1fr auto', gap:12, alignItems:'center' }} className="adaptiveGrid">
-                <div style={{ fontWeight: 800, fontSize: 15 }}>{domainLabel(row.domain)}</div>
-                <div style={{ height: 16, borderRadius: 999, background:'rgba(255,255,255,.08)', overflow:'hidden', position:'relative' }}>
+                <div style={{ display:'flex', alignItems:'center', gap:10, flexWrap:'wrap' }}>
+                  <div style={{ fontWeight: 800, fontSize: 15 }}>{domainLabel(row.domain)}</div>
+                  <span style={{ fontSize:12, color:tone.badge, border:`1px solid ${tone.track}`, background:tone.track, borderRadius:999, padding:'2px 8px', fontWeight:700 }}>{mastery.toFixed(1)}% mastery</span>
+                </div>
+                <div style={{ height: 16, borderRadius: 999, background:'rgba(255,255,255,.08)', overflow:'hidden', position:'relative', boxShadow: mastery > 0 ? `inset 0 0 0 1px ${tone.track}` : undefined }}>
                   <div style={{ width: `${mastery}%`, height:'100%', background: tone.bg, borderRadius: 999 }} />
                 </div>
                 <div style={{ fontWeight: 800, color: tone.color, minWidth: 52, textAlign: 'right' }}>{mastery}%</div>

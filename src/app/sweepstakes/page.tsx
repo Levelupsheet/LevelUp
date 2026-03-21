@@ -25,78 +25,157 @@ type Campaign = {
   leaderboard?: Array<{ userId: string; displayName: string; quantity: number; isWinner?: boolean }>;
 };
 
-function Countdown({ endsAt }: { endsAt?: string }) {
-  const [now, setNow] = useState(Date.now());
-  useEffect(() => { const t = setInterval(() => setNow(Date.now()), 1000); return () => clearInterval(t); }, []);
-  const label = useMemo(() => {
-    if (!endsAt) return 'No draw date set';
-    const diff = new Date(endsAt).getTime() - now;
-    if (diff <= 0) return 'Drawing closed';
-    const total = Math.floor(diff / 1000);
-    const d = Math.floor(total / 86400);
-    const h = Math.floor((total % 86400) / 3600);
-    const m = Math.floor((total % 3600) / 60);
-    const s = total % 60;
-    return `${d}d ${h}h ${m}m ${s}s`;
-  }, [endsAt, now]);
-  return <div className="muted">Countdown: {label}</div>;
+type UserSummary = {
+  tokenBalance?: number;
+  weeklyCount?: number;
+  weeklyLimit?: number;
+  campaignEntries?: number;
+};
+
+function formatCountdown(endsAt?: string, now: number = Date.now()) {
+  if (!endsAt) return 'No draw date set';
+  const diff = new Date(endsAt).getTime() - now;
+  if (diff <= 0) return 'Drawing closed';
+  const total = Math.floor(diff / 1000);
+  const d = Math.floor(total / 86400);
+  const h = Math.floor((total % 86400) / 3600);
+  const m = Math.floor((total % 3600) / 60);
+  const s = total % 60;
+  return `${d}d ${h}h ${m}m ${s}s`;
 }
 
-function SweepstakesModal({ campaign, user, onClose, onEntered }: { campaign: Campaign | null; user: any; onClose: ()=>void; onEntered: ()=>void; }) {
+function Countdown({ endsAt, compact = false }: { endsAt?: string; compact?: boolean }) {
+  const [now, setNow] = useState(Date.now());
+  useEffect(() => { const t = setInterval(() => setNow(Date.now()), 1000); return () => clearInterval(t); }, []);
+  const label = useMemo(() => formatCountdown(endsAt, now), [endsAt, now]);
+  return <div className={compact ? 'badge' : 'muted'} style={compact ? undefined : { marginTop: 8 }}>⏳ {label}</div>;
+}
+
+function looksLikeImage(url?: string | null) {
+  const v = String(url || '').toLowerCase();
+  return /(\.png|\.jpe?g|\.gif|\.webp|\.svg)(\?|$)/.test(v);
+}
+
+function TermsModal({ campaign, onClose }: { campaign: Campaign | null; onClose: () => void }) {
   if (!campaign) return null;
+  return (
+    <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,.72)', display:'grid', placeItems:'center', zIndex:1100, padding:20 }} onClick={onClose}>
+      <div className="glass" style={{ width:'min(840px, 96vw)', maxHeight:'88vh', overflow:'auto', padding:20 }} onClick={(e)=>e.stopPropagation()}>
+        <div style={{ display:'flex', justifyContent:'space-between', gap:10, alignItems:'center' }}>
+          <div>
+            <div className="muted" style={{ fontSize: 12 }}>Terms and conditions</div>
+            <h3 style={{ margin:'6px 0 0 0' }}>{campaign.title}</h3>
+          </div>
+          <button className="secondaryBtn" onClick={onClose}>Close</button>
+        </div>
+        <div className="featureCard" style={{ marginTop: 14 }}>
+          <div style={{ whiteSpace:'pre-wrap', lineHeight:1.6 }}>{campaign.rulesText || 'Rules will be published here for the live drawing.'}</div>
+          {campaign.rulesUrl ? <div style={{ marginTop: 12 }}><a href={campaign.rulesUrl} target="_blank" rel="noreferrer">Open full rules ↗</a></div> : null}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SweepstakesModal({ campaign, user, onClose, onEntered }: { campaign: Campaign | null; user: UserSummary | null; onClose: ()=>void; onEntered: ()=>void; }) {
+  const [showTerms, setShowTerms] = useState(false);
+  if (!campaign) return null;
+
+  const tokenCost = Math.max(0, Number(campaign.tokenCost || 0));
+  const balance = Math.max(0, Number(user?.tokenBalance || 0));
+  const nextBalance = Math.max(0, balance - tokenCost);
+  const canAfford = balance >= tokenCost;
+
   async function enterTokens() {
-    const res = await fetch('/api/sweepstakes/enter', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ campaignId: campaign.id, quantity: 1 }) });
+    const confirmed = window.confirm(`Enter ${campaign.title} for ${tokenCost} tokens?\nCurrent balance: ${balance}\nNew balance after entry: ${nextBalance}`);
+    if (!confirmed) return;
+
+    const res = await fetch('/api/sweepstakes/enter', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ campaignId: campaign.id, quantity: 1 }),
+    });
     const data = await res.json().catch(() => ({}));
     if (!res.ok || !data?.ok) {
       alert(data?.error || 'Could not enter sweepstakes');
       return;
     }
+    alert(`Entry confirmed! New token balance: ${Number(data?.tokenBalance ?? nextBalance)}`);
     onEntered();
   }
+
   return (
-    <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,.65)', display:'grid', placeItems:'center', zIndex:1000, padding:20 }} onClick={onClose}>
-      <div className="glass" style={{ width:'min(920px, 96vw)', maxHeight:'90vh', overflow:'auto', padding:18 }} onClick={(e)=>e.stopPropagation()}>
-        <div style={{ display:'flex', justifyContent:'space-between', gap:10, alignItems:'center' }}>
-          <div>
-            <div className="muted" style={{ fontSize: 12 }}>Sweepstakes details</div>
-            <h2 style={{ margin:'6px 0 0 0' }}>{campaign.title}</h2>
-          </div>
-          <button className="secondaryBtn" onClick={onClose}>Close</button>
-        </div>
-        <div style={{ display:'grid', gridTemplateColumns:'1.1fr 1fr', gap:18, marginTop:16 }}>
-          <div className="featureCard">
-            <div><b>Prize</b></div>
-            <div style={{ marginTop:8 }}>{campaign.prizePoolLabel || 'Prize drawing'}</div>
-            <div className="muted" style={{ marginTop:8 }}>Prize value: ${Number(campaign.prizeValueUsd || 0).toFixed(2)}</div>
-            <Countdown endsAt={campaign.endsAt} />
-            <div className="muted" style={{ marginTop:8 }}>Entry method: {campaign.allowTokenEntry ? `${campaign.tokenCost || 0} tokens` : 'Not enabled'} {campaign.allowGoldenQuestion ? '• Golden question wins enabled' : ''}</div>
-            {campaign.prizeUrl ? <div style={{ marginTop:10 }}><a href={campaign.prizeUrl} target="_blank" rel="noreferrer">View prize ↗</a></div> : null}
-            <div style={{ marginTop: 14 }}>
-              {campaign.status === 'DRAWN' && campaign.winner ? <div><b>Winner:</b> {campaign.winner.displayName}</div> : null}
-              {campaign.allowTokenEntry ? <button className="gold" style={{ marginTop:12 }} onClick={enterTokens}>Enter with tokens</button> : null}
-              {!campaign.allowTokenEntry && campaign.allowGoldenQuestion ? <div className="muted" style={{ marginTop:12 }}>Correctly answer golden questions in active sessions to earn entries for this drawing.</div> : null}
-              {user ? <div className="muted" style={{ marginTop:8 }}>Your entries for current drawing: {Number(user?.campaignEntries || 0)}</div> : null}
+    <>
+      <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,.72)', display:'grid', placeItems:'center', zIndex:1000, padding:20 }} onClick={onClose}>
+        <div className="glass" style={{ width:'min(1040px, 96vw)', maxHeight:'90vh', overflow:'auto', padding:20, boxShadow:'0 30px 80px rgba(0,0,0,.5)' }} onClick={(e)=>e.stopPropagation()}>
+          <div style={{ display:'flex', justifyContent:'space-between', gap:10, alignItems:'center' }}>
+            <div>
+              <div className="muted" style={{ fontSize: 12 }}>Sweepstakes details</div>
+              <h2 style={{ margin:'6px 0 0 0' }}>{campaign.title}</h2>
             </div>
+            <button className="secondaryBtn" onClick={onClose}>Close</button>
           </div>
-          <div className="featureCard">
-            <div><b>Terms and conditions</b></div>
-            <div className="muted" style={{ whiteSpace:'pre-wrap', marginTop:8 }}>{campaign.rulesText || 'Rules will be published here for the live drawing.'}</div>
-            {campaign.rulesUrl ? <div style={{ marginTop:10 }}><a href={campaign.rulesUrl} target="_blank" rel="noreferrer">Open full rules ↗</a></div> : null}
-          </div>
-        </div>
-        <div className="featureCard" style={{ marginTop:16 }}>
-          <b>Entry leaderboard</b>
-          <div style={{ display:'grid', gap:8, marginTop:10 }}>
-            {Array.isArray(campaign.leaderboard) && campaign.leaderboard.length ? campaign.leaderboard.slice(0,25).map((row, idx) => (
-              <div key={`${row.userId}-${idx}`} style={{ display:'flex', justifyContent:'space-between', gap:10, padding:'8px 10px', borderRadius:10, border:'1px solid rgba(255,255,255,.08)', background: row.isWinner ? 'rgba(90,200,120,.12)' : 'rgba(255,255,255,.03)' }}>
-                <div>{idx+1}. {row.displayName} {row.isWinner ? '🏆' : ''}</div>
-                <div>{row.quantity} entries</div>
+
+          <div style={{ display:'grid', gridTemplateColumns:'1.15fr 1fr', gap:18, marginTop:16 }} className="sweepModalGrid">
+            <div className="featureCard" style={{ position:'relative', overflow:'hidden' }}>
+              <div style={{ position:'absolute', inset:0, background:'radial-gradient(circle at top right, rgba(251,191,36,.16), transparent 44%)', pointerEvents:'none' }} />
+              <div style={{ position:'relative' }}>
+                <div><b>Prize</b></div>
+                <div style={{ marginTop:8, fontSize:24, fontWeight:900 }}>{campaign.prizePoolLabel || 'Prize drawing'}</div>
+                <div className="muted" style={{ marginTop:8 }}>Prize value: ${Number(campaign.prizeValueUsd || 0).toFixed(2)}</div>
+                <Countdown endsAt={campaign.endsAt} />
+                <div className="muted" style={{ marginTop:8 }}>Entry method: {campaign.allowTokenEntry ? `${campaign.tokenCost || 0} tokens` : 'Not enabled'} {campaign.allowGoldenQuestion ? '• Golden entries enabled' : ''}</div>
+                {campaign.prizeUrl ? (
+                  <div style={{ marginTop: 14 }}>
+                    {looksLikeImage(campaign.prizeUrl) ? (
+                      <a href={campaign.prizeUrl} target="_blank" rel="noreferrer" style={{ display:'block' }}>
+                        <img src={campaign.prizeUrl} alt={campaign.prizePoolLabel || 'Prize'} style={{ width:'100%', maxHeight:260, objectFit:'cover', borderRadius:14, border:'1px solid rgba(255,255,255,.08)' }} />
+                      </a>
+                    ) : (
+                      <a href={campaign.prizeUrl} target="_blank" rel="noreferrer">View prize ↗</a>
+                    )}
+                  </div>
+                ) : null}
+                <div style={{ marginTop: 16, display:'flex', gap:10, flexWrap:'wrap' }}>
+                  {campaign.allowTokenEntry ? (
+                    <button className="gold" onClick={enterTokens} disabled={!canAfford} title={!canAfford ? 'Not enough tokens' : undefined}>
+                      Enter with tokens
+                    </button>
+                  ) : null}
+                  <button className="secondaryBtn" onClick={() => setShowTerms(true)}>Terms</button>
+                </div>
+                {campaign.allowTokenEntry ? (
+                  <div className="muted" style={{ marginTop: 10 }}>
+                    This entry costs <b>{tokenCost}</b> tokens. Current balance: <b>{balance}</b>. After entry: <b>{nextBalance}</b>.
+                  </div>
+                ) : null}
+                {!campaign.allowTokenEntry && campaign.allowGoldenQuestion ? <div className="muted" style={{ marginTop:12 }}>Correctly answer golden questions in active sessions to earn entries for this drawing.</div> : null}
+                {campaign.status === 'DRAWN' && campaign.winner ? <div style={{ marginTop:12 }}><b>Winner:</b> {campaign.winner.displayName}</div> : null}
+                {user ? <div className="muted" style={{ marginTop:8 }}>Your entries for current drawing: {Number(user?.campaignEntries || 0)}</div> : null}
               </div>
-            )) : <div className="muted">No entries yet.</div>}
+            </div>
+            <div className="featureCard">
+              <div><b>Live details</b></div>
+              <div className="muted" style={{ marginTop:10 }}>Starts: {campaign.startsAt ? new Date(campaign.startsAt).toLocaleString() : 'TBD'}</div>
+              <div className="muted" style={{ marginTop:6 }}>Ends: {campaign.endsAt ? new Date(campaign.endsAt).toLocaleString() : 'TBD'}</div>
+              <div className="muted" style={{ marginTop:6 }}>Entries: {Number(campaign.totalEntries || 0)} • Participants: {Number(campaign.totalParticipants || 0)}</div>
+              <div className="featureCard" style={{ marginTop:14, background:'rgba(255,255,255,.02)' }}>
+                <b>Entry leaderboard</b>
+                <div style={{ display:'grid', gap:8, marginTop:10 }}>
+                  {Array.isArray(campaign.leaderboard) && campaign.leaderboard.length ? campaign.leaderboard.slice(0,10).map((row, idx) => (
+                    <div key={`${row.userId}-${idx}`} style={{ display:'flex', justifyContent:'space-between', gap:10, padding:'8px 10px', borderRadius:10, border:'1px solid rgba(255,255,255,.08)', background: row.isWinner ? 'rgba(90,200,120,.12)' : 'rgba(255,255,255,.03)' }}>
+                      <div>{idx+1}. {row.displayName} {row.isWinner ? '🏆' : ''}</div>
+                      <div>{row.quantity} entries</div>
+                    </div>
+                  )) : <div className="muted">No entries yet.</div>}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+      <TermsModal campaign={showTerms ? campaign : null} onClose={() => setShowTerms(false)} />
+    </>
   );
 }
 
@@ -118,51 +197,67 @@ export default function SweepstakesPage() {
   return (
     <main style={{ minHeight: '100vh' }} className="dashboardBg">
       <div className="dashWrap" style={{ paddingTop: 96, paddingBottom: 48 }}>
-        <div className="glass" style={{ padding: 18 }}>
-          <div style={{ display:'flex', justifyContent:'space-between', gap:12, flexWrap:'wrap', alignItems:'center' }}>
-            <div>
-              <div className="muted" style={{ fontSize: 12 }}>Sweepstakes</div>
-              <h1 style={{ margin:'6px 0 0 0', fontSize: 28, fontWeight: 900 }}>Live sweepstakes</h1>
-              <div className="muted" style={{ marginTop: 8, maxWidth: 920 }}>
-                Use earned tokens to enter eligible drawings, or unlock entries through golden-question wins when enabled for that campaign.
+        <div className="glass" style={{ padding: 20, overflow:'hidden', position:'relative' }}>
+          <div style={{ position:'absolute', inset:0, background:'radial-gradient(circle at top right, rgba(59,130,246,.12), transparent 35%), radial-gradient(circle at bottom left, rgba(251,191,36,.10), transparent 30%)', pointerEvents:'none' }} />
+          <div style={{ position:'relative' }}>
+            <div style={{ display:'flex', justifyContent:'space-between', gap:12, flexWrap:'wrap', alignItems:'center' }}>
+              <div>
+                <div className="muted" style={{ fontSize: 12 }}>Sweepstakes</div>
+                <h1 style={{ margin:'6px 0 0 0', fontSize: 34, fontWeight: 900 }}>Live sweepstakes</h1>
+                <div className="muted" style={{ marginTop: 8, maxWidth: 920, fontSize: 18, lineHeight: 1.5 }}>
+                  Use earned tokens to enter eligible drawings, or unlock entries through golden-question wins when enabled for that campaign.
+                </div>
+              </div>
+              <div style={{ display:'flex', gap:10, flexWrap:'wrap' }}>
+                <Link className="secondaryBtn" href="/start">Back to Start</Link>
+                <Link className="gold" href="/dashboard">Go to Dashboard →</Link>
               </div>
             </div>
-            <div style={{ display:'flex', gap:10, flexWrap:'wrap' }}>
-              <Link className="secondaryBtn" href="/start">Back to Start</Link>
-              <Link className="gold" href="/dashboard">Go to Dashboard →</Link>
+
+            <div className="featureCard" style={{ marginTop:18, display:'flex', justifyContent:'space-between', gap:12, flexWrap:'wrap', alignItems:'center' }}>
+              <div>
+                <b>Your sweepstakes balance</b>
+                <div className="muted" style={{ marginTop:8, fontSize: 16 }}>Tokens: {Number(data?.user?.tokenBalance || 0)} • Entries this week: {Number(data?.user?.weeklyCount || 0)} / {Number(data?.user?.weeklyLimit || 0)}</div>
+              </div>
+              {active[0] ? <Countdown endsAt={active[0]?.endsAt} compact /> : null}
             </div>
-          </div>
 
-          <div className="featureCard" style={{ marginTop:16 }}>
-            <b>Your sweepstakes balance</b>
-            <div className="muted" style={{ marginTop:8 }}>Tokens: {Number(data?.user?.tokenBalance || 0)} • Entries this week: {Number(data?.user?.weeklyCount || 0)} / {Number(data?.user?.weeklyLimit || 0)}</div>
-          </div>
-
-          <div style={{ marginTop: 18 }}>
-            <h3 style={{ marginBottom: 10 }}>Active drawings</h3>
-            <div className="grid3">
-              {active.length ? active.map((c) => (
-                <button key={c.id} type="button" className="featureCard" style={{ textAlign:'left' }} onClick={() => setSelected(c)}>
-                  <b>{c.title}</b>
-                  <div className="muted" style={{ marginTop:8 }}>{c.prizePoolLabel || 'Prize drawing'} • ${Number(c.prizeValueUsd || 0).toFixed(2)}</div>
-                  <div className="muted" style={{ marginTop:6 }}>{c.allowTokenEntry ? `${c.tokenCost || 0} tokens to enter` : 'Token entry disabled'} {c.allowGoldenQuestion ? '• Golden entries enabled' : ''}</div>
-                  <div className="muted" style={{ marginTop:6 }}>Ends: {c.endsAt ? new Date(c.endsAt).toLocaleString() : 'TBD'}</div>
-                </button>
-              )) : <div className="featureCard"><b>No sweepstakes loaded yet.</b></div>}
+            <div style={{ marginTop: 22 }}>
+              <h3 style={{ marginBottom: 12, fontSize: 24 }}>Active drawings</h3>
+              <div className="grid3">
+                {active.length ? active.map((c) => (
+                  <button key={c.id} type="button" className="featureCard" style={{ textAlign:'left', position:'relative', overflow:'hidden' }} onClick={() => setSelected(c)}>
+                    <div style={{ position:'absolute', inset:0, background:'radial-gradient(circle at top right, rgba(251,191,36,.18), transparent 34%)', pointerEvents:'none' }} />
+                    <div style={{ position:'relative' }}>
+                      <div style={{ display:'flex', justifyContent:'space-between', gap:10, alignItems:'center', flexWrap:'wrap' }}>
+                        <b style={{ fontSize: 22 }}>{c.title}</b>
+                        <Countdown endsAt={c.endsAt} compact />
+                      </div>
+                      <div className="muted" style={{ marginTop:10, fontSize: 16 }}>{c.prizePoolLabel || 'Prize drawing'} • ${Number(c.prizeValueUsd || 0).toFixed(2)}</div>
+                      <div className="muted" style={{ marginTop:8, fontSize: 15 }}>{c.allowTokenEntry ? `${c.tokenCost || 0} tokens to enter` : 'Token entry disabled'} {c.allowGoldenQuestion ? '• Golden entries enabled' : ''}</div>
+                      <div className="muted" style={{ marginTop:8 }}>Ends: {c.endsAt ? new Date(c.endsAt).toLocaleString() : 'TBD'}</div>
+                      <div style={{ display:'flex', gap:10, marginTop:14, flexWrap:'wrap' }}>
+                        <span className="badge">{Number(c.totalEntries || 0)} entries</span>
+                        <span className="badge">{Number(c.totalParticipants || 0)} participants</span>
+                      </div>
+                    </div>
+                  </button>
+                )) : <div className="featureCard"><b>No sweepstakes loaded yet.</b></div>}
+              </div>
             </div>
-          </div>
 
-          <div style={{ marginTop: 18 }}>
-            <h3 style={{ marginBottom: 10 }}>Past drawings</h3>
-            <div className="grid3">
-              {past.length ? past.map((c) => (
-                <button key={c.id} type="button" className="featureCard" style={{ textAlign:'left' }} onClick={() => setSelected(c)}>
-                  <b>{c.title}</b>
-                  <div className="muted" style={{ marginTop:8 }}>{c.prizePoolLabel || 'Prize drawing'}</div>
-                  <div className="muted" style={{ marginTop:6 }}>Winner: {c.winner?.displayName || 'Pending'}</div>
-                  <div className="muted" style={{ marginTop:6 }}>Drawn: {c.drawnAt ? new Date(c.drawnAt).toLocaleString() : 'Not drawn yet'}</div>
-                </button>
-              )) : <div className="featureCard"><b>No past drawings yet.</b></div>}
+            <div style={{ marginTop: 22 }}>
+              <h3 style={{ marginBottom: 12, fontSize: 24 }}>Past drawings</h3>
+              <div className="grid3">
+                {past.length ? past.map((c) => (
+                  <button key={c.id} type="button" className="featureCard" style={{ textAlign:'left' }} onClick={() => setSelected(c)}>
+                    <b>{c.title}</b>
+                    <div className="muted" style={{ marginTop:8 }}>{c.prizePoolLabel || 'Prize drawing'}</div>
+                    <div className="muted" style={{ marginTop:6 }}>Winner: {c.winner?.displayName || 'Pending'}</div>
+                    <div className="muted" style={{ marginTop:6 }}>Drawn: {c.drawnAt ? new Date(c.drawnAt).toLocaleString() : 'Not drawn yet'}</div>
+                  </button>
+                )) : <div className="featureCard"><b>No past drawings yet.</b></div>}
+              </div>
             </div>
           </div>
         </div>
