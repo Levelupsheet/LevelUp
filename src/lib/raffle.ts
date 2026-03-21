@@ -1,5 +1,6 @@
 import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
+import { findActiveSweepstakesCampaign, findSweepstakesCampaignById, findSweepstakesCampaignBySlug, insertSweepstakesCampaign, listRaffleEntriesForCampaignWindow, updateSweepstakesWinner } from "@/lib/sweepstakesSql";
 
 export const RAFFLE_WEEKLY_ENTRY_LIMIT = 5;
 
@@ -30,15 +31,7 @@ export function addHours(date: Date, hours: number) {
 
 export async function getOrCreateActiveSweepstakes(tx: typeof prisma = prisma) {
   const now = new Date();
-  const existing = await tx.sweepstakesCampaign.findFirst({
-    where: {
-      status: "ACTIVE",
-      isLive: true,
-      startsAt: { lte: now },
-      endsAt: { gte: now },
-    },
-    orderBy: { startsAt: "desc" },
-  });
+  const existing = await findActiveSweepstakesCampaign(tx as any);
   if (existing) return existing;
 
   const start = startOfWeekUtc(now);
@@ -47,30 +40,58 @@ export async function getOrCreateActiveSweepstakes(tx: typeof prisma = prisma) {
   end.setUTCHours(23, 59, 59, 999);
 
   const slug = `weekly-${start.toISOString().slice(0, 10)}`;
+  const already = await findSweepstakesCampaignBySlug(slug, tx as any);
   const weeklyPool = await tx.prizePool.findUnique({ where: { poolType: "WEEKLY_GOLDEN_POOL" } }).catch(() => null);
   const weeklyPoolCents = Number(weeklyPool?.currentAmount || 0);
-  return tx.sweepstakesCampaign.upsert({
-    where: { slug },
-    update: { status: "ACTIVE", isLive: true, startsAt: start, endsAt: end, prizePoolCents: weeklyPoolCents, prizePoolLabel: `$${(weeklyPoolCents / 100).toFixed(2)}` },
-    create: {
-      slug,
+  if (already) {
+    return insertOrUpdateExistingSweepstakes(already.id, {
       title: `Weekly Sweepstakes ${start.toISOString().slice(0, 10)}`,
-      status: "ACTIVE",
+      slug,
+      status: 'ACTIVE',
       isLive: true,
       startsAt: start,
       endsAt: end,
-      prizePoolLabel: `$${(weeklyPoolCents / 100).toFixed(2)}`,
       prizePoolCents: weeklyPoolCents,
-    },
-  });
+      prizePoolLabel: `$${(weeklyPoolCents / 100).toFixed(2)}`,
+    }, tx as any);
+  }
+  return insertSweepstakesCampaign({
+    id: typeof crypto.randomUUID === 'function' ? crypto.randomUUID() : `sw_${Date.now()}_${Math.random().toString(36).slice(2,8)}`,
+    slug,
+    title: `Weekly Sweepstakes ${start.toISOString().slice(0, 10)}`,
+    status: 'ACTIVE',
+    isLive: true,
+    startsAt: start,
+    endsAt: end,
+    prizePoolLabel: `$${(weeklyPoolCents / 100).toFixed(2)}`,
+    prizePoolCents: weeklyPoolCents,
+  }, tx as any);
+}
+
+async function insertOrUpdateExistingSweepstakes(id: string, input: { title: string; slug?: string; status: string; isLive: boolean; startsAt: Date; endsAt: Date; prizePoolCents: number; prizePoolLabel?: string | null; }, tx: any) {
+  await tx.$executeRawUnsafe(`
+    UPDATE "SweepstakesCampaign"
+    SET "title" = $2,
+        "status" = CAST($3 AS "SweepstakesCampaignStatus"),
+        "isLive" = $4,
+        "startsAt" = $5,
+        "endsAt" = $6,
+        "prizePoolCents" = $7,
+        "prizePoolLabel" = $8,
+        "updatedAt" = CURRENT_TIMESTAMP
+    WHERE "id" = $1
+  `, id, input.title, input.status, input.isLive, input.startsAt, input.endsAt, input.prizePoolCents, input.prizePoolLabel ?? null);
+  return findSweepstakesCampaignById(id, tx as any);
 }
 
 export async function countWeeklyEntries(tx: typeof prisma = prisma, userId: string, weekStart = startOfWeekUtc(new Date()), campaignId?: string | null) {
-  const row = await tx.raffleEntry.aggregate({
-    where: { userId, weekStart, ...(campaignId ? { campaignId } : {}) },
-    _sum: { quantity: true },
-  });
-  return Number(row._sum.quantity || 0);
+  const rows = (await tx.$queryRawUnsafe(`
+    SELECT COALESCE(SUM("quantity"), 0) AS "total"
+    FROM "RaffleEntry"
+    WHERE "userId" = $1 AND "weekStart" = $2
+      AND ($3::text IS NULL OR "campaignId" = $3)
+  `, userId, weekStart, campaignId || null)) as any[];
+  return Number(rows?.[0]?.total || 0);
 }
 
 export async function awardRaffleEntries(
@@ -102,23 +123,26 @@ export async function awardRaffleEntries(
   }
 
   const campaign = input.campaignId
-    ? await tx.sweepstakesCampaign.findUnique({ where: { id: input.campaignId } })
-    : await getOrCreateActiveSweepstakes(tx);
+    ? await findSweepstakesCampaignById(input.campaignId, tx as any)
+    : await getOrCreateActiveSweepstakes(tx as any);
 
-  await tx.raffleEntry.create({
-    data: {
-      userId: input.userId,
-      source: input.source,
-      quantity: awarded,
-      weekStart,
-      campaignId: campaign?.id || null,
-      meta: (input.meta || null) as any,
-      sourceRefType: input.sourceRefType || undefined,
-      sourceRefId: input.sourceRefId || undefined,
-      auditKey: input.auditKey || undefined,
-      createdAt,
-    },
-  });
+  await tx.$executeRawUnsafe(`
+    INSERT INTO "RaffleEntry"
+      ("id", "userId", "source", "quantity", "weekStart", "campaignId", "meta", "sourceRefType", "sourceRefId", "auditKey", "createdAt")
+    VALUES ($1,$2,CAST($3 AS "RaffleEntrySource"),$4,$5,$6,CAST($7 AS JSONB),CAST($8 AS "RaffleSourceRefType"),$9,$10,$11)
+  `,
+    typeof crypto.randomUUID === "function" ? crypto.randomUUID() : `re_${Date.now()}_${Math.random().toString(36).slice(2,8)}`,
+    input.userId,
+    input.source,
+    awarded,
+    weekStart,
+    campaign?.id || null,
+    JSON.stringify(input.meta || null),
+    input.sourceRefType || null,
+    input.sourceRefId || null,
+    input.auditKey || null,
+    createdAt
+  );
 
   return { awarded, capped: awarded < quantityRequested, remaining: Math.max(0, remaining - awarded), campaignId: campaign?.id || null };
 }
@@ -160,17 +184,10 @@ export function buildVerificationUrl(token: string) {
 }
 
 export async function drawSweepstakesWinner(tx: typeof prisma, campaignId: string) {
-  const campaign = await tx.sweepstakesCampaign.findUnique({ where: { id: campaignId } });
+  const campaign = await findSweepstakesCampaignById(campaignId, tx as any);
   if (!campaign) throw new Error("Sweepstakes campaign not found");
 
-  const entries = await tx.raffleEntry.findMany({
-    where: {
-      campaignId,
-      createdAt: { gte: campaign.startsAt, lte: campaign.endsAt },
-    },
-    orderBy: { createdAt: "asc" },
-  });
-
+  const entries = await listRaffleEntriesForCampaignWindow(campaignId, campaign.startsAt, campaign.endsAt, tx as any);
   const weighted: typeof entries = [];
   for (const entry of entries) {
     const qty = Math.max(1, Math.floor(Number(entry.quantity || 1)));
@@ -179,15 +196,13 @@ export async function drawSweepstakesWinner(tx: typeof prisma, campaignId: strin
   if (!weighted.length) return null;
 
   const winner = weighted[Math.floor(Math.random() * weighted.length)];
-  await tx.sweepstakesCampaign.update({
-    where: { id: campaignId },
-    data: {
-      status: "DRAWN",
-      winnerEntryId: winner.id,
-      winnerUserId: winner.userId,
-      drawnAt: new Date(),
-    },
-  });
+  await updateSweepstakesWinner({
+    id: campaignId,
+    winnerEntryId: winner.id,
+    winnerUserId: winner.userId,
+    status: 'DRAWN',
+    drawnAt: new Date(),
+  }, tx as any);
 
   return winner;
 }

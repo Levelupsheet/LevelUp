@@ -1,6 +1,7 @@
 import { requireAdminRequest } from "@/app/api/_lib/adminGuard";
 import { prisma } from "@/lib/prisma";
 import { drawSweepstakesWinner, getOrCreateActiveSweepstakes } from "@/lib/raffle";
+import { findSweepstakesCampaignById } from "@/lib/sweepstakesSql";
 
 export async function POST(req: Request) {
   const guard = await requireAdminRequest();
@@ -12,7 +13,7 @@ export async function POST(req: Request) {
 
     const result = await prisma.$transaction(async (tx) => {
       const campaign = campaignId
-        ? await tx.sweepstakesCampaign.findUnique({ where: { id: campaignId } })
+        ? await findSweepstakesCampaignById(campaignId, tx as any)
         : await getOrCreateActiveSweepstakes(tx as any);
       if (!campaign) throw new Error("Sweepstakes campaign not found");
 
@@ -22,7 +23,7 @@ export async function POST(req: Request) {
       }
 
       const user = await tx.user.findUnique({ where: { id: winner.userId }, select: { id: true, email: true, displayName: true } });
-      return { campaign: await tx.sweepstakesCampaign.findUnique({ where: { id: campaign.id } }), winner: { ...winner, user } };
+      return { campaign: await findSweepstakesCampaignById(campaign.id, tx as any), winner: { ...winner, user } };
     });
 
     // `result` may not be inferred as an object type; merge safely with Object.assign

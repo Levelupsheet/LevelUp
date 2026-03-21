@@ -2,6 +2,7 @@ import { prisma } from '@/lib/prisma';
 import { getRequestUserId } from '@/app/api/_lib/authUser';
 import { awardRaffleEntries } from '@/lib/raffle';
 import { getSweepstakesCampaignMetaMap } from '@/lib/sweepstakesCampaignMeta';
+import { findSweepstakesCampaignById } from '@/lib/sweepstakesSql';
 
 export async function POST(req: Request) {
   try {
@@ -12,7 +13,7 @@ export async function POST(req: Request) {
     const quantity = Math.max(1, Math.min(50, Number(body?.quantity || 1) || 1));
     if (!campaignId) return Response.json({ ok: false, error: 'campaignId required' }, { status: 400 });
 
-    const campaign = await (prisma as any).sweepstakesCampaign.findUnique({ where: { id: campaignId } });
+    const campaign = await findSweepstakesCampaignById(campaignId, prisma);
     if (!campaign) return Response.json({ ok: false, error: 'Campaign not found' }, { status: 404 });
     const now = new Date();
     if (!campaign.isLive || campaign.status !== 'ACTIVE' || new Date(campaign.startsAt) > now || new Date(campaign.endsAt) < now) {

@@ -11,6 +11,18 @@ type DomainRow = {
   wrongCount: number;
 };
 
+function clamp(v: number) {
+  return Math.max(0, Math.min(100, Number.isFinite(v) ? v : 0));
+}
+
+function masteryTone(mastery: number) {
+  const v = clamp(mastery);
+  if (v >= 80) return { color: "#eab308", bg: "linear-gradient(90deg, rgba(245,158,11,0.95), rgba(234,179,8,0.95))" };
+  if (v >= 55) return { color: "#22c55e", bg: "linear-gradient(90deg, rgba(34,197,94,0.95), rgba(16,185,129,0.95))" };
+  if (v >= 30) return { color: "#38bdf8", bg: "linear-gradient(90deg, rgba(56,189,248,0.95), rgba(99,102,241,0.92))" };
+  return { color: "#94a3b8", bg: "linear-gradient(90deg, rgba(148,163,184,0.9), rgba(100,116,139,0.92))" };
+}
+
 export default function AdaptiveLearningCard(props: {
   overallMastery?: number;
   rows?: DomainRow[];
@@ -18,29 +30,51 @@ export default function AdaptiveLearningCard(props: {
 }) {
   const rows = Array.isArray(props.rows) ? props.rows.slice(0, 6) : [];
   return (
-    <div className="card" style={{ padding: 16, marginBottom: 16 }}>
+    <div className="card adaptiveLearningCard" style={{ padding: 16, marginBottom: 16 }}>
       <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
         <div>
           <div style={{ fontWeight: 900, fontSize: 18 }}>Adaptive Learning Profile</div>
-          <div className="muted" style={{ marginTop: 4 }}>Mastery rises on correct answers, falls on missed answers, and question difficulty adapts by domain.</div>
+          <div className="muted" style={{ marginTop: 4 }}>Mastery grows over many correct answers and adapts by domain, accuracy, and difficulty.</div>
         </div>
-        <div className="badge">Overall mastery {Math.round(Number(props.overallMastery ?? 50))}%</div>
+        <div className="badge">Overall mastery {Math.round(Number(props.overallMastery ?? 0))}%</div>
       </div>
-      <div style={{ display: "grid", gap: 10, marginTop: 14 }}>
-        {rows.length ? rows.map((row) => (
-          <div key={row.domain} style={{ display: "grid", gridTemplateColumns: "minmax(120px, 1fr) minmax(140px, 2fr) auto auto", gap: 12, alignItems: "center" }}>
-            <div style={{ fontWeight: 800 }}>{domainLabel(row.domain)}</div>
-            <div style={{ height: 10, borderRadius: 999, background: "rgba(255,255,255,0.08)", overflow: "hidden" }}>
-              <div style={{ width: `${Math.max(0, Math.min(100, row.mastery))}%`, height: "100%", borderRadius: 999, background: "linear-gradient(90deg, rgba(99,102,241,0.85), rgba(34,197,94,0.9))" }} />
+      <div style={{ display: "grid", gap: 12, marginTop: 14 }}>
+        {rows.length ? rows.map((row) => {
+          const mastery = clamp(row.mastery);
+          const accuracy = clamp(row.accuracy);
+          const totalAnswered = Math.max(0, Number(row.correctCount || 0) + Number(row.wrongCount || 0));
+          const tone = masteryTone(mastery);
+          return (
+            <div key={row.domain} className="adaptiveRow">
+              <div className="adaptiveRowTop">
+                <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+                  <div className="adaptiveDomainLabel">{domainLabel(row.domain)}</div>
+                  <span className="adaptiveMiniBadge" style={{ borderColor: `${tone.color}55`, color: tone.color }}>
+                    {mastery}% mastery
+                  </span>
+                </div>
+                <div className="adaptiveMetaRight">
+                  <span>{row.correctCount} correct</span>
+                  <span>•</span>
+                  <span>{accuracy}% accuracy</span>
+                  <span>•</span>
+                  <span>D{row.currentDifficulty}</span>
+                </div>
+              </div>
+              <div className="adaptiveTrack">
+                <div className="adaptiveFill" style={{ width: `${mastery}%`, background: tone.bg }} />
+              </div>
+              <div className="adaptiveRowBottom">
+                <div className="adaptiveCounts">{row.correctCount} / {Math.max(totalAnswered, 0)} answers correct</div>
+                <div className="adaptiveCounts">{row.wrongCount} missed</div>
+              </div>
             </div>
-            <div style={{ fontWeight: 900, fontVariantNumeric: "tabular-nums" }}>{Math.round(row.mastery)}%</div>
-            <div className="muted" style={{ fontSize: 12 }}>Acc {Math.round(row.accuracy)}% · D{row.currentDifficulty}</div>
-          </div>
-        )) : <div className="muted">Complete a run to start building your adaptive learning profile.</div>}
+          );
+        }) : <div className="muted">Complete a run to start building your adaptive learning profile.</div>}
       </div>
       {props.weakestDomains?.length ? (
         <div style={{ marginTop: 12, display: "flex", gap: 8, flexWrap: "wrap" }}>
-          <span className="muted" style={{ fontSize: 12 }}>Weakest domains:</span>
+          <span className="muted" style={{ fontSize: 12 }}>Needs work:</span>
           {props.weakestDomains.map((domain) => <span key={domain} className="badge">{domainLabel(domain)}</span>)}
         </div>
       ) : null}

@@ -1,5 +1,5 @@
-import fs from 'fs/promises';
-import path from 'path';
+import { prisma } from '@/lib/prisma';
+import { ensureSweepstakesMetaTable } from '@/lib/sweepstakesSql';
 
 export type SweepstakesCampaignMeta = {
   campaignId: string;
@@ -13,9 +13,6 @@ export type SweepstakesCampaignMeta = {
   rulesUrl?: string;
   shortDescription?: string;
 };
-
-const DATA_DIR = path.join(process.cwd(), 'data');
-const DATA_FILE = path.join(DATA_DIR, 'sweepstakes-campaigns.json');
 
 function normalizeMeta(row: any): SweepstakesCampaignMeta {
   return {
@@ -34,18 +31,41 @@ function normalizeMeta(row: any): SweepstakesCampaignMeta {
 
 export async function readSweepstakesCampaignMeta(): Promise<SweepstakesCampaignMeta[]> {
   try {
-    const raw = await fs.readFile(DATA_FILE, 'utf8');
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed.map(normalizeMeta).filter((r) => r.campaignId) : [];
+    await ensureSweepstakesMetaTable(prisma);
+    const rows = (await prisma.$queryRawUnsafe(`
+      SELECT * FROM "SweepstakesCampaignMeta"
+      ORDER BY "updatedAt" DESC, "createdAt" DESC
+    `)) as any[];
+    return Array.isArray(rows) ? rows.map(normalizeMeta).filter((r) => r.campaignId) : [];
   } catch {
     return [];
   }
 }
 
 export async function writeSweepstakesCampaignMeta(rows: SweepstakesCampaignMeta[]) {
-  await fs.mkdir(DATA_DIR, { recursive: true });
+  await ensureSweepstakesMetaTable(prisma);
   const normalized = (Array.isArray(rows) ? rows : []).map(normalizeMeta).filter((r) => r.campaignId);
-  await fs.writeFile(DATA_FILE, JSON.stringify(normalized, null, 2), 'utf8');
+  await prisma.$transaction(async (tx: any) => {
+    await tx.$executeRawUnsafe(`DELETE FROM "SweepstakesCampaignMeta"`);
+    for (const row of normalized) {
+      await tx.$executeRawUnsafe(`
+        INSERT INTO "SweepstakesCampaignMeta"
+          ("campaignId", "tokenCost", "allowTokenEntry", "allowGoldenQuestion", "prizeValueUsd", "prizeUrl", "prizeImageUrl", "rulesText", "rulesUrl", "shortDescription")
+        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
+      `,
+        row.campaignId,
+        Math.max(0, Number(row.tokenCost ?? 0) || 0),
+        row.allowTokenEntry === undefined ? true : Boolean(row.allowTokenEntry),
+        Boolean(row.allowGoldenQuestion),
+        Math.max(0, Number(row.prizeValueUsd ?? 0) || 0),
+        row.prizeUrl ?? null,
+        row.prizeImageUrl ?? null,
+        row.rulesText ?? null,
+        row.rulesUrl ?? null,
+        row.shortDescription ?? null,
+      );
+    }
+  });
 }
 
 export async function getSweepstakesCampaignMetaMap() {
@@ -54,12 +74,35 @@ export async function getSweepstakesCampaignMetaMap() {
 }
 
 export async function upsertSweepstakesCampaignMeta(input: SweepstakesCampaignMeta) {
-  const rows = await readSweepstakesCampaignMeta();
+  await ensureSweepstakesMetaTable(prisma);
   const next = normalizeMeta(input);
-  const idx = rows.findIndex((r) => r.campaignId === next.campaignId);
-  if (idx >= 0) rows[idx] = { ...rows[idx], ...next };
-  else rows.push(next);
-  await writeSweepstakesCampaignMeta(rows);
+  await prisma.$executeRawUnsafe(`
+    INSERT INTO "SweepstakesCampaignMeta"
+      ("campaignId", "tokenCost", "allowTokenEntry", "allowGoldenQuestion", "prizeValueUsd", "prizeUrl", "prizeImageUrl", "rulesText", "rulesUrl", "shortDescription")
+    VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
+    ON CONFLICT ("campaignId") DO UPDATE SET
+      "tokenCost" = EXCLUDED."tokenCost",
+      "allowTokenEntry" = EXCLUDED."allowTokenEntry",
+      "allowGoldenQuestion" = EXCLUDED."allowGoldenQuestion",
+      "prizeValueUsd" = EXCLUDED."prizeValueUsd",
+      "prizeUrl" = EXCLUDED."prizeUrl",
+      "prizeImageUrl" = EXCLUDED."prizeImageUrl",
+      "rulesText" = EXCLUDED."rulesText",
+      "rulesUrl" = EXCLUDED."rulesUrl",
+      "shortDescription" = EXCLUDED."shortDescription",
+      "updatedAt" = CURRENT_TIMESTAMP
+  `,
+    next.campaignId,
+    Math.max(0, Number(next.tokenCost ?? 0) || 0),
+    next.allowTokenEntry === undefined ? true : Boolean(next.allowTokenEntry),
+    Boolean(next.allowGoldenQuestion),
+    Math.max(0, Number(next.prizeValueUsd ?? 0) || 0),
+    next.prizeUrl ?? null,
+    next.prizeImageUrl ?? null,
+    next.rulesText ?? null,
+    next.rulesUrl ?? null,
+    next.shortDescription ?? null,
+  );
   return next;
 }
 

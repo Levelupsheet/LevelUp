@@ -2128,3 +2128,70 @@ button.gold{
   .d2OrbFrame{ width: min(52vw, 200px) !important; height: min(52vw, 200px) !important; }
   .luDropdown{ right: -6px; }
 }
+
+
+/* Adaptive learning detail card */
+.adaptiveLearningCard{ min-width: 0; }
+.adaptiveRow{
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+}
+.adaptiveRowTop{
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.adaptiveDomainLabel{ font-weight: 900; font-size: 16px; }
+.adaptiveMiniBadge{
+  display:inline-flex;
+  align-items:center;
+  border:1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.04);
+  padding: 4px 9px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+}
+.adaptiveMetaRight{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  font-size:12px;
+  opacity:0.88;
+}
+.adaptiveTrack{
+  height: 14px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+.adaptiveFill{ height:100%; border-radius:999px; }
+.adaptiveRowBottom{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap;
+}
+.adaptiveCounts{ font-size:12px; opacity:0.84; }
+@media (max-width: 900px){
+  .adaptiveRow{ padding: 10px; }
+  .adaptiveDomainLabel{ font-size: 15px; }
+  .adaptiveTrack{ height: 12px; }
+}
+@media (max-width: 640px){
+  .adaptiveRowTop,
+  .adaptiveRowBottom,
+  .adaptiveMetaRight{
+    display:grid;
+    grid-template-columns: 1fr;
+    gap:6px;
+  }
+  .adaptiveMiniBadge{ width: fit-content; }
+}

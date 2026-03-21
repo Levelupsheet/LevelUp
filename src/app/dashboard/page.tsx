@@ -348,16 +348,6 @@ export default function Dashboard() {
     return [...local, ...server].slice(0, 8);
   }, [activity, notes]);
 
-  const spotlightDomains = useMemo(() => {
-    const preferred = ["IDENTITY", "NETWORKING", "SECURITY", "AWS"];
-    const byKey = new Map<string, LearningRow>(learningRows.map((row) => [String(row.domain).toUpperCase(), row] as [string, LearningRow]));
-    return preferred.map((key) => ({
-      key,
-      label: key === "AWS" ? "AWS" : key === "IDENTITY" ? "Identity" : key === "NETWORKING" ? "Networking" : key === "SECURITY" ? "Security" : key.charAt(0) + key.slice(1).toLowerCase(),
-      mastery: Math.round(Number(byKey.get(key)?.mastery ?? 0)),
-    }));
-  }, [learningRows]);
-
   const recommendedRoles = useMemo(() => {
     if ((localLevel || 1) < 7) return [] as CareerMatchRow[];
     if (careerMatches.length) return careerMatches;
@@ -696,23 +686,9 @@ export default function Dashboard() {
               <span style={{ width: 10, height: 10, borderRadius: 999, background: (elig?.eligible ? "rgba(120,220,160,0.8)" : "rgba(255,255,255,0.25)") }} />
               <small>Eligibility for Interview Unlocked!</small>
             </div>
+            <div style={{ marginTop: 8, opacity: 0.82 }}><small>Adaptive mastery details are shown in the main panel.</small></div>
           </div>
 
-          <div className="card masteryCompactCard" style={{ marginTop: 12, padding: 12 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "center" }}>
-              <h4 style={{ margin: 0 }}>Domain Mastery</h4>
-              <small>{Math.round(overallMastery)}% overall</small>
-            </div>
-            <div style={{ display: "grid", gap: 10, marginTop: 12 }}>
-              {spotlightDomains.map((row) => (
-                <div key={row.key} className="masteryCompactRow">
-                  <div className="masteryCompactLabel">{row.label}</div>
-                  <div className="masteryCompactTrack"><div className="masteryCompactFill" style={{ width: `${Math.max(0, Math.min(100, row.mastery))}%` }} /></div>
-                  <div className="masteryCompactValue">{row.mastery}%</div>
-                </div>
-              ))}
-            </div>
-          </div>
         </aside>
 
         <section className="maincol">

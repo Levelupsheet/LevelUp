@@ -2,6 +2,8 @@ import { requireAdminRequest } from '@/app/api/_lib/adminGuard';
 import { prisma } from '@/lib/prisma';
 import { campaignView } from '@/lib/sweepstakesView';
 import { mergeCampaignMeta, upsertSweepstakesCampaignMeta, getSweepstakesCampaignMetaMap } from '@/lib/sweepstakesCampaignMeta';
+import { listSweepstakesCampaigns, insertSweepstakesCampaign, updateSweepstakesCampaign } from '@/lib/sweepstakesSql';
+import crypto from 'crypto';
 
 function parseDate(v: any, fallback?: Date | null) {
   if (!v) return fallback ?? null;
@@ -14,11 +16,15 @@ function slugify(title: string) {
   return `${base || 'sweepstakes'}-${Date.now().toString().slice(-6)}`;
 }
 
+function newId() {
+  return typeof crypto.randomUUID === 'function' ? crypto.randomUUID() : `sw_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+}
+
 export async function GET() {
   const guard = await requireAdminRequest();
   if (!guard.ok) return guard.response;
   try {
-    const rows = await (prisma as any).sweepstakesCampaign.findMany({ orderBy: [{ startsAt: 'desc' }, { createdAt: 'desc' }] }).catch(() => []);
+    const rows = await listSweepstakesCampaigns(prisma).catch(() => []);
     const metaMap = await getSweepstakesCampaignMetaMap();
     const campaigns = await Promise.all((rows || []).map((row: any) => campaignView(mergeCampaignMeta(row, metaMap.get(String(row.id))))));
     const current = campaigns.find((c: any) => c?.isLive && c?.status === 'ACTIVE') || campaigns[0] || null;
@@ -44,31 +50,30 @@ export async function POST(req: Request) {
 
     let campaign: any;
     if (id) {
-      campaign = await (prisma as any).sweepstakesCampaign.update({
-        where: { id },
-        data: {
-          title,
-          prizePoolLabel,
-          prizePoolCents: Math.round(prizeValueUsd * 100),
-          startsAt,
-          endsAt,
-          status,
-          isLive,
-        },
-      });
+      campaign = await updateSweepstakesCampaign({
+        id,
+        title,
+        prizePoolLabel,
+        prizePoolCents: Math.round(prizeValueUsd * 100),
+        startsAt,
+        endsAt,
+        status,
+        isLive,
+        termsUrl: body?.rulesUrl ? String(body.rulesUrl).trim() : null,
+      }, prisma);
     } else {
-      campaign = await (prisma as any).sweepstakesCampaign.create({
-        data: {
-          slug: slugify(title),
-          title,
-          prizePoolLabel,
-          prizePoolCents: Math.round(prizeValueUsd * 100),
-          startsAt,
-          endsAt,
-          status,
-          isLive,
-        },
-      });
+      campaign = await insertSweepstakesCampaign({
+        id: newId(),
+        slug: slugify(title),
+        title,
+        prizePoolLabel,
+        prizePoolCents: Math.round(prizeValueUsd * 100),
+        startsAt,
+        endsAt,
+        status,
+        isLive,
+        termsUrl: body?.rulesUrl ? String(body.rulesUrl).trim() : null,
+      }, prisma);
     }
 
     await upsertSweepstakesCampaignMeta({
@@ -84,7 +89,7 @@ export async function POST(req: Request) {
       shortDescription: body?.shortDescription ? String(body.shortDescription) : undefined,
     });
 
-    const freshRows = await (prisma as any).sweepstakesCampaign.findMany({ orderBy: [{ startsAt: 'desc' }, { createdAt: 'desc' }] }).catch(() => []);
+    const freshRows = await listSweepstakesCampaigns(prisma).catch(() => []);
     const metaMap = await getSweepstakesCampaignMetaMap();
     const campaigns = await Promise.all((freshRows || []).map((row: any) => campaignView(mergeCampaignMeta(row, metaMap.get(String(row.id))))));
     const current = campaigns.find((c: any) => c?.id === String(campaign.id)) || campaigns[0] || null;

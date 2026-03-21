@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { getSweepstakesCampaignMetaMap, mergeCampaignMeta } from '@/lib/sweepstakesCampaignMeta';
+import { listRaffleEntriesForCampaign } from '@/lib/sweepstakesSql';
 
 function num(v: any, d = 0) {
   const n = Number(v);
@@ -10,10 +11,7 @@ type UserLite = { id: string; displayName?: string | null; email?: string | null
 
 export async function campaignView(campaign: any) {
   if (!campaign) return null;
-  const entries = await (prisma as any).raffleEntry.findMany({
-    where: { campaignId: campaign.id },
-    orderBy: { createdAt: 'asc' },
-  });
+  const entries = await listRaffleEntriesForCampaign(String(campaign.id), prisma);
 
   const byUser = new Map<string, { userId: string; quantity: number; tickets: number; lastEntryAt: Date | null }>();
   for (const entry of entries) {

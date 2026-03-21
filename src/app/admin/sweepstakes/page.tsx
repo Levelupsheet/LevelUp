@@ -84,7 +84,7 @@ export default function AdminSweepstakesPage() {
       body: JSON.stringify(form),
     });
     const data = await res.json().catch(() => ({}));
-    setStatus(data?.ok ? 'Campaign updated.' : data?.error || 'Failed to update campaign');
+    setStatus(data?.ok ? 'Campaign updated.' : [data?.error || 'Failed to update campaign', data?.detail].filter(Boolean).join(': '));
     if (data?.ok) loadCampaigns(data?.campaign?.id || form.id);
   }
 
@@ -92,7 +92,7 @@ export default function AdminSweepstakesPage() {
     setStatus('Drawing winner...');
     const res = await fetch('/api/admin/sweepstakes/draw', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ campaignId: selected?.id }) });
     const data = await res.json().catch(() => ({}));
-    setStatus(data?.ok ? (data?.winner ? `Winner drawn: ${data.winner.user?.displayName || data.winner.user?.email || data.winner.userId}` : 'No eligible entries to draw from.') : data?.error || 'Draw failed.');
+    setStatus(data?.ok ? (data?.winner ? `Winner drawn: ${data.winner.user?.displayName || data.winner.user?.email || data.winner.userId}` : 'No eligible entries to draw from.') : [data?.error || 'Draw failed.', data?.detail].filter(Boolean).join(': '));
     await loadCampaigns(selected?.id);
   }
 
