@@ -93,18 +93,22 @@ async function buildNewSession(userId: string, questionCount = 10) {
   let finalQuestions: any[] = [...selected];
 
   const currentLevel = Math.max(1, Number(Math.floor(((await prisma.user.findUnique({ where: { id: userId }, select: { xp: true } }).catch(() => ({ xp: 0 })) as any).xp || 0) / 500) + 1));
-  const alreadyHadGolden = await (prisma as any).$queryRawUnsafe(`SELECT 1 FROM "GoldenQuestionHistory" WHERE "userId" = $1 AND "level" = $2 LIMIT 1`, userId, currentLevel).then((rows: any[]) => Array.isArray(rows) && rows.length > 0).catch(() => false);
+  const alreadyHadGolden = await (prisma as any).$queryRawUnsafe(`SELECT 1 FROM "GoldenQuestionHistory" WHERE "userId" = $1 AND "level" = $2 AND "awarded" = TRUE LIMIT 1`, userId, currentLevel).then((rows: any[]) => Array.isArray(rows) && rows.length > 0).catch(() => false);
 
-  if (!alreadyHadGolden && goldenPool.length > 0 && finalQuestions.length >= 6) {
-    const selectedIds = new Set(finalQuestions.map((q: any) => String(q.id || "")));
-    const availableGolden = goldenPool.filter((q: any) => !selectedIds.has(String(q.id || "")));
-    const weighted = (availableGolden.length ? availableGolden : goldenPool).flatMap((q: any) => Array.from({ length: Math.max(1, Number(q.goldenWeight || 1)) }, () => q));
-    const picked = weighted[Math.floor(Math.random() * weighted.length)] || goldenPool[0];
-    if (picked) {
-      const replacementIndex = Math.min(5, Math.max(0, finalQuestions.length - 1));
-      finalQuestions[replacementIndex] = { ...shuffleQuestionPayload(picked), isGolden: true, goldenBonusXp: picked.goldenBonusXp || 50 } as any;
-      goldenQuestionId = String((finalQuestions[replacementIndex] as any).id);
+  if (!alreadyHadGolden && finalQuestions.length >= 6) {
+    const replacementIndex = Math.min(5, Math.max(0, finalQuestions.length - 1));
+    if (goldenPool.length > 0) {
+      const selectedIds = new Set(finalQuestions.map((q: any) => String(q.id || "")));
+      const availableGolden = goldenPool.filter((q: any) => !selectedIds.has(String(q.id || "")));
+      const weighted = (availableGolden.length ? availableGolden : goldenPool).flatMap((q: any) => Array.from({ length: Math.max(1, Number(q.goldenWeight || 1)) }, () => q));
+      const picked = weighted[Math.floor(Math.random() * weighted.length)] || goldenPool[0];
+      if (picked) {
+        finalQuestions[replacementIndex] = { ...shuffleQuestionPayload(picked), isGolden: true, goldenBonusXp: picked.goldenBonusXp || 50 } as any;
+      }
+    } else {
+      finalQuestions[replacementIndex] = { ...finalQuestions[replacementIndex], isGolden: true } as any;
     }
+    goldenQuestionId = String((finalQuestions[replacementIndex] as any).id || `inline-golden-${replacementIndex}`);
   }
 
   const session = await prisma.$transaction(async (tx: any) => {

@@ -15,6 +15,8 @@ type Drop = {
   rewardRef?: string | null;
   quantity: number;
   rarity?: string | null;
+  visualIcon?: string | null;
+  visualImageUrl?: string | null;
 };
 
 type OpenResult = {
@@ -52,6 +54,8 @@ function dropTitle(d: Drop) {
 }
 
 function visualForDrop(d: Drop) {
+  if (d.visualImageUrl) return { key: d.rewardType, label: d.rewardRef || d.rewardType, icon: d.visualImageUrl };
+  if (d.visualIcon) return { key: d.rewardType, label: d.rewardRef || d.rewardType, icon: d.visualIcon };
   const found = REWARD_VISUALS.find((v) => v.key === d.rewardType);
   return found ?? { key: d.rewardType, label: d.rewardType, icon: "🎁" };
 }
@@ -236,7 +240,7 @@ export default function LootVaultModal(props: {
                 }}
                 aria-hidden="true"
               >
-                <div style={{ fontSize: 30, lineHeight: 1 }}>{preview.icon}</div>
+                {preview.icon.startsWith("http") ? <img src={preview.icon} alt="preview" style={{ width: 38, height: 38, objectFit: "contain" }} /> : <div style={{ fontSize: 30, lineHeight: 1 }}>{preview.icon}</div>}
               </div>
               <div style={{ minWidth: 0 }}>
                 <div style={{ fontWeight: 800 }}>{spinning ? "Spinning…" : hasResults ? "Results" : "Ready"}</div>

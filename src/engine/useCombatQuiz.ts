@@ -267,6 +267,9 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
       const nextIdx = s.idx + 1;
       if (nextIdx >= opts.questions.length) return { ...s, finished: true };
 
+      const nextQ = opts.questions[nextIdx];
+      const nextLvl = nextQ ? inferLevel(nextQ) : 1;
+      const effNextTier: DifficultyTier = Math.max(s.tier, nextLvl) as DifficultyTier;
       return {
         ...s,
         idx: nextIdx,
@@ -274,9 +277,10 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
         locked: false,
         feedback: null,
         lastWasCorrect: null,
+        timeLeft: timed ? rules.timePerQuestionByTier[effNextTier] : s.timeLeft,
       };
     });
-  }, [opts.questions.length]);
+  }, [opts.questions, rules.timePerQuestionByTier, timed]);
 
   const reset = useCallback(() => {
     stopTimer();
