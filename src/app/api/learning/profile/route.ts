@@ -5,23 +5,6 @@ import { inferDomainFromQuestion, type LearningProfileSnapshot } from "@/lib/lea
 
 const TARGET_DOMAINS = ["IDENTITY", "NETWORKING", "SECURITY", "AWS", "AZURE", "WINDOWS"] as const;
 
-
-async function ensureUserDomainStatsTable(tx: any = prisma) {
-  await tx.$executeRawUnsafe(`
-    CREATE TABLE IF NOT EXISTS "UserDomainStats" (
-      "id" TEXT PRIMARY KEY,
-      "userId" TEXT NOT NULL,
-      "domain" TEXT NOT NULL,
-      "correctCount" INTEGER NOT NULL DEFAULT 0,
-      "wrongCount" INTEGER NOT NULL DEFAULT 0,
-      "currentDifficulty" INTEGER NOT NULL DEFAULT 1,
-      "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      UNIQUE ("userId", "domain")
-    )
-  `);
-}
-
 function asNum(v: unknown, fallback = 0) {
   const n = Number(v);
   return Number.isFinite(n) ? n : fallback;
@@ -45,12 +28,10 @@ export async function GET(req: Request) {
     const userId = await getRequestUserId(req);
     if (!userId) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
 
-    await ensureUserDomainStatsTable(prisma as any);
-    const [practiceAnswers, certAnswers, userDomains, domainStatsRows] = await Promise.all([
+    const [practiceAnswers, certAnswers, userDomains] = await Promise.all([
       prisma.practiceAnswer.findMany({ where: { userId }, orderBy: { createdAt: "desc" }, take: 250 }),
       prisma.certPracticeAnswer.findMany({ where: { userId }, orderBy: { createdAt: "desc" }, take: 250 }),
       prisma.userDomain.findMany({ where: { userId } }),
-      (prisma as any).$queryRawUnsafe(`SELECT * FROM "UserDomainStats" WHERE "userId" = $1`, userId).catch(() => []),
     ]);
 
     const masteryMap = new Map<string, { domain: string; mastery: number; correctCount: number; wrongCount: number; accuracy: number; currentDifficulty: number }>();
@@ -60,23 +41,19 @@ export async function GET(req: Request) {
       return masteryMap.get(domain)!;
     };
 
-    for (const row of domainStatsRows || []) {
-      const domain = inferDomainFromQuestion({ domain: (row as any).domain });
-      const slot = ensure(domain);
-      slot.correctCount += Math.max(0, Number((row as any).correctCount || 0));
-      slot.wrongCount += Math.max(0, Number((row as any).wrongCount || 0));
-      slot.currentDifficulty = Math.max(slot.currentDifficulty, Number((row as any).currentDifficulty || 1));
-    }
-
     for (const row of practiceAnswers || []) {
       const domain = inferDomainFromQuestion({ domain: row.domain, prompt: row.prompt });
-      ensure(domain);
+      const slot = ensure(domain);
+      slot.correctCount += 1;
+      slot.currentDifficulty = Math.max(slot.currentDifficulty, Number(row.tier || 1));
     }
 
     for (const row of certAnswers || []) {
       const exam = String(row.exam || "GENERAL").toUpperCase();
       const domain = exam === "AWS" ? "AWS" : exam === "AZURE" || exam === "AZ_900" ? "AZURE" : exam === "SECURITY_PLUS" ? "SECURITY" : "GENERAL";
-      ensure(domain);
+      const slot = ensure(domain);
+      slot.correctCount += 1;
+      slot.currentDifficulty = Math.max(slot.currentDifficulty, 2);
     }
 
     for (const row of userDomains || []) {

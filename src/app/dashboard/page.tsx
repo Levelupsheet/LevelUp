@@ -747,10 +747,7 @@ export default function Dashboard() {
                           type="button"
                           onClick={(e) => {
                             e.stopPropagation();
-                            // Clear this notification immediately (read/cleared)
-                            markNotificationReadAndRemove(n);
-                            // Also clear any local loot-earned activities so they don't pile up
-                            try { clearActivitiesByType(userId ?? "", ["LOOT_BOX_EARNED"]); setActivity(getActivities(userId ?? "")); } catch {}
+                            // Keep the notification until the chest is actually claimed/opened.
                             setLootOpen(true);
                           }}
                         >

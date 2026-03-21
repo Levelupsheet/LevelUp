@@ -2196,6 +2196,21 @@ button.gold{
   .adaptiveMiniBadge{ width: fit-content; }
 }
 
-.d2GoldenQuestion{position:relative;animation:d2GoldenGlow 1.8s ease-in-out infinite alternate;}
-.d2GoldenQuestion::before{content:"";position:absolute;inset:-1px;border-radius:18px;pointer-events:none;box-shadow:0 0 30px rgba(245,197,66,.18), inset 0 0 26px rgba(245,197,66,.08);}
-@keyframes d2GoldenGlow{from{box-shadow:0 0 0 1px rgba(245,197,66,.12),0 0 18px rgba(245,197,66,.08);}to{box-shadow:0 0 0 1px rgba(245,197,66,.3),0 0 34px rgba(245,197,66,.2);}}
+
+.d2GoldenQuestionCard{
+  border: 1px solid rgba(255,215,64,0.55) !important;
+  box-shadow: 0 0 0 1px rgba(255,215,64,0.18), 0 0 28px rgba(255,190,40,0.18), inset 0 0 18px rgba(255,215,64,0.06);
+  background: linear-gradient(180deg, rgba(255,215,64,0.05), rgba(255,255,255,0.02));
+  position: relative;
+}
+.d2GoldenQuestionCard::after{
+  content:"";
+  position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+  background: linear-gradient(120deg, transparent 0%, rgba(255,226,138,0.12) 45%, transparent 75%);
+  animation: d2GoldenSweep 2.2s linear infinite;
+}
+@keyframes d2GoldenSweep{
+  0%{ transform: translateX(-30%); opacity:.15; }
+  50%{ opacity:.35; }
+  100%{ transform: translateX(30%); opacity:.15; }
+}
