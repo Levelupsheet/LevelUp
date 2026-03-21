@@ -45,6 +45,7 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
 
   const [state, setState] = useState<CombatState>(() => buildInitialState());
   const timerRef = useRef<number | null>(null);
+  const timeoutResolvedRef = useRef<string | null>(null);
 
   const q = opts.questions[state.idx];
 
@@ -66,6 +67,7 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
   const startTimer = useCallback((seconds: number) => {
     stopTimer();
     if (!timed) return;
+    timeoutResolvedRef.current = null;
     setState((s) => ({ ...s, timeLeft: seconds }));
     timerRef.current = window.setInterval(() => {
       setState((s) => {
@@ -94,6 +96,9 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
 
   useEffect(() => {
     if (!timed || !q || state.finished || state.locked || state.timeLeft !== 0) return;
+    const timeoutKey = `${state.idx}:${q.id || "q"}`;
+    if (timeoutResolvedRef.current === timeoutKey) return;
+    timeoutResolvedRef.current = timeoutKey;
 
     setState((s) => {
       if (s.locked || s.finished) return s;
@@ -260,6 +265,7 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
   }, [q, rules]);
 
   const next = useCallback(() => {
+    stopTimer();
     setState((s) => {
       if (s.finished) return s;
       if (s.playerHP <= 0 || s.enemyHP <= 0) return { ...s, finished: true };
@@ -280,7 +286,7 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
         timeLeft: timed ? rules.timePerQuestionByTier[effNextTier] : s.timeLeft,
       };
     });
-  }, [opts.questions, rules.timePerQuestionByTier, timed]);
+  }, [opts.questions, rules.timePerQuestionByTier, timed, stopTimer]);
 
   const reset = useCallback(() => {
     stopTimer();

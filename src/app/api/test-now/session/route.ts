@@ -90,6 +90,7 @@ async function buildNewSession(userId: string, questionCount = 10) {
   const selected = sampleQuestions(pool, questionCount).map((q) => shuffleQuestionPayload(q));
   const goldenPool = pool.filter((q: any) => q.isGoldenEligible);
   let goldenQuestionId: string | null = null;
+  let goldenQuestionIndex: number | null = null;
   let finalQuestions: any[] = [...selected];
 
   const currentLevel = Math.max(1, Number(Math.floor(((await prisma.user.findUnique({ where: { id: userId }, select: { xp: true } }).catch(() => ({ xp: 0 })) as any).xp || 0) / 500) + 1));
@@ -97,6 +98,7 @@ async function buildNewSession(userId: string, questionCount = 10) {
 
   if (!alreadyHadGolden && finalQuestions.length >= 6) {
     const replacementIndex = Math.min(5, Math.max(0, finalQuestions.length - 1));
+    goldenQuestionIndex = replacementIndex;
     if (goldenPool.length > 0) {
       const selectedIds = new Set(finalQuestions.map((q: any) => String(q.id || "")));
       const availableGolden = goldenPool.filter((q: any) => !selectedIds.has(String(q.id || "")));
@@ -133,9 +135,9 @@ async function buildNewSession(userId: string, questionCount = 10) {
           sessionId: created.id,
           questionId: String(q.id || "") || null,
           orderIndex: i,
-          payloadJson: q,
-          isGolden: String(q.id) === goldenQuestionId,
-          goldenBonusXp: String(q.id) === goldenQuestionId ? Number(q.goldenBonusXp || 50) : null,
+          payloadJson: { ...q, isGolden: Boolean(goldenQuestionIndex === i) },
+          isGolden: Boolean(goldenQuestionIndex === i),
+          goldenBonusXp: goldenQuestionIndex === i ? Number(q.goldenBonusXp || 50) : null,
         },
       });
     }
