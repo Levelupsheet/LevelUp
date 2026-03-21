@@ -11,8 +11,18 @@ export async function ensureSweepstakesCoreTables(db?: DbLike) {
       IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'SweepstakesCampaignStatus') THEN
         CREATE TYPE "SweepstakesCampaignStatus" AS ENUM ('DRAFT', 'ACTIVE', 'CLOSED', 'DRAWN');
       END IF;
+      IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'RaffleEntrySource') THEN
+        CREATE TYPE "RaffleEntrySource" AS ENUM ('GOLDEN_QUESTION');
+      END IF;
+      IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'RaffleSourceRefType') THEN
+        CREATE TYPE "RaffleSourceRefType" AS ENUM ('QUESTION','SESSION','BOSS_ENCOUNTER','LOOT_BOX','FREE_ENTRY_SUBMISSION','MANUAL_ADJUSTMENT');
+      END IF;
     END $$;
   `);
+
+  await p.$executeRawUnsafe(`ALTER TYPE "RaffleEntrySource" ADD VALUE IF NOT EXISTS 'BOSS_BATTLE'`);
+  await p.$executeRawUnsafe(`ALTER TYPE "RaffleEntrySource" ADD VALUE IF NOT EXISTS 'CHEST_REWARD'`);
+  await p.$executeRawUnsafe(`ALTER TYPE "RaffleEntrySource" ADD VALUE IF NOT EXISTS 'FREE_ENTRY'`);
 
   await p.$executeRawUnsafe(`
     CREATE TABLE IF NOT EXISTS "SweepstakesCampaign" (
@@ -29,6 +39,7 @@ export async function ensureSweepstakesCoreTables(db?: DbLike) {
       "prizePoolCents" INTEGER NOT NULL DEFAULT 0,
       "prizePoolLabel" TEXT,
       "termsUrl" TEXT,
+      "entryCapPerUserPerWeek" INTEGER NOT NULL DEFAULT 5,
       "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
       "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
       CONSTRAINT "SweepstakesCampaign_pkey" PRIMARY KEY ("id")
@@ -36,14 +47,35 @@ export async function ensureSweepstakesCoreTables(db?: DbLike) {
   `);
 
   await p.$executeRawUnsafe(`
+    CREATE TABLE IF NOT EXISTS "RaffleEntry" (
+      "id" TEXT NOT NULL,
+      "userId" TEXT NOT NULL,
+      "source" "RaffleEntrySource" NOT NULL DEFAULT 'GOLDEN_QUESTION',
+      "quantity" INTEGER NOT NULL DEFAULT 1,
+      "weekStart" TIMESTAMP(3) NOT NULL,
+      "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      "meta" JSONB,
+      "campaignId" TEXT,
+      "sourceRefType" "RaffleSourceRefType",
+      "sourceRefId" TEXT,
+      "auditKey" TEXT,
+      CONSTRAINT "RaffleEntry_pkey" PRIMARY KEY ("id")
+    )
+  `);
+
+  await p.$executeRawUnsafe(`
     CREATE UNIQUE INDEX IF NOT EXISTS "SweepstakesCampaign_slug_key"
     ON "SweepstakesCampaign"("slug")
   `);
-
   await p.$executeRawUnsafe(`
     CREATE INDEX IF NOT EXISTS "SweepstakesCampaign_status_startsAt_endsAt_idx"
     ON "SweepstakesCampaign"("status", "startsAt", "endsAt")
   `);
+  await p.$executeRawUnsafe(`CREATE INDEX IF NOT EXISTS "RaffleEntry_userId_createdAt_idx" ON "RaffleEntry"("userId", "createdAt")`);
+  await p.$executeRawUnsafe(`CREATE INDEX IF NOT EXISTS "RaffleEntry_userId_weekStart_idx" ON "RaffleEntry"("userId", "weekStart")`);
+  await p.$executeRawUnsafe(`CREATE INDEX IF NOT EXISTS "RaffleEntry_campaignId_createdAt_idx" ON "RaffleEntry"("campaignId", "createdAt")`);
+  await p.$executeRawUnsafe(`CREATE INDEX IF NOT EXISTS "RaffleEntry_sourceRefType_sourceRefId_idx" ON "RaffleEntry"("sourceRefType", "sourceRefId")`);
+  await p.$executeRawUnsafe(`CREATE UNIQUE INDEX IF NOT EXISTS "RaffleEntry_auditKey_key" ON "RaffleEntry"("auditKey")`);
 }
 
 export async function ensureSweepstakesMetaTable(db?: DbLike) {
@@ -211,6 +243,7 @@ export async function updateSweepstakesWinner(input: {
 
 export async function listRaffleEntriesForCampaign(campaignId: string, db?: DbLike): Promise<any[]> {
   const p = dbClient(db);
+  await ensureSweepstakesCoreTables(p);
   const rows = await p.$queryRawUnsafe(`
     SELECT * FROM "RaffleEntry"
     WHERE "campaignId" = $1
@@ -221,6 +254,7 @@ export async function listRaffleEntriesForCampaign(campaignId: string, db?: DbLi
 
 export async function listRaffleEntriesForCampaignWindow(campaignId: string, startsAt: Date, endsAt: Date, db?: DbLike): Promise<any[]> {
   const p = dbClient(db);
+  await ensureSweepstakesCoreTables(p);
   const rows = await p.$queryRawUnsafe(`
     SELECT * FROM "RaffleEntry"
     WHERE "campaignId" = $1 AND "createdAt" >= $2 AND "createdAt" <= $3

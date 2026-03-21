@@ -1,6 +1,6 @@
 import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
-import { findActiveSweepstakesCampaign, findSweepstakesCampaignById, findSweepstakesCampaignBySlug, insertSweepstakesCampaign, listRaffleEntriesForCampaignWindow, updateSweepstakesWinner } from "@/lib/sweepstakesSql";
+import { ensureSweepstakesCoreTables, findActiveSweepstakesCampaign, findSweepstakesCampaignById, findSweepstakesCampaignBySlug, insertSweepstakesCampaign, listRaffleEntriesForCampaignWindow, updateSweepstakesWinner } from "@/lib/sweepstakesSql";
 
 export const RAFFLE_WEEKLY_ENTRY_LIMIT = 5;
 
@@ -30,6 +30,7 @@ export function addHours(date: Date, hours: number) {
 }
 
 export async function getOrCreateActiveSweepstakes(tx: typeof prisma = prisma) {
+  await ensureSweepstakesCoreTables(tx as any);
   const now = new Date();
   const existing = await findActiveSweepstakesCampaign(tx as any);
   if (existing) return existing;
@@ -85,6 +86,7 @@ async function insertOrUpdateExistingSweepstakes(id: string, input: { title: str
 }
 
 export async function countWeeklyEntries(tx: typeof prisma = prisma, userId: string, weekStart = startOfWeekUtc(new Date()), campaignId?: string | null) {
+  await ensureSweepstakesCoreTables(tx as any);
   const rows = (await tx.$queryRawUnsafe(`
     SELECT COALESCE(SUM("quantity"), 0) AS "total"
     FROM "RaffleEntry"
@@ -108,6 +110,7 @@ export async function awardRaffleEntries(
     auditKey?: string | null;
   },
 ) {
+  await ensureSweepstakesCoreTables(tx as any);
   const quantityRequested = Math.max(0, Math.floor(Number(input.quantity || 0)));
   if (!input.userId || quantityRequested <= 0) {
     return { awarded: 0, capped: false, remaining: RAFFLE_WEEKLY_ENTRY_LIMIT };
