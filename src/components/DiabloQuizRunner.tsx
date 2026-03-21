@@ -19,6 +19,8 @@ import { evaluateQuestionAnswer } from "@/lib/questionTransforms";
 
 export type DiabloQuestion = {
   id?: string;
+  sessionQuestionId?: string;
+  isGolden?: boolean;
   prompt: string;
   type?: QuestionType;
   choices?: string[];
@@ -38,6 +40,7 @@ export type DiabloQuizRunSummary = {
   enemyHP: number;
   timeLeft: number;
   masteryByDomain?: Record<string, number>;
+  domainStatsByDomain?: Record<string, { correctCount: number; wrongCount: number; currentDifficulty: number }>;
 };
 
 export type QuizMediaConfig = {
@@ -294,6 +297,7 @@ export default function DiabloQuizRunner(props: {
   onXp?: (xpDelta: number, totalXp: number) => void;
   initialState?: any;
   onStateChange?: (state: any) => void;
+  onQuestionAdvanced?: (payload: { sessionQuestionId?: string; questionId?: string; isCorrect: boolean; isGolden: boolean; domainId?: string; level?: DifficultyTier }) => void;
   media?: QuizMediaConfig;
 }) {
   const {
@@ -312,6 +316,7 @@ export default function DiabloQuizRunner(props: {
     onXp,
     initialState,
     onStateChange,
+    onQuestionAdvanced,
     media,
   } = props;
 
@@ -332,6 +337,7 @@ export default function DiabloQuizRunner(props: {
   );
 
   const [hitPulse, setHitPulse] = useState<null | "player" | "enemy">(null);
+  const domainStatsRef = useRef<Record<string, { correctCount: number; wrongCount: number; currentDifficulty: number }>>({});
   const [fillValue, setFillValue] = useState("");
   const [cliValue, setCliValue] = useState("");
   const [logValue, setLogValue] = useState("");
@@ -345,6 +351,12 @@ export default function DiabloQuizRunner(props: {
     timed,
     onXp,
     onSubmit: (r) => {
+      const domainKey = String(r.domainId || "general").toLowerCase();
+      const current = domainStatsRef.current[domainKey] || { correctCount: 0, wrongCount: 0, currentDifficulty: 1 };
+      if (r.correct) current.correctCount += 1;
+      else current.wrongCount += 1;
+      current.currentDifficulty = Math.max(current.currentDifficulty || 1, Number(r.tier || 1));
+      domainStatsRef.current[domainKey] = current;
       setHitPulse(r.correct ? "enemy" : "player");
       if ((r.correct && !media?.enemyHitSrc) || (!r.correct && !media?.playerHitSrc)) {
         window.setTimeout(() => setHitPulse(null), 900);
@@ -359,6 +371,7 @@ export default function DiabloQuizRunner(props: {
 
   useEffect(() => {
     finishedOnceRef.current = false;
+    domainStatsRef.current = {};
   }, [combatQuestions.length, timed, title]);
 
   useEffect(() => {
@@ -395,6 +408,7 @@ export default function DiabloQuizRunner(props: {
       enemyHP: state.enemyHP,
       timeLeft: state.timeLeft,
       masteryByDomain: state.mastery,
+      domainStatsByDomain: domainStatsRef.current,
     });
   }, [state.finished, state.xpEarned, state.correctCount, state.playerHP, state.enemyHP, state.timeLeft, combatQuestions.length, onComplete, outcome]);
 
@@ -409,6 +423,21 @@ export default function DiabloQuizRunner(props: {
 
   const domainLabel = labelForDomain(currentDomainId);
   const finished = Boolean(forceFinish) || state.finished;
+  const isGoldenQuestion = Boolean(question && (question as any).isGolden);
+
+  function handleNextQuestion() {
+    if (question && state.locked) {
+      onQuestionAdvanced?.({
+        sessionQuestionId: (question as any).sessionQuestionId,
+        questionId: String(question.id || ""),
+        isCorrect: Boolean(state.lastWasCorrect),
+        isGolden: Boolean((question as any).isGolden),
+        domainId: question.domainId,
+        level: question.level,
+      });
+    }
+    next();
+  }
 
   const isEnemyHitVideo = hitPulse === "enemy" && Boolean(media?.enemyHitSrc);
   const isPlayerHitVideo = hitPulse === "player" && Boolean(media?.playerHitSrc);
@@ -479,7 +508,7 @@ export default function DiabloQuizRunner(props: {
               <ModelPanel title={playerName} src={playerVideo} loop={!isPlayerHitVideo} onEnded={isPlayerHitVideo ? () => setHitPulse(null) : undefined} height="clamp(260px, 30vh, 420px)" />
             </div>
 
-            <div className={"d2QuestionCard d2QuizQuestionCard " + (hitPulse === "enemy" ? "d2HitFlash" : "") } style={{ minHeight: 560 }}>
+            <div className={"d2QuestionCard d2QuizQuestionCard " + (hitPulse === "enemy" ? "d2HitFlash" : "") + (isGoldenQuestion ? " d2GoldenQuestion" : "") } style={{ minHeight: 560, border: isGoldenQuestion ? "1px solid rgba(245, 197, 66, 0.75)" : undefined, boxShadow: isGoldenQuestion ? "0 0 0 1px rgba(245,197,66,.22), 0 0 26px rgba(245,197,66,.18), inset 0 0 32px rgba(245,197,66,.08)" : undefined }}>
               <span className="d2Rivet" style={{ left: 12, top: 12 }} />
               <span className="d2Rivet" style={{ right: 12, top: 12 }} />
               <span className="d2Rivet" style={{ left: 12, bottom: 12 }} />
@@ -496,6 +525,7 @@ export default function DiabloQuizRunner(props: {
                       {timed ? <span className="badge" style={{ fontVariantNumeric: "tabular-nums" }}>⏱ {Math.max(0, state.timeLeft)}s</span> : null}
                       <span className="badge">{labelForType(questionType)}</span>
                       {metaRight ? <span className="badge">{metaRight}</span> : null}
+                      {isGoldenQuestion ? <span className="badge" style={{ borderColor: "rgba(245,197,66,.55)", color: "#fcd34d", boxShadow: "0 0 18px rgba(245,197,66,.16)" }}>Golden Draw Question</span> : null}
                       <span className="badge">XP +{state.xpEarned}</span>
                     </div>
                   </div>
@@ -545,7 +575,7 @@ export default function DiabloQuizRunner(props: {
                         </button>
                       </>
                     ) : (
-                      <button className="d2Btn" onClick={() => next()}>NEXT</button>
+                      <button className="d2Btn" onClick={() => handleNextQuestion()}>NEXT</button>
                     )}
                   </div>
 
@@ -588,12 +618,13 @@ export default function DiabloQuizRunner(props: {
               </div>
             </div>
 
-            <div className={"d2QuestionCard d2QuizQuestionCard mobileQuizQuestionCard " + (hitPulse === "enemy" ? "d2HitFlash" : "")}>
+            <div className={"d2QuestionCard d2QuizQuestionCard mobileQuizQuestionCard " + (hitPulse === "enemy" ? "d2HitFlash" : "") + (isGoldenQuestion ? " d2GoldenQuestion" : "")} style={{ border: isGoldenQuestion ? "1px solid rgba(245, 197, 66, 0.75)" : undefined, boxShadow: isGoldenQuestion ? "0 0 0 1px rgba(245,197,66,.22), 0 0 24px rgba(245,197,66,.18), inset 0 0 30px rgba(245,197,66,.08)" : undefined }}>
               {!finished && question ? (
                 <>
                   <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
                     <span className="badge">{labelForType(questionType)}</span>
                     <span className="badge">Tier {state.tier}</span>
+                    {isGoldenQuestion ? <span className="badge" style={{ borderColor: "rgba(245,197,66,.55)", color: "#fcd34d", boxShadow: "0 0 18px rgba(245,197,66,.16)" }}>Golden Draw Question</span> : null}
                   </div>
                   <div className="mobileQuizPrompt">{question.prompt}</div>
                   <DomainRuneBar domainLabel={domainLabel} mastery={currentMastery} tier={state.tier} />
@@ -638,7 +669,7 @@ export default function DiabloQuizRunner(props: {
                         </button>
                       </>
                     ) : (
-                      <button className="d2Btn" onClick={() => next()}>NEXT</button>
+                      <button className="d2Btn" onClick={() => handleNextQuestion()}>NEXT</button>
                     )}
                   </div>
                   {state.locked && (

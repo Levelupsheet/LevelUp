@@ -52,6 +52,8 @@ function mapQuestion(q: any, idx: number): DiabloQuestion {
 
   return {
     id: q?.id || `question_${idx}`,
+    sessionQuestionId: q?.sessionQuestionId ? String(q.sessionQuestionId) : undefined,
+    isGolden: Boolean(q?.isGolden),
     prompt: String(q?.prompt || ""),
     type,
     choices,
@@ -153,6 +155,27 @@ export default function GameEngine(props: Props) {
     }, 250) as any;
   }, [lane, sessionId]);
 
+  const handleQuestionAdvanced = useCallback(async (payload: { sessionQuestionId?: string; questionId?: string; isCorrect: boolean; isGolden: boolean; domainId?: string; level?: 1 | 2 | 3 }) => {
+    if (lane !== "TEST_NOW" || !sessionId || !payload?.sessionQuestionId) return;
+    try {
+      await fetch("/api/test-now/session", {
+        method: "PATCH",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          sessionId,
+          answeredQuestions: [{
+            sessionQuestionId: payload.sessionQuestionId,
+            isCorrect: payload.isCorrect,
+            isGolden: payload.isGolden,
+            questionId: payload.questionId,
+            domainId: payload.domainId,
+            level: payload.level,
+          }],
+        }),
+      });
+    } catch {}
+  }, [lane, sessionId]);
+
   const handleComplete = useCallback(async (summary: DiabloQuizRunSummary) => {
     const speedBonus = timed ? calculateSpeedBonus(summary.timeLeft || 0) : 0;
     const awardedXp = summary.xpEarned + speedBonus;
@@ -178,6 +201,7 @@ export default function GameEngine(props: Props) {
           xpEarned: awardedXp,
           outcome: summary.outcome,
           masteryByDomain: summary.masteryByDomain || {},
+          domainStatsByDomain: summary.domainStatsByDomain || {},
           questionDomains: questions.map((q) => ({ id: String(q.id || ""), domainId: String(q.domainId || "general"), level: Number(q.level || 1) })),
         }),
       });
@@ -188,5 +212,5 @@ export default function GameEngine(props: Props) {
   if (loading) return <div className="page"><div className="container" style={{ maxWidth: 1280 }}><div className="card" style={{ padding: 18 }}><div style={{ fontWeight: 800, fontSize: 18 }}>Loading {title}…</div><div className="muted" style={{ marginTop: 8 }}>{lane === "TEST_NOW" ? "Restoring or creating your saved Test Now session." : "Pulling randomized questions from your active database set."}</div></div></div></div>;
   if (!questions.length) return <div className="page"><div className="container" style={{ maxWidth: 1120 }}><div className="card" style={{ padding: 18 }}><div style={{ fontWeight: 800, fontSize: 18 }}>No questions available</div><div className="muted" style={{ marginTop: 8 }}>Assign an active question set in Admin.</div><div style={{ marginTop: 14 }}><Link className="btn" href="/admin">Open Admin</Link></div></div></div></div>;
 
-  return <DiabloQuizRunner title={title} subtitle={setLabel} enemyName={enemyName} questions={questions} timed={timed} metaLeft={metaLeft} metaRight={metaRight} exitHref={exitHref} exitLabel={exitLabel} onExit={onExit} onComplete={handleComplete} onStateChange={saveSessionProgress} initialState={initialState} media={{ playerIdleSrc: "/video/player-idle.mp4", playerAttackSrc: "/video/player-attack.mp4", enemyIdleSrc: "/video/enemy-idle.mp4", enemyHitSrc: "/video/enemy-damage.mp4", width: 1600, height: 900 }} />;
+  return <DiabloQuizRunner title={title} subtitle={setLabel} enemyName={enemyName} questions={questions} timed={timed} metaLeft={metaLeft} metaRight={metaRight} exitHref={exitHref} exitLabel={exitLabel} onExit={onExit} onComplete={handleComplete} onStateChange={saveSessionProgress} onQuestionAdvanced={handleQuestionAdvanced} initialState={initialState} media={{ playerIdleSrc: "/video/player-idle.mp4", playerAttackSrc: "/video/player-attack.mp4", enemyIdleSrc: "/video/enemy-idle.mp4", enemyHitSrc: "/video/enemy-damage.mp4", width: 1600, height: 900 }} />;
 }

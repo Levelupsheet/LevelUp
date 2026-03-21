@@ -53,6 +53,7 @@ export default function AdaptiveLearningCard(props: {
           const totalAnswered = Math.max(0, Number(row.correctCount || 0) + Number(row.wrongCount || 0));
           const tone = masteryTone(row.domain, mastery);
           const hasAnswers = totalAnswered > 0;
+          const metricText = hasAnswers ? `${row.correctCount} correct • ${row.wrongCount} missed • ${accuracy}% accuracy • D${row.currentDifficulty}` : `Mastery tracked from play history • D${row.currentDifficulty}`;
           return (
             <div key={row.domain} style={{ border: '1px solid rgba(255,255,255,.08)', borderRadius: 14, padding: 12, background: 'rgba(255,255,255,.02)' }}>
               <div style={{ display:'grid', gridTemplateColumns:'minmax(110px,160px) 1fr auto', gap:12, alignItems:'center' }} className="adaptiveGrid">
@@ -67,13 +68,7 @@ export default function AdaptiveLearningCard(props: {
               </div>
               <div style={{ display:'flex', justifyContent:'space-between', gap:12, flexWrap:'wrap', color:'rgba(255,255,255,.74)', fontSize:12, marginTop:8 }}>
                 <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
-                  <span style={{ color: 'rgba(255,255,255,.92)', fontWeight: 700 }}>{row.correctCount} correct</span>
-                  <span>•</span>
-                  <span>{row.wrongCount} missed</span>
-                  <span>•</span>
-                  <span>{accuracy}% accuracy</span>
-                  <span>•</span>
-                  <span>D{row.currentDifficulty}</span>
+                  <span style={{ color: 'rgba(255,255,255,.92)', fontWeight: 700 }}>{metricText}</span>
                 </div>
                 <div>{hasAnswers ? `${totalAnswered} answered` : 'Keep practicing to build this domain.'}</div>
               </div>

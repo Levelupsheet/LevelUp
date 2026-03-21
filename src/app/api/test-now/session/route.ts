@@ -6,6 +6,29 @@ import { normalizeDifficultyLevel, sampleQuestions, shuffleQuestionPayload } fro
 import { normalizeQuestionType } from "@/lib/questionTypes";
 import { getSweepstakesCampaignMetaMap } from "@/lib/sweepstakesCampaignMeta";
 import { awardRaffleEntries } from "@/lib/raffle";
+import { levelFromXp } from "@/lib/progression";
+
+
+async function ensureGoldenQuestionHistoryTable(tx: any = prisma) {
+  await tx.$executeRawUnsafe(`
+    CREATE TABLE IF NOT EXISTS "GoldenQuestionHistory" (
+      "id" TEXT PRIMARY KEY,
+      "userId" TEXT NOT NULL,
+      "level" INTEGER NOT NULL,
+      "sessionId" TEXT,
+      "questionId" TEXT,
+      "awarded" BOOLEAN NOT NULL DEFAULT FALSE,
+      "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+  await tx.$executeRawUnsafe(`CREATE INDEX IF NOT EXISTS "GoldenQuestionHistory_user_level_idx" ON "GoldenQuestionHistory"("userId","level")`);
+}
+
+async function userAlreadyHadGoldenForLevel(userId: string, level: number) {
+  await ensureGoldenQuestionHistoryTable(prisma as any);
+  const rows = await (prisma as any).$queryRawUnsafe(`SELECT 1 FROM "GoldenQuestionHistory" WHERE "userId" = $1 AND "level" = $2 LIMIT 1`, userId, level);
+  return Array.isArray(rows) && rows.length > 0;
+}
 
 function mapQuestion(q: any) {
   const rawData = q.data && typeof q.data === "object" ? q.data : {};
@@ -26,6 +49,8 @@ function mapQuestion(q: any) {
     isGoldenEligible: Boolean(q.isGoldenEligible),
     goldenWeight: Number(q.goldenWeight || 1),
     goldenBonusXp: Number(q.goldenBonusXp || 50),
+    sessionQuestionId: q.sessionQuestionId ? String(q.sessionQuestionId) : undefined,
+    isGolden: Boolean(q.isGolden),
   };
 }
 
@@ -65,24 +90,30 @@ async function buildNewSession(userId: string, questionCount = 10) {
   });
   if (!placement?.set?.questions?.length) throw new Error("No active Test Now question set found");
 
+  const user = await prisma.user.findUnique({ where: { id: userId }, select: { xp: true } }).catch(() => null);
+  const currentLevel = levelFromXp(Number(user?.xp || 0));
+  const alreadyHadGolden = await userAlreadyHadGoldenForLevel(userId, currentLevel);
+
   const pool = placement.set.questions.map(mapQuestion);
   const selected = sampleQuestions(pool, questionCount).map((q) => shuffleQuestionPayload(q));
   const goldenPool = pool.filter((q: any) => q.isGoldenEligible);
-  const shouldSpawnGolden = goldenPool.length > 0 && Math.random() < 0.12;
   let goldenQuestionId: string | null = null;
   let finalQuestions: any[] = [...selected];
 
-  if (shouldSpawnGolden) {
-    const weighted = goldenPool.flatMap((q: any) => Array.from({ length: Math.max(1, Number(q.goldenWeight || 1)) }, () => q));
+  if (!alreadyHadGolden && goldenPool.length > 0 && finalQuestions.length >= 6) {
+    const selectedIds = new Set(finalQuestions.map((q: any) => String(q.id || "")));
+    const availableGolden = goldenPool.filter((q: any) => !selectedIds.has(String(q.id || "")));
+    const weighted = (availableGolden.length ? availableGolden : goldenPool).flatMap((q: any) => Array.from({ length: Math.max(1, Number(q.goldenWeight || 1)) }, () => q));
     const picked = weighted[Math.floor(Math.random() * weighted.length)] || goldenPool[0];
     if (picked) {
-      const replacementIndex = Math.floor(Math.random() * finalQuestions.length);
+      const replacementIndex = Math.min(5, finalQuestions.length - 1);
       finalQuestions[replacementIndex] = { ...shuffleQuestionPayload(picked), isGolden: true, goldenBonusXp: picked.goldenBonusXp || 50 } as any;
       goldenQuestionId = String((finalQuestions[replacementIndex] as any).id);
     }
   }
 
   const session = await prisma.$transaction(async (tx: any) => {
+    await ensureGoldenQuestionHistoryTable(tx);
     const created = await tx.gameSession.create({
       data: {
         userId,
@@ -109,6 +140,9 @@ async function buildNewSession(userId: string, questionCount = 10) {
           goldenBonusXp: String(q.id) === goldenQuestionId ? Number(q.goldenBonusXp || 50) : null,
         },
       });
+    }
+    if (goldenQuestionId) {
+      await tx.$executeRawUnsafe(`INSERT INTO "GoldenQuestionHistory" ("id","userId","level","sessionId","questionId","awarded","createdAt") VALUES ($1,$2,$3,$4,$5,FALSE,CURRENT_TIMESTAMP)`, `gqh_${Date.now()}_${Math.random().toString(36).slice(2,8)}`, userId, currentLevel, created.id, goldenQuestionId);
     }
     return tx.gameSession.findUnique({ where: { id: created.id }, include: { questions: { orderBy: { orderIndex: "asc" } } } });
   });
@@ -154,11 +188,15 @@ export async function PATCH(req: Request) {
     const answered = Array.isArray(body?.answeredQuestions) ? body.answeredQuestions : [];
 
     await prisma.$transaction(async (tx: any) => {
+      await ensureGoldenQuestionHistoryTable(tx);
+      const sessionMeta = await tx.gameSession.findUnique({ where: { id: sessionId }, select: { userId: true } });
+      const activeCampaign = await (tx as any).sweepstakesCampaign?.findFirst?.({ where: { status: "ACTIVE", isLive: true, startsAt: { lte: new Date() }, endsAt: { gte: new Date() } }, orderBy: { startsAt: "desc" } }).catch(() => null);
+      const metaMap = await getSweepstakesCampaignMetaMap().catch(() => new Map());
       if (answered.length) {
         for (const row of answered) {
           const sessionQuestionId = String(row?.sessionQuestionId || "").trim();
           if (!sessionQuestionId) continue;
-          await tx.gameSessionQuestion.update({
+          const updatedQuestion = await tx.gameSessionQuestion.update({
             where: { id: sessionQuestionId },
             data: {
               answered: true,
@@ -167,6 +205,19 @@ export async function PATCH(req: Request) {
               answeredAt: new Date(),
             },
           });
+          if (updatedQuestion?.isGolden && row?.isCorrect && activeCampaign && metaMap.get(String(activeCampaign.id))?.allowGoldenQuestion && sessionMeta?.userId) {
+            await awardRaffleEntries(tx as any, {
+              userId: String(sessionMeta.userId),
+              source: "GOLDEN_QUESTION",
+              quantity: 1,
+              campaignId: activeCampaign.id,
+              sourceRefType: "QUESTION",
+              sourceRefId: String(updatedQuestion.id),
+              auditKey: `golden-question:${String(updatedQuestion.id)}`,
+              meta: { sessionId, questionId: updatedQuestion.questionId } as any,
+            });
+            await tx.$executeRawUnsafe(`UPDATE "GoldenQuestionHistory" SET "awarded" = TRUE WHERE "sessionId" = $1 AND "questionId" = $2`, sessionId, String(updatedQuestion.questionId || ""));
+          }
         }
       }
       await tx.gameSession.update({
@@ -180,35 +231,6 @@ export async function PATCH(req: Request) {
       });
     });
     const session = await (prisma as any).gameSession.findUnique({ where: { id: sessionId }, include: { questions: { orderBy: { orderIndex: "asc" } } } });
-
-    if (status === "COMPLETED" && session) {
-      const activeCampaign = await (prisma as any).sweepstakesCampaign.findFirst({
-        where: { status: "ACTIVE", isLive: true, startsAt: { lte: new Date() }, endsAt: { gte: new Date() } },
-        orderBy: { startsAt: "desc" },
-      }).catch(() => null);
-      if (activeCampaign) {
-        const metaMap = await getSweepstakesCampaignMetaMap().catch(() => new Map());
-        const meta = metaMap.get(String(activeCampaign.id));
-        if (meta?.allowGoldenQuestion) {
-          await prisma.$transaction(async (tx: any) => {
-            const fresh = await tx.gameSession.findUnique({ where: { id: sessionId }, include: { questions: { orderBy: { orderIndex: "asc" } } } });
-            for (const q of fresh?.questions || []) {
-              if (!q?.isGolden || !q?.isCorrect) continue;
-              await awardRaffleEntries(tx as any, {
-                userId: fresh.userId,
-                source: "GOLDEN_QUESTION",
-                quantity: 1,
-                campaignId: activeCampaign.id,
-                sourceRefType: "QUESTION",
-                sourceRefId: String(q.id),
-                auditKey: `golden-question:${String(q.id)}`,
-                meta: { sessionId: fresh.id, questionId: q.questionId } as any,
-              });
-            }
-          }).catch(() => null);
-        }
-      }
-    }
     return NextResponse.json(serializeSession(session));
   } catch (e: any) {
     return NextResponse.json({ error: e?.message || "Failed to update Test Now session" }, { status: 500 });
