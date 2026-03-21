@@ -47,7 +47,7 @@ type AdminUser = {
 };
 
 type CareerMatchRow = { id: string; title: string; company?: string; domain: string; minLevel: number; minMastery: number; description: string; url: string; location?: string; salary?: string; isActive?: boolean };
-type LootVaultRow = { id: string; name: string; type: string; costTokens: number; description: string; isActive?: boolean; sweepstakesEntries?: number; fulfillmentUrl?: string };
+type LootVaultRow = { id: string; name: string; type: string; costTokens: number; description: string; isActive?: boolean; sweepstakesEntries?: number; fulfillmentUrl?: string; dropWeight?: number; spinnerSymbol?: string; iconUrl?: string };
 
 function asArray<T>(value: T[] | null | undefined): T[] {
   return Array.isArray(value) ? value : [];
@@ -87,7 +87,7 @@ function LootVaultAdmin(){
     setRows(prev => prev.map(r => r.id === id ? { ...r, ...patch } : r));
   }
   function addRow(){
-    setRows(prev => ([...prev, { id: `reward-${Date.now()}`, name: 'New reward', type: 'SWEEPSTAKES_ENTRY', costTokens: 100, description: '', isActive: true, sweepstakesEntries: 1 }]));
+    setRows(prev => ([...prev, { id: `reward-${Date.now()}`, name: 'New reward', type: 'SWEEPSTAKES_ENTRY', costTokens: 100, description: '', isActive: true, sweepstakesEntries: 1, dropWeight: 1, spinnerSymbol: '🎁', iconUrl: '' }]));
   }
   function removeRow(id: string){
     setRows(prev => prev.filter(r => r.id !== id));
@@ -119,16 +119,19 @@ function LootVaultAdmin(){
       <div style={{ marginTop: 12, display:'grid', gap: 12 }}>
         {loading ? <div>Loading loot vault rewards…</div> : rows.map((row) => (
           <div key={row.id} className="card" style={{ padding: 12 }}>
-            <div style={{ display:'grid', gap: 10, gridTemplateColumns:'1.1fr 0.9fr 0.7fr 0.7fr auto', alignItems:'end' }}>
+            <div style={{ display:'grid', gap: 10, gridTemplateColumns:'1.1fr 0.9fr 0.65fr 0.65fr 0.55fr auto', alignItems:'end' }}>
               <label><small>Name</small><input value={row.name} onChange={(e)=>updateRow(row.id,{ name:e.target.value })} /></label>
               <label><small>Type</small><input value={row.type} onChange={(e)=>updateRow(row.id,{ type:e.target.value.toUpperCase() })} /></label>
               <label><small>Token cost</small><input type="number" value={row.costTokens} onChange={(e)=>updateRow(row.id,{ costTokens:Number(e.target.value||0) })} /></label>
               <label><small>Sweepstakes entries</small><input type="number" value={row.sweepstakesEntries ?? 0} onChange={(e)=>updateRow(row.id,{ sweepstakesEntries:Number(e.target.value||0) })} /></label>
+              <label><small>Drop weight</small><input type="number" value={row.dropWeight ?? 1} onChange={(e)=>updateRow(row.id,{ dropWeight:Number(e.target.value||0) })} /></label>
               <button className="danger" onClick={() => removeRow(row.id)}>Delete</button>
             </div>
-            <div style={{ marginTop: 10, display:'grid', gap: 10, gridTemplateColumns:'1fr 1fr auto', alignItems:'end' }}>
+            <div style={{ marginTop: 10, display:'grid', gap: 10, gridTemplateColumns:'1fr 1fr 0.8fr 0.8fr auto', alignItems:'end' }}>
               <label><small>Description</small><input value={row.description} onChange={(e)=>updateRow(row.id,{ description:e.target.value })} /></label>
               <label><small>Fulfillment URL (optional)</small><input value={row.fulfillmentUrl || ''} onChange={(e)=>updateRow(row.id,{ fulfillmentUrl:e.target.value })} /></label>
+              <label><small>Spinner symbol</small><input value={row.spinnerSymbol || ''} onChange={(e)=>updateRow(row.id,{ spinnerSymbol:e.target.value })} placeholder="🎁" /></label>
+              <label><small>Image URL</small><input value={row.iconUrl || ''} onChange={(e)=>updateRow(row.id,{ iconUrl:e.target.value })} placeholder="https://..." /></label>
               <label style={{ display:'flex', gap:8, alignItems:'center', paddingBottom:6 }}><input type='checkbox' checked={row.isActive !== false} onChange={(e)=>updateRow(row.id,{ isActive:e.target.checked })} /> Active</label>
             </div>
           </div>
