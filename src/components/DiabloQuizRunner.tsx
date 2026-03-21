@@ -457,7 +457,6 @@ export default function DiabloQuizRunner(props: {
   const isPlayerHitVideo = hitPulse === "player" && Boolean(media?.playerHitSrc);
   const playerVideo = hitPulse === "enemy" ? media?.playerAttackSrc || media?.playerIdleSrc : hitPulse === "player" ? media?.playerHitSrc || media?.playerIdleSrc : media?.playerIdleSrc;
   const enemyVideo = hitPulse === "enemy" ? media?.enemyHitSrc || media?.enemyIdleSrc : media?.enemyIdleSrc;
-  const isGoldenActive = Boolean((question as any)?.isGolden);
 
   function handleManualSubmit() {
     if (!question || state.locked) return;
@@ -523,7 +522,7 @@ export default function DiabloQuizRunner(props: {
               <ModelPanel title={playerName} src={playerVideo} loop={!isPlayerHitVideo} onEnded={isPlayerHitVideo ? () => setHitPulse(null) : undefined} height="clamp(260px, 30vh, 420px)" />
             </div>
 
-            <div className={"d2QuestionCard d2QuizQuestionCard " + (hitPulse === "enemy" ? "d2HitFlash" : "") + (isGoldenActive ? " d2GoldenQuestionCard" : "") } style={{ minHeight: 560 }}>
+            <div className={"d2QuestionCard d2QuizQuestionCard " + (hitPulse === "enemy" ? "d2HitFlash" : "") } style={{ minHeight: 560 }}>
               <span className="d2Rivet" style={{ left: 12, top: 12 }} />
               <span className="d2Rivet" style={{ right: 12, top: 12 }} />
               <span className="d2Rivet" style={{ left: 12, bottom: 12 }} />
@@ -614,7 +613,7 @@ export default function DiabloQuizRunner(props: {
 
             <div style={{ display: "grid", gap: 12 }}>
               <D2EnemyHealthBar value={state.enemyHP} name={enemyName.toUpperCase().slice(0, 18)} />
-              <ModelPanel title={enemyName.toUpperCase().slice(0, 18)} src={enemyVideo} mirrored loop={!isEnemyHitVideo} onEnded={isEnemyHitVideo ? () => setHitPulse(null) : undefined} height="clamp(260px, 30vh, 420px)" />
+              <ModelPanel title={enemyName.toUpperCase().slice(0, 18)} src={enemyVideo} loop={!isEnemyHitVideo} onEnded={isEnemyHitVideo ? () => setHitPulse(null) : undefined} height="clamp(260px, 30vh, 420px)" />
             </div>
           </div>
         ) : (
@@ -630,7 +629,7 @@ export default function DiabloQuizRunner(props: {
             <div className="mobileCombatCard">
               <D2EnemyHealthBar value={state.enemyHP} name={enemyName.toUpperCase().slice(0, 18)} />
               <div style={{ marginTop: 10 }}>
-                <ModelPanel title={enemyName.toUpperCase().slice(0, 18)} src={enemyVideo} mirrored loop={!isEnemyHitVideo} onEnded={isEnemyHitVideo ? () => setHitPulse(null) : undefined} height={230} />
+                <ModelPanel title={enemyName.toUpperCase().slice(0, 18)} src={enemyVideo} loop={!isEnemyHitVideo} onEnded={isEnemyHitVideo ? () => setHitPulse(null) : undefined} height={230} />
               </div>
             </div>
 

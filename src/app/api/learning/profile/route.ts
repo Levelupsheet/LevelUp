@@ -23,28 +23,43 @@ function calcMastery(correct: number, wrong: number, fallbackXp = 0, seed = 0) {
   return Math.max(0, Math.min(100, Number(seed.toFixed(1))));
 }
 
+type DomainAggregate = {
+  domain: string;
+  mastery: number;
+  correctCount: number;
+  wrongCount: number;
+  accuracy: number;
+  currentDifficulty: number;
+};
+
 export async function GET(req: Request) {
   try {
     const userId = await getRequestUserId(req);
     if (!userId) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
 
-    const [practiceAnswers, certAnswers, userDomains, sessionQuestions] = await Promise.all([
+    const [practiceAnswers, certAnswers, userDomains, gameSessionQuestions] = await Promise.all([
       prisma.practiceAnswer.findMany({ where: { userId }, orderBy: { createdAt: "desc" }, take: 250 }),
       prisma.certPracticeAnswer.findMany({ where: { userId }, orderBy: { createdAt: "desc" }, take: 250 }),
       prisma.userDomain.findMany({ where: { userId } }),
       prisma.gameSessionQuestion.findMany({
         where: {
-          session: { userId, status: "COMPLETED" },
           answered: true,
-          isCorrect: { not: null },
+          session: {
+            userId,
+            status: "COMPLETED",
+          },
+        },
+        select: {
+          isCorrect: true,
+          payloadJson: true,
+          session: { select: { mode: true } },
         },
         orderBy: { answeredAt: "desc" },
-        take: 400,
-        include: { session: { select: { id: true, mode: true, status: true } } },
+        take: 500,
       }).catch(() => [] as any[]),
     ]);
 
-    const masteryMap = new Map<string, { domain: string; mastery: number; correctCount: number; wrongCount: number; accuracy: number; currentDifficulty: number }>();
+    const masteryMap = new Map<string, DomainAggregate>();
     const ensure = (domainInput?: string | null) => {
       const domain = String(domainInput || "GENERAL").toUpperCase();
       if (!masteryMap.has(domain)) masteryMap.set(domain, { domain, mastery: 0, correctCount: 0, wrongCount: 0, accuracy: 0, currentDifficulty: 1 });
@@ -54,6 +69,7 @@ export async function GET(req: Request) {
     for (const row of practiceAnswers || []) {
       const domain = inferDomainFromQuestion({ domain: row.domain, prompt: row.prompt });
       const slot = ensure(domain);
+      slot.correctCount += 1;
       slot.currentDifficulty = Math.max(slot.currentDifficulty, Number(row.tier || 1));
     }
 
@@ -61,17 +77,18 @@ export async function GET(req: Request) {
       const exam = String(row.exam || "GENERAL").toUpperCase();
       const domain = exam === "AWS" ? "AWS" : exam === "AZURE" || exam === "AZ_900" ? "AZURE" : exam === "SECURITY_PLUS" ? "SECURITY" : "GENERAL";
       const slot = ensure(domain);
+      slot.correctCount += 1;
       slot.currentDifficulty = Math.max(slot.currentDifficulty, 2);
     }
 
-    for (const row of sessionQuestions || []) {
-      const payload = (row as any)?.payloadJson && typeof (row as any).payloadJson === 'object' ? (row as any).payloadJson : {};
-      const rawDomain = String((payload as any)?.domainId || (payload as any)?.data?.domainId || ((payload as any)?.tags || [])[0] || '').trim();
-      const domain = inferDomainFromQuestion({ domain: rawDomain, prompt: String((payload as any)?.prompt || '') });
+    for (const row of gameSessionQuestions || []) {
+      const payload = row?.payloadJson && typeof row.payloadJson === "object" ? row.payloadJson as any : {};
+      const rawDomain = String(payload?.domainId || payload?.data?.domainId || payload?.data?.domain || (Array.isArray(payload?.tags) ? payload.tags[0] : "") || "general");
+      const domain = inferDomainFromQuestion({ domain: rawDomain, prompt: String(payload?.prompt || "") });
       const slot = ensure(domain);
-      if ((row as any).isCorrect === true) slot.correctCount += 1;
-      else if ((row as any).isCorrect === false) slot.wrongCount += 1;
-      slot.currentDifficulty = Math.max(slot.currentDifficulty, Number((payload as any)?.level || (payload as any)?.difficulty || 1));
+      if (row?.isCorrect === true) slot.correctCount += 1;
+      else if (row?.isCorrect === false) slot.wrongCount += 1;
+      slot.currentDifficulty = Math.max(slot.currentDifficulty, Number(payload?.difficulty || payload?.level || 1));
     }
 
     for (const row of userDomains || []) {

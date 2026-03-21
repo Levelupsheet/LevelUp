@@ -88,22 +88,22 @@ async function buildNewSession(userId: string, questionCount = 10) {
   await ensureGoldenQuestionHistoryTable();
   const pool = placement.set.questions.map(mapQuestion);
   const selected = sampleQuestions(pool, questionCount).map((q) => shuffleQuestionPayload(q));
+  const goldenPool = pool.filter((q: any) => q.isGoldenEligible);
   let goldenQuestionId: string | null = null;
   let finalQuestions: any[] = [...selected];
 
   const currentLevel = Math.max(1, Number(Math.floor(((await prisma.user.findUnique({ where: { id: userId }, select: { xp: true } }).catch(() => ({ xp: 0 })) as any).xp || 0) / 500) + 1));
   const alreadyHadGolden = await (prisma as any).$queryRawUnsafe(`SELECT 1 FROM "GoldenQuestionHistory" WHERE "userId" = $1 AND "level" = $2 LIMIT 1`, userId, currentLevel).then((rows: any[]) => Array.isArray(rows) && rows.length > 0).catch(() => false);
 
-  if (!alreadyHadGolden && finalQuestions.length >= 6) {
-    const replacementIndex = 5;
-    const picked = finalQuestions[replacementIndex];
+  if (!alreadyHadGolden && goldenPool.length > 0 && finalQuestions.length >= 6) {
+    const selectedIds = new Set(finalQuestions.map((q: any) => String(q.id || "")));
+    const availableGolden = goldenPool.filter((q: any) => !selectedIds.has(String(q.id || "")));
+    const weighted = (availableGolden.length ? availableGolden : goldenPool).flatMap((q: any) => Array.from({ length: Math.max(1, Number(q.goldenWeight || 1)) }, () => q));
+    const picked = weighted[Math.floor(Math.random() * weighted.length)] || goldenPool[0];
     if (picked) {
-      finalQuestions[replacementIndex] = {
-        ...picked,
-        isGolden: true,
-        goldenBonusXp: Number((picked as any)?.goldenBonusXp || 50),
-      } as any;
-      goldenQuestionId = String((finalQuestions[replacementIndex] as any).id || '');
+      const replacementIndex = Math.min(5, Math.max(0, finalQuestions.length - 1));
+      finalQuestions[replacementIndex] = { ...shuffleQuestionPayload(picked), isGolden: true, goldenBonusXp: picked.goldenBonusXp || 50 } as any;
+      goldenQuestionId = String((finalQuestions[replacementIndex] as any).id);
     }
   }
 

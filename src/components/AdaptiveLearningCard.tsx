@@ -38,15 +38,15 @@ export default function AdaptiveLearningCard(props: {
 }) {
   const rows = Array.isArray(props.rows) ? props.rows.slice(0, 6) : [];
   return (
-    <div className="card adaptiveLearningCard" style={{ padding: 11, marginBottom: 12, transform: 'scale(0.92)', transformOrigin: 'top center' }}>
-      <div style={{ display: "flex", justifyContent: "space-between", gap: 9, flexWrap: "wrap", alignItems: "center" }}>
+    <div className="card adaptiveLearningCard" style={{ padding: 16, marginBottom: 16 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
         <div>
-          <div style={{ fontWeight: 900, fontSize: 15 }}>Adaptive Learning Profile</div>
+          <div style={{ fontWeight: 900, fontSize: 18 }}>Adaptive Learning Profile</div>
           <div className="muted" style={{ marginTop: 4 }}>Mastery rises over many correct answers, accuracy, and difficulty.</div>
         </div>
         <div className="badge">Overall mastery {Math.round(Number(props.overallMastery ?? 0))}%</div>
       </div>
-      <div style={{ display: "grid", gap: 9, marginTop: 10 }}>
+      <div style={{ display: "grid", gap: 12, marginTop: 14 }}>
         {rows.length ? rows.map((row) => {
           const mastery = clamp(row.mastery);
           const accuracy = clamp(row.accuracy);
@@ -54,7 +54,7 @@ export default function AdaptiveLearningCard(props: {
           const tone = masteryTone(row.domain, mastery);
           const hasAnswers = totalAnswered > 0;
           return (
-            <div key={row.domain} style={{ border: '1px solid rgba(255,255,255,.08)', borderRadius: 14, padding: 9, background: 'rgba(255,255,255,.02)' }}>
+            <div key={row.domain} style={{ border: '1px solid rgba(255,255,255,.08)', borderRadius: 14, padding: 12, background: 'rgba(255,255,255,.02)' }}>
               <div style={{ display:'grid', gridTemplateColumns:'minmax(110px,160px) 1fr auto', gap:12, alignItems:'center' }} className="adaptiveGrid">
                 <div style={{ display:'flex', alignItems:'center', gap:10, flexWrap:'wrap' }}>
                   <div style={{ fontWeight: 800, fontSize: 15 }}>{domainLabel(row.domain)}</div>

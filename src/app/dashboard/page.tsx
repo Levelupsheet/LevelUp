@@ -66,6 +66,7 @@ export default function Dashboard() {
   const [userId, setUserId] = useState<string | null>(null);
   const [userLabel, setUserLabel] = useState<string | null>(null);
   const [userAvatar, setUserAvatar] = useState<string | null>(null);
+  const [isAdminUser, setIsAdminUser] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
   const [localXp, setLocalXp] = useState<number>(0);
@@ -409,7 +410,7 @@ export default function Dashboard() {
           <a href="/rewards">Rewards</a>
           <a href="/sweepstakes">Sweepstakes</a>
           <a href="#" onClick={(e) => (e.preventDefault(), setMerchOpen(true))}>Merch</a>
-          <a href="/admin">Admin</a>
+          {isAdminUser ? <a href="/admin">Admin</a> : null}
         </nav>
 
         <div className="navActions">
