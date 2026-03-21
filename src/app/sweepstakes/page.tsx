@@ -77,8 +77,84 @@ function TermsModal({ campaign, onClose }: { campaign: Campaign | null; onClose:
   );
 }
 
+
+
+function RaffleReel({ campaign }: { campaign: Campaign | null }) {
+  const entries = Array.isArray(campaign?.leaderboard)
+    ? campaign!.leaderboard!.flatMap((row) => Array.from({ length: Math.max(1, Number(row.quantity || 1)) }, () => row.displayName))
+    : [];
+  const names = entries.length ? entries : ['Waiting for entries'];
+  const winnerName = campaign?.winner?.displayName || null;
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    if (!campaign) return;
+    let idx = 0;
+    let timer: any;
+    const tick = () => {
+      idx += 1;
+      setIndex(idx);
+      let delay = 120;
+      if (winnerName) {
+        const remaining = Math.max(0, 18 - idx);
+        delay = 80 + Math.min(520, remaining * 26);
+      } else if (idx % 18 > 12) {
+        delay = 260;
+      }
+      timer = setTimeout(() => {
+        if (winnerName && idx > 18) {
+          const target = names.findIndex((n) => n === winnerName);
+          setIndex(target >= 0 ? target : idx);
+          return;
+        }
+        tick();
+      }, delay);
+    };
+    tick();
+    return () => clearTimeout(timer);
+  }, [campaign?.id, winnerName, names.join('|')]);
+
+  const visible = Array.from({ length: 7 }, (_, i) => names[(index + i) % names.length]);
+
+  return (
+    <div className="featureCard" style={{ marginTop: 14, padding: 14, background: 'linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02))' }}>
+      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', gap:10, marginBottom:10 }}>
+        <b>{winnerName ? 'Winner reel' : 'Live entry reel'}</b>
+        <span className="badge" style={{ borderColor:'rgba(255,215,90,.35)', color:'#ffe28a' }}>{winnerName ? 'Locked on winner' : 'Drawing tease'}</span>
+      </div>
+      <div style={{ perspective: 1000, overflow: 'hidden', borderRadius: 16, border:'1px solid rgba(255,255,255,.08)', background:'radial-gradient(circle at top, rgba(255,215,90,.08), transparent 35%), rgba(0,0,0,.25)' }}>
+        <div style={{ display:'grid', gap:8, padding:14 }}>
+          {visible.map((name, i) => {
+            const isCenter = i === 3;
+            const isWinner = Boolean(winnerName) && name === winnerName && isCenter;
+            return (
+              <div key={`${name}-${i}-${index}`} style={{
+                transform: `rotateX(${(i - 3) * 10}deg) scale(${isCenter ? 1 : 0.92})`,
+                transformOrigin: 'center center',
+                opacity: isCenter ? 1 : 0.52,
+                padding:'10px 14px',
+                borderRadius:12,
+                border: isWinner ? '1px solid rgba(255,215,90,.55)' : '1px solid rgba(255,255,255,.08)',
+                background: isWinner ? 'linear-gradient(90deg, rgba(255,215,90,.22), rgba(255,255,255,.04))' : 'rgba(255,255,255,.03)',
+                color: isCenter ? '#fff' : 'rgba(255,255,255,.72)',
+                fontWeight: isCenter ? 800 : 600,
+                boxShadow: isWinner ? '0 0 24px rgba(255,215,90,.18)' : 'none',
+              }}>
+                {name}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+      <div className="muted" style={{ marginTop: 10, fontSize: 13 }}>
+        The actual winner is still drawn randomly from the live entries pool.
+      </div>
+    </div>
+  );
+}
 function SweepstakesModal({ campaign, user, onClose, onEntered }: { campaign: Campaign | null; user: UserSummary | null; onClose: ()=>void; onEntered: ()=>void; }) {
   const [showTerms, setShowTerms] = useState(false);
+  const [confirmingEntry, setConfirmingEntry] = useState(false);
   if (!campaign) return null;
 
   const tokenCost = Math.max(0, Number(campaign.tokenCost || 0));
@@ -87,8 +163,10 @@ function SweepstakesModal({ campaign, user, onClose, onEntered }: { campaign: Ca
   const canAfford = balance >= tokenCost;
 
   async function enterTokens() {
-    const confirmed = window.confirm(`Enter ${campaign.title} for ${tokenCost} tokens?\nCurrent balance: ${balance}\nNew balance after entry: ${nextBalance}`);
-    if (!confirmed) return;
+    if (!confirmingEntry) {
+      setConfirmingEntry(true);
+      return;
+    }
 
     const res = await fetch('/api/sweepstakes/enter', {
       method: 'POST',
@@ -97,10 +175,11 @@ function SweepstakesModal({ campaign, user, onClose, onEntered }: { campaign: Ca
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok || !data?.ok) {
+      setConfirmingEntry(false);
       alert(data?.error || 'Could not enter sweepstakes');
       return;
     }
-    alert(`Entry confirmed! New token balance: ${Number(data?.tokenBalance ?? nextBalance)}`);
+    setConfirmingEntry(false);
     onEntered();
   }
 
@@ -139,11 +218,21 @@ function SweepstakesModal({ campaign, user, onClose, onEntered }: { campaign: Ca
                 <div style={{ marginTop: 16, display:'flex', gap:10, flexWrap:'wrap' }}>
                   {campaign.allowTokenEntry ? (
                     <button className="gold" onClick={enterTokens} disabled={!canAfford} title={!canAfford ? 'Not enough tokens' : undefined}>
-                      Enter with tokens
+                      {confirmingEntry ? 'Confirm entry' : 'Enter with tokens'}
                     </button>
                   ) : null}
                   <button className="secondaryBtn" onClick={() => setShowTerms(true)}>Terms</button>
                 </div>
+                {confirmingEntry ? (
+                  <div className="featureCard" style={{ marginTop: 12, borderColor:'rgba(255,215,90,.28)' }}>
+                    <b>Confirm entry</b>
+                    <div className="muted" style={{ marginTop: 8 }}>This entry costs <b>{tokenCost}</b> tokens. Current balance: <b>{balance}</b>. After entry: <b>{nextBalance}</b>.</div>
+                    <div style={{ display:'flex', gap:10, marginTop:12 }}>
+                      <button className="gold" onClick={enterTokens}>Confirm</button>
+                      <button className="secondaryBtn" onClick={() => setConfirmingEntry(false)}>Cancel</button>
+                    </div>
+                  </div>
+                ) : null}
                 {campaign.allowTokenEntry ? (
                   <div className="muted" style={{ marginTop: 10 }}>
                     This entry costs <b>{tokenCost}</b> tokens. Current balance: <b>{balance}</b>. After entry: <b>{nextBalance}</b>.
@@ -172,6 +261,7 @@ function SweepstakesModal({ campaign, user, onClose, onEntered }: { campaign: Ca
               </div>
             </div>
           </div>
+          <RaffleReel campaign={campaign} />
         </div>
       </div>
       <TermsModal campaign={showTerms ? campaign : null} onClose={() => setShowTerms(false)} />
@@ -182,8 +272,18 @@ function SweepstakesModal({ campaign, user, onClose, onEntered }: { campaign: Ca
 export default function SweepstakesPage() {
   const [data, setData] = useState<any>({ campaigns: [], current: null, user: null });
   const [selected, setSelected] = useState<Campaign | null>(null);
+  const [authChecked, setAuthChecked] = useState(false);
+  const [authed, setAuthed] = useState(false);
 
   async function load() {
+    const authRes = await fetch('/api/auth/me', { cache: 'no-store' as any }).catch(() => null as any);
+    if (!authRes || !authRes.ok) {
+      setAuthed(false);
+      setAuthChecked(true);
+      return;
+    }
+    setAuthed(true);
+    setAuthChecked(true);
     const res = await fetch('/api/sweepstakes/summary', { cache: 'no-store' });
     const json = await res.json().catch(() => ({}));
     setData(json?.ok ? json : { campaigns: [], current: null, user: null });
@@ -193,6 +293,27 @@ export default function SweepstakesPage() {
   const campaigns: Campaign[] = Array.isArray(data?.campaigns) ? data.campaigns : [];
   const active = campaigns.filter((c) => c?.status === 'ACTIVE' || c?.isLive);
   const past = campaigns.filter((c) => c?.status !== 'ACTIVE' && !c?.isLive);
+
+  if (!authChecked) {
+    return <main style={{ minHeight: '100vh' }} className="dashboardBg"><div className="dashWrap" style={{ paddingTop: 120 }}><div className="glass" style={{ padding: 24, maxWidth: 720, margin: '0 auto' }}>Loading sweepstakes…</div></div></main>;
+  }
+
+  if (authChecked && !authed) {
+    return (
+      <main style={{ minHeight: '100vh' }} className="dashboardBg">
+        <div className="dashWrap" style={{ paddingTop: 120, paddingBottom: 48 }}>
+          <div className="glass" style={{ padding: 24, maxWidth: 780, margin: '0 auto' }}>
+            <h1 style={{ margin: 0 }}>Sign in required</h1>
+            <p className="muted" style={{ marginTop: 10 }}>Please sign in through the dashboard before viewing or entering sweepstakes drawings.</p>
+            <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
+              <Link className="gold" href="/dashboard">Go to Dashboard →</Link>
+              <Link className="secondaryBtn" href="/start">Back to Start</Link>
+            </div>
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main style={{ minHeight: '100vh' }} className="dashboardBg">

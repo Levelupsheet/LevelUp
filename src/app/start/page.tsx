@@ -17,6 +17,58 @@ type SweepCampaignRow = {
   status?: string;
 };
 
+
+
+type SweepSummaryCampaign = SweepCampaignRow & {
+  totalEntries?: number;
+  totalParticipants?: number;
+  winner?: { displayName?: string | null } | null;
+  allowGoldenQuestion?: boolean;
+  allowTokenEntry?: boolean;
+  tokenCost?: number;
+  prizeValueUsd?: number;
+  prizeValueDollars?: number;
+};
+
+function SweepstakesSummaryModal({ campaign, onClose }: { campaign: SweepSummaryCampaign | null; onClose: () => void }) {
+  if (!campaign) return null;
+  const hasWinner = Boolean(campaign.winner?.displayName);
+  return (
+    <div className="luModalOverlay" onClick={onClose}>
+      <div className="luModal" role="dialog" aria-modal="true" aria-label="Sweepstakes summary" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 720 }}>
+        <div className="luModalHeader" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
+          <div>
+            <b style={{ fontSize: 20, color: '#ffe28a' }}>{hasWinner ? 'Golden Sweepstakes Winner' : campaign.title || 'Sweepstakes countdown'}</b>
+            <div><small className="luHint">{campaign.prizePoolLabel || 'Prize drawing'}</small></div>
+          </div>
+          <button className="secondaryBtn" type="button" onClick={onClose}>✕</button>
+        </div>
+        <div className="luModalBody">
+          <div className="featureCard" style={{ padding: 14, borderColor: 'rgba(255,215,90,.3)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+              <div>
+                <b>{campaign.prizePoolLabel || campaign.title}</b>
+                <div className="muted" style={{ marginTop: 6 }}>
+                  {hasWinner ? `Winner: ${campaign.winner?.displayName}` : `Countdown: ${formatCountdown(campaign.endsAt)}`}
+                </div>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <div style={{ fontWeight: 900 }}>{Number(campaign.totalEntries || 0)} entries</div>
+                <div className="muted" style={{ marginTop: 4 }}>{Number(campaign.totalParticipants || 0)} participants</div>
+              </div>
+            </div>
+            <div className="muted" style={{ marginTop: 12 }}>
+              {campaign.endsAt ? `Draw closes ${new Date(campaign.endsAt).toLocaleString()}` : 'No end date set yet.'}
+            </div>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 14 }}>
+            <button className="secondaryBtn" type="button" onClick={onClose}>Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 function formatCountdown(target?: string | Date | null) {
   if (!target) return "Draw details coming soon";
   const end = new Date(target).getTime();
@@ -71,6 +123,7 @@ export default function Home() {
   const [aboutOpen, setAboutOpen] = useState<null | "company" | "product" | "contact">(null);
   const [sweepstakesLive, setSweepstakesLive] = useState<SweepCampaignRow[]>([]);
   const [sweepSummary, setSweepSummary] = useState<any>(null);
+  const [sweepModalCampaign, setSweepModalCampaign] = useState<SweepSummaryCampaign | null>(null);
 
   useEffect(() => {
     const onScroll = () => {
@@ -316,7 +369,7 @@ export default function Home() {
               </div>
 
               <div style={{ marginTop: 10, display: "grid", gap: 10 }}>
-                {(leaderboard ?? [null, null, null]).slice(0, 3).map((u: any, idx: number) => {
+                {(leaderboard ?? [null, null, null, null, null]).slice(0, 5).map((u: any, idx: number) => {
                   const isSelected = !!u && lbSelected?.id === u.id;
                   return (
                     <button
@@ -366,7 +419,7 @@ export default function Home() {
                       </div>
                     </div>
                     <div style={{ marginTop: 10, display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-                      <button className="gold" type="button" onClick={() => (window.location.href = '/sweepstakes')}>{hasWinner ? 'View winner' : 'View countdown'}</button>
+                      <button className="gold" type="button" onClick={() => setSweepModalCampaign(feature)}>{hasWinner ? 'View winner' : 'View countdown'}</button>
                     </div>
                   </div>
                 );
@@ -381,7 +434,7 @@ export default function Home() {
                     </div>
                     <div style={{ textAlign: "right" }}>
                       <div style={{ fontWeight: 900 }}>{lbSelected.xp} XP</div>
-                      <div className="muted" style={{ fontSize: 12 }}>Top 3</div>
+                      <div className="muted" style={{ fontSize: 12 }}>Top 5</div>
                     </div>
                   </div>
                   <div style={{ marginTop: 10, display: "flex", gap: 10, flexWrap: "wrap" }}>
@@ -527,13 +580,11 @@ export default function Home() {
 
           <div className="grid3" style={{ marginTop: 16 }}>
             {(sweepstakesLive.length ? sweepstakesLive : [null, null, null]).slice(0, 3).map((item: any, idx: number) => (
-              <button
+              <div
                 key={item?.id ?? `live-${idx}`}
-                type="button"
                 className="featureCard"
                 data-reveal
                 data-delay={String(360 + idx * 90)}
-                onClick={() => (window.location.href = "/sweepstakes")}
                 style={{ textAlign: 'left', minHeight: 160 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10 }}>
@@ -546,17 +597,14 @@ export default function Home() {
                 <div className="muted" style={{ marginTop: 10, fontSize: 13 }}>
                   {item ? `Draw closes ${new Date(item.endsAt || '').toLocaleString()}` : 'Create a live drawing in the admin portal to feature it here.'}
                 </div>
-                <div style={{ marginTop: 14, color: '#ffe28a', fontWeight: 700 }}>
-                  {item ? 'View live drawing →' : 'Open sweepstakes →'}
+                <div style={{ marginTop: 14, display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+                  <span className="badge">{item ? `${Number(item.totalEntries || 0)} entries` : '0 entries'}</span>
+                  <span className="badge">{item ? `${Number(item.totalParticipants || 0)} participants` : '0 participants'}</span>
                 </div>
-              </button>
+              </div>
             ))}
           </div>
 
-          <div style={{ marginTop: 18, display: "flex", gap: 10, flexWrap: "wrap" }} data-reveal data-delay="630">
-            <button className="gold" onClick={() => (window.location.href = "/sweepstakes")}>Learn about sweepstakes →</button>
-            <button className="secondaryBtn" onClick={() => goEnterApp("sweepstakes_enter")}>Enter app</button>
-          </div>
         </div>
       </section>
 
@@ -657,6 +705,7 @@ export default function Home() {
           </div>
         </div>
       </footer>
+      <SweepstakesSummaryModal campaign={sweepModalCampaign} onClose={() => setSweepModalCampaign(null)} />
       <MerchModal open={merchOpen} onClose={() => setMerchOpen(false)} />
 </main>
   );

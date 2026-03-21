@@ -96,7 +96,7 @@ export async function GET(req: Request) {
       return String(a.createdAt).localeCompare(String(b.createdAt));
     });
 
-    const top = sorted.slice(0, 3).map((u) => ({
+    const top = sorted.slice(0, 5).map((u) => ({
       id: u.id,
       displayName: u.displayName,
       xp: u.xp,
