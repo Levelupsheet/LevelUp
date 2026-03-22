@@ -78,6 +78,12 @@ model User {
   rank             UserRank          @default(STUDENT)
   rankUpdatedAt    DateTime?
   drawingEligibleUntil DateTime?
+  subscriptionTier String            @default("FREE")
+  subscriptionStatus String          @default("FREE")
+  subscriptionStartedAt DateTime?
+  subscriptionExpiresAt DateTime?
+  paypalSubscriptionId String?
+  paypalPlanId    String?
   createdAt        DateTime          @default(now())
   lastActiveAt     DateTime?
 

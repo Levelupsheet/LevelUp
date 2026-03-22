@@ -1,0 +1,8 @@
+-- AlterTable
+ALTER TABLE "User"
+  ADD COLUMN IF NOT EXISTS "subscriptionTier" TEXT NOT NULL DEFAULT 'FREE',
+  ADD COLUMN IF NOT EXISTS "subscriptionStatus" TEXT NOT NULL DEFAULT 'FREE',
+  ADD COLUMN IF NOT EXISTS "subscriptionStartedAt" TIMESTAMP(3),
+  ADD COLUMN IF NOT EXISTS "subscriptionExpiresAt" TIMESTAMP(3),
+  ADD COLUMN IF NOT EXISTS "paypalSubscriptionId" TEXT,
+  ADD COLUMN IF NOT EXISTS "paypalPlanId" TEXT;

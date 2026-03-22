@@ -1,6 +1,7 @@
 import path from 'path';
 import fs from 'fs';
 import crypto from 'crypto';
+import { prisma } from '@/lib/prisma';
 import { downgradeSubscriptionByEmail, setSubscriptionMetaByEmail, setSubscriptionTierByEmail, type SubscriptionStatus } from '@/lib/subscriptions';
 
 export type PaidTier = 'PRO' | 'PREMIUM';
@@ -23,6 +24,29 @@ type PendingOrder = {
 };
 
 type PendingMap = Record<string, PendingOrder>;
+
+
+async function syncDbSubscriptionByEmail(email: string, patch: {
+  tier?: string | null;
+  status?: string | null;
+  startedAt?: string | null;
+  expiresAt?: string | null;
+  paypalSubscriptionId?: string | null;
+  paypalPlanId?: string | null;
+}) {
+  const key = String(email || '').trim().toLowerCase();
+  if (!key) return;
+  const data: any = {};
+  if (patch.tier !== undefined) data.subscriptionTier = patch.tier || 'FREE';
+  if (patch.status !== undefined) data.subscriptionStatus = patch.status || 'FREE';
+  if (patch.startedAt !== undefined) data.subscriptionStartedAt = patch.startedAt ? new Date(patch.startedAt) : null;
+  if (patch.expiresAt !== undefined) data.subscriptionExpiresAt = patch.expiresAt ? new Date(patch.expiresAt) : null;
+  if (patch.paypalSubscriptionId !== undefined) data.paypalSubscriptionId = patch.paypalSubscriptionId || null;
+  if (patch.paypalPlanId !== undefined) data.paypalPlanId = patch.paypalPlanId || null;
+  try {
+    await prisma.user.updateMany({ where: { email: key }, data });
+  } catch {}
+}
 
 type PendingSubscription = {
   subscriptionId: string;
@@ -245,6 +269,12 @@ export async function createPayPalSubscription(params: { tier: PaidTier; userId:
     paypalPlanId: planId,
     updatedAt: new Date().toISOString(),
   });
+  void syncDbSubscriptionByEmail(params.email, {
+    tier: params.tier,
+    status: 'PENDING',
+    paypalSubscriptionId: subscriptionId,
+    paypalPlanId: planId,
+  });
   return { subscriptionId, approveUrl, raw: data };
 }
 
@@ -300,6 +330,14 @@ export async function finalizePayPalSubscription(subscriptionId: string) {
         expiresAt: nextBillingTime,
       });
       setSubscriptionTierByEmail(email, tier);
+      await syncDbSubscriptionByEmail(email, {
+        tier,
+        status: 'ACTIVE',
+        startedAt: startTime,
+        expiresAt: nextBillingTime,
+        paypalSubscriptionId: subscriptionId,
+        paypalPlanId: planId,
+      });
     } else if (mapped === 'PENDING') {
       setSubscriptionMetaByEmail(email, {
         tier,
@@ -309,8 +347,23 @@ export async function finalizePayPalSubscription(subscriptionId: string) {
         startedAt: startTime,
         expiresAt: nextBillingTime,
       });
+      await syncDbSubscriptionByEmail(email, {
+        tier,
+        status: 'PENDING',
+        startedAt: startTime,
+        expiresAt: nextBillingTime,
+        paypalSubscriptionId: subscriptionId,
+        paypalPlanId: planId,
+      });
     } else {
       downgradeSubscriptionByEmail(email, mapped);
+      await syncDbSubscriptionByEmail(email, {
+        tier: 'FREE',
+        status: mapped,
+        expiresAt: new Date().toISOString(),
+        paypalSubscriptionId: subscriptionId,
+        paypalPlanId: planId,
+      });
     }
   }
   return { details, pending, email, tier, status };
@@ -370,23 +423,28 @@ export async function applyWebhookEvent(event: any) {
   if (eventType === 'BILLING.SUBSCRIPTION.ACTIVATED' || String(resource?.status || '').toUpperCase() === 'ACTIVE') {
     setSubscriptionMetaByEmail(email, { tier, status: 'ACTIVE', ...updateCommon });
     setSubscriptionTierByEmail(email, tier);
+    await syncDbSubscriptionByEmail(email, { tier, status: 'ACTIVE', ...updateCommon });
     return { ok: true, status: 'ACTIVE' };
   }
   if (eventType === 'PAYMENT.SALE.COMPLETED' || eventType === 'BILLING.SUBSCRIPTION.RE-ACTIVATED') {
     setSubscriptionMetaByEmail(email, { tier, status: 'ACTIVE', ...updateCommon });
     setSubscriptionTierByEmail(email, tier);
+    await syncDbSubscriptionByEmail(email, { tier, status: 'ACTIVE', ...updateCommon });
     return { ok: true, status: 'ACTIVE' };
   }
   if (eventType === 'BILLING.SUBSCRIPTION.CANCELLED') {
     downgradeSubscriptionByEmail(email, 'CANCELLED');
+    await syncDbSubscriptionByEmail(email, { tier: 'FREE', status: 'CANCELLED', expiresAt: new Date().toISOString(), paypalSubscriptionId: subscriptionId, paypalPlanId: planId });
     return { ok: true, status: 'CANCELLED' };
   }
   if (eventType === 'BILLING.SUBSCRIPTION.EXPIRED') {
     downgradeSubscriptionByEmail(email, 'EXPIRED');
+    await syncDbSubscriptionByEmail(email, { tier: 'FREE', status: 'EXPIRED', expiresAt: new Date().toISOString(), paypalSubscriptionId: subscriptionId, paypalPlanId: planId });
     return { ok: true, status: 'EXPIRED' };
   }
   if (eventType === 'BILLING.SUBSCRIPTION.SUSPENDED' || eventType === 'PAYMENT.SALE.DENIED') {
     downgradeSubscriptionByEmail(email, 'SUSPENDED');
+    await syncDbSubscriptionByEmail(email, { tier: 'FREE', status: 'SUSPENDED', expiresAt: new Date().toISOString(), paypalSubscriptionId: subscriptionId, paypalPlanId: planId });
     return { ok: true, status: 'SUSPENDED' };
   }
   return { ok: true, status: 'IGNORED' };

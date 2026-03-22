@@ -121,6 +121,13 @@ export default function Dashboard() {
   const levelSpan = XP_PER_LEVEL;
   const xpIntoLevel = xpIntoCurrentLevel(xp);
   const levelMax = levelSpan;
+  const normalizedTier = String(subscriptionTier || "FREE").toUpperCase();
+  const tierLabel = normalizedTier === "PREMIUM" ? "Premium" : normalizedTier === "PRO" ? "Pro" : "Free";
+  const tierBadgeStyle = normalizedTier === "PREMIUM"
+    ? { color: "#eef3ff", background: "linear-gradient(135deg, rgba(230,236,244,0.26), rgba(130,140,156,0.24))", border: "1px solid rgba(220,228,236,0.55)", boxShadow: "0 0 12px rgba(220,228,236,0.18)" }
+    : normalizedTier === "PRO"
+      ? { color: "#9ad2ff", background: "linear-gradient(135deg, rgba(58,124,255,0.24), rgba(18,64,160,0.18))", border: "1px solid rgba(96,166,255,0.45)", boxShadow: "0 0 12px rgba(74,126,255,0.18)" }
+      : { color: "#ffca7a", background: "linear-gradient(135deg, rgba(255,156,48,0.20), rgba(156,86,18,0.16))", border: "1px solid rgba(255,176,88,0.38)", boxShadow: "0 0 10px rgba(255,153,0,0.12)" };
   const isFreeTier = String(subscriptionTier || "FREE").toUpperCase() === "FREE";
   const hasFreeStartCooldown = isFreeTier && (localLevel || 1) >= 3 && freeStartCooldownUntil > cooldownNow;
   const freeStartCooldownRemainingMs = Math.max(0, freeStartCooldownUntil - cooldownNow);
@@ -717,7 +724,7 @@ export default function Dashboard() {
           <div className="card" style={{ padding: 12 }}>
             <div style={{ display: "flex", justifyContent: "space-between", gap: 10 }}>
               <small>{levelTitleFromLevel(localLevel)} • Level {localLevel}</small>
-              <small>{subscriptionTier === "FREE" ? "Free" : subscriptionTier === "PREMIUM" ? "Premium" : "Pro"}</small>
+              <small style={{ padding: "2px 10px", borderRadius: 999, fontWeight: 800, letterSpacing: 0.2, ...(tierBadgeStyle as any) }}>{tierLabel}</small>
             </div>
             <div style={{ marginTop: 10 }}>
               <ProgressBar value={Number.isFinite(xpIntoLevel) ? xpIntoLevel : 0} max={levelMax} />
@@ -743,6 +750,7 @@ export default function Dashboard() {
             <div>
               <b>Welcome back</b>
               <div><small>Signed in as <span style={{ opacity: 0.95 }}>{userLabel ?? userId}</span></small></div>
+              <div style={{ marginTop: 6 }}><small style={{ padding: "3px 10px", borderRadius: 999, fontWeight: 800, ...(tierBadgeStyle as any) }}>{tierLabel} plan</small></div>
             </div>
 
             <div className="kpiRow">

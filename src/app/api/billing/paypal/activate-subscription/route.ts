@@ -35,9 +35,6 @@ export async function POST(req: Request) {
     });
 
     const done = await finalizePayPalSubscription(subscriptionId);
-    if (done.email && String(done.email).toLowerCase() !== String(user.email || '').toLowerCase()) {
-      return NextResponse.json({ ok: false, error: 'Subscription email mismatch.' }, { status: 403 });
-    }
 
     return NextResponse.json({ ok: true, subscriptionTier: done.tier, status: done.status, subscriptionId });
   } catch (err: any) {
