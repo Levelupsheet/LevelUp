@@ -3,6 +3,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import MerchModal from "@/components/MerchModal";
+import PayPalSubscriptionButton from "@/components/PayPalSubscriptionButton";
 import { levelBandLabel } from "@/lib/progression";
 
 
@@ -287,34 +288,13 @@ export default function Home() {
               </div>
 
               <div style={{ display: "grid", gap: 10, marginTop: 14 }}>
-                <button
-                  className="gold"
-                  type="button"
-                  disabled={checkoutBusy === planModal.plan}
-                  onClick={async () => {
-                    try {
-                      setPlanError("");
-                      setCheckoutBusy(planModal.plan);
-                      const planKey = String(planModal.plan || "").toUpperCase() === "PREMIUM" ? "PREMIUM" : "PRO";
-                      const res = await fetch('/api/billing/paypal/create-subscription', {
-                        method: 'POST',
-                        headers: { 'content-type': 'application/json' },
-                        body: JSON.stringify({ plan: planKey }),
-                      });
-                      const data = await res.json().catch(() => null);
-                      if (!res.ok || !data?.ok || !data?.approveUrl) {
-                        throw new Error(String(data?.error || 'Unable to start PayPal subscription.'));
-                      }
-                      window.location.href = String(data.approveUrl);
-                    } catch (err: any) {
-                      setPlanError(err?.message || 'Unable to start PayPal subscription.');
-                    } finally {
-                      setCheckoutBusy(null);
-                    }
+                <PayPalSubscriptionButton
+                  plan={String(planModal.plan || "").toUpperCase() === "PREMIUM" ? "PREMIUM" : "PRO"}
+                  onSuccess={() => {
+                    setPlanError("");
+                    setPlanModal(null);
                   }}
-                >
-                  {checkoutBusy === planModal.plan ? `Starting ${planModal.plan} checkout...` : `PayPal — ${planModal.plan}`}
-                </button>
+                />
                 <button className="secondaryBtn" type="button" onClick={() => goEnterApp("pricing_modal")}>Continue with free app access</button>
               </div>
 
