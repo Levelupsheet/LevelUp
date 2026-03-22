@@ -31,10 +31,10 @@ export async function POST(req: Request) {
       status: 'APPROVAL_PENDING',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      customId: null,
+      customId: user.id,
     });
 
-    const done = await finalizePayPalSubscription(subscriptionId);
+    const done = await finalizePayPalSubscription(subscriptionId, user.id);
 
     return NextResponse.json({ ok: true, subscriptionTier: done.tier, status: done.status, subscriptionId });
   } catch (err: any) {

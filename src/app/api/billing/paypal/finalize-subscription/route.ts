@@ -15,7 +15,7 @@ export async function POST(req: Request) {
     if (pending && String(pending.userId) !== String(user.id)) {
       return NextResponse.json({ ok: false, error: 'Subscription does not belong to the current user.' }, { status: 403 });
     }
-    const done = await finalizePayPalSubscription(subscriptionId);
+    const done = await finalizePayPalSubscription(subscriptionId, user.id);
     if (done.email && String(done.email).toLowerCase() !== String(user.email || '').toLowerCase()) {
       return NextResponse.json({ ok: false, error: 'Subscription email mismatch.' }, { status: 403 });
     }

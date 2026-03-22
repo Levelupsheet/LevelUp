@@ -88,9 +88,11 @@ export function paypalClientSecret() {
 }
 
 export function paypalPlanIdForTier(tier: PaidTier) {
+  const fallback = tier === 'PREMIUM'
+    ? 'P-44119510FD537603NNG7XNMQ'
+    : 'P-0L833853TV738062GNG7XKAI';
   const key = tier === 'PREMIUM' ? process.env.PAYPAL_PREMIUM_PLAN_ID : process.env.PAYPAL_PRO_PLAN_ID;
-  if (!key) throw new Error(`Missing ${tier === 'PREMIUM' ? 'PAYPAL_PREMIUM_PLAN_ID' : 'PAYPAL_PRO_PLAN_ID'}`);
-  return key;
+  return String(key || fallback);
 }
 
 export async function getPayPalAccessToken() {
@@ -302,14 +304,14 @@ function mapSubscriptionStatus(statusRaw: string): SubscriptionStatus {
   return 'PENDING';
 }
 
-export async function finalizePayPalSubscription(subscriptionId: string) {
+export async function finalizePayPalSubscription(subscriptionId: string, userId?: string) {
   const details = await getPayPalSubscriptionDetails(subscriptionId);
   const status = String(details?.status || '');
   const pending = getPendingSubscription(subscriptionId);
   const parsedCustom = parseSubscriptionCustomId(String(details?.custom_id || pending?.customId || ''));
   const email = String(parsedCustom?.email || pending?.email || '').toLowerCase();
   const tier = (parsedCustom?.tier || pending?.tier || 'PRO') as PaidTier;
-  const planId = String(details?.plan_id || pending?.planId || '');
+  const planId = String(details?.plan_id || pending?.planId || paypalPlanIdForTier(tier));
   const startTime = String(details?.start_time || new Date().toISOString());
   let nextBillingTime = String(details?.billing_info?.next_billing_time || '');
   if (!nextBillingTime) {
@@ -317,9 +319,22 @@ export async function finalizePayPalSubscription(subscriptionId: string) {
     d.setMonth(d.getMonth() + 1);
     nextBillingTime = d.toISOString();
   }
-  updatePendingSubscription(subscriptionId, { status });
+  updatePendingSubscription(subscriptionId, { status, userId: userId || pending?.userId || '', email: email || pending?.email || '' });
+  const mapped = mapSubscriptionStatus(status);
+  const dbPatch: any = {
+    subscriptionTier: mapped === 'ACTIVE' || mapped === 'PENDING' ? tier : 'FREE',
+    subscriptionStatus: mapped === 'ACTIVE' ? 'ACTIVE' : mapped === 'PENDING' ? 'PENDING' : mapped,
+    subscriptionStartedAt: startTime ? new Date(startTime) : null,
+    subscriptionExpiresAt: nextBillingTime ? new Date(nextBillingTime) : null,
+    paypalSubscriptionId: subscriptionId,
+    paypalPlanId: planId || null,
+  };
+  if (userId) {
+    try {
+      await prisma.user.update({ where: { id: userId }, data: dbPatch });
+    } catch {}
+  }
   if (email) {
-    const mapped = mapSubscriptionStatus(status);
     if (mapped === 'ACTIVE') {
       setSubscriptionMetaByEmail(email, {
         tier,
