@@ -5,8 +5,7 @@ export default function ProgressBar({ value, max }: { value: number; max: number
       <div className="progressBar" aria-label="progress">
         <div className="progressFill" style={{ width: `${pct}%` }} />
       </div>
-      <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6 }}>
-        <small>XP: {value} / {max}</small>
+      <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 6 }}>
         <small>{pct}%</small>
       </div>
     </div>

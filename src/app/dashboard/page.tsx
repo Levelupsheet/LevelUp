@@ -38,6 +38,12 @@ type CareerMatchRow = { id: string; title: string; domain: string; description: 
 type SweepstakesSummary = { current?: any | null; user?: any | null; campaigns?: any[] }
 
 
+const FREE_SESSION_COOLDOWN_MS = 30 * 60 * 1000;
+
+function getFreeSessionCooldownKey(userId: string | null) {
+  return `lu_free_session_cooldown_v1:${userId || "anon"}`;
+}
+
 function labelPos(p: string){
   if (p === "HELPDESK_SUPPORT") return "Helpdesk Support";
   if (p === "DESKTOP_TECHNICIAN") return "Desktop Technician";
@@ -100,6 +106,8 @@ export default function Dashboard() {
   const [careerMatches, setCareerMatches] = useState<CareerMatchRow[]>([]);
   const [sweepSummary, setSweepSummary] = useState<SweepstakesSummary | null>(null);
   const [subscriptionTier, setSubscriptionTier] = useState<string>("FREE");
+  const [freeStartCooldownUntil, setFreeStartCooldownUntil] = useState<number>(0);
+  const [cooldownNow, setCooldownNow] = useState<number>(Date.now());
 
   // Level-up detection (notification-only; user opens vault when ready)
   const prevLevelRef = useRef<number>(0);
@@ -113,6 +121,10 @@ export default function Dashboard() {
   const levelSpan = XP_PER_LEVEL;
   const xpIntoLevel = xpIntoCurrentLevel(xp);
   const levelMax = levelSpan;
+  const isFreeTier = String(subscriptionTier || "FREE").toUpperCase() === "FREE";
+  const hasFreeStartCooldown = isFreeTier && (localLevel || 1) >= 3 && freeStartCooldownUntil > cooldownNow;
+  const freeStartCooldownRemainingMs = Math.max(0, freeStartCooldownUntil - cooldownNow);
+  const freeStartCooldownLabel = `${Math.floor(freeStartCooldownRemainingMs / 60000)}m ${Math.floor((freeStartCooldownRemainingMs % 60000) / 1000)}s`;
 
   function setLaunchGate(target: "position-training" | "cert-mcq" | "test-now") {
     try {
@@ -122,6 +134,37 @@ export default function Dashboard() {
       );
     } catch {}
   }
+  function armFreeSessionCooldown() {
+    if (!isFreeTier || (localLevel || 1) < 3) return;
+    const until = Date.now() + FREE_SESSION_COOLDOWN_MS;
+    setFreeStartCooldownUntil(until);
+    try { localStorage.setItem(getFreeSessionCooldownKey(userId), String(until)); } catch {}
+  }
+
+  function startLeveledMode(mode: "position" | "cert" | "test") {
+    if (hasFreeStartCooldown) return;
+    setShowLaunchModal(false);
+    if (mode === "position") setPositionTrainingOpen(true);
+    if (mode === "cert") setCertPracticeOpen(true);
+    if (mode === "test") setTestNowOpen(true);
+    armFreeSessionCooldown();
+  }
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(getFreeSessionCooldownKey(userId));
+      const until = Number(raw || 0);
+      setFreeStartCooldownUntil(Number.isFinite(until) ? until : 0);
+    } catch {
+      setFreeStartCooldownUntil(0);
+    }
+  }, [userId]);
+
+  useEffect(() => {
+    if (!hasFreeStartCooldown) return;
+    const t = window.setInterval(() => setCooldownNow(Date.now()), 1000);
+    return () => window.clearInterval(t);
+  }, [hasFreeStartCooldown]);
 
   async function refresh(activeUserId: string) {
     setLoading(true);
@@ -494,14 +537,17 @@ export default function Dashboard() {
             </div>
 
             <div className="luModalBody">
+              {hasFreeStartCooldown && (
+                <div className="card" style={{ marginBottom: 12, padding: 12, borderColor: "rgba(255,210,120,0.28)", background: "rgba(255,184,77,0.08)" }}>
+                  <b style={{ display: "block", marginBottom: 4 }}>Free tier cooldown active</b>
+                  <small>You can start another session in {freeStartCooldownLabel}. Upgrade to Pro to remove cooldowns.</small>
+                </div>
+              )}
               <div className="luGrid3">
                 <button
                   className="luRoleCard"
                   type="button"
-                  onClick={() => {
-                    setShowLaunchModal(false);
-                    setPositionTrainingOpen(true);
-                  }}
+                  onClick={() => startLeveledMode("position")}
                 >
                   <div className="luRoleIcon" aria-hidden="true">🎯</div>
                   <div className="luRoleTitle">Position training</div>
@@ -511,10 +557,7 @@ export default function Dashboard() {
                 <button
                   className="luRoleCard"
                   type="button"
-                  onClick={() => {
-                    setShowLaunchModal(false);
-                    setCertPracticeOpen(true);
-                  }}
+                  onClick={() => startLeveledMode("cert")}
                 >
                   <div className="luRoleIcon" aria-hidden="true">📚</div>
                   <div className="luRoleTitle">Certifications</div>
@@ -524,29 +567,13 @@ export default function Dashboard() {
                 <button
                   className="luRoleCard"
                   type="button"
-                  onClick={() => {
-                    setShowLaunchModal(false);
-                    setTestNowOpen(true);
-                  }}
+                  onClick={() => startLeveledMode("test")}
                 >
                   <div className="luRoleIcon" aria-hidden="true">⚡</div>
                   <div className="luRoleTitle">Test now!</div>
                   <div className="luRoleDesc">Timed mini-check to benchmark your level.</div>
                 </button>
 
-                {/* Keep the mock interview inside the same "Start Now" experience */}
-                <button
-                  className="luRoleCard"
-                  type="button"
-                  onClick={() => {
-                    setShowLaunchModal(false);
-                    setMockInterviewOpen(true);
-                  }}
-                >
-                  <div className="luRoleIcon" aria-hidden="true">🧠</div>
-                  <div className="luRoleTitle">Mock tech interview</div>
-                  <div className="luRoleDesc">Stage 1 MCQ → unlock Stage 2 mixed interview.</div>
-                </button>
               </div>
             </div>
           </div>
@@ -658,13 +685,13 @@ export default function Dashboard() {
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
             <div className="sidebarLogoBox"><img src="/levelup-pro-logo.svg" alt="LevelUp Pro" className="sidebarLogoImg" /></div>
             <div>
-              <img src="/levelup-pro-logo.svg" alt="LevelUp Pro" style={{height: 22, width: "auto", opacity: 0.95}} />
+              <div style={{ fontWeight: 900, fontSize: 22, lineHeight: 1.05 }}>LevelUp Pro</div>
               <div><small>Interview Prep</small></div>
             </div>
           </div>
 
-          <button className="primary" style={{ width: "100%", marginTop: 8 }} onClick={() => setShowLaunchModal(true)}>
-            Start Now!
+          <button className="primary" style={{ width: "100%", marginTop: 8, opacity: hasFreeStartCooldown ? 0.7 : 1 }} onClick={() => !hasFreeStartCooldown && setShowLaunchModal(true)} disabled={hasFreeStartCooldown} title={hasFreeStartCooldown ? `Free tier cooldown: ${freeStartCooldownLabel}` : undefined}>
+            {hasFreeStartCooldown ? `Start Now! (${freeStartCooldownLabel})` : "Start Now!"}
           </button>
 
           <div style={{ marginTop: 10 }}>
@@ -680,6 +707,7 @@ export default function Dashboard() {
             <small style={{ display: "block", marginTop: 6, opacity: 0.8 }}>
               {(localLevel || 1) >= 5 ? "Mock interview unlocked." : "Unlocks at level 5."}
             </small>
+            {hasFreeStartCooldown && <small style={{ display: "block", marginTop: 6, color: "#f5d37b" }}>Free users can start another session in {freeStartCooldownLabel}.</small>}
           </div>
 
           <hr style={{ margin: "14px 0" }} />
@@ -702,7 +730,7 @@ export default function Dashboard() {
 
           <div style={{ marginTop: 10 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <span style={{ width: 10, height: 10, borderRadius: 999, background: (elig?.eligible ? "rgba(120,220,160,0.8)" : "rgba(255,255,255,0.25)") }} />
+              <span style={{ width: 10, height: 10, borderRadius: 999, background: (((localLevel || 1) >= 5 || elig?.eligible) ? "rgba(120,220,160,0.92)" : "rgba(255,255,255,0.25)"), boxShadow: (((localLevel || 1) >= 5 || elig?.eligible) ? "0 0 10px rgba(120,220,160,0.55)" : "none") }} />
               <small>Eligibility for Interview Unlocked!</small>
             </div>
             <div style={{ marginTop: 8, opacity: 0.82 }}><small>Adaptive mastery details are shown in the main panel.</small></div>
