@@ -30,6 +30,8 @@ type UserSummary = {
   weeklyCount?: number;
   weeklyLimit?: number;
   campaignEntries?: number;
+  entriesByCampaign?: Record<string, number>;
+  activeEnteredCampaignIds?: string[];
 };
 
 function formatCountdown(endsAt?: string, now: number = Date.now()) {
@@ -240,7 +242,7 @@ function SweepstakesModal({ campaign, user, onClose, onEntered }: { campaign: Ca
                 ) : null}
                 {!campaign.allowTokenEntry && campaign.allowGoldenQuestion ? <div className="muted" style={{ marginTop:12 }}>Correctly answer golden questions in active sessions to earn entries for this drawing.</div> : null}
                 {campaign.status === 'DRAWN' && campaign.winner ? <div style={{ marginTop:12 }}><b>Winner:</b> {campaign.winner.displayName}</div> : null}
-                {user ? <div className="muted" style={{ marginTop:8 }}>Your entries for current drawing: {Number(user?.campaignEntries || 0)}</div> : null}
+                {user ? <div className="muted" style={{ marginTop:8 }}>Your entries for current drawing: {Number(user?.entriesByCampaign?.[String(campaign.id)] || 0)}</div> : null}
               </div>
             </div>
             <div className="featureCard">

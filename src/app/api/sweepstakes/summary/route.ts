@@ -27,19 +27,26 @@ export async function GET(req: Request) {
     const current = campaigns.find((c: any) => c?.isLive && c?.status === 'ACTIVE') || campaigns.find((c: any) => c?.status === 'ACTIVE') || campaigns[0] || null;
 
     let userSummary = null;
-    if (userId && current) {
+    if (userId) {
       const weekStart = startOfWeekUtc(now);
       const [weeklyCount, sourceBreakdown, campaignRows, wallet] = await Promise.all([
         countWeeklyEntries(prisma, userId, weekStart),
         prisma.$queryRawUnsafe(`SELECT "source", COALESCE(SUM("quantity"),0) AS "quantity" FROM "RaffleEntry" WHERE "userId" = $1 AND "weekStart" = $2 GROUP BY "source"`, userId, weekStart).catch(() => []),
-        prisma.$queryRawUnsafe(`SELECT COALESCE(SUM("quantity"),0) AS "quantity" FROM "RaffleEntry" WHERE "userId" = $1 AND "campaignId" = $2`, userId, current.id).catch(() => []),
+        prisma.$queryRawUnsafe(`SELECT "campaignId", COALESCE(SUM("quantity"),0) AS "quantity" FROM "RaffleEntry" WHERE "userId" = $1 GROUP BY "campaignId"`, userId).catch(() => []),
         prisma.wallet.findUnique({ where: { userId } }).catch(() => null),
       ]);
-      const campaignEntries = Array.isArray(campaignRows) ? Number((campaignRows[0] as any)?.quantity || 0) : 0;
+      const entriesByCampaign = Array.isArray(campaignRows)
+        ? Object.fromEntries(campaignRows.map((row: any) => [String(row.campaignId), Number(row.quantity || 0)]))
+        : {};
+      const activeEnteredCampaignIds = campaigns
+        .filter((c: any) => (c?.status === 'ACTIVE' || c?.isLive) && Number(entriesByCampaign[String(c.id)] || 0) > 0)
+        .map((c: any) => String(c.id));
       userSummary = {
         userId,
         weeklyCount,
-        campaignEntries,
+        campaignEntries: current ? Number(entriesByCampaign[String(current.id)] || 0) : 0,
+        entriesByCampaign,
+        activeEnteredCampaignIds,
         remainingThisWeek: Math.max(0, RAFFLE_WEEKLY_ENTRY_LIMIT - weeklyCount),
         weeklyLimit: RAFFLE_WEEKLY_ENTRY_LIMIT,
         tokenBalance: Number(wallet?.tokenBalance || 0),

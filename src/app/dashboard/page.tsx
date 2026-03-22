@@ -677,7 +677,7 @@ export default function Dashboard() {
               </button>
             )}
             <small style={{ display: "block", marginTop: 6, opacity: 0.8 }}>
-              {(localLevel || 1) >= 5 ? "(Test mode) Launches the new mock interview modal." : "Unlocks at level 5."}
+              {(localLevel || 1) >= 5 ? "Mock interview unlocked." : "Unlocks at level 5."}
             </small>
           </div>
 
@@ -784,19 +784,34 @@ export default function Dashboard() {
 
 
 
-          {sweepSummary?.current ? (
+          {Array.isArray(sweepSummary?.campaigns) && sweepSummary.campaigns.length ? (
             <div className="card" style={{ marginTop: 14, borderColor: 'rgba(255,215,90,.22)', boxShadow: '0 0 0 1px rgba(255,215,90,.06) inset' }}>
               <div style={{ display:'flex', justifyContent:'space-between', gap:12, alignItems:'center', flexWrap:'wrap' }}>
                 <div>
                   <h3 style={{ margin: 0 }}>Active sweepstakes</h3>
-                  <div><small>{sweepSummary.current.title} • {sweepSummary.current.prizePoolLabel || 'Prize drawing'}</small></div>
+                  <div><small>Campaigns you are currently entered in.</small></div>
                 </div>
                 <a className="secondaryBtn" href="/sweepstakes">Open sweepstakes</a>
               </div>
-              <div style={{ marginTop: 10, display:'flex', gap:10, flexWrap:'wrap' }}>
-                <span className="badge">Your entries: {Number(sweepSummary?.user?.campaignEntries || 0)}</span>
-                <span className="badge">Tokens: {Number(sweepSummary?.user?.tokenBalance || 0)}</span>
-                <span className="badge">Draw closes: {sweepSummary.current?.endsAt ? new Date(sweepSummary.current.endsAt).toLocaleString() : 'TBD'}</span>
+              <div style={{ marginTop: 12, display:'grid', gap:10 }}>
+                {sweepSummary.campaigns
+                  .filter((c: any) => (c?.status === 'ACTIVE' || c?.isLive) && Number(sweepSummary?.user?.entriesByCampaign?.[String(c.id)] || 0) > 0)
+                  .map((c: any) => (
+                    <div key={c.id} className="featureCard" style={{ display:'flex', justifyContent:'space-between', gap:12, alignItems:'center', flexWrap:'wrap' }}>
+                      <div>
+                        <div><b>{c.title}</b> • <small>{c.prizePoolLabel || 'Prize drawing'}</small></div>
+                        <div style={{ marginTop:8, display:'flex', gap:10, flexWrap:'wrap' }}>
+                          <span className="badge">Your entries: {Number(sweepSummary?.user?.entriesByCampaign?.[String(c.id)] || 0)}</span>
+                          <span className="badge">Participants: {Number(c.totalParticipants || 0)}</span>
+                          <span className="badge">Entries: {Number(c.totalEntries || 0)}</span>
+                        </div>
+                      </div>
+                      <div style={{ display:'flex', gap:10, flexWrap:'wrap' }}>
+                        <span className="badge">Tokens: {Number(sweepSummary?.user?.tokenBalance || 0)}</span>
+                        <span className="badge">Draw closes: {c?.endsAt ? new Date(c.endsAt).toLocaleString() : 'TBD'}</span>
+                      </div>
+                    </div>
+                  ))}
               </div>
             </div>
           ) : null}
