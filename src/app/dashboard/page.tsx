@@ -453,7 +453,7 @@ export default function Dashboard() {
       <header className="navTop" style={{ marginBottom: 18 }}>
         <div className="navTopInner">
         <div className="brandLock">
-          <div className="brandMark brandMark--logo"><img src="/levelup-pro-logo.svg" alt="LevelUp Pro" className="brandMarkImg" /></div>
+          <div className="brandMark brandMark--logo"><img src="/levelup-pro-mark.svg" alt="LevelUp Pro" className="brandMarkImg" /></div>
           <div className="brandText">
             <b>LevelUp Pro</b>
             <small>Dashboard</small>
@@ -683,7 +683,7 @@ export default function Dashboard() {
       <div className="shell">
         <aside className="sidebar">
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
-            <div className="sidebarLogoBox"><img src="/levelup-pro-logo.svg" alt="LevelUp Pro" className="sidebarLogoImg" /></div>
+            <div className="sidebarLogoBox"><img src="/levelup-pro-mark.svg" alt="LevelUp Pro" className="sidebarLogoImg" /></div>
             <div>
               <div style={{ fontWeight: 900, fontSize: 22, lineHeight: 1.05 }}>LevelUp Pro</div>
               <div><small>Interview Prep</small></div>

@@ -5,9 +5,9 @@ export const metadata: Metadata = {
   title: "LevelUp Pro",
   description: "Prepare for interviews, certifications, and professional development.",
   icons: {
-    icon: "/levelup-pro-logo.svg",
-    shortcut: "/levelup-pro-logo.svg",
-    apple: "/levelup-pro-logo.svg",
+    icon: "/levelup-pro-mark.svg",
+    shortcut: "/levelup-pro-mark.svg",
+    apple: "/levelup-pro-mark.svg",
   },
 };
 

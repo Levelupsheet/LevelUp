@@ -47,7 +47,7 @@ export function setSubscriptionTierByEmail(email: string, tier: SubscriptionTier
 }
 
 export function xpCapForTier(tier: SubscriptionTier) {
-  if (tier === 'FREE') return XP_PER_LEVEL * 2 - 1; // level 2 max
+  if (tier === 'FREE') return XP_PER_LEVEL * 3 - 1; // free can reach level 3, level 4 requires paid tier
   return Number.MAX_SAFE_INTEGER;
 }
 

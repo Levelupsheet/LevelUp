@@ -116,6 +116,8 @@ export default function Home() {
   const raf = useRef<number | null>(null);
   const [merchOpen, setMerchOpen] = useState(false);
   const [planModal, setPlanModal] = useState<null | { plan: string; price: string }>(null);
+  const [checkoutBusy, setCheckoutBusy] = useState<null | string>(null);
+  const [planError, setPlanError] = useState<string>("");
 
   const [leaderboard, setLeaderboard] = useState<Array<{ id: string; displayName: string; xp: number; level: number; rank: string }> | null>(null);
   const [leaderboardMetric, setLeaderboardMetric] = useState<"top" | "active" | "improved">("top");
@@ -242,7 +244,7 @@ export default function Home() {
       <header className="navTop">
         <div className="navTopInner">
         <div className="brandLock">
-          <div className="brandMark">L</div>
+          <div className="brandMark brandMark--logo"><img src="/levelup-pro-mark.svg" alt="LevelUp Pro" className="brandMarkImg" /></div>
           <div className="brandText">
             <b>LevelUp Pro</b>
             <small>Gamified IT training</small>
@@ -271,22 +273,55 @@ export default function Home() {
             <div className="luModalHeader" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12 }}>
               <div>
                 <b style={{ fontSize: 18 }}>{planModal.plan} — {planModal.price}</b>
-                <div><small className="luHint">Billing is coming next. We’ll wire Stripe when you’re ready.</small></div>
+                <div><small className="luHint">Use PayPal checkout links from your environment now. More payment methods can be added later.</small></div>
               </div>
               <button className="secondaryBtn" type="button" onClick={() => setPlanModal(null)}>✕</button>
             </div>
 
             <div className="luModalBody">
               <div className="featureCard" style={{ padding: 12 }}>
-                <b>What happens next</b>
+                <b>Checkout options</b>
                 <div className="muted" style={{ marginTop: 6, fontSize: 13 }}>
-                  This button will become a secure checkout. For now, it’s a placeholder so we can finish the product flow first.
+                  PayPal checkout is processed securely on the server. Sign in first so your account can be upgraded automatically after payment.
                 </div>
               </div>
 
+              <div style={{ display: "grid", gap: 10, marginTop: 14 }}>
+                <button
+                  className="gold"
+                  type="button"
+                  disabled={checkoutBusy === planModal.plan}
+                  onClick={async () => {
+                    try {
+                      setPlanError("");
+                      setCheckoutBusy(planModal.plan);
+                      const planKey = String(planModal.plan || "").toUpperCase() === "PREMIUM" ? "PREMIUM" : "PRO";
+                      const res = await fetch('/api/billing/paypal/create-order', {
+                        method: 'POST',
+                        headers: { 'content-type': 'application/json' },
+                        body: JSON.stringify({ plan: planKey }),
+                      });
+                      const data = await res.json().catch(() => null);
+                      if (!res.ok || !data?.ok || !data?.approveUrl) {
+                        throw new Error(String(data?.error || 'Unable to start PayPal checkout.'));
+                      }
+                      window.location.href = String(data.approveUrl);
+                    } catch (err: any) {
+                      setPlanError(err?.message || 'Unable to start PayPal checkout.');
+                    } finally {
+                      setCheckoutBusy(null);
+                    }
+                  }}
+                >
+                  {checkoutBusy === planModal.plan ? `Starting ${planModal.plan} checkout...` : `PayPal — ${planModal.plan}`}
+                </button>
+                <button className="secondaryBtn" type="button" onClick={() => goEnterApp("pricing_modal")}>Continue with free app access</button>
+              </div>
+
+              {planError ? <div className="muted" style={{ color: '#ffb4b4', marginTop: 12 }}>{planError}</div> : null}
+
               <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 14 }}>
-                <button className="secondaryBtn" type="button" onClick={() => setPlanModal(null)}>Close</button>
-                <button className="gold" type="button" onClick={() => setPlanModal(null)}>Sounds good</button>
+                <button className="secondaryBtn" type="button" onClick={() => { setPlanError(""); setPlanModal(null); }}>Close</button>
               </div>
             </div>
           </div>
@@ -535,7 +570,7 @@ export default function Home() {
         </div>
 
         <p className="muted" style={{ marginTop: 14, fontSize: 13 }}>
-          Note: payment integration is planned (Stripe). For now, the buttons are placeholders.
+          PayPal links can be configured now through environment variables, and more payment methods can be added later.
         </p>
       </section>
 
