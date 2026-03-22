@@ -1,6 +1,7 @@
 import { prisma } from "../../_lib/prisma";
 import { ensureUser } from "../../_lib/ensureUser";
 import { getRequestUserId } from "../../_lib/authUser";
+import { capXpForTier, getSubscriptionTierByEmail } from "@/lib/subscriptions";
 
 export async function GET(req: Request) {
   try {
@@ -11,6 +12,12 @@ export async function GET(req: Request) {
     if (!user) {
       // Create a minimal user record for local/demo flows
       user = await ensureUser(userId);
+    }
+
+    const subscriptionTier = getSubscriptionTierByEmail(user.email);
+    const cappedXp = capXpForTier(user.xp, subscriptionTier);
+    if (cappedXp !== user.xp) {
+      user = await prisma.user.update({ where: { id: userId }, data: { xp: cappedXp } });
     }
 
     const [notifications, badges, offers] = await Promise.all([
@@ -44,13 +51,16 @@ export async function GET(req: Request) {
         id: user.id,
         xp: user.xp,
         tokenBalance: wallet.tokenBalance,
+      subscriptionTier,
         rank: (user as any).rank ?? "STUDENT",
         drawingEligibleUntil: (user as any).drawingEligibleUntil ?? null,
         startingPosition: user.startingPosition,
         moduleChoice: user.moduleChoice,
+        subscriptionTier,
       },
       xp: user.xp,
       tokenBalance: wallet.tokenBalance,
+      subscriptionTier,
       notifications,
       badges,
       offers,

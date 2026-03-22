@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "../../_lib/prisma";
 import { ensureUser } from "../../_lib/ensureUser";
+import { applyUserXpIncrement } from "@/lib/xpCaps";
 
 export async function POST(req: Request) {
   try {
@@ -73,10 +74,7 @@ export async function POST(req: Request) {
       });
 
       if (xpToAdd > 0) {
-        await tx.user.update({
-          where: { id: userId },
-          data: { xp: { increment: xpToAdd } },
-        });
+        await applyUserXpIncrement(tx, userId, xpToAdd);
       }
 
       await tx.lootBox.updateMany({

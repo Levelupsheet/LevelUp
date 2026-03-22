@@ -1,5 +1,6 @@
 import { prisma } from "../../_lib/prisma";
 import { ensureUser } from "../../_lib/ensureUser";
+import { syncUserXpUpward } from "@/lib/xpCaps";
 
 // Sync local/demo XP to the server (never decreases).
 // This keeps the leaderboard consistent with what the dashboard shows.
@@ -18,17 +19,10 @@ export async function POST(req: Request) {
     const existing = await prisma.user.findUnique({ where: { id: userId } });
     if (!existing) await ensureUser(userId);
 
-    // Read current XP and only ever increase.
     const current = await prisma.user.findUnique({ where: { id: userId }, select: { xp: true } });
     const currentXp = current?.xp ?? 0;
-    const nextXp = Math.max(currentXp, xp);
-
-    if (nextXp !== currentXp) {
-      const updated = await prisma.user.update({ where: { id: userId }, data: { xp: nextXp }, select: { xp: true } });
-      return Response.json({ ok: true, xp: updated.xp });
-    }
-
-    return Response.json({ ok: true, xp: currentXp });
+    const updated = await syncUserXpUpward(prisma, userId, xp);
+    return Response.json({ ok: true, xp: (updated as any)?.xp ?? currentXp });
   } catch (err: any) {
     return Response.json(
       { ok: false, error: "Failed to sync XP", detail: String(err?.message ?? err) },

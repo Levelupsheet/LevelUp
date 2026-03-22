@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireAdminRequest } from "@/app/api/_lib/adminGuard";
 import { prisma } from "@/lib/prisma";
+import { getSubscriptionTierByEmail, setSubscriptionTierByEmail } from "@/lib/subscriptions";
 
 export async function GET(){
   const admin = await requireAdminRequest();
@@ -20,7 +21,7 @@ export async function GET(){
         lastActiveAt: true,
       }
     });
-    return NextResponse.json({ users });
+    return NextResponse.json({ users: users.map((u) => ({ ...u, subscriptionTier: getSubscriptionTierByEmail(u.email) })) });
   }catch(e:any){
     return NextResponse.json({ error: e?.message || "Failed to load users" }, { status: 500 });
   }
@@ -31,7 +32,7 @@ export async function PATCH(req: Request){
   if (!admin.ok) return admin.response;
   try{
     const body = await req.json();
-    const { id, xp, startingPosition, moduleChoice } = body || {};
+    const { id, xp, startingPosition, moduleChoice, subscriptionTier } = body || {};
     if (!id) return NextResponse.json({ error: "Missing id" }, { status: 400 });
 
     const data: any = {};
@@ -40,7 +41,8 @@ export async function PATCH(req: Request){
     if (moduleChoice) data.moduleChoice = moduleChoice;
 
     const user = await prisma.user.update({ where: { id }, data });
-    return NextResponse.json({ user });
+    if (typeof subscriptionTier === "string" && user.email) setSubscriptionTierByEmail(user.email, subscriptionTier as any);
+    return NextResponse.json({ user: { ...user, subscriptionTier: getSubscriptionTierByEmail(user.email) } });
   }catch(e:any){
     return NextResponse.json({ error: e?.message || "Failed to update user" }, { status: 500 });
   }

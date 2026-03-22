@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "../../_lib/prisma";
 import { ensureUser } from "../../_lib/ensureUser";
 import { levelFromXp } from "@/lib/progression";
+import { syncUserXpUpward } from "@/lib/xpCaps";
 
 // Creates pending loot boxes (typically on level-up) and a notification.
 // Server-side verification: grants ONLY when XP crosses a level threshold.
@@ -47,11 +48,12 @@ export async function POST(req: Request) {
       }
 
       // Optionally sync XP upward (never decrease from client).
+      let syncedUser:any = user;
       if (xpAfter > currentXp) {
-        await tx.user.update({ where: { id: userId }, data: { xp: Math.floor(xpAfter) } });
+        syncedUser = await syncUserXpUpward(tx, userId, xpAfter);
       }
 
-      const effectiveXp = Math.max(currentXp, xpAfter);
+      const effectiveXp = Math.max((syncedUser as any)?.xp ?? currentXp, currentXp, xpAfter);
       const levelNow = levelFromXp(effectiveXp);
 
       // Already granted for this level (or beyond)

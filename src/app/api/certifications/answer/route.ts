@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { prisma } from "../../_lib/prisma";
+import { applyUserXpIncrement } from "@/lib/xpCaps";
 
 const Body = z.object({
   userId: z.string().min(1),
@@ -31,10 +32,7 @@ export async function POST(req: Request) {
       },
     });
 
-    await prisma.user.update({
-      where: { id: user.id },
-      data: { xp: { increment: xpAwarded }, lastActiveAt: new Date() },
-    });
+    await applyUserXpIncrement(prisma, user.id, xpAwarded);
 
     return Response.json({ ok: true, xpAwarded });
   } catch (e: any) {

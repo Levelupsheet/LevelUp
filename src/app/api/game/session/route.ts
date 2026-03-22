@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { ensureUser } from "@/app/api/_lib/ensureUser";
 import { inferDomainFromQuestion } from "@/lib/learningProfile";
+import { applyUserXpIncrement } from "@/lib/xpCaps";
 
 function asNum(v: unknown, fallback = 0) {
   const n = Number(v);
@@ -20,11 +21,7 @@ export async function POST(req: Request) {
     if (!existing) await ensureUser(userId);
 
     const updated = await prisma.$transaction(async (tx) => {
-      const user = await tx.user.update({
-        where: { id: userId },
-        data: { xp: { increment: xpEarned }, lastActiveAt: new Date() },
-        select: { id: true, xp: true },
-      });
+      const user = await applyUserXpIncrement(tx, userId, xpEarned);
 
       const domainMap = new Map<string, { mastery: number; questions: number; level: number }>();
       for (const [key, val] of Object.entries(masteryByDomain || {})) {

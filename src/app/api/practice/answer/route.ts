@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { prisma } from "../../_lib/prisma";
 import { gradeAnswer, qualifiesForHR, rankLabelIT, readinessFromXP } from "../../_lib/scoring";
+import { applyUserXpIncrement } from "@/lib/xpCaps";
 
 const Body = z.object({
   userId: z.string().min(1),
@@ -43,15 +44,8 @@ export async function POST(req: Request) {
       },
     });
 
-    // Update user XP
-    const updated = await prisma.user.update({
-      where: { id: user.id },
-      data: {
-        xp: { increment: score.xpAwarded },
-        lastActiveAt: new Date(),
-      },
-      select: { xp: true },
-    });
+    // Update user XP with subscription cap
+    const updated = await applyUserXpIncrement(prisma, user.id, score.xpAwarded);
 
     // Update per-domain mastery (domain XP is a smaller slice of awarded XP)
     const domainXP = Math.max(2, Math.round(score.xpAwarded * 0.15));

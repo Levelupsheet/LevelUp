@@ -12,7 +12,7 @@ import LootVaultModal from "@/components/LootVaultModal";
 import AuthGateCard from "@/components/AuthGateCard";
 import GoogleLoginButton from "@/components/ui/GoogleLoginButton";
 import { getActiveUser, setActiveUserId, syncAuthenticatedUser } from "@/lib/userStore";
-import { XP_PER_LEVEL, xpIntoCurrentLevel, levelFromXp } from "@/lib/progression";
+import { XP_PER_LEVEL, xpIntoCurrentLevel, levelFromXp, levelTitleFromLevel } from "@/lib/progression";
 import { addActivity, getActivities, clearActivitiesByType, clearActivities, removeActivity, type ActivityItem } from "@/lib/activityStore";
 
 type Eligibility = {
@@ -98,6 +98,7 @@ export default function Dashboard() {
   const [overallMastery, setOverallMastery] = useState<number>(0);
   const [careerMatches, setCareerMatches] = useState<CareerMatchRow[]>([]);
   const [sweepSummary, setSweepSummary] = useState<SweepstakesSummary | null>(null);
+  const [subscriptionTier, setSubscriptionTier] = useState<string>("FREE");
 
   // Level-up detection (notification-only; user opens vault when ready)
   const prevLevelRef = useRef<number>(0);
@@ -151,6 +152,9 @@ export default function Dashboard() {
       if (!res.ok) throw new Error(data?.error ?? data?.detail ?? text ?? "Failed");
       setNotes(data.notifications ?? []);
       setUser(data.user ?? null);
+      setSubscriptionTier(String(data.subscriptionTier ?? data.user?.subscriptionTier ?? "FREE").toUpperCase());
+      setLocalXp(Number(data.xp ?? data.user?.xp ?? 0) || 0);
+      setLocalLevel(levelFromXp(Number(data.xp ?? data.user?.xp ?? 0) || 0));
       setTokenBalance(Number(data.tokenBalance ?? data.user?.tokenBalance ?? 0) || 0);
       if (!data.user?.startingPosition) { setPositionChangeMode(false); setPendingPos(null); setShowPositionModal(true); }
 
@@ -663,13 +667,17 @@ export default function Dashboard() {
           </button>
 
           <div style={{ marginTop: 10 }}>
-            {(
+            {(localLevel || 1) >= 5 ? (
               <button className="gold" style={{ width: "100%" }} onClick={() => setMockInterviewOpen(true)}>
                 Begin Tech Interview →
               </button>
+            ) : (
+              <button className="gold" style={{ width: "100%", opacity: 0.65, cursor: "not-allowed" }} disabled title="Unlocks at level 5">
+                Begin Tech Interview 🔒
+              </button>
             )}
             <small style={{ display: "block", marginTop: 6, opacity: 0.8 }}>
-              (Test mode) Launches the new mock interview modal.
+              {(localLevel || 1) >= 5 ? "(Test mode) Launches the new mock interview modal." : "Unlocks at level 5."}
             </small>
           </div>
 
@@ -679,8 +687,8 @@ export default function Dashboard() {
 
           <div className="card" style={{ padding: 12 }}>
             <div style={{ display: "flex", justifyContent: "space-between", gap: 10 }}>
-              <small>Helpdesk Support • Level {localLevel}</small>
-              <small>{elig?.readiness ? `${elig.readiness.toFixed(0)}% ready` : "—"}</small>
+              <small>{levelTitleFromLevel(localLevel)} • Level {localLevel}</small>
+              <small>{subscriptionTier === "FREE" ? "Free" : subscriptionTier === "PREMIUM" ? "Premium" : "Pro"}</small>
             </div>
             <div style={{ marginTop: 10 }}>
               <ProgressBar value={Number.isFinite(xpIntoLevel) ? xpIntoLevel : 0} max={levelMax} />

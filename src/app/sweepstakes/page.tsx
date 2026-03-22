@@ -59,7 +59,7 @@ function looksLikeImage(url?: string | null) {
 function TermsModal({ campaign, onClose }: { campaign: Campaign | null; onClose: () => void }) {
   if (!campaign) return null;
   return (
-    <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,.72)', display:'grid', placeItems:'center', zIndex:1100, padding:20 }} onClick={onClose}>
+    <div style={{ position:'fixed', inset:0, background:'rgba(2,6,16,.88)', display:'grid', placeItems:'center', zIndex:1100, padding:20 }} onClick={onClose}>
       <div className="glass" style={{ width:'min(840px, 96vw)', maxHeight:'88vh', overflow:'auto', padding:20 }} onClick={(e)=>e.stopPropagation()}>
         <div style={{ display:'flex', justifyContent:'space-between', gap:10, alignItems:'center' }}>
           <div>
@@ -122,7 +122,7 @@ function RaffleReel({ campaign }: { campaign: Campaign | null }) {
         <b>{winnerName ? 'Winner reel' : 'Live entry reel'}</b>
         <span className="badge" style={{ borderColor:'rgba(255,215,90,.35)', color:'#ffe28a' }}>{winnerName ? 'Locked on winner' : 'Drawing tease'}</span>
       </div>
-      <div style={{ perspective: 1000, overflow: 'hidden', borderRadius: 16, border:'1px solid rgba(255,255,255,.08)', background:'radial-gradient(circle at top, rgba(255,215,90,.08), transparent 35%), rgba(0,0,0,.25)' }}>
+      <div style={{ perspective: 1000, overflow: 'hidden', borderRadius: 16, border:'1px solid rgba(255,255,255,.08)', background:'radial-gradient(circle at top, rgba(255,215,90,.12), transparent 35%), rgba(5,8,18,.86)', minHeight: 360 }}>
         <div style={{ display:'grid', gap:8, padding:14 }}>
           {visible.map((name, i) => {
             const isCenter = i === 3;
@@ -185,8 +185,8 @@ function SweepstakesModal({ campaign, user, onClose, onEntered }: { campaign: Ca
 
   return (
     <>
-      <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,.72)', display:'grid', placeItems:'center', zIndex:1000, padding:20 }} onClick={onClose}>
-        <div className="glass" style={{ width:'min(1040px, 96vw)', maxHeight:'90vh', overflow:'auto', padding:20, boxShadow:'0 30px 80px rgba(0,0,0,.5)' }} onClick={(e)=>e.stopPropagation()}>
+      <div style={{ position:'fixed', inset:0, background:'rgba(2,6,16,.88)', display:'grid', placeItems:'center', zIndex:1000, padding:20 }} onClick={onClose}>
+        <div className="glass" style={{ width:'min(1040px, 96vw)', maxHeight:'90vh', overflow:'auto', padding:20, boxShadow:'0 30px 100px rgba(0,0,0,.72)', background:'linear-gradient(180deg, rgba(8,12,24,.98), rgba(8,12,24,.96))', border:'1px solid rgba(255,255,255,.08)'  }} onClick={(e)=>e.stopPropagation()}>
           <div style={{ display:'flex', justifyContent:'space-between', gap:10, alignItems:'center' }}>
             <div>
               <div className="muted" style={{ fontSize: 12 }}>Sweepstakes details</div>
@@ -197,7 +197,7 @@ function SweepstakesModal({ campaign, user, onClose, onEntered }: { campaign: Ca
 
           <div style={{ display:'grid', gridTemplateColumns:'1.15fr 1fr', gap:18, marginTop:16 }} className="sweepModalGrid">
             <div className="featureCard" style={{ position:'relative', overflow:'hidden' }}>
-              <div style={{ position:'absolute', inset:0, background:'radial-gradient(circle at top right, rgba(251,191,36,.16), transparent 44%)', pointerEvents:'none' }} />
+              <div style={{ position:'absolute', inset:0, background:'radial-gradient(circle at top right, rgba(251,191,36,.22), transparent 44%), rgba(0,0,0,.22)', pointerEvents:'none' }} />
               <div style={{ position:'relative' }}>
                 <div><b>Prize</b></div>
                 <div style={{ marginTop:8, fontSize:24, fontWeight:900 }}>{campaign.prizePoolLabel || 'Prize drawing'}</div>
@@ -261,7 +261,7 @@ function SweepstakesModal({ campaign, user, onClose, onEntered }: { campaign: Ca
               </div>
             </div>
           </div>
-          <RaffleReel campaign={campaign} />
+          <div style={{ marginTop: 14 }}><RaffleReel campaign={campaign} /></div>
         </div>
       </div>
       <TermsModal campaign={showTerms ? campaign : null} onClose={() => setShowTerms(false)} />

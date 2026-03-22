@@ -44,6 +44,7 @@ type AdminUser = {
   moduleChoice?: string | null;
   createdAt: string;
   lastActiveAt?: string | null;
+  subscriptionTier?: string | null;
 };
 
 type CareerMatchRow = { id: string; title: string; company?: string; domain: string; minLevel: number; minMastery: number; description: string; url: string; location?: string; salary?: string; isActive?: boolean };
@@ -1418,6 +1419,7 @@ export default function AdminPage(){
                   <th>Starting Position</th>
                   <th>Module</th>
                   <th>Created</th>
+                  <th>Plan</th>
                   <th></th>
                 </tr>
               </thead>
@@ -1458,6 +1460,16 @@ export default function AdminPage(){
                         </select>
                       </td>
                       <td><small>{new Date(u.createdAt).toLocaleString()}</small></td>
+                      <td style={{ width: 140 }}>
+                        <select
+                          value={(edit.subscriptionTier ?? u.subscriptionTier ?? "FREE") as any}
+                          onChange={(e) => setUserEdits(prev => ({ ...prev, [u.id]: { ...prev[u.id], subscriptionTier: e.target.value } }))}
+                        >
+                          <option value="FREE">Free</option>
+                          <option value="PRO">Pro</option>
+                          <option value="PREMIUM">Premium</option>
+                        </select>
+                      </td>
                       <td style={{ width: 120 }}>
                         <button className="primary" onClick={() => saveUser(u.id)}>Save</button>
                       </td>
@@ -1465,7 +1477,7 @@ export default function AdminPage(){
                   );
                 })}
                 {users.length === 0 ? (
-                  <tr><td colSpan={7}><small>No users found.</small></td></tr>
+                  <tr><td colSpan={8}><small>No users found.</small></td></tr>
                 ) : null}
               </tbody>
             </table>
