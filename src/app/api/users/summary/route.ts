@@ -56,7 +56,6 @@ export async function GET(req: Request) {
         drawingEligibleUntil: (user as any).drawingEligibleUntil ?? null,
         startingPosition: user.startingPosition,
         moduleChoice: user.moduleChoice,
-        subscriptionTier,
       },
       xp: user.xp,
       tokenBalance: wallet.tokenBalance,
