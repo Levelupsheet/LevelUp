@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { requireAdminRequest } from "@/app/api/_lib/adminGuard";
 import { prisma } from "@/lib/prisma";
 import { getSubscriptionTierByEmail, setSubscriptionMetaByEmail, setSubscriptionTierByEmail } from "@/lib/subscriptions";
+import type { SubscriptionStatus } from "@/lib/subscriptions";
 
 export async function GET(){
   const admin = await requireAdminRequest();
@@ -53,7 +54,8 @@ export async function PATCH(req: Request){
     if (typeof subscriptionTier === "string" && user.email) {
       const tier = String(subscriptionTier).toUpperCase() as any;
       setSubscriptionTierByEmail(user.email, tier);
-      setSubscriptionMetaByEmail(user.email, { tier, status: tier === 'FREE' ? 'FREE' : 'ACTIVE' });
+      const status = (tier === 'FREE' ? 'FREE' : 'ACTIVE') as unknown as SubscriptionStatus;
+      setSubscriptionMetaByEmail(user.email, { tier, status });
     }
     return NextResponse.json({ user: { ...user, subscriptionTier: String((user as any).subscriptionTier || getSubscriptionTierByEmail(user.email) || 'FREE').toUpperCase() } });
   }catch(e:any){
