@@ -528,12 +528,12 @@ button.gold::after{
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 12px;
-  border-radius: 16px;
-  background: rgba(8, 12, 22, 0.65);
+  padding: 10px 14px;
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(8, 12, 22, 0.88), rgba(8, 12, 22, 0.72));
   border: 1px solid rgba(255,255,255,0.10);
-  backdrop-filter: blur(10px);
-  box-shadow: 0 16px 40px rgba(0,0,0,0.35);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.05);
 }
 
 .brandLock{
@@ -542,9 +542,9 @@ button.gold::after{
   gap: 10px;
 }
 .brandMark{
-  width: 32px;
-  height: 32px;
-  border-radius: 10px;
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
   display:flex;
   align-items:center;
   justify-content:center;
@@ -558,6 +558,10 @@ button.gold::after{
 }
 .brandText b{ font-size: 14px; }
 .brandText small{ opacity: 0.75; }
+.brandMark--logo{ overflow:hidden; padding:0; background:rgba(255,255,255,0.06); }
+.brandMarkImg{ width:100%; height:100%; object-fit:contain; display:block; padding:6px; }
+.sidebarLogoBox{ width:40px; height:40px; border-radius:12px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.08); display:flex; align-items:center; justify-content:center; overflow:hidden; }
+.sidebarLogoImg{ width:100%; height:100%; object-fit:contain; display:block; padding:6px; }
 
 .navLinks{
   display:flex;

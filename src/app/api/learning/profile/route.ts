@@ -12,14 +12,16 @@ function asNum(v: unknown, fallback = 0) {
 
 function calcMastery(correct: number, wrong: number, fallbackXp = 0, seed = 0) {
   const total = correct + wrong;
-  const xpPct = Math.max(0, Math.min(100, (Number(fallbackXp || 0) / 5000) * 100));
+  const xpPct = Math.max(0, Math.min(100, (Number(fallbackXp || 0) / 8000) * 100));
   if (total > 0) {
     const accuracy = (correct / total) * 100;
-    const confidenceBoost = Math.min(10, total * 0.45);
-    const blended = accuracy * 0.22 + xpPct * 0.78 + confidenceBoost + seed;
+    const volumeFactor = Math.max(0.08, Math.min(1, total / 40));
+    const confidenceBoost = Math.min(4, total * 0.12);
+    const blendedBase = accuracy * 0.18 + xpPct * 0.82;
+    const blended = blendedBase * volumeFactor + confidenceBoost + seed;
     return Math.max(0, Math.min(100, Number(blended.toFixed(1))));
   }
-  if (fallbackXp > 0) return Math.max(0, Math.min(100, Number((xpPct + seed).toFixed(1))));
+  if (fallbackXp > 0) return Math.max(0, Math.min(100, Number(((xpPct * 0.65) + seed).toFixed(1))));
   return Math.max(0, Math.min(100, Number(seed.toFixed(1))));
 }
 

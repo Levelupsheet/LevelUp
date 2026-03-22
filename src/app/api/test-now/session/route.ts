@@ -242,7 +242,7 @@ export async function PATCH(req: Request) {
                 meta: { sessionId: session.id, questionId: q.questionId } as any,
               });
               if (Number(award?.awarded || 0) > 0) {
-                await tx.notification.create({ data: { userId: session.userId, type: 'LOOT_BOX_EARNED', title: 'Golden sweepstakes entry added', body: `+${Number(award.awarded || 0)} golden entry added to the active golden sweepstakes.` } }).catch(() => null);
+                await tx.notification.create({ data: { userId: session.userId, type: 'SWEEPSTAKES_ENTRY', title: 'Golden sweepstakes entry added', body: `+${Number(award.awarded || 0)} golden entry added to the active golden sweepstakes.` } }).catch(() => null);
               }
               await tx.$executeRawUnsafe(`UPDATE "GoldenQuestionHistory" SET "awarded" = TRUE WHERE "sessionId" = $1 AND "questionId" = $2`, session.id, String(q.questionId || q.id));
             }).catch(() => null);

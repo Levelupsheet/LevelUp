@@ -40,8 +40,8 @@ export async function POST(req: Request) {
 
       for (const [domain, info] of domainMap.entries()) {
         const domainXpIncrement = Math.max(
-          2,
-          Math.round(info.questions * (1 + info.level) + (Math.max(0, Math.min(100, info.mastery)) / 100) * 4)
+          1,
+          Math.round(info.questions * 0.5 + info.level * 0.5 + (Math.max(0, Math.min(100, info.mastery)) / 100) * 1.5)
         );
         await tx.userDomain.upsert({
           where: { userId_domain: { userId, domain } },

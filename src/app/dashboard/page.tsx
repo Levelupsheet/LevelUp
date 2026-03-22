@@ -60,6 +60,7 @@ function prettyType(t: string){
   if (t === "HR_INVITE") return "Hiring Manager Ping";
   if (t === "TECH_INTERVIEW_READY") return "Tech Interview Ready";
   if (t === "LOOT_BOX_EARNED") return "Reward";
+  if (t === "SWEEPSTAKES_ENTRY") return "Sweepstakes";
   return t;
 }
 
@@ -409,7 +410,7 @@ export default function Dashboard() {
       <header className="navTop" style={{ marginBottom: 18 }}>
         <div className="navTopInner">
         <div className="brandLock">
-          <div className="brandMark">L</div>
+          <div className="brandMark brandMark--logo"><img src="/levelup-pro-logo.svg" alt="LevelUp Pro" className="brandMarkImg" /></div>
           <div className="brandText">
             <b>LevelUp Pro</b>
             <small>Dashboard</small>
@@ -655,7 +656,7 @@ export default function Dashboard() {
       <div className="shell">
         <aside className="sidebar">
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
-            <div style={{ width: 34, height: 34, borderRadius: 10, background: "rgba(255,255,255,0.10)", border: "1px solid var(--cardBorder)" }} />
+            <div className="sidebarLogoBox"><img src="/levelup-pro-logo.svg" alt="LevelUp Pro" className="sidebarLogoImg" /></div>
             <div>
               <img src="/levelup-pro-logo.svg" alt="LevelUp Pro" style={{height: 22, width: "auto", opacity: 0.95}} />
               <div><small>Interview Prep</small></div>
@@ -758,7 +759,7 @@ export default function Dashboard() {
                     <p style={{ margin: 0 }}>{n.body}</p>
                     {n.scheduledAt && <p style={{ margin: "6px 0 0 0" }}><small>Scheduled: {new Date(n.scheduledAt).toLocaleString()}</small></p>}
 
-                    {n.type === "LOOT_BOX_EARNED" && (
+                    {(n.type === "LOOT_BOX_EARNED" && !/golden sweepstakes/i.test(`${n.title} ${n.body}`)) && (
                       <div style={{ marginTop: 10, display: "flex", gap: 10, alignItems: "center" }}>
                         <button
                           className="primary"
