@@ -1,5 +1,7 @@
 import path from 'path';
 import fs from 'fs';
+import crypto from 'crypto';
+import { downgradeSubscriptionByEmail, setSubscriptionMetaByEmail, setSubscriptionTierByEmail, type SubscriptionStatus } from '@/lib/subscriptions';
 
 export type PaidTier = 'PRO' | 'PREMIUM';
 
@@ -22,7 +24,22 @@ type PendingOrder = {
 
 type PendingMap = Record<string, PendingOrder>;
 
+type PendingSubscription = {
+  subscriptionId: string;
+  userId: string;
+  email: string;
+  tier: PaidTier;
+  planId: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+  customId?: string | null;
+};
+
+type PendingSubscriptionMap = Record<string, PendingSubscription>;
+
 const PENDING_FILE = path.join(process.cwd(), 'data', 'paypal-orders.json');
+const SUBS_FILE = path.join(process.cwd(), 'data', 'paypal-subscriptions.json');
 
 function ensureDir() {
   fs.mkdirSync(path.dirname(PENDING_FILE), { recursive: true });
@@ -44,6 +61,12 @@ export function paypalClientSecret() {
   const v = process.env.PAYPAL_CLIENT_SECRET;
   if (!v) throw new Error('Missing PAYPAL_CLIENT_SECRET');
   return v;
+}
+
+export function paypalPlanIdForTier(tier: PaidTier) {
+  const key = tier === 'PREMIUM' ? process.env.PAYPAL_PREMIUM_PLAN_ID : process.env.PAYPAL_PRO_PLAN_ID;
+  if (!key) throw new Error(`Missing ${tier === 'PREMIUM' ? 'PAYPAL_PREMIUM_PLAN_ID' : 'PAYPAL_PRO_PLAN_ID'}`);
+  return key;
 }
 
 export async function getPayPalAccessToken() {
@@ -104,6 +127,43 @@ export function updatePendingOrder(orderId: string, patch: Partial<PendingOrder>
   return map[key];
 }
 
+export function readPendingSubscriptions(): PendingSubscriptionMap {
+  try {
+    const raw = fs.readFileSync(SUBS_FILE, 'utf8');
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === 'object' ? parsed : {};
+  } catch {
+    ensureDir();
+    fs.writeFileSync(SUBS_FILE, JSON.stringify({}, null, 2));
+    return {};
+  }
+}
+
+export function writePendingSubscriptions(map: PendingSubscriptionMap) {
+  ensureDir();
+  fs.writeFileSync(SUBS_FILE, JSON.stringify(map, null, 2));
+}
+
+export function savePendingSubscription(row: PendingSubscription) {
+  const map = readPendingSubscriptions();
+  map[row.subscriptionId] = row;
+  writePendingSubscriptions(map);
+}
+
+export function getPendingSubscription(subscriptionId: string) {
+  const map = readPendingSubscriptions();
+  return map[String(subscriptionId || '')] || null;
+}
+
+export function updatePendingSubscription(subscriptionId: string, patch: Partial<PendingSubscription>) {
+  const map = readPendingSubscriptions();
+  const key = String(subscriptionId || '');
+  if (!map[key]) return null;
+  map[key] = { ...map[key], ...patch, updatedAt: new Date().toISOString() };
+  writePendingSubscriptions(map);
+  return map[key];
+}
+
 export function appBaseUrl(req?: Request) {
   const explicit = process.env.NEXT_PUBLIC_APP_URL || process.env.APP_URL;
   if (explicit) return explicit.replace(/\/$/, '');
@@ -114,6 +174,222 @@ export function appBaseUrl(req?: Request) {
     }
   } catch {}
   return 'http://localhost:3000';
+}
+
+export function buildSubscriptionCustomId(params: { userId: string; email: string; tier: PaidTier }) {
+  const payload = JSON.stringify({ userId: params.userId, email: params.email, tier: params.tier });
+  return Buffer.from(payload, 'utf8').toString('base64url');
+}
+
+export function parseSubscriptionCustomId(v?: string | null): { userId: string; email: string; tier: PaidTier } | null {
+  try {
+    const raw = Buffer.from(String(v || ''), 'base64url').toString('utf8');
+    const parsed = JSON.parse(raw);
+    const tier = String(parsed?.tier || '').toUpperCase();
+    if ((tier !== 'PRO' && tier !== 'PREMIUM') || !parsed?.email) return null;
+    return { userId: String(parsed.userId || ''), email: String(parsed.email || ''), tier } as any;
+  } catch {
+    return null;
+  }
+}
+
+export async function createPayPalSubscription(params: { tier: PaidTier; userId: string; email: string; returnBase: string; }) {
+  const token = await getPayPalAccessToken();
+  const planId = paypalPlanIdForTier(params.tier);
+  const customId = buildSubscriptionCustomId(params);
+  const res = await fetch(`${paypalBaseUrl()}/v1/billing/subscriptions`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+      Prefer: 'return=representation',
+    },
+    body: JSON.stringify({
+      plan_id: planId,
+      custom_id: customId,
+      application_context: {
+        brand_name: 'LevelUp Pro',
+        user_action: 'SUBSCRIBE_NOW',
+        shipping_preference: 'NO_SHIPPING',
+        return_url: `${params.returnBase}/billing/paypal/success`,
+        cancel_url: `${params.returnBase}/billing/paypal/cancel`,
+      },
+    }),
+    cache: 'no-store',
+  });
+  if (!res.ok) {
+    const detail = await res.text().catch(() => '');
+    throw new Error(`Failed to create PayPal subscription: ${detail || res.statusText}`);
+  }
+  const data = await res.json();
+  const subscriptionId = String(data.id || '');
+  if (!subscriptionId) throw new Error('PayPal subscription id missing');
+  const approveUrl = Array.isArray(data.links)
+    ? String(data.links.find((l: any) => l?.rel === 'approve')?.href || '')
+    : '';
+  savePendingSubscription({
+    subscriptionId,
+    userId: params.userId,
+    email: params.email,
+    tier: params.tier,
+    planId,
+    status: String(data.status || 'APPROVAL_PENDING'),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    customId,
+  });
+  setSubscriptionMetaByEmail(params.email, {
+    tier: params.tier,
+    status: 'PENDING',
+    paypalSubscriptionId: subscriptionId,
+    paypalPlanId: planId,
+    updatedAt: new Date().toISOString(),
+  });
+  return { subscriptionId, approveUrl, raw: data };
+}
+
+export async function getPayPalSubscriptionDetails(subscriptionId: string) {
+  const token = await getPayPalAccessToken();
+  const res = await fetch(`${paypalBaseUrl()}/v1/billing/subscriptions/${encodeURIComponent(subscriptionId)}`, {
+    method: 'GET',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    cache: 'no-store',
+  });
+  if (!res.ok) {
+    const detail = await res.text().catch(() => '');
+    throw new Error(`Failed to load PayPal subscription: ${detail || res.statusText}`);
+  }
+  return res.json();
+}
+
+function mapSubscriptionStatus(statusRaw: string): SubscriptionStatus {
+  const s = String(statusRaw || '').toUpperCase();
+  if (s === 'ACTIVE') return 'ACTIVE';
+  if (s === 'APPROVAL_PENDING') return 'PENDING';
+  if (s === 'CANCELLED') return 'CANCELLED';
+  if (s === 'EXPIRED') return 'EXPIRED';
+  if (s === 'SUSPENDED') return 'SUSPENDED';
+  return 'PENDING';
+}
+
+export async function finalizePayPalSubscription(subscriptionId: string) {
+  const details = await getPayPalSubscriptionDetails(subscriptionId);
+  const status = String(details?.status || '');
+  const pending = getPendingSubscription(subscriptionId);
+  const parsedCustom = parseSubscriptionCustomId(String(details?.custom_id || pending?.customId || ''));
+  const email = String(parsedCustom?.email || pending?.email || '').toLowerCase();
+  const tier = (parsedCustom?.tier || pending?.tier || 'PRO') as PaidTier;
+  const planId = String(details?.plan_id || pending?.planId || '');
+  const startTime = String(details?.start_time || new Date().toISOString());
+  let nextBillingTime = String(details?.billing_info?.next_billing_time || '');
+  if (!nextBillingTime) {
+    const d = new Date(startTime || Date.now());
+    d.setMonth(d.getMonth() + 1);
+    nextBillingTime = d.toISOString();
+  }
+  updatePendingSubscription(subscriptionId, { status });
+  if (email) {
+    const mapped = mapSubscriptionStatus(status);
+    if (mapped === 'ACTIVE') {
+      setSubscriptionMetaByEmail(email, {
+        tier,
+        status: 'ACTIVE',
+        paypalSubscriptionId: subscriptionId,
+        paypalPlanId: planId,
+        startedAt: startTime,
+        expiresAt: nextBillingTime,
+      });
+      setSubscriptionTierByEmail(email, tier);
+    } else if (mapped === 'PENDING') {
+      setSubscriptionMetaByEmail(email, {
+        tier,
+        status: 'PENDING',
+        paypalSubscriptionId: subscriptionId,
+        paypalPlanId: planId,
+        startedAt: startTime,
+        expiresAt: nextBillingTime,
+      });
+    } else {
+      downgradeSubscriptionByEmail(email, mapped);
+    }
+  }
+  return { details, pending, email, tier, status };
+}
+
+export async function verifyWebhookSignature(req: Request, bodyText: string) {
+  const webhookId = process.env.PAYPAL_WEBHOOK_ID;
+  if (!webhookId) return true;
+  const transmissionId = req.headers.get('paypal-transmission-id');
+  const transmissionTime = req.headers.get('paypal-transmission-time');
+  const certUrl = req.headers.get('paypal-cert-url');
+  const authAlgo = req.headers.get('paypal-auth-algo');
+  const transmissionSig = req.headers.get('paypal-transmission-sig');
+  if (!transmissionId || !transmissionTime || !certUrl || !authAlgo || !transmissionSig) {
+    return false;
+  }
+  const token = await getPayPalAccessToken();
+  const res = await fetch(`${paypalBaseUrl()}/v1/notifications/verify-webhook-signature`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      auth_algo: authAlgo,
+      cert_url: certUrl,
+      transmission_id: transmissionId,
+      transmission_sig: transmissionSig,
+      transmission_time: transmissionTime,
+      webhook_id: webhookId,
+      webhook_event: JSON.parse(bodyText),
+    }),
+    cache: 'no-store',
+  });
+  if (!res.ok) return false;
+  const data = await res.json().catch(() => null);
+  return String(data?.verification_status || '').toUpperCase() === 'SUCCESS';
+}
+
+export async function applyWebhookEvent(event: any) {
+  const eventType = String(event?.event_type || '');
+  const resource = event?.resource || {};
+  const subscriptionId = String(resource?.id || resource?.billing_agreement_id || resource?.resource?.id || '');
+  if (!subscriptionId) return { ok: false, reason: 'subscription id missing' };
+  const pending = getPendingSubscription(subscriptionId);
+  const parsedCustom = parseSubscriptionCustomId(String(resource?.custom_id || pending?.customId || ''));
+  const email = String(parsedCustom?.email || pending?.email || '').toLowerCase();
+  const tier = (parsedCustom?.tier || pending?.tier || 'PRO') as PaidTier;
+  const planId = String(resource?.plan_id || pending?.planId || '');
+  const updateCommon = {
+    paypalSubscriptionId: subscriptionId,
+    paypalPlanId: planId,
+    startedAt: String(resource?.start_time || new Date().toISOString()),
+    expiresAt: String(resource?.billing_info?.next_billing_time || ''),
+  };
+
+  if (pending) updatePendingSubscription(subscriptionId, { status: String(resource?.status || eventType) });
+  if (!email) return { ok: true, reason: 'no email available' };
+
+  if (eventType === 'BILLING.SUBSCRIPTION.ACTIVATED' || String(resource?.status || '').toUpperCase() === 'ACTIVE') {
+    setSubscriptionMetaByEmail(email, { tier, status: 'ACTIVE', ...updateCommon });
+    setSubscriptionTierByEmail(email, tier);
+    return { ok: true, status: 'ACTIVE' };
+  }
+  if (eventType === 'PAYMENT.SALE.COMPLETED' || eventType === 'BILLING.SUBSCRIPTION.RE-ACTIVATED') {
+    setSubscriptionMetaByEmail(email, { tier, status: 'ACTIVE', ...updateCommon });
+    setSubscriptionTierByEmail(email, tier);
+    return { ok: true, status: 'ACTIVE' };
+  }
+  if (eventType === 'BILLING.SUBSCRIPTION.CANCELLED') {
+    downgradeSubscriptionByEmail(email, 'CANCELLED');
+    return { ok: true, status: 'CANCELLED' };
+  }
+  if (eventType === 'BILLING.SUBSCRIPTION.EXPIRED') {
+    downgradeSubscriptionByEmail(email, 'EXPIRED');
+    return { ok: true, status: 'EXPIRED' };
+  }
+  if (eventType === 'BILLING.SUBSCRIPTION.SUSPENDED' || eventType === 'PAYMENT.SALE.DENIED') {
+    downgradeSubscriptionByEmail(email, 'SUSPENDED');
+    return { ok: true, status: 'SUSPENDED' };
+  }
+  return { ok: true, status: 'IGNORED' };
 }
 
 export async function createPayPalOrder(params: {

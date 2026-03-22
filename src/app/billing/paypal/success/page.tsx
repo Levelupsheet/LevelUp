@@ -7,22 +7,24 @@ export default function PayPalSuccessPage() {
   const router = useRouter();
   const params = useSearchParams();
   const orderId = useMemo(() => String(params.get('token') || '').trim(), [params]);
+  const subscriptionId = useMemo(() => String(params.get('subscription_id') || '').trim(), [params]);
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [message, setMessage] = useState('Completing your PayPal purchase...');
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      if (!orderId) {
+      if (!orderId && !subscriptionId) {
         setStatus('error');
-        setMessage('Missing PayPal order token.');
+        setMessage('Missing PayPal subscription token.');
         return;
       }
       try {
-        const res = await fetch('/api/billing/paypal/capture-order', {
+        const isSubscription = Boolean(subscriptionId);
+        const res = await fetch(isSubscription ? '/api/billing/paypal/finalize-subscription' : '/api/billing/paypal/capture-order', {
           method: 'POST',
           headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ orderId }),
+          body: JSON.stringify(isSubscription ? { subscriptionId } : { orderId }),
         });
         const data = await res.json().catch(() => null);
         if (cancelled) return;
@@ -45,7 +47,7 @@ export default function PayPalSuccessPage() {
     return () => {
       cancelled = true;
     };
-  }, [orderId, router]);
+  }, [orderId, subscriptionId, router]);
 
   return (
     <main style={{ minHeight: '100vh', display: 'grid', placeItems: 'center', background: '#050914', color: '#fff', padding: 24 }}>

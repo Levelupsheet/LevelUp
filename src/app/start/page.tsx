@@ -273,7 +273,7 @@ export default function Home() {
             <div className="luModalHeader" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12 }}>
               <div>
                 <b style={{ fontSize: 18 }}>{planModal.plan} — {planModal.price}</b>
-                <div><small className="luHint">Use PayPal checkout links from your environment now. More payment methods can be added later.</small></div>
+                <div><small className="luHint">PayPal subscriptions are processed securely on the server. Sign in first so your account can be upgraded automatically after approval.</small></div>
               </div>
               <button className="secondaryBtn" type="button" onClick={() => setPlanModal(null)}>✕</button>
             </div>
@@ -282,7 +282,7 @@ export default function Home() {
               <div className="featureCard" style={{ padding: 12 }}>
                 <b>Checkout options</b>
                 <div className="muted" style={{ marginTop: 6, fontSize: 13 }}>
-                  PayPal checkout is processed securely on the server. Sign in first so your account can be upgraded automatically after payment.
+                  PayPal recurring subscriptions are processed securely on the server. Sign in first so your account can be upgraded automatically after approval.
                 </div>
               </div>
 
@@ -296,18 +296,18 @@ export default function Home() {
                       setPlanError("");
                       setCheckoutBusy(planModal.plan);
                       const planKey = String(planModal.plan || "").toUpperCase() === "PREMIUM" ? "PREMIUM" : "PRO";
-                      const res = await fetch('/api/billing/paypal/create-order', {
+                      const res = await fetch('/api/billing/paypal/create-subscription', {
                         method: 'POST',
                         headers: { 'content-type': 'application/json' },
                         body: JSON.stringify({ plan: planKey }),
                       });
                       const data = await res.json().catch(() => null);
                       if (!res.ok || !data?.ok || !data?.approveUrl) {
-                        throw new Error(String(data?.error || 'Unable to start PayPal checkout.'));
+                        throw new Error(String(data?.error || 'Unable to start PayPal subscription.'));
                       }
                       window.location.href = String(data.approveUrl);
                     } catch (err: any) {
-                      setPlanError(err?.message || 'Unable to start PayPal checkout.');
+                      setPlanError(err?.message || 'Unable to start PayPal subscription.');
                     } finally {
                       setCheckoutBusy(null);
                     }

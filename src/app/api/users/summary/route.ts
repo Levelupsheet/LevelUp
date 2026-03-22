@@ -1,7 +1,7 @@
 import { prisma } from "../../_lib/prisma";
 import { ensureUser } from "../../_lib/ensureUser";
 import { getRequestUserId } from "../../_lib/authUser";
-import { capXpForTier, getSubscriptionTierByEmail } from "@/lib/subscriptions";
+import { capXpForTier, getSubscriptionMetaByEmail, getSubscriptionTierByEmail } from "@/lib/subscriptions";
 
 export async function GET(req: Request) {
   try {
@@ -14,6 +14,7 @@ export async function GET(req: Request) {
     }
 
     const subscriptionTier = getSubscriptionTierByEmail(user.email);
+    const subscriptionMeta = getSubscriptionMetaByEmail(user.email);
     const cappedXp = capXpForTier(user.xp, subscriptionTier);
     if (cappedXp !== user.xp) {
       user = await prisma.user.update({ where: { id: userId }, data: { xp: cappedXp } });
@@ -38,10 +39,16 @@ export async function GET(req: Request) {
         startingPosition: user.startingPosition,
         moduleChoice: user.moduleChoice,
         subscriptionTier,
+      subscriptionStatus: subscriptionMeta?.status || (subscriptionTier === 'FREE' ? 'FREE' : 'ACTIVE'),
+      subscriptionExpiresAt: subscriptionMeta?.expiresAt || null,
+        subscriptionStatus: subscriptionMeta?.status || (subscriptionTier === 'FREE' ? 'FREE' : 'ACTIVE'),
+        subscriptionExpiresAt: subscriptionMeta?.expiresAt || null,
       },
       xp: user.xp,
       tokenBalance: wallet.tokenBalance,
       subscriptionTier,
+      subscriptionStatus: subscriptionMeta?.status || (subscriptionTier === 'FREE' ? 'FREE' : 'ACTIVE'),
+      subscriptionExpiresAt: subscriptionMeta?.expiresAt || null,
       notifications,
       badges,
       offers,
