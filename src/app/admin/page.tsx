@@ -45,6 +45,10 @@ type AdminUser = {
   createdAt: string;
   lastActiveAt?: string | null;
   subscriptionTier?: string | null;
+  subscriptionStatus?: string | null;
+  subscriptionExpiresAt?: string | null;
+  paypalSubscriptionId?: string | null;
+  paypalPlanId?: string | null;
 };
 
 type CareerMatchRow = { id: string; title: string; company?: string; domain: string; minLevel: number; minMastery: number; description: string; url: string; location?: string; salary?: string; isActive?: boolean };
@@ -1201,6 +1205,24 @@ export default function AdminPage(){
     await refreshUsers();
   }
 
+  async function syncUserPayPal(id: string){
+    setErr(null);
+    const patch = userEdits[id] || {};
+    const r = await fetch("/api/admin/users/sync-paypal", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        userId: id,
+        subscriptionId: typeof patch.paypalSubscriptionId === "string" ? patch.paypalSubscriptionId : undefined,
+      }),
+    });
+    const j = await r.json().catch(() => null);
+    if (!r.ok) { setErr(j?.error || "Failed to sync PayPal"); return; }
+    popToast("PayPal subscription synced");
+    await refreshUsers();
+  }
+
+
   // ===== Question Sets / Questions =====
   async function assignPlacement(lane: "TEST_NOW" | "TRAINING" | "CERTIFICATIONS" | "INTERVIEW") {
     try {
@@ -1420,6 +1442,9 @@ export default function AdminPage(){
                   <th>Module</th>
                   <th>Created</th>
                   <th>Plan</th>
+                  <th>Status</th>
+                  <th>Subscription ID</th>
+                  <th>Expires</th>
                   <th></th>
                 </tr>
               </thead>
@@ -1470,14 +1495,46 @@ export default function AdminPage(){
                           <option value="PREMIUM">Premium</option>
                         </select>
                       </td>
-                      <td style={{ width: 120 }}>
-                        <button className="primary" onClick={() => saveUser(u.id)}>Save</button>
+                      <td style={{ width: 130 }}>
+                        <select
+                          value={(edit.subscriptionStatus ?? u.subscriptionStatus ?? ((edit.subscriptionTier ?? u.subscriptionTier ?? "FREE") === "FREE" ? "FREE" : "ACTIVE")) as any}
+                          onChange={(e) => setUserEdits(prev => ({ ...prev, [u.id]: { ...prev[u.id], subscriptionStatus: e.target.value } }))}
+                        >
+                          <option value="FREE">FREE</option>
+                          <option value="ACTIVE">ACTIVE</option>
+                          <option value="PENDING">PENDING</option>
+                          <option value="CANCELLED">CANCELLED</option>
+                          <option value="SUSPENDED">SUSPENDED</option>
+                          <option value="EXPIRED">EXPIRED</option>
+                        </select>
+                      </td>
+                      <td style={{ width: 260 }}>
+                        <input
+                          value={(edit.paypalSubscriptionId ?? u.paypalSubscriptionId ?? ((edit.subscriptionTier ?? u.subscriptionTier ?? "FREE") === "FREE" ? "FREE" : "")) as any}
+                          onChange={(e) => setUserEdits(prev => ({ ...prev, [u.id]: { ...prev[u.id], paypalSubscriptionId: e.target.value } }))}
+                          placeholder={(edit.subscriptionTier ?? u.subscriptionTier ?? "FREE") === "FREE" ? "FREE" : "I-XXXXXXXXXXXX"}
+                          disabled={(edit.subscriptionTier ?? u.subscriptionTier ?? "FREE") === "FREE"}
+                        />
+                      </td>
+                      <td style={{ width: 190 }}>
+                        <input
+                          value={(edit.subscriptionExpiresAt ?? (u.subscriptionExpiresAt ? new Date(u.subscriptionExpiresAt).toISOString().slice(0,16) : "")) as any}
+                          onChange={(e) => setUserEdits(prev => ({ ...prev, [u.id]: { ...prev[u.id], subscriptionExpiresAt: e.target.value } }))}
+                          type="datetime-local"
+                          disabled={(edit.subscriptionTier ?? u.subscriptionTier ?? "FREE") === "FREE"}
+                        />
+                      </td>
+                      <td style={{ width: 220 }}>
+                        <div className="row" style={{ gap: 8, flexWrap:"wrap" }}>
+                          <button className="primary" onClick={() => saveUser(u.id)}>Save</button>
+                          <button onClick={() => syncUserPayPal(u.id)} disabled={((userEdits[u.id]?.subscriptionTier ?? u.subscriptionTier ?? "FREE") === "FREE") || !String((userEdits[u.id]?.paypalSubscriptionId ?? u.paypalSubscriptionId ?? "")).trim() || String((userEdits[u.id]?.paypalSubscriptionId ?? u.paypalSubscriptionId ?? "")).trim().toUpperCase() === "FREE"}>Sync PayPal</button>
+                        </div>
                       </td>
                     </tr>
                   );
                 })}
                 {users.length === 0 ? (
-                  <tr><td colSpan={8}><small>No users found.</small></td></tr>
+                  <tr><td colSpan={11}><small>No users found.</small></td></tr>
                 ) : null}
               </tbody>
             </table>
