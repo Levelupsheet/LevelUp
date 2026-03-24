@@ -12,8 +12,7 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
     "seed": "ts-node --transpile-only prisma/seed.ts",
-    "content:notes": "echo Use /admin/content to upload or sync the fact bank JSON into the live DB",
-    "sync:paypal": "node --loader ts-node/esm scripts/sync-paypal-subscriptions.ts"
+    "content:notes": "echo Use /admin/content to upload or sync the fact bank JSON into the live DB"
   },
   "dependencies": {
     "@prisma/client": "^5.20.0",

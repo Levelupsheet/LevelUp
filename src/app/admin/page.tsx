@@ -1205,24 +1205,6 @@ export default function AdminPage(){
     await refreshUsers();
   }
 
-  async function syncUserPayPal(id: string){
-    setErr(null);
-    const patch = userEdits[id] || {};
-    const r = await fetch("/api/admin/users/sync-paypal", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        userId: id,
-        subscriptionId: typeof patch.paypalSubscriptionId === "string" ? patch.paypalSubscriptionId : undefined,
-      }),
-    });
-    const j = await r.json().catch(() => null);
-    if (!r.ok) { setErr(j?.error || "Failed to sync PayPal"); return; }
-    popToast("PayPal subscription synced");
-    await refreshUsers();
-  }
-
-
   // ===== Question Sets / Questions =====
   async function assignPlacement(lane: "TEST_NOW" | "TRAINING" | "CERTIFICATIONS" | "INTERVIEW") {
     try {
@@ -1524,11 +1506,8 @@ export default function AdminPage(){
                           disabled={(edit.subscriptionTier ?? u.subscriptionTier ?? "FREE") === "FREE"}
                         />
                       </td>
-                      <td style={{ width: 220 }}>
-                        <div className="row" style={{ gap: 8, flexWrap:"wrap" }}>
-                          <button className="primary" onClick={() => saveUser(u.id)}>Save</button>
-                          <button onClick={() => syncUserPayPal(u.id)} disabled={((userEdits[u.id]?.subscriptionTier ?? u.subscriptionTier ?? "FREE") === "FREE") || !String((userEdits[u.id]?.paypalSubscriptionId ?? u.paypalSubscriptionId ?? "")).trim() || String((userEdits[u.id]?.paypalSubscriptionId ?? u.paypalSubscriptionId ?? "")).trim().toUpperCase() === "FREE"}>Sync PayPal</button>
-                        </div>
+                      <td style={{ width: 120 }}>
+                        <button className="primary" onClick={() => saveUser(u.id)}>Save</button>
                       </td>
                     </tr>
                   );
