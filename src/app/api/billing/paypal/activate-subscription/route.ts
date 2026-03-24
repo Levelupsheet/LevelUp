@@ -43,9 +43,9 @@ export async function POST(req: Request) {
         subscriptionTier: done.tier,
         subscriptionStatus: done.status,
         paypalSubscriptionId: subscriptionId,
-        paypalPlanId: done.planId || paypalPlanIdForTier(tier),
+        paypalPlanId: (done as any).planId || paypalPlanIdForTier(tier),
         subscriptionStartedAt: new Date(),
-        subscriptionExpiresAt: done.expiresAt || null,
+        subscriptionExpiresAt: (done as any).expiresAt || null,
       } as any,
     });
 
@@ -54,8 +54,8 @@ export async function POST(req: Request) {
       subscriptionTier: done.tier,
       status: done.status,
       subscriptionId,
-      expiresAt: done.expiresAt || null,
-      planId: done.planId || paypalPlanIdForTier(tier),
+      expiresAt: (done as any).expiresAt || null,
+      planId: (done as any).planId || paypalPlanIdForTier(tier),
     });
   } catch (err: any) {
     return NextResponse.json({ ok: false, error: err?.message || 'Failed to activate PayPal subscription.' }, { status: 500 });
