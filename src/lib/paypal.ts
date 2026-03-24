@@ -304,30 +304,6 @@ function mapSubscriptionStatus(statusRaw: string): SubscriptionStatus {
   return 'PENDING';
 }
 
-export async function syncPayPalSubscriptionForUser(params: {
-  userId: string;
-  email: string;
-  subscriptionId: string;
-  expectedTier?: 'PRO' | 'PREMIUM';
-}) {
-  if (!params?.subscriptionId) {
-    throw new Error("Missing subscriptionId");
-  }
-
-  const result = await finalizePayPalSubscription(
-    params.subscriptionId,
-    params.userId
-  );
-
-  return {
-    ok: true,
-    subscriptionId: params.subscriptionId,
-    email: params.email,
-    expectedTier: params.expectedTier,
-    result,
-  };
-}
-
 export async function finalizePayPalSubscription(subscriptionId: string, userId?: string) {
   const details = await getPayPalSubscriptionDetails(subscriptionId);
   const status = String(details?.status || '');
