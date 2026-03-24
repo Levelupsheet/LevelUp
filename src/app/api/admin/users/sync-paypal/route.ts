@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireAdminRequest } from "@/app/api/_lib/adminGuard";
 import { prisma } from "@/lib/prisma";
-import { syncPayPalSubscriptionForUser } from "@/lib/paypal";
+// paypal helper is imported dynamically below to avoid static export mismatch
 
 export async function POST(req: Request) {
   const admin = await requireAdminRequest();
@@ -28,7 +28,13 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "No PayPal subscription ID stored for this user." }, { status: 400 });
     }
 
-    const synced = await syncPayPalSubscriptionForUser({
+    const paypal = (await import("@/lib/paypal")) as any;
+    const syncFn =
+      paypal.syncPayPalSubscriptionForUser ?? paypal.syncPayPalSubscription ?? paypal.default;
+    if (typeof syncFn !== "function") {
+      return NextResponse.json({ error: "PayPal sync function not available" }, { status: 500 });
+    }
+    const synced = await syncFn({
       userId: user.id,
       email: String((user as any).email || ""),
       subscriptionId,

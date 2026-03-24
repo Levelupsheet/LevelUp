@@ -47,29 +47,26 @@ export async function PATCH(req: Request){
     if (typeof subscriptionTier === "string") {
       const tier = String(subscriptionTier).toUpperCase();
       const isPaid = tier === "PRO" || tier === "PREMIUM";
-      const normalizedStatus = typeof subscriptionStatus === "string"
-        ? String(subscriptionStatus).toUpperCase().trim()
-        : "";
-      const status = normalizedStatus || (isPaid ? "ACTIVE" : "FREE");
-      const normalizedExpiry = typeof subscriptionExpiresAt === "string"
-        ? String(subscriptionExpiresAt).trim()
-        : subscriptionExpiresAt;
-      const normalizedSubId = typeof paypalSubscriptionId === "string"
-        ? String(paypalSubscriptionId).trim()
-        : "";
-      const normalizedPlanId = typeof paypalPlanId === "string"
-        ? String(paypalPlanId).trim()
-        : "";
-
+      const status = typeof subscriptionStatus === 'string'
+        ? String(subscriptionStatus).toUpperCase()
+        : (isPaid ? 'ACTIVE' : 'FREE');
       data.subscriptionTier = tier;
-      data.subscriptionStatus = tier === "FREE" ? "FREE" : status;
-      data.subscriptionExpiresAt = tier === "FREE"
+      data.subscriptionStatus = status;
+      data.subscriptionExpiresAt = tier === 'FREE'
         ? null
-        : normalizedExpiry
-          ? new Date(String(normalizedExpiry))
-          : new Date("2099-12-31T23:59:59.000Z");
-      data.paypalSubscriptionId = tier === "FREE" ? null : (normalizedSubId || null);
-      data.paypalPlanId = tier === "FREE" ? null : (normalizedPlanId || null);
+        : (subscriptionExpiresAt
+            ? new Date(String(subscriptionExpiresAt))
+            : new Date('2099-12-31T23:59:59.000Z'));
+      data.paypalSubscriptionId = tier === 'FREE'
+        ? null
+        : (typeof paypalSubscriptionId === 'string' && String(paypalSubscriptionId).trim()
+            ? String(paypalSubscriptionId).trim()
+            : null);
+      data.paypalPlanId = tier === 'FREE'
+        ? null
+        : (typeof paypalPlanId === 'string' && String(paypalPlanId).trim()
+            ? String(paypalPlanId).trim()
+            : null);
     }
 
     const user = await prisma.user.update({ where: { id }, data });

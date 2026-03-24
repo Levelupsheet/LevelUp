@@ -550,3 +550,28 @@ export async function capturePayPalOrder(orderId: string) {
   const data = await res.json();
   return data;
 }
+
+
+export async function syncPayPalSubscriptionForUser(params: {
+  userId: string;
+  email: string;
+  subscriptionId: string;
+  expectedTier?: 'PRO' | 'PREMIUM';
+}) {
+  if (!params?.subscriptionId) {
+    throw new Error('Missing subscriptionId');
+  }
+
+  const result = await finalizePayPalSubscription(
+    params.subscriptionId,
+    params.userId
+  );
+
+  return {
+    ok: true,
+    subscriptionId: params.subscriptionId,
+    email: params.email,
+    expectedTier: params.expectedTier,
+    result,
+  };
+}
