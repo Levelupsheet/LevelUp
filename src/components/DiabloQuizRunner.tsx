@@ -239,8 +239,30 @@ function renderQuestionInput(args: {
   }
 
   if (type === "cli_command") {
+    const expectedCommands = safeArray<string>((data as any).expectedCommands);
+    const distractorCommands = safeArray<string>((data as any).distractorCommands);
+    const generatedDistractors = !distractorCommands.length
+      ? expectedCommands.flatMap((command) => {
+          const normalized = String(command || "").trim();
+          if (!normalized) return [] as string[];
+          const lower = normalized.toLowerCase();
+          if (lower.includes("connect-azaccount")) return ["az login", "Connect-MgGraph", "Get-AzSubscription"];
+          if (lower.includes("connect-mggraph")) return ["Connect-AzAccount", "Get-MgUser", "az login"];
+          if (lower.includes("get-azaduser")) return ["Get-AzVM", "Get-AzSubscription", "Get-AzContext"];
+          if (lower.includes("get-mguser")) return ["Get-MgGroup", "Connect-MgGraph", "Get-MgContext"];
+          if (lower.includes("aws s3 ls")) return ["aws ec2 describe-instances", "aws s3api list-buckets", "aws sts get-caller-identity"];
+          if (lower.includes("aws sts get-caller-identity")) return ["aws iam list-users", "aws s3 ls", "aws configure list"];
+          if (lower.includes("ipconfig /flushdns")) return ["ipconfig /release", "nslookup", "ping 8.8.8.8"];
+          if (lower.includes("ipconfig")) return ["ping 127.0.0.1", "tracert 8.8.8.8", "netstat -an"];
+          if (lower.includes("sfc /scannow")) return ["chkdsk /f", "DISM /Online /Cleanup-Image /CheckHealth", "gpupdate /force"];
+          if (lower.includes("dism /online /cleanup-image /restorehealth")) return ["sfc /scannow", "DISM /Online /Cleanup-Image /CheckHealth", "chkdsk /scan"];
+          return [] as string[];
+        })
+      : [];
     const commandSuggestions = Array.from(new Set([
-      ...safeArray<string>((data as any).expectedCommands),
+      ...expectedCommands,
+      ...distractorCommands,
+      ...generatedDistractors,
       ...commandHistory,
     ].filter(Boolean))).slice(0, 4);
     return (
@@ -255,7 +277,7 @@ function renderQuestionInput(args: {
             placeholder={String(data.placeholder || "Enter the command")}
             className="input"
             spellCheck={false}
-            style={{ width: "100%", minHeight: 120, resize: "vertical", fontFamily: "monospace", background: "rgba(0,0,0,0.42)" }}
+            style={{ width: "100%", minHeight: 110, resize: "none", overflow: "auto", fontFamily: "monospace", background: "rgba(0,0,0,0.42)" }}
           />
           {commandSuggestions.length ? (
             <div style={{ marginTop: 10, display: "flex", gap: 8, flexWrap: "wrap" }}>
@@ -687,7 +709,7 @@ export default function DiabloQuizRunner(props: {
   return (
     <div
       className="modalShell d2QuizShell"
-      style={{ position: "relative", width: "min(96vw, 1800px)", maxWidth: media?.width || 1600, minHeight: "min(860px, calc(100dvh - 48px))", margin: "0 auto" }}
+      style={{ position: "relative", width: "min(96vw, 1800px)", maxWidth: media?.width || 1600, minHeight: "min(820px, calc(100dvh - 40px))", margin: "0 auto" }}
     >
       <div className="modalHead">
         <div>
@@ -711,7 +733,7 @@ export default function DiabloQuizRunner(props: {
               <ModelPanel title={playerName} src={playerVideo} loop={!isPlayerHitVideo} onEnded={isPlayerHitVideo ? () => setHitPulse(null) : undefined} height="clamp(260px, 30vh, 420px)" />
             </div>
 
-            <div className={"d2QuestionCard d2QuizQuestionCard " + (hitPulse === "enemy" ? "d2HitFlash" : "") + ((question as any)?.isGolden ? " d2GoldenQuestionCard" : "") } style={{ minHeight: 560 }}>
+            <div className={"d2QuestionCard d2QuizQuestionCard " + (hitPulse === "enemy" ? "d2HitFlash" : "") + ((question as any)?.isGolden ? " d2GoldenQuestionCard" : "") } style={{ minHeight: 560, overflow: "hidden" }}>
               <span className="d2Rivet" style={{ left: 12, top: 12 }} />
               <span className="d2Rivet" style={{ right: 12, top: 12 }} />
               <span className="d2Rivet" style={{ left: 12, bottom: 12 }} />
