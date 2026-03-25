@@ -272,6 +272,7 @@ function SweepstakesModal({ campaign, user, onClose, onEntered }: { campaign: Ca
 export default function SweepstakesPage() {
   const [data, setData] = useState<any>({ campaigns: [], current: null, user: null });
   const [selected, setSelected] = useState<Campaign | null>(null);
+  const [pendingCampaignId, setPendingCampaignId] = useState<string | null>(null);
   const [authChecked, setAuthChecked] = useState(false);
   const [authed, setAuthed] = useState(false);
 
@@ -288,11 +289,29 @@ export default function SweepstakesPage() {
     const json = await res.json().catch(() => ({}));
     setData(json?.ok ? json : { campaigns: [], current: null, user: null });
   }
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      setPendingCampaignId(params.get('campaign'));
+    } catch {}
+    load();
+  }, []);
 
   const campaigns: Campaign[] = Array.isArray(data?.campaigns) ? data.campaigns : [];
   const active = campaigns.filter((c) => c?.status === 'ACTIVE' || c?.isLive);
   const past = campaigns.filter((c) => c?.status !== 'ACTIVE' && !c?.isLive);
+
+  useEffect(() => {
+    if (!pendingCampaignId || !campaigns.length) return;
+    const match = campaigns.find((campaign) => String(campaign.id) === String(pendingCampaignId));
+    if (!match) return;
+    setSelected(match);
+    const timer = window.setTimeout(() => {
+      const el = document.getElementById(`campaign-${match.id}`);
+      el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 120);
+    return () => window.clearTimeout(timer);
+  }, [pendingCampaignId, campaigns]);
 
   if (!authChecked) {
     return <main style={{ minHeight: '100vh' }} className="dashboardBg"><div className="dashWrap" style={{ paddingTop: 120 }}><div className="glass" style={{ padding: 24, maxWidth: 720, margin: '0 auto' }}>Loading sweepstakes…</div></div></main>;
@@ -347,7 +366,7 @@ export default function SweepstakesPage() {
               <h3 style={{ marginBottom: 12, fontSize: 24 }}>Active drawings</h3>
               <div className="grid3">
                 {active.length ? active.map((c) => (
-                  <button key={c.id} type="button" className="featureCard" style={{ textAlign:'left', position:'relative', overflow:'hidden' }} onClick={() => setSelected(c)}>
+                  <button key={c.id} id={`campaign-${c.id}`} type="button" className="featureCard" style={{ textAlign:'left', position:'relative', overflow:'hidden', scrollMarginTop: 120 }} onClick={() => { setSelected(c); try { const params = new URLSearchParams(window.location.search); params.set('campaign', String(c.id)); window.history.replaceState({}, '', `/sweepstakes?${params.toString()}`); } catch {} }}>
                     <div style={{ position:'absolute', inset:0, background:'radial-gradient(circle at top right, rgba(251,191,36,.18), transparent 34%)', pointerEvents:'none' }} />
                     <div style={{ position:'relative' }}>
                       <div style={{ display:'flex', justifyContent:'space-between', gap:10, alignItems:'center', flexWrap:'wrap' }}>
@@ -371,7 +390,7 @@ export default function SweepstakesPage() {
               <h3 style={{ marginBottom: 12, fontSize: 24 }}>Past drawings</h3>
               <div className="grid3">
                 {past.length ? past.map((c) => (
-                  <button key={c.id} type="button" className="featureCard" style={{ textAlign:'left' }} onClick={() => setSelected(c)}>
+                  <button key={c.id} id={`campaign-${c.id}`} type="button" className="featureCard" style={{ textAlign:'left', scrollMarginTop: 120 }} onClick={() => { setSelected(c); try { const params = new URLSearchParams(window.location.search); params.set('campaign', String(c.id)); window.history.replaceState({}, '', `/sweepstakes?${params.toString()}`); } catch {} }}>
                     <b>{c.title}</b>
                     <div className="muted" style={{ marginTop:8 }}>{c.prizePoolLabel || 'Prize drawing'}</div>
                     <div className="muted" style={{ marginTop:6 }}>Winner: {c.winner?.displayName || 'Pending'}</div>
@@ -383,7 +402,7 @@ export default function SweepstakesPage() {
           </div>
         </div>
       </div>
-      <SweepstakesModal campaign={selected} user={data?.user} onClose={() => setSelected(null)} onEntered={() => { setSelected(null); load(); }} />
+      <SweepstakesModal campaign={selected} user={data?.user} onClose={() => { setSelected(null); try { const params = new URLSearchParams(window.location.search); params.delete('campaign'); const next = params.toString(); window.history.replaceState({}, '', next ? `/sweepstakes?${next}` : '/sweepstakes'); } catch {} }} onEntered={() => { setSelected(null); load(); }} />
     </main>
   );
 }

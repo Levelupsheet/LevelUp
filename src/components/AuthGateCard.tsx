@@ -34,9 +34,9 @@ export default function AuthGateCard({ error }: { error?: string | null }) {
             <div key={item} className="card" style={{ padding: 12, background: "rgba(255,255,255,0.04)" }}>{item}</div>
           ))}
         </div>
-        <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 22 }}>
-          <a className="primaryBtn" href="/api/auth/google/start">Continue with Google</a>
-          <a className="secondaryBtn" href="/start">Back</a>
+        <div style={{ display: "grid", gap: 12, marginTop: 22, justifyItems: "center" }}>
+          <a className="primaryBtn" href="/api/auth/google/start" style={{ minWidth: 260, justifySelf: "center" }}>Continue with Google</a>
+          <a className="secondaryBtn" href="/start" style={{ minWidth: 140, justifySelf: "center" }}>Back</a>
         </div>
       </div>
     </div>

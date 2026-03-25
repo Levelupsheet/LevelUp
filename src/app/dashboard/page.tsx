@@ -704,15 +704,15 @@ export default function Dashboard() {
           <div style={{ marginTop: 10 }}>
             {(localLevel || 1) >= 5 ? (
               <button className="gold" style={{ width: "100%" }} onClick={() => setMockInterviewOpen(true)}>
-                Begin Tech Interview →
+                Begin Boss Battle →
               </button>
             ) : (
               <button className="gold" style={{ width: "100%", opacity: 0.65, cursor: "not-allowed" }} disabled title="Unlocks at level 5">
-                Begin Tech Interview 🔒
+                Begin Boss Battle 🔒
               </button>
             )}
             <small style={{ display: "block", marginTop: 6, opacity: 0.8 }}>
-              {(localLevel || 1) >= 5 ? "Mock interview unlocked." : "Unlocks at level 5."}
+              {(localLevel || 1) >= 5 ? "Boss battle unlocked." : "Unlocks at level 5."}
             </small>
             {hasFreeStartCooldown && <small style={{ display: "block", marginTop: 6, color: "#f5d37b" }}>Free users can start another session in {freeStartCooldownLabel}.</small>}
           </div>
@@ -738,7 +738,7 @@ export default function Dashboard() {
           <div style={{ marginTop: 10 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <span style={{ width: 10, height: 10, borderRadius: 999, background: (((localLevel || 1) >= 5 || elig?.eligible) ? "rgba(120,220,160,0.92)" : "rgba(255,255,255,0.25)"), boxShadow: (((localLevel || 1) >= 5 || elig?.eligible) ? "0 0 10px rgba(120,220,160,0.55)" : "none") }} />
-              <small>Eligibility for Interview Unlocked!</small>
+              <small>Boss Battle Eligibility Unlocked!</small>
             </div>
             <div style={{ marginTop: 8, opacity: 0.82 }}><small>Adaptive mastery details are shown in the main panel.</small></div>
           </div>
@@ -769,7 +769,7 @@ export default function Dashboard() {
               <span className="badge"><b>Tech Ready</b>: {hasTechReady ? "Yes" : "No"}</span>
               <button onClick={() => userId && refresh(userId)} disabled={loading}>{loading ? "Refreshing..." : "Refresh"}</button>
               <button className="primary" onClick={checkEligibility} disabled={loading}>Check Eligibility</button>
-              {hasHRInvite && <button className="primary" onClick={() => window.location.href="/interview/hr"}>Start HR Interview</button>}
+              {hasHRInvite && <button className="primary" onClick={() => window.location.href="/interview/hr"}>Start Boss Battle (HR)</button>}
             </div>
           </div>
 
@@ -826,15 +826,19 @@ export default function Dashboard() {
               <div style={{ display:'flex', justifyContent:'space-between', gap:12, alignItems:'center', flexWrap:'wrap' }}>
                 <div>
                   <h3 style={{ margin: 0 }}>Active sweepstakes</h3>
-                  <div><small>Campaigns you are currently entered in.</small></div>
+                  <div><small>Campaigns you are currently entered in. Click a drawing card to open that campaign.</small></div>
                 </div>
-                <a className="secondaryBtn" href="/sweepstakes">Open sweepstakes</a>
               </div>
               <div style={{ marginTop: 12, display:'grid', gap:10 }}>
                 {sweepSummary.campaigns
                   .filter((c: any) => (c?.status === 'ACTIVE' || c?.isLive) && Number(sweepSummary?.user?.entriesByCampaign?.[String(c.id)] || 0) > 0)
                   .map((c: any) => (
-                    <div key={c.id} className="featureCard" style={{ display:'flex', justifyContent:'space-between', gap:12, alignItems:'center', flexWrap:'wrap' }}>
+                    <a
+                      key={c.id}
+                      href={`/sweepstakes?campaign=${encodeURIComponent(String(c.id))}`}
+                      className="featureCard"
+                      style={{ display:'flex', justifyContent:'space-between', gap:12, alignItems:'center', flexWrap:'wrap', textDecoration:'none', color:'inherit', cursor:'pointer' }}
+                    >
                       <div>
                         <div><b>{c.title}</b> • <small>{c.prizePoolLabel || 'Prize drawing'}</small></div>
                         <div style={{ marginTop:8, display:'flex', gap:10, flexWrap:'wrap' }}>
@@ -847,7 +851,7 @@ export default function Dashboard() {
                         <span className="badge">Tokens: {Number(sweepSummary?.user?.tokenBalance || 0)}</span>
                         <span className="badge">Draw closes: {c?.endsAt ? new Date(c.endsAt).toLocaleString() : 'TBD'}</span>
                       </div>
-                    </div>
+                    </a>
                   ))}
               </div>
             </div>

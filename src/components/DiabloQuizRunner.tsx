@@ -10,6 +10,7 @@ import { useCombatQuiz } from "@/engine/useCombatQuiz";
 import type { CombatQuestion, DifficultyTier } from "@/engine/CombatQuizEngine";
 import {
   normalizeQuestionType,
+  normalizeText,
   safeArray,
   uniqueSortedNumbers,
   type QuestionData,
@@ -319,6 +320,61 @@ function renderQuestionInput(args: {
     );
   }
 
+  if (type === "matching") {
+    const pairs = safeArray<any>((data as any).pairs)
+      .map((pair) => ({ left: String(pair?.left || "").trim(), right: String(pair?.right || "").trim() }))
+      .filter((pair) => pair.left && pair.right);
+    const leftItems = safeArray<string>((data as any).leftItems).length
+      ? safeArray<string>((data as any).leftItems)
+      : pairs.map((pair) => pair.left);
+    const rightItems = safeArray<string>((data as any).rightItems).length
+      ? safeArray<string>((data as any).rightItems)
+      : Array.from(new Set(pairs.map((pair) => pair.right)));
+    const correctMatches = safeArray<string>((data as any).correctMatches).length
+      ? safeArray<string>((data as any).correctMatches)
+      : pairs.map((pair) => pair.right);
+
+    return (
+      <div style={{ marginTop: 14, display: "grid", gap: 12 }}>
+        {(data as any).instructions ? <div className="badge" style={{ whiteSpace: "normal", lineHeight: 1.4 }}>{String((data as any).instructions)}</div> : null}
+        {leftItems.map((left, index) => {
+          const selected = matchingSelections[index] || "";
+          const isOk = state.locked && normalizeText(selected) === normalizeText(correctMatches[index]);
+          const isBad = state.locked && Boolean(selected) && !isOk;
+          return (
+            <div
+              key={`${left}_${index}`}
+              className="card"
+              style={{
+                padding: 12,
+                display: "grid",
+                gridTemplateColumns: "minmax(180px, 1.2fr) minmax(180px, 1fr)",
+                gap: 12,
+                alignItems: "center",
+                background: "rgba(255,255,255,0.04)",
+                borderColor: isOk ? "rgba(46, 204, 113, 0.55)" : isBad ? "rgba(255, 90, 90, 0.55)" : undefined,
+              }}
+            >
+              <div style={{ fontWeight: 700 }}>{left}</div>
+              <select
+                value={selected}
+                disabled={state.locked}
+                onChange={(e) => setMatchingSelection(index, e.target.value)}
+                className="input"
+                style={{ width: "100%" }}
+              >
+                <option value="">Select a match…</option>
+                {rightItems.map((option, optionIndex) => (
+                  <option key={`${option}_${optionIndex}`} value={option}>{option}</option>
+                ))}
+              </select>
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
+
   return <div className="muted" style={{ marginTop: 14 }}>Unsupported question type.</div>;
 }
 
@@ -385,11 +441,6 @@ export default function DiabloQuizRunner(props: {
   const [logValue, setLogValue] = useState("");
   const [sequenceItems, setSequenceItems] = useState<string[]>([]);
   const [multiSelected, setMultiSelected] = useState<number[]>([]);
-  const [matchingSelections, setMatchingSelections] = useState<string[]>([]);
-  const [hiddenChoiceIndices, setHiddenChoiceIndices] = useState<number[]>([]);
-  const [hintMessage, setHintMessage] = useState<string | null>(null);
-  const [hintXpSpent, setHintXpSpent] = useState<number>(0);
-  const [hintsUsedCount, setHintsUsedCount] = useState<number>(0);
   const [isMobileLayout, setIsMobileLayout] = useState(false);
   const [goldenEntryFlash, setGoldenEntryFlash] = useState<string | null>(null);
   const finishedOnceRef = useRef(false);
@@ -573,6 +624,7 @@ export default function DiabloQuizRunner(props: {
     if (questionType === "multi_select") return multiSelected.length > 0;
     if (questionType === "cli_command") return cliValue.trim().length > 0;
     if (questionType === "log_analysis") return logValue.trim().length > 0;
+    if (questionType === "matching") return matchingSelections.length > 0 && matchingSelections.every((value) => value.trim().length > 0);
     return false;
   }
 
