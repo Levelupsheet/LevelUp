@@ -16,6 +16,7 @@ import {
   type QuestionType,
 } from "@/lib/questionTypes";
 import { evaluateQuestionAnswer } from "@/lib/questionTransforms";
+import { domainHintLabel, getHintCost, partialExplanation, removableIncorrectIndices, type HintType } from "@/lib/hints";
 
 export type DiabloQuestion = {
   id?: string;
@@ -34,6 +35,9 @@ export type DiabloQuestion = {
 export type DiabloQuizRunSummary = {
   outcome: "victory" | "defeat" | "complete" | null;
   xpEarned: number;
+  rawXpEarned?: number;
+  hintXpSpent?: number;
+  hintsUsedCount?: number;
   correctCount: number;
   totalQuestions: number;
   playerHP: number;
@@ -69,6 +73,8 @@ function labelForType(type: QuestionType) {
   if (type === "incident") return "Incident";
   if (type === "cli_command") return "CLI Command";
   if (type === "log_analysis") return "Log Analysis";
+  if (type === "true_false") return "True / False";
+  if (type === "matching") return "Matching";
   return "Question";
 }
 
@@ -122,6 +128,9 @@ function renderQuestionInput(args: {
   moveSequenceItem: (from: number, to: number) => void;
   multiSelected: number[];
   toggleMultiSelected: (index: number) => void;
+  matchingSelections: string[];
+  setMatchingSelection: (index: number, value: string) => void;
+  hiddenChoiceIndices: number[];
 }) {
   const {
     question,
@@ -138,6 +147,9 @@ function renderQuestionInput(args: {
     moveSequenceItem,
     multiSelected,
     toggleMultiSelected,
+    matchingSelections,
+    setMatchingSelection,
+    hiddenChoiceIndices,
   } = args;
 
   const type = normalizeQuestionType(question.type);
@@ -155,6 +167,7 @@ function renderQuestionInput(args: {
           </div>
         ) : null}
         {choices.map((choice, index) => {
+          if (hiddenChoiceIndices.includes(index)) return null;
           const isSel = mcqSelected === index;
           const isOk = state.locked && index === correctIndex;
           const isBad = state.locked && isSel && index !== correctIndex;
@@ -169,6 +182,35 @@ function renderQuestionInput(args: {
               onClick={() => onSelectMcq(index)}
               disabled={state.locked}
               style={extraStyle}
+            >
+              {choice}
+            </button>
+          );
+        })}
+      </div>
+    );
+  }
+
+  if (type === "true_false") {
+    const choices = ["True", "False"];
+    const correctIndex = Number((data as any).correctIndex ?? question.correctIndex ?? 0);
+    return (
+      <div style={{ marginTop: 14, display: "grid", gap: 10 }}>
+        {choices.map((choice, index) => {
+          if (hiddenChoiceIndices.includes(index)) return null;
+          const isSel = mcqSelected === index;
+          const isOk = state.locked && index === correctIndex;
+          const isBad = state.locked && isSel && index !== correctIndex;
+          return (
+            <button
+              key={choice}
+              type="button"
+              className={"d2ChoiceBtn" + (isSel ? " selected" : "")}
+              onClick={() => onSelectMcq(index)}
+              disabled={state.locked}
+              style={{
+                borderColor: isOk ? "rgba(46, 204, 113, 0.55)" : isBad ? "rgba(255, 90, 90, 0.55)" : undefined,
+              }}
             >
               {choice}
             </button>
@@ -362,7 +404,7 @@ export default function DiabloQuizRunner(props: {
   });
 
   const questionType = normalizeQuestionType(question?.type);
-  const usesManualSubmit = questionType !== "multiple_choice" && questionType !== "incident";
+  const usesManualSubmit = questionType !== "multiple_choice" && questionType !== "incident" && questionType !== "true_false";
 
   useEffect(() => {
     finishedOnceRef.current = false;
@@ -381,6 +423,14 @@ export default function DiabloQuizRunner(props: {
     setCliValue("");
     setLogValue("");
     setMultiSelected([]);
+    setHiddenChoiceIndices([]);
+    setHintMessage(null);
+    if (questionType === "matching") {
+      const pairs = safeArray<any>((data as any).pairs).filter((pair) => pair?.left && pair?.right);
+      setMatchingSelections(Array.from({ length: pairs.length }, () => ""));
+    } else {
+      setMatchingSelections([]);
+    }
     if (questionType === "sequence_order") {
       const items = safeArray<string>(data.items);
       const correctOrder = safeArray<string>(data.correctOrder);
@@ -395,7 +445,10 @@ export default function DiabloQuizRunner(props: {
     finishedOnceRef.current = true;
     onComplete?.({
       outcome: outcome as DiabloQuizRunSummary['outcome'],
-      xpEarned: state.xpEarned,
+      xpEarned: Math.max(0, state.xpEarned - hintXpSpent),
+      rawXpEarned: state.xpEarned,
+      hintXpSpent,
+      hintsUsedCount,
       correctCount: state.correctCount,
       totalQuestions: combatQuestions.length,
       playerHP: state.playerHP,
@@ -403,7 +456,7 @@ export default function DiabloQuizRunner(props: {
       timeLeft: state.timeLeft,
       masteryByDomain: state.mastery,
     });
-  }, [state.finished, state.xpEarned, state.correctCount, state.playerHP, state.enemyHP, state.timeLeft, combatQuestions.length, onComplete, outcome]);
+  }, [state.finished, state.xpEarned, state.correctCount, state.playerHP, state.enemyHP, state.timeLeft, combatQuestions.length, onComplete, outcome, hintXpSpent, hintsUsedCount]);
 
   const playerName = useMemo(() => {
     try {
@@ -416,12 +469,34 @@ export default function DiabloQuizRunner(props: {
 
   const domainLabel = labelForDomain(currentDomainId);
   const finished = Boolean(forceFinish) || state.finished;
+  const displayedXp = Math.max(0, state.xpEarned - hintXpSpent);
 
+  function useHint(type: HintType) {
+    if (!question || state.locked) return;
+    const cost = getHintCost(type);
+    setHintXpSpent((v) => v + cost);
+    setHintsUsedCount((v) => v + 1);
+    if (type === "REMOVE_TWO") {
+      const removable = removableIncorrectIndices(question).filter((index) => !hiddenChoiceIndices.includes(index));
+      if (!removable.length) {
+        setHintMessage("Remove two is only available for multiple choice and incident questions.");
+        return;
+      }
+      setHiddenChoiceIndices((current) => [...new Set([...current, ...removable])]);
+      setHintMessage(`Two weak answers removed. XP penalty: ${cost}.`);
+      return;
+    }
+    if (type === "PARTIAL_EXPLANATION") {
+      setHintMessage(`${partialExplanation(question.explanation)} (−${cost} XP)`);
+      return;
+    }
+    setHintMessage(`${domainHintLabel(question.domainId || currentDomainId)} focus — use the strongest core concept first. (−${cost} XP)`);
+  }
 
   function deriveSelectedAnswer() {
     const data = (question?.data || {}) as Record<string, unknown>;
     if (!question) return undefined;
-    if (questionType === "multiple_choice" || questionType === "incident") {
+    if (questionType === "multiple_choice" || questionType === "incident" || questionType === "true_false") {
       const choices = safeArray<string>(question.choices?.length ? question.choices : data.choices);
       return typeof state.selected === "number" ? choices[state.selected] ?? state.selected : state.selected;
     }
@@ -466,6 +541,7 @@ export default function DiabloQuizRunner(props: {
     if (questionType === "multi_select") answer = multiSelected;
     if (questionType === "cli_command") answer = cliValue;
     if (questionType === "log_analysis") answer = logValue;
+    if (questionType === "matching") answer = matchingSelections;
 
     const result = evaluateQuestionAnswer({
       type: question.type,
@@ -540,7 +616,7 @@ export default function DiabloQuizRunner(props: {
                       {timed ? <span className="badge" style={{ fontVariantNumeric: "tabular-nums" }}>⏱ {Math.max(0, state.timeLeft)}s</span> : null}
                       <span className="badge">{labelForType(questionType)}</span>
                       {metaRight ? <span className="badge">{metaRight}</span> : null}
-                      <span className="badge">XP +{state.xpEarned}</span>
+                      <span className="badge">XP +{displayedXp}</span>
                     </div>
                   </div>
 
@@ -565,7 +641,19 @@ export default function DiabloQuizRunner(props: {
                     toggleMultiSelected: (index) => {
                       setMultiSelected((current) => current.includes(index) ? current.filter((v) => v !== index) : [...current, index].sort((a, b) => a - b));
                     },
+                    matchingSelections,
+                    setMatchingSelection: (index, value) => setMatchingSelections((current) => current.map((row, i) => i === index ? value : row)),
+                    hiddenChoiceIndices,
                   })}
+
+                  {!state.locked ? (
+                    <div style={{ marginTop: 14, display: "flex", gap: 8, flexWrap: "wrap" }}>
+                      <button className="d2Btn" type="button" onClick={() => useHint("REMOVE_TWO")}>Hint: Remove 2 (−{getHintCost("REMOVE_TWO")})</button>
+                      <button className="d2Btn" type="button" onClick={() => useHint("PARTIAL_EXPLANATION")}>Hint: Explain (−{getHintCost("PARTIAL_EXPLANATION")})</button>
+                      <button className="d2Btn" type="button" onClick={() => useHint("DOMAIN_HINT")}>Hint: Domain (−{getHintCost("DOMAIN_HINT")})</button>
+                    </div>
+                  ) : null}
+                  {hintMessage ? <div className="badge" style={{ marginTop: 10, whiteSpace: "normal", lineHeight: 1.4 }}>{hintMessage}</div> : null}
 
                   <div className="d2ActionRow" style={{ marginTop: 14 }}>
                     {!state.locked ? (
@@ -579,6 +667,9 @@ export default function DiabloQuizRunner(props: {
                             setCliValue("");
                             setLogValue("");
                             setMultiSelected([]);
+                            setMatchingSelections([]);
+                            setHiddenChoiceIndices([]);
+                            setHintMessage(null);
                             const data = (question.data || {}) as Record<string, unknown>;
                             const items = safeArray<string>(data.items);
                             const correctOrder = safeArray<string>(data.correctOrder);
@@ -606,7 +697,8 @@ export default function DiabloQuizRunner(props: {
               ) : (
                 <div className="card" style={{ padding: 16, background: "rgba(255,255,255,0.04)" }}>
                   <div style={{ fontWeight: 950, fontSize: 20 }}>{outcome === "victory" ? "Victory" : outcome === "defeat" ? "Defeat" : "Run complete"}</div>
-                  <div className="muted" style={{ marginTop: 8 }}>Score {state.correctCount}/{combatQuestions.length} • XP +{state.xpEarned}</div>
+                  <div className="muted" style={{ marginTop: 8 }}>Score {state.correctCount}/{combatQuestions.length} • XP +{displayedXp}</div>
+                  {hintXpSpent > 0 ? <div className="muted" style={{ marginTop: 6 }}>Hints used: {hintsUsedCount} • XP spent on hints: {hintXpSpent}</div> : null}
                 </div>
               )}
             </div>
@@ -622,7 +714,7 @@ export default function DiabloQuizRunner(props: {
               <div className="mobileQuizProgress">Q{Math.min(state.idx + 1, combatQuestions.length)} / {combatQuestions.length}</div>
               <div className="mobileQuizBadges">
                 {timed ? <span className="badge" style={{ fontVariantNumeric: "tabular-nums" }}>⏱ {Math.max(0, state.timeLeft)}s</span> : null}
-                <span className="badge">XP +{state.xpEarned}</span>
+                <span className="badge">XP +{displayedXp}</span>
               </div>
             </div>
 
@@ -660,7 +752,19 @@ export default function DiabloQuizRunner(props: {
                     toggleMultiSelected: (index) => {
                       setMultiSelected((current) => current.includes(index) ? current.filter((v) => v !== index) : [...current, index].sort((a, b) => a - b));
                     },
+                    matchingSelections,
+                    setMatchingSelection: (index, value) => setMatchingSelections((current) => current.map((row, i) => i === index ? value : row)),
+                    hiddenChoiceIndices,
                   })}
+
+                  {!state.locked ? (
+                    <div style={{ marginTop: 14, display: "flex", gap: 8, flexWrap: "wrap" }}>
+                      <button className="d2Btn" type="button" onClick={() => useHint("REMOVE_TWO")}>Hint: Remove 2 (−{getHintCost("REMOVE_TWO")})</button>
+                      <button className="d2Btn" type="button" onClick={() => useHint("PARTIAL_EXPLANATION")}>Hint: Explain (−{getHintCost("PARTIAL_EXPLANATION")})</button>
+                      <button className="d2Btn" type="button" onClick={() => useHint("DOMAIN_HINT")}>Hint: Domain (−{getHintCost("DOMAIN_HINT")})</button>
+                    </div>
+                  ) : null}
+                  {hintMessage ? <div className="badge" style={{ marginTop: 10, whiteSpace: "normal", lineHeight: 1.4 }}>{hintMessage}</div> : null}
 
                   <div className="d2ActionRow mobileQuizActions" style={{ marginTop: 14 }}>
                     {!state.locked ? (
@@ -674,6 +778,9 @@ export default function DiabloQuizRunner(props: {
                             setCliValue("");
                             setLogValue("");
                             setMultiSelected([]);
+                            setMatchingSelections([]);
+                            setHiddenChoiceIndices([]);
+                            setHintMessage(null);
                             const data = (question.data || {}) as Record<string, unknown>;
                             const items = safeArray<string>(data.items);
                             const correctOrder = safeArray<string>(data.correctOrder);
@@ -700,7 +807,7 @@ export default function DiabloQuizRunner(props: {
               ) : (
                 <div className="card" style={{ padding: 16, background: "rgba(255,255,255,0.04)" }}>
                   <div style={{ fontWeight: 950, fontSize: 20 }}>{outcome === "victory" ? "Victory" : outcome === "defeat" ? "Defeat" : "Run complete"}</div>
-                  <div className="muted" style={{ marginTop: 8 }}>Score {state.correctCount}/{combatQuestions.length} • XP +{state.xpEarned}</div>
+                  <div className="muted" style={{ marginTop: 8 }}>Score {state.correctCount}/{combatQuestions.length} • XP +{displayedXp}</div>
                 </div>
               )}
             </div>

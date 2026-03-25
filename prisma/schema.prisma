@@ -269,6 +269,8 @@ enum QuestionType {
   INCIDENT
   CLI_COMMAND
   LOG_ANALYSIS
+  TRUE_FALSE
+  MATCHING
 }
 
 model QuestionSetPlacement {

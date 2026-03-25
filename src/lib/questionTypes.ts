@@ -5,7 +5,9 @@ export type QuestionType =
   | "multi_select"
   | "incident"
   | "cli_command"
-  | "log_analysis";
+  | "log_analysis"
+  | "true_false"
+  | "matching";
 
 export type MultipleChoiceData = {
   choices?: string[];
@@ -52,6 +54,26 @@ export type LogAnalysisData = {
   caseSensitive?: boolean;
 };
 
+export type TrueFalseData = {
+  statement?: string;
+  correctAnswer?: boolean | string;
+  choices?: string[];
+  correctIndex?: number;
+};
+
+export type MatchingPair = {
+  left: string;
+  right: string;
+};
+
+export type MatchingData = {
+  pairs: MatchingPair[];
+  leftItems?: string[];
+  rightItems?: string[];
+  correctMatches?: string[];
+  instructions?: string;
+};
+
 export type QuestionData =
   | MultipleChoiceData
   | FillBlankData
@@ -60,6 +82,8 @@ export type QuestionData =
   | IncidentData
   | CliCommandData
   | LogAnalysisData
+  | TrueFalseData
+  | MatchingData
   | Record<string, unknown>;
 
 export function normalizeQuestionType(value: unknown): QuestionType {
@@ -71,7 +95,9 @@ export function normalizeQuestionType(value: unknown): QuestionType {
     raw === "multi_select" ||
     raw === "incident" ||
     raw === "cli_command" ||
-    raw === "log_analysis"
+    raw === "log_analysis" ||
+    raw === "true_false" ||
+    raw === "matching"
   ) return raw;
   return "multiple_choice";
 }

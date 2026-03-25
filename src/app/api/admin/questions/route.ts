@@ -36,6 +36,28 @@ function toDbQuestionPayload(input: any, sortOrder: number) {
     };
   }
 
+  if (type === "true_false") {
+    const answerRaw = String((sourceData as any)?.correctAnswer ?? input?.correctAnswer ?? (Number(input?.correctIndex ?? (sourceData as any)?.correctIndex ?? 0) === 0 ? "true" : "false")).trim().toLowerCase();
+    const choices = ["True", "False"];
+    const correctIndex = answerRaw === "false" ? 1 : 0;
+    return {
+      prompt,
+      type: "TRUE_FALSE",
+      choices,
+      correctIndex,
+      data: {
+        ...sourceData,
+        choices,
+        correctIndex,
+        correctAnswer: correctIndex === 0,
+      },
+      explanation,
+      difficulty,
+      tags,
+      sortOrder,
+    };
+  }
+
   if (type === "fill_blank") {
     const answers = safeArray<string>((sourceData as any)?.answers).map((value) => String(value).trim()).filter(Boolean);
     if (!answers.length) throw new Error("fill_blank questions require data.answers[]");
@@ -97,6 +119,30 @@ function toDbQuestionPayload(input: any, sortOrder: number) {
     };
   }
 
+  if (type === "matching") {
+    const pairs = safeArray<any>((sourceData as any)?.pairs)
+      .map((pair) => ({ left: String(pair?.left || "").trim(), right: String(pair?.right || "").trim() }))
+      .filter((pair) => pair.left && pair.right);
+    if (pairs.length < 2) throw new Error("matching questions require data.pairs[] with left/right values");
+    return {
+      prompt,
+      type: "MATCHING",
+      choices: null,
+      correctIndex: null,
+      data: {
+        ...sourceData,
+        pairs,
+        leftItems: pairs.map((pair) => pair.left),
+        rightItems: Array.from(new Set(pairs.map((pair) => pair.right))),
+        correctMatches: pairs.map((pair) => pair.right),
+      },
+      explanation,
+      difficulty,
+      tags,
+      sortOrder,
+    };
+  }
+
   if (type === "cli_command") {
     const expectedCommands = safeArray<string>((sourceData as any)?.expectedCommands).map((value) => String(value).trim()).filter(Boolean);
     if (!expectedCommands.length) throw new Error("cli_command questions require data.expectedCommands[]");
@@ -116,13 +162,33 @@ function toDbQuestionPayload(input: any, sortOrder: number) {
     };
   }
 
+  if (type === "log_analysis") {
+    const logText = String((sourceData as any)?.logText || (sourceData as any)?.log || "").trim();
+    const answers = safeArray<string>((sourceData as any)?.answers).map((value) => String(value).trim()).filter(Boolean);
+    const expectedFindings = safeArray<string>((sourceData as any)?.expectedFindings).map((value) => String(value).trim()).filter(Boolean);
+    const acceptable = answers.length ? answers : expectedFindings;
+    if (!logText || !acceptable.length) throw new Error("log_analysis questions require data.logText and data.answers[] or data.expectedFindings[]");
+    return {
+      prompt,
+      type: "LOG_ANALYSIS",
+      choices: null,
+      correctIndex: null,
+      data: {
+        ...sourceData,
+        logText,
+        answers: acceptable,
+        expectedFindings: expectedFindings.length ? expectedFindings : acceptable,
+      },
+      explanation,
+      difficulty,
+      tags,
+      sortOrder,
+    };
+  }
+
   throw new Error(`Unsupported question type: ${type}`);
 }
 
-/**
- * GET /api/admin/questions?setId=...
- * Returns questions ordered by sortOrder.
- */
 export async function GET(req: Request) {
   const admin = await requireAdminRequest();
   if (!admin.ok) return admin.response;
@@ -142,12 +208,6 @@ export async function GET(req: Request) {
   }
 }
 
-/**
- * POST /api/admin/questions
- * Supports:
- *  - single insert: { setId, prompt, type?, choices?, correctIndex?, data?, explanation?, difficulty?, tags? }
- *  - bulk insert:   { setId, questions: [ {...} ] }
- */
 export async function POST(req: Request) {
   const admin = await requireAdminRequest();
   if (!admin.ok) return admin.response;
@@ -166,23 +226,18 @@ export async function POST(req: Request) {
       const incoming = body.questions;
       if (incoming.length === 0) return NextResponse.json({ inserted: 0 });
       const data = incoming.map((q: any) => ({ setId, ...toDbQuestionPayload(q, typeof q.sortOrder === "number" ? q.sortOrder : nextOrder++) }));
-      const res = await prisma.mCQQuestion.createMany({ data });
+      const res = await prisma.mCQQuestion.createMany({ data: data as any });
       return NextResponse.json({ inserted: res.count });
     }
 
     const payload = toDbQuestionPayload(body, typeof body.sortOrder === "number" ? body.sortOrder : nextOrder);
-    const q = await prisma.mCQQuestion.create({ data: { setId, ...payload } });
+    const q = await prisma.mCQQuestion.create({ data: { setId, ...(payload as any) } });
     return NextResponse.json({ question: q });
   } catch (e: any) {
     return NextResponse.json({ error: e?.message || "Failed" }, { status: 500 });
   }
 }
 
-/**
- * PATCH /api/admin/questions
- * Body:
- *  - { setId, order: [questionId1, questionId2, ...] } // reorders
- */
 export async function PATCH(req: Request) {
   const admin = await requireAdminRequest();
   if (!admin.ok) return admin.response;

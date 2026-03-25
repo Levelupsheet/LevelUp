@@ -34,9 +34,7 @@ export function shuffleQuestionPayload<T extends QuestionChoiceShape>(question: 
 
   if (type === "multiple_choice" || type === "incident") {
     const choices = safeArray<string>(question.choices?.length ? question.choices : (question.data as any)?.choices);
-    const correctIndex = Number(
-      question.correctIndex ?? (question.data as any)?.correctIndex ?? 0,
-    );
+    const correctIndex = Number(question.correctIndex ?? (question.data as any)?.correctIndex ?? 0);
 
     const entries = choices.map((choice, index) => ({
       choice,
@@ -57,6 +55,24 @@ export function shuffleQuestionPayload<T extends QuestionChoiceShape>(question: 
       choices: nextChoices,
       correctIndex: nextCorrectIndex < 0 ? correctIndex : nextCorrectIndex,
       data: nextData,
+    };
+  }
+
+  if (type === "true_false") {
+    const raw = (question.data || {}) as Record<string, unknown>;
+    const answer = String(raw.correctAnswer ?? raw.answer ?? (question.correctIndex === 0 ? "true" : "false")).trim().toLowerCase();
+    const truthy = answer === "true" || answer === "t" || answer === "yes" || answer === "1";
+    const choices = ["True", "False"];
+    return {
+      ...question,
+      choices,
+      correctIndex: truthy ? 0 : 1,
+      data: {
+        ...raw,
+        choices,
+        correctIndex: truthy ? 0 : 1,
+        correctAnswer: truthy,
+      },
     };
   }
 
@@ -97,6 +113,26 @@ export function shuffleQuestionPayload<T extends QuestionChoiceShape>(question: 
     };
   }
 
+  if (type === "matching") {
+    const raw = (question.data || {}) as Record<string, unknown>;
+    const pairs = safeArray<any>(raw.pairs)
+      .map((pair) => ({ left: String(pair?.left || "").trim(), right: String(pair?.right || "").trim() }))
+      .filter((pair) => pair.left && pair.right);
+    const leftItems = pairs.map((pair) => pair.left);
+    const correctMatches = pairs.map((pair) => pair.right);
+    const rightItems = shuffleArray([...new Set(correctMatches)]);
+    return {
+      ...question,
+      data: {
+        ...raw,
+        pairs,
+        leftItems,
+        rightItems,
+        correctMatches,
+      },
+    };
+  }
+
   return question;
 }
 
@@ -124,6 +160,17 @@ export function evaluateQuestionAnswer(input: {
     return {
       correct: selected === correctIndex,
       feedback: selected === correctIndex ? null : "Review the best response and try again.",
+    };
+  }
+
+  if (type === "true_false") {
+    const raw = String(input.answer ?? "").trim().toLowerCase();
+    const picked = raw === "0" ? "true" : raw === "1" ? "false" : raw;
+    const expected = String(data.correctAnswer ?? (Number(data.correctIndex ?? input.correctIndex ?? -1) === 0 ? "true" : "false")).trim().toLowerCase();
+    const correct = picked === expected || (picked === "true" && expected === "1") || (picked === "false" && expected === "0");
+    return {
+      correct,
+      feedback: correct ? null : `Correct answer: ${expected === "true" || expected === "1" ? "True" : "False"}`,
     };
   }
 
@@ -155,6 +202,16 @@ export function evaluateQuestionAnswer(input: {
     return {
       correct,
       feedback: correct ? null : `Correct selections: ${expected.map((n) => n + 1).join(", ")}`,
+    };
+  }
+
+  if (type === "matching") {
+    const expected = safeArray<string>(data.correctMatches).map((value) => normalizeText(value));
+    const submitted = safeArray<string>(input.answer).map((value) => normalizeText(value));
+    const correct = submitted.length === expected.length && submitted.every((value, index) => value === expected[index]);
+    return {
+      correct,
+      feedback: correct ? null : `Correct matches: ${safeArray<any>(data.pairs).map((pair) => `${pair.left} → ${pair.right}`).join(" • ")}`,
     };
   }
 

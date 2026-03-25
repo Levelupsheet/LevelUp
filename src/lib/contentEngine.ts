@@ -36,6 +36,8 @@ export type NormalizedKnowledgeBlock = {
   procedures: any[];
   commands: any[];
   scenarios: any[];
+  logs: any[];
+  matching: any[];
   distractors: string[];
   tags: string[];
   source: string | null;
@@ -222,6 +224,8 @@ export function normalizeKnowledgeBlock(input: KnowledgeBlockInput, index = 0): 
     procedures: Array.isArray(raw.procedures) ? raw.procedures : [],
     commands: Array.isArray(raw.commands) ? raw.commands : [],
     scenarios: Array.isArray(raw.scenarios) ? raw.scenarios : [],
+    logs: Array.isArray(raw.logs) ? raw.logs : [],
+    matching: Array.isArray(raw.matching) ? raw.matching : [],
     distractors: uniqueStrings(raw.distractors || []),
     tags: normalizedTags,
     source: raw.source ? String(raw.source) : null,
@@ -241,6 +245,8 @@ export function normalizeKnowledgeBlock(input: KnowledgeBlockInput, index = 0): 
     procedures: Array.isArray(raw.procedures) ? raw.procedures : [],
     commands: Array.isArray(raw.commands) ? raw.commands : [],
     scenarios: Array.isArray(raw.scenarios) ? raw.scenarios : [],
+    logs: Array.isArray(raw.logs) ? raw.logs : [],
+    matching: Array.isArray(raw.matching) ? raw.matching : [],
     distractors: uniqueStrings(raw.distractors || []),
     tags: normalizedTags,
     source: raw.source ? String(raw.source) : null,
@@ -282,6 +288,21 @@ function fillBlankFromFact(block: NormalizedKnowledgeBlock, factInput: any): Can
   const masked = fact.statement.includes(String(fact.answer)) ? fact.statement.replace(String(fact.answer), "____") : `${fact.statement} ____`;
   return { prompt: fact.questionHint || masked, type: "fill_blank", difficulty: block.difficulty, explanation: fact.statement, tags: questionTags(block, fact.tags), data: { ...toBase(block).data, answers: uniqueStrings([fact.answer, ...fact.synonyms]), placeholder: "Type your answer", caseSensitive: false }, ...goldenDefaults(block, block.difficulty) };
 }
+function trueFalseFromFact(block: NormalizedKnowledgeBlock, factInput: any): CandidateQuestion | null {
+  const fact = normalizeFact(factInput);
+  if (!fact.statement) return null;
+  return {
+    prompt: `True or false: ${fact.statement}`,
+    type: "true_false" as any,
+    difficulty: block.difficulty,
+    explanation: fact.answer ? `Correct fact: ${fact.statement}` : fact.statement,
+    tags: questionTags(block, [...fact.tags, "true_false"]),
+    choices: ["True", "False"],
+    correctIndex: 0,
+    data: { ...toBase(block).data, statement: fact.statement, choices: ["True", "False"], correctIndex: 0, correctAnswer: true },
+    ...goldenDefaults(block, block.difficulty),
+  };
+}
 function definitionQuestions(block: NormalizedKnowledgeBlock, def: any): CandidateQuestion[] {
   const term = String(def?.term || "").trim();
   const definition = String(def?.definition || "").trim();
@@ -308,11 +329,17 @@ function commandQuestion(block: NormalizedKnowledgeBlock, command: any): Candida
   return { prompt: `Enter the command to: ${purpose}`, type: "cli_command", difficulty: block.difficulty, explanation: `Expected command: ${cmd}`, tags: questionTags(block, uniqueStrings([command?.platform, ...(command?.tags || [])])), data: { ...toBase(block).data, expectedCommands: uniqueStrings([cmd, ...(command?.aliases || [])]), placeholder: "Type command here", caseSensitive: false }, ...goldenDefaults(block, block.difficulty) };
 }
 function logAnalysisQuestion(block: NormalizedKnowledgeBlock, source: any): CandidateQuestion | null {
-  const scenarioText = String(source?.scenario || source?.statement || source?.purpose || "").trim();
-  const bestAction = String(source?.bestAction || source?.answer || source?.title || source?.purpose || "").trim();
-  const logText = source?.logText ? String(source.logText) : source?.command ? logTextFromCommand(source) : [`[09:15:22] ALERT ${block.title}`, scenarioText || "System generated troubleshooting event.", bestAction ? `Observed clue: ${bestAction}` : "Observed clue: review the failure message."].join("\n");
+  const scenarioText = String(source?.scenario || source?.statement || source?.purpose || source?.question || "").trim();
+  const bestAction = String(source?.bestAction || source?.answer || source?.correctAnswer || source?.title || source?.purpose || "").trim();
+  const logText = source?.logText
+    ? String(source.logText)
+    : source?.log
+      ? String(source.log)
+      : source?.command
+        ? logTextFromCommand(source)
+        : [`[09:15:22] ALERT ${block.title}`, scenarioText || "System generated troubleshooting event.", bestAction ? `Observed clue: ${bestAction}` : "Observed clue: review the failure message."].join("\n");
   if (!logText || !bestAction) return null;
-  return { prompt: "Review the log excerpt and identify the most likely issue or finding.", type: "log_analysis", difficulty: Math.max(2, block.difficulty), explanation: bestAction, tags: questionTags(block, ["log_analysis"]), data: { ...toBase(block, Math.max(2, block.difficulty)).data, logText, answers: uniqueStrings([bestAction, ...(source?.aliases || [])]), expectedFindings: uniqueStrings([bestAction]), placeholder: "Describe the issue shown in the log", caseSensitive: false }, ...goldenDefaults(block, Math.max(2, block.difficulty)) };
+  return { prompt: String(source?.question || "Review the log excerpt and identify the most likely issue or finding."), type: "log_analysis", difficulty: Math.max(2, block.difficulty), explanation: bestAction, tags: questionTags(block, ["log_analysis"]), data: { ...toBase(block, Math.max(2, block.difficulty)).data, logText, answers: uniqueStrings([bestAction, ...(source?.aliases || [])]), expectedFindings: uniqueStrings([bestAction]), placeholder: "Describe the issue shown in the log", caseSensitive: false }, ...goldenDefaults(block, Math.max(2, block.difficulty)) };
 }
 function scenarioQuestion(block: NormalizedKnowledgeBlock, scenario: any): CandidateQuestion | null {
   const scenarioText = String(scenario?.scenario || "").trim();
@@ -332,6 +359,26 @@ function multiSelectQuestion(block: NormalizedKnowledgeBlock): CandidateQuestion
   const correctIndices = choices.map((choice, index) => (correct.includes(choice) ? index : -1)).filter((index) => index >= 0);
   return { prompt: "Select all answers that are most strongly associated with secure access, identity, or core service troubleshooting in this block.", type: "multi_select", difficulty: Math.max(2, block.difficulty), explanation: "This multi-select is generated from the most relevant technical terms in the knowledge block.", tags: questionTags(block, ["generated", "multi_select"]), data: { ...toBase(block, Math.max(2, block.difficulty)).data, choices, correctIndices, minSelections: Math.min(correctIndices.length, 1), maxSelections: correctIndices.length }, ...goldenDefaults(block, Math.max(2, block.difficulty)) };
 }
+function matchingQuestion(block: NormalizedKnowledgeBlock, source: any): CandidateQuestion | null {
+  const pairs = uniqueStrings((Array.isArray(source?.pairs) ? source.pairs : []).map((pair: any) => `${String(pair?.left || "").trim()}|||${String(pair?.right || "").trim()}`))
+    .map((row) => {
+      const [left, right] = row.split("|||");
+      return { left, right };
+    })
+    .filter((pair) => pair.left && pair.right);
+  if (pairs.length < 2) return null;
+  const leftItems = pairs.map((pair) => pair.left);
+  const correctMatches = pairs.map((pair) => pair.right);
+  return {
+    prompt: String(source?.prompt || "Match each item to the correct value."),
+    type: "matching" as any,
+    difficulty: Math.max(2, block.difficulty),
+    explanation: pairs.map((pair) => `${pair.left}: ${pair.right}`).join(" • "),
+    tags: questionTags(block, ["matching"]),
+    data: { ...toBase(block, Math.max(2, block.difficulty)).data, pairs, leftItems, rightItems: shuffle(correctMatches), correctMatches },
+    ...goldenDefaults(block, Math.max(2, block.difficulty)),
+  };
+}
 
 export function generateQuestionsFromBlock(block: NormalizedKnowledgeBlock): CandidateQuestion[] {
   const questions: CandidateQuestion[] = [];
@@ -340,6 +387,7 @@ export function generateQuestionsFromBlock(block: NormalizedKnowledgeBlock): Can
     const allowed = normalizedFact.questionTypes;
     if (!allowed.length || allowed.includes("multiple_choice")) { const mc = multipleChoiceFromFact(block, fact); if (mc) questions.push(mc); }
     if (!allowed.length || allowed.includes("fill_blank")) { const fb = fillBlankFromFact(block, fact); if (fb) questions.push(fb); }
+    if (allowed.includes("true_false")) { const tf = trueFalseFromFact(block, fact); if (tf) questions.push(tf); }
     if (!allowed.length || allowed.includes("log_analysis")) { const log = logAnalysisQuestion(block, normalizedFact); if (log) questions.push(log); }
   }
   for (const def of block.definitions) questions.push(...definitionQuestions(block, def));
@@ -352,12 +400,14 @@ export function generateQuestionsFromBlock(block: NormalizedKnowledgeBlock): Can
     const q = scenarioQuestion(block, scenario); if (q) questions.push(q);
     const log = logAnalysisQuestion(block, scenario); if (log) questions.push(log);
   }
+  for (const entry of block.logs) { const log = logAnalysisQuestion(block, entry); if (log) questions.push(log); }
+  for (const entry of block.matching) { const q = matchingQuestion(block, entry); if (q) questions.push(q); }
   const multi = multiSelectQuestion(block); if (multi) questions.push(multi);
   return questions;
 }
 
 export function mapCandidateToDbQuestion(question: CandidateQuestion, sortOrder: number) {
-  const type = question.type.toUpperCase() as QuestionType;
+  const type = question.type.toUpperCase() as any;
   const base = {
     prompt: question.prompt,
     type,
@@ -371,8 +421,8 @@ export function mapCandidateToDbQuestion(question: CandidateQuestion, sortOrder:
     goldenWeight: Number(question.goldenWeight || 1),
     goldenBonusXp: Number(question.goldenBonusXp || 50),
   };
-  if (type === "MULTIPLE_CHOICE" || type === "INCIDENT") {
-    return { ...base, choices: question.choices ?? null, correctIndex: question.correctIndex ?? null, data: { ...question.data, choices: question.choices ?? [], correctIndex: question.correctIndex ?? -1 } };
+  if (type === "MULTIPLE_CHOICE" || type === "INCIDENT" || type === "TRUE_FALSE") {
+    return { ...base, choices: question.choices ?? (Array.isArray((question.data as any)?.choices) ? (question.data as any).choices : null), correctIndex: question.correctIndex ?? ((question.data as any)?.correctIndex ?? null), data: { ...question.data, choices: question.choices ?? ((question.data as any)?.choices ?? []), correctIndex: question.correctIndex ?? ((question.data as any)?.correctIndex ?? -1) } };
   }
   if (type === "MULTI_SELECT") {
     return { ...base, choices: Array.isArray(question.data?.choices) ? question.data.choices : null, correctIndex: null };
