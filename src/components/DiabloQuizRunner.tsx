@@ -385,6 +385,11 @@ export default function DiabloQuizRunner(props: {
   const [logValue, setLogValue] = useState("");
   const [sequenceItems, setSequenceItems] = useState<string[]>([]);
   const [multiSelected, setMultiSelected] = useState<number[]>([]);
+  const [matchingSelections, setMatchingSelections] = useState<string[]>([]);
+  const [hiddenChoiceIndices, setHiddenChoiceIndices] = useState<number[]>([]);
+  const [hintMessage, setHintMessage] = useState<string | null>(null);
+  const [hintXpSpent, setHintXpSpent] = useState<number>(0);
+  const [hintsUsedCount, setHintsUsedCount] = useState<number>(0);
   const [isMobileLayout, setIsMobileLayout] = useState(false);
   const [goldenEntryFlash, setGoldenEntryFlash] = useState<string | null>(null);
   const finishedOnceRef = useRef(false);
