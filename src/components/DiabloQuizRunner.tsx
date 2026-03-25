@@ -477,6 +477,14 @@ export default function DiabloQuizRunner(props: {
   const [multiSelected, setMultiSelected] = useState<number[]>([]);
   const [isMobileLayout, setIsMobileLayout] = useState(false);
   const [goldenEntryFlash, setGoldenEntryFlash] = useState<string | null>(null);
+
+  // Newly added state to support hints and choice hiding/matching
+  const [matchingSelections, setMatchingSelections] = useState<string[]>([]);
+  const [hiddenChoiceIndices, setHiddenChoiceIndices] = useState<number[]>([]);
+  const [hintMessage, setHintMessage] = useState<string | null>(null);
+  const [hintXpSpent, setHintXpSpent] = useState<number>(0);
+  const [hintsUsedCount, setHintsUsedCount] = useState<number>(0);
+
   const finishedOnceRef = useRef(false);
 
   const { state, question, select, clear, submit, submitManual, next, currentDomainId, currentMastery, outcome } = useCombatQuiz({
