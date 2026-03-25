@@ -17,7 +17,7 @@ export default function GoogleLoginButton(props: { authenticated?: boolean; comp
     return (
       <a href="/profile" className="secondaryBtn" style={baseStyle} title="Signed in with Google">
         <span aria-hidden="true" style={{ display: "inline-grid", placeItems: "center", width: 20, height: 20, borderRadius: 999, background: "rgba(255,255,255,0.14)", fontSize: 12 }}>✓</span>
-        {compact ? "Google Connected" : "Google Connected"}
+        {compact ? "Account" : "Account"}
       </a>
     );
   }

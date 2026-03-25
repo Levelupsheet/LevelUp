@@ -57,7 +57,7 @@ export default function RewardsHistoryModal(props: {
         <div className="luModalHeader" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div>
             <b style={{ fontSize: 18 }}>🎁 Rewards</b>
-            <div style={{ opacity: 0.7, marginTop: 2, fontSize: 13 }}>Your claimed loot history + balances.</div>
+            <div style={{ opacity: 0.7, marginTop: 2, fontSize: 13 }}>Your claimed loot, wallet, inventory, and rare unlocks.</div>
           </div>
           <button className="luIconBtn" onClick={onClose} aria-label="Close">✕</button>
         </div>
@@ -87,18 +87,33 @@ export default function RewardsHistoryModal(props: {
                   <div style={{ display: "grid", gap: 10 }}>
                     {(data.boxes as LootBox[]).map((b) => (
                       <div key={b.id} className="luInset" style={{ padding: 12 }}>
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
                           <div style={{ fontWeight: 700 }}>{b.type.toLowerCase()} box</div>
                           <div style={{ opacity: 0.7, fontSize: 12 }}>{new Date(b.createdAt).toLocaleString()}</div>
                         </div>
                         <div style={{ marginTop: 8, display: "grid", gap: 6 }}>
                           {b.drops.map((d, idx) => (
-                            <div key={idx} style={{ display: "flex", justifyContent: "space-between", gap: 10, opacity: 0.95 }}>
-                              <div>{iconFor(d.rewardType)} {d.rewardType === "TOKENS" ? `${d.quantity} Tokens` : d.rewardType === "XP_BOOST" ? `${d.quantity} XP` : `${d.rewardType}`}</div>
+                            <div key={idx} style={{ display: "flex", justifyContent: "space-between", gap: 10, opacity: 0.95, padding: "8px 10px", borderRadius: 10, background: "rgba(255,255,255,0.03)" }}>
+                              <div>{iconFor(d.rewardType)} {d.rewardType === "TOKENS" ? `${d.quantity} Tokens` : d.rewardType === "XP_BOOST" ? `${d.quantity} XP` : d.rewardRef ? `${d.rewardRef}` : `${d.rewardType}`}</div>
                               <div style={{ opacity: 0.65, textTransform: "capitalize" }}>{d.rarity ?? ""}</div>
                             </div>
                           ))}
                         </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <div className="luCard" style={{ padding: 12 }}>
+                <div style={{ fontWeight: 700, marginBottom: 8 }}>Inventory</div>
+                {(!data.inventory || data.inventory.length === 0) ? (
+                  <div style={{ opacity: 0.75 }}>No saved rewards yet.</div>
+                ) : (
+                  <div style={{ display: "grid", gap: 8 }}>
+                    {(data.inventory as any[]).slice(0, 30).map((item, idx) => (
+                      <div key={idx} className="luInset" style={{ padding: 10, display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+                        <div>{iconFor(item.itemType)} <b>{item.itemRef || item.itemType}</b></div>
+                        <div style={{ opacity: 0.75 }}>x{Number(item.quantity || 1)}</div>
                       </div>
                     ))}
                   </div>

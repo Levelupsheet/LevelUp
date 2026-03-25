@@ -1,12 +1,50 @@
 [
   {
+    "id": "tokens-common",
+    "name": "Token Cache",
+    "type": "TOKENS",
+    "costTokens": 0,
+    "description": "Common token reward from the loot vault.",
+    "isActive": true,
+    "dropWeight": 45,
+    "spinnerSymbol": "🪙",
+    "quantity": 25,
+    "rarity": "common"
+  },
+  {
+    "id": "xp-small",
+    "name": "XP Burst",
+    "type": "XP_BOOST",
+    "costTokens": 0,
+    "description": "Instant XP reward from the loot vault.",
+    "isActive": true,
+    "dropWeight": 26,
+    "spinnerSymbol": "⚡",
+    "quantity": 100,
+    "rarity": "uncommon"
+  },
+  {
+    "id": "badge-consistency",
+    "name": "Consistency Badge",
+    "type": "BADGE",
+    "costTokens": 0,
+    "description": "A collectible badge reward.",
+    "isActive": true,
+    "dropWeight": 10,
+    "spinnerSymbol": "🏅",
+    "rarity": "rare"
+  },
+  {
     "id": "sweep-entry-1",
     "name": "1 Sweepstakes Entry",
     "type": "SWEEPSTAKES_ENTRY",
     "costTokens": 100,
     "description": "Convert tokens into one sweepstakes entry.",
     "isActive": true,
-    "sweepstakesEntries": 1
+    "dropWeight": 8,
+    "spinnerSymbol": "🎟️",
+    "sweepstakesEntries": 1,
+    "rarity": "rare"
   },
   {
     "id": "sweep-entry-5",
@@ -15,7 +53,10 @@
     "costTokens": 450,
     "description": "Bundle entry option for active campaigns.",
     "isActive": true,
-    "sweepstakesEntries": 5
+    "dropWeight": 3,
+    "spinnerSymbol": "🎫",
+    "sweepstakesEntries": 5,
+    "rarity": "epic"
   },
   {
     "id": "cashout-5",
@@ -23,7 +64,10 @@
     "type": "CASH_OUT",
     "costTokens": 500,
     "description": "Manual reward fulfillment for small-value cash redemption.",
-    "isActive": true
+    "isActive": true,
+    "dropWeight": 2,
+    "spinnerSymbol": "💵",
+    "rarity": "epic"
   },
   {
     "id": "merch-mousepad",
@@ -31,6 +75,20 @@
     "type": "MERCH",
     "costTokens": 700,
     "description": "Redeem for official LevelUp Pro merch.",
-    "isActive": true
+    "isActive": true,
+    "dropWeight": 2,
+    "spinnerSymbol": "🖱️",
+    "rarity": "epic"
+  },
+  {
+    "id": "diamond-prize",
+    "name": "Diamond Prize Pull",
+    "type": "PRIZE",
+    "costTokens": 0,
+    "description": "A rare premium reward from the loot vault.",
+    "isActive": true,
+    "dropWeight": 1,
+    "spinnerSymbol": "💎",
+    "rarity": "legendary"
   }
 ]

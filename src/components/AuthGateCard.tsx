@@ -35,7 +35,13 @@ export default function AuthGateCard({ error }: { error?: string | null }) {
           ))}
         </div>
         <div style={{ display: "grid", gap: 12, marginTop: 22, justifyItems: "center" }}>
-          <a className="primaryBtn" href="/api/auth/google/start" style={{ minWidth: 260, justifySelf: "center" }}>Continue with Google</a>
+          <a
+            className="primaryBtn"
+            href="/api/auth/google/start"
+            style={{ minWidth: 300, width: "min(100%, 340px)", justifyContent: "center", textAlign: "center", fontWeight: 900 }}
+          >
+            Continue with Google
+          </a>
           <a className="secondaryBtn" href="/start" style={{ minWidth: 140, justifySelf: "center" }}>Back</a>
         </div>
       </div>

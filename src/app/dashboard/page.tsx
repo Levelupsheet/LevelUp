@@ -10,7 +10,6 @@ import AvatarMenu from "@/components/AvatarMenu";
 import WhatsNextPanel from "@/components/WhatsNextPanel";
 import LootVaultModal from "@/components/LootVaultModal";
 import AuthGateCard from "@/components/AuthGateCard";
-import GoogleLoginButton from "@/components/ui/GoogleLoginButton";
 import { getActiveUser, setActiveUserId, syncAuthenticatedUser } from "@/lib/userStore";
 import { XP_PER_LEVEL, xpIntoCurrentLevel, levelFromXp, levelTitleFromLevel } from "@/lib/progression";
 import { addActivity, getActivities, clearActivitiesByType, clearActivities, removeActivity, type ActivityItem } from "@/lib/activityStore";
@@ -459,13 +458,13 @@ export default function Dashboard() {
 
       <header className="navTop" style={{ marginBottom: 18 }}>
         <div className="navTopInner">
-        <div className="brandLock">
+        <a className="brandLock brandLockLink" href="/start">
           <div className="brandMark brandMark--logo"><img src="/levelup-pro-mark.svg" alt="LevelUp Pro" className="brandMarkImg" /></div>
           <div className="brandText">
             <b>LevelUp Pro</b>
             <small>Dashboard</small>
           </div>
-        </div>
+        </a>
 
         <nav className="navLinks">
           <a href="/dashboard">Dashboard</a>
@@ -479,7 +478,6 @@ export default function Dashboard() {
 
         <div className="navActions">
           <button className="secondaryBtn" type="button" onClick={() => (window.location.href = "/start#pricing")}>Pricing</button>
-          <GoogleLoginButton authenticated />
           <button className="primaryBtn" type="button" onClick={() => setShowLaunchModal(true)}>Start Now →</button>
 
           {/* Token balance pill */}

@@ -1,682 +1,92 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
-import { useCombatQuiz } from "@/engine/useCombatQuiz";
-import DomainRuneBar from "@/components/DomainRuneBar";
-import D2LifeOrb from "@/components/D2LifeOrb";
-import D2EnemyHealthBar from "@/components/D2EnemyHealthBar";
+import React, { useMemo, useState } from "react";
+import DiabloQuizRunner from "@/components/DiabloQuizRunner";
 import ProgressBar from "@/components/ProgressBar";
-import { awardXp, getActiveUser, setTrackProgress, type TrackId } from "@/lib/userStore";
+import { getActiveUser, setTrackProgress, type TrackId } from "@/lib/userStore";
 import { addActivity } from "@/lib/activityStore";
 
-type Difficulty = "easy" | "medium" | "hard";
-
 type Track = "azure_m365" | "aws" | "helpdesk" | "desktop";
+type Stage = 1 | 2;
 
-type Question = {
+type BossQuestion = {
   id: string;
-  track: Track;
-  kind: "mcq" | "short";
-  question: string;
-  idealAnswer: string;
-  options?: string[];
+  prompt: string;
+  type: "multiple_choice" | "fill_blank" | "cli_command";
+  choices?: string[];
   correctIndex?: number;
-  rubricKeywords?: string[];
-  difficulty: Difficulty;
-  tags: string[];
+  explanation?: string;
+  domainId: string;
+  level: 1 | 2 | 3;
+  data?: Record<string, unknown>;
 };
 
-function makeRepeatMCQs(opts: {
-  track: Track;
-  prefix: string;
-  startN: number;
-  count: number;
-  difficulty?: Difficulty;
-  tags: string[];
-  question: (n: number) => string;
-  options: string[];
-  correctIndex: number;
-  idealAnswer: string;
-}): Question[] {
-  const out: Question[] = [];
-  for (let i = 0; i < opts.count; i++) {
-    const n = opts.startN + i;
-    out.push({
-      id: `${opts.prefix}${n}`,
-      track: opts.track,
-      kind: "mcq",
-      question: opts.question(n),
-      options: opts.options,
-      correctIndex: opts.correctIndex,
-      idealAnswer: opts.idealAnswer,
-      difficulty: opts.difficulty ?? (n % 4 === 0 ? "medium" : "easy"),
-      tags: opts.tags,
-    });
-  }
-  return out;
-}
+const TRACK_META: Record<Track, { title: string; subtitle: string }> = {
+  azure_m365: { title: "Azure / M365", subtitle: "Identity • Intune • Security" },
+  aws: { title: "AWS", subtitle: "IAM • VPC • Compute" },
+  helpdesk: { title: "Help Desk", subtitle: "Triage • Tickets • Basics" },
+  desktop: { title: "Desktop Support", subtitle: "Windows • Endpoint • Fixes" },
+};
 
-function makePromptMCQs(opts: {
-  track: Track;
-  prefix: string;
-  prompts: string[];
-  tags: string[];
-  options: string[];
-  correctIndex: number;
-  idealAnswer: string;
-  difficulty?: Difficulty;
-}): Question[] {
-  return opts.prompts.map((q, i) => ({
-    id: `${opts.prefix}${i + 1}`,
-    track: opts.track,
-    kind: "mcq",
-    question: q,
-    options: opts.options,
-    correctIndex: opts.correctIndex,
-    idealAnswer: opts.idealAnswer,
-    difficulty: opts.difficulty ?? ((i + 1) % 4 === 0 ? "medium" : "easy"),
-    tags: opts.tags,
-  }));
-}
+const STAGE_ONE_BANK: Record<Track, BossQuestion[]> = {
+  azure_m365: [
+    { id: "az1", prompt: "Which control should you use to require MFA only for high-risk sign-ins?", type: "multiple_choice", choices: ["Intune", "Conditional Access", "SharePoint", "Power Automate"], correctIndex: 1, explanation: "Conditional Access evaluates sign-in signals and can require MFA.", domainId: "azure", level: 1 },
+    { id: "az2", prompt: "Enter the command to connect to Azure", type: "cli_command", explanation: "Use Connect-AzAccount.", domainId: "azure", level: 1, data: { expectedCommands: ["Connect-AzAccount"], placeholder: "Type the command to sign in to Azure", allowContains: true } },
+    { id: "az3", prompt: "Which service manages device compliance for Conditional Access decisions?", type: "multiple_choice", choices: ["Intune", "Defender for Identity", "Exchange Online", "Purview"], correctIndex: 0, explanation: "Intune reports device compliance status.", domainId: "azure", level: 1 },
+    { id: "az4", prompt: "Fill in the blank: The cloud identity service formerly known as Azure AD is Microsoft ____ ID.", type: "fill_blank", explanation: "Microsoft Entra ID is the modern name.", domainId: "azure", level: 1, data: { answers: ["Entra"], placeholder: "Type the missing word" } },
+  ],
+  aws: [
+    { id: "aws1", prompt: "Security Groups are best described as…", type: "multiple_choice", choices: ["Stateless subnet ACLs", "Stateful instance firewalls", "S3 policies", "IAM roles"], correctIndex: 1, explanation: "Security Groups are stateful instance-level firewalls.", domainId: "aws", level: 1 },
+    { id: "aws2", prompt: "Enter the AWS CLI command to list S3 buckets", type: "cli_command", explanation: "Use aws s3 ls.", domainId: "aws", level: 1, data: { expectedCommands: ["aws s3 ls"], placeholder: "Type an AWS CLI command", allowContains: true } },
+    { id: "aws3", prompt: "Which service provides managed relational databases?", type: "multiple_choice", choices: ["RDS", "S3", "IAM", "CloudFront"], correctIndex: 0, explanation: "Amazon RDS provides managed relational databases.", domainId: "aws", level: 1 },
+    { id: "aws4", prompt: "Fill in the blank: AWS identity permissions are commonly managed with ____ policies.", type: "fill_blank", explanation: "IAM policies define permissions.", domainId: "aws", level: 1, data: { answers: ["IAM"], placeholder: "Type the missing service name" } },
+  ],
+  helpdesk: [
+    { id: "hd1", prompt: "A user says Teams is down. What should you check first?", type: "multiple_choice", choices: ["Service health", "Printer queue", "BIOS version", "Screen resolution"], correctIndex: 0, explanation: "Service health is the first check for broad M365 issues.", domainId: "helpdesk", level: 1 },
+    { id: "hd2", prompt: "Enter the command to display IP configuration on Windows", type: "cli_command", explanation: "Use ipconfig or ipconfig /all.", domainId: "helpdesk", level: 1, data: { expectedCommands: ["ipconfig", "ipconfig /all"], placeholder: "Type a Windows networking command", allowContains: true } },
+    { id: "hd3", prompt: "Which step most cleanly isolates a profile issue from an app issue?", type: "multiple_choice", choices: ["Reimage immediately", "Test with a different user profile", "Disable DNS", "Replace the keyboard"], correctIndex: 1, explanation: "Testing with a different user profile isolates whether the issue follows the user.", domainId: "helpdesk", level: 1 },
+    { id: "hd4", prompt: "Fill in the blank: The STAR method stands for Situation, Task, Action, and ____.", type: "fill_blank", explanation: "Result is the final STAR step.", domainId: "helpdesk", level: 1, data: { answers: ["Result"], placeholder: "Complete the interview framework" } },
+  ],
+  desktop: [
+    { id: "ds1", prompt: "Which tool is commonly used to review Windows application and system logs?", type: "multiple_choice", choices: ["Event Viewer", "Paint", "Task Scheduler", "Notepad"], correctIndex: 0, explanation: "Event Viewer is used for Windows log review.", domainId: "desktop", level: 1 },
+    { id: "ds2", prompt: "Enter the command to check and repair protected Windows system files", type: "cli_command", explanation: "Use sfc /scannow.", domainId: "desktop", level: 1, data: { expectedCommands: ["sfc /scannow"], placeholder: "Type a safe Windows repair command", allowContains: true } },
+    { id: "ds3", prompt: "BitLocker recovery commonly appears after…", type: "multiple_choice", choices: ["A monitor cable change", "TPM or hardware measurement changes", "A font install", "Changing the wallpaper"], correctIndex: 1, explanation: "TPM or hardware changes can trigger BitLocker recovery.", domainId: "desktop", level: 1 },
+    { id: "ds4", prompt: "Fill in the blank: DISM can repair the Windows component ____.", type: "fill_blank", explanation: "The Windows component store is repaired by DISM.", domainId: "desktop", level: 1, data: { answers: ["store"], placeholder: "Type the missing word" } },
+  ],
+};
 
-// ===== Stage 1 pool: 25 MCQs per track =====
-const BANK_STAGE1: Question[] = [
-  // --- Azure/M365 base ---
-  {
-    id: "s1_az1",
-    track: "azure_m365",
-    kind: "mcq",
-    question: "In Entra ID (Azure AD), what is Conditional Access primarily used for?",
-    options: [
-      "Managing DNS zones for Microsoft 365",
-      "Evaluating access signals and enforcing controls like MFA or compliant devices",
-      "Creating on-prem domain trusts",
-      "Replacing Intune device compliance policies",
-    ],
-    correctIndex: 1,
-    idealAnswer:
-      "Conditional Access evaluates signals (user, device, location, risk) and enforces controls like MFA, compliant devices, or blocking access.",
-    difficulty: "easy",
-    tags: ["Conditional Access", "Security"],
-  },
-  {
-    id: "s1_az2",
-    track: "azure_m365",
-    kind: "mcq",
-    question: "What does PIM (Privileged Identity Management) help you enforce?",
-    options: [
-      "Always-on Global Admin access for IT staff",
-      "Just-in-time role elevation with approvals/time limits",
-      "Passwordless login without MFA",
-      "Email retention policies in Exchange Online",
-    ],
-    correctIndex: 1,
-    idealAnswer:
-      "PIM supports just-in-time privileged role activation with controls like MFA, approvals, and time limits.",
-    difficulty: "easy",
-    tags: ["PIM", "Least Privilege"],
-  },
-  {
-    id: "s1_az3",
-    track: "azure_m365",
-    kind: "mcq",
-    question: "Intune device compliance is commonly used with Conditional Access to…",
-    options: [
-      "Automatically renew SSL certificates",
-      "Require a compliant device before allowing access to M365 resources",
-      "Create VPC route tables",
-      "Enable DHCP reservations",
-    ],
-    correctIndex: 1,
-    idealAnswer:
-      "Intune reports compliance to Entra ID so Conditional Access can require compliant devices for access.",
-    difficulty: "medium",
-    tags: ["Intune", "Conditional Access"],
-  },
-  {
-    id: "s1_az4",
-    track: "azure_m365",
-    kind: "mcq",
-    question: "Which control is MOST effective to prevent legacy authentication attacks in M365?",
-    options: [
-      "Enable POP/IMAP for all users",
-      "Block legacy authentication using Conditional Access / security defaults",
-      "Disable DNS",
-      "Turn off MFA",
-    ],
-    correctIndex: 1,
-    idealAnswer: "Blocking legacy auth prevents basic-auth protocols from bypassing modern controls like MFA/CA.",
-    difficulty: "easy",
-    tags: ["Security", "Legacy Auth"],
-  },
-  ...makePromptMCQs({
-    track: "azure_m365",
-    prefix: "s1_azx_",
-    tags: ["Security", "M365"],
-    prompts: [
-      "You suspect impossible travel sign-ins. What should you check first in Entra ID?",
-      "A VIP is targeted by phishing. Which control most reduces account takeover risk?",
-      "A contractor needs admin rights for 2 hours. What is the safest approach?",
-      "You want to require managed devices for SharePoint access. What do you use?",
-      "How do you protect a tenant from lockout if MFA/CA breaks?",
-      "Where do you confirm whether a user was challenged for MFA?",
-      "What is the best way to reduce privilege standing access for admins?",
-      "A user complains Outlook keeps prompting. What sign-in signal is most useful?",
-      "You want to stop basic auth protocols from bypassing MFA. What do you do?",
-      "What does a 'compliant device' requirement typically validate?",
-      "A device is lost. What is the best immediate action in Intune?",
-      "You need to see risky users/sign-ins driven by identity signals. What product helps?",
-      "A mailbox needs litigation hold. Where is this configured?",
-      "You want to control who can register MFA methods. Where do you manage that?",
-      "How do you detect mass file downloads in M365?",
-      "A user needs access from a new country. What is a safe way to allow it?",
-      "What is the purpose of Azure AD / Entra ID role assignments?",
-      "An app requests high permissions. What should you review first?",
-      "You want central device policy + app deployment. Which service?",
-      "Where do you configure passwordless authentication methods?",
-      "How do you enforce least privilege for Microsoft 365 admin roles?",
-    ],
-    options: [
-      "Disable auditing",
-      "Review logs and enforce Conditional Access / least privilege",
-      "Allow anonymous admin access",
-      "Disable MFA",
-    ],
-    correctIndex: 1,
-    idealAnswer: "Use sign-in/audit logs and enforce Conditional Access + least privilege to reduce tenant risk.",
-  }),
-
-  // --- AWS base ---
-  {
-    id: "s1_aws1",
-    track: "aws",
-    kind: "mcq",
-    question: "What is the best description of an IAM Role?",
-    options: [
-      "A long-term identity with permanent access keys",
-      "A temporary set of permissions that can be assumed",
-      "A subnet-level firewall",
-      "A storage class in S3",
-    ],
-    correctIndex: 1,
-    idealAnswer: "An IAM role provides temporary permissions that a principal assumes for short-lived access.",
-    difficulty: "easy",
-    tags: ["IAM", "Security"],
-  },
-  {
-    id: "s1_aws2",
-    track: "aws",
-    kind: "mcq",
-    question: "Security Groups in AWS are…",
-    options: [
-      "Stateless and support explicit deny rules",
-      "Stateful and act as instance-level firewalls",
-      "Used only for S3 access control",
-      "A replacement for route tables",
-    ],
-    correctIndex: 1,
-    idealAnswer: "Security Groups are stateful instance-level firewalls that use allow rules.",
-    difficulty: "medium",
-    tags: ["VPC", "Networking"],
-  },
-  {
-    id: "s1_aws3",
-    track: "aws",
-    kind: "mcq",
-    question: "A VPC is best described as…",
-    options: ["A global CDN", "A logically isolated virtual network in AWS", "An S3 bucket policy", "A database engine"],
-    correctIndex: 1,
-    idealAnswer: "A VPC is a logically isolated network where you define subnets, routes, and security controls.",
-    difficulty: "easy",
-    tags: ["VPC", "Networking"],
-  },
-  {
-    id: "s1_aws4",
-    track: "aws",
-    kind: "mcq",
-    question: "Which service is commonly used for object storage?",
-    options: ["S3", "RDS", "EC2", "ECS"],
-    correctIndex: 0,
-    idealAnswer: "Amazon S3 is object storage.",
-    difficulty: "easy",
-    tags: ["S3"],
-  },
-  ...makePromptMCQs({
-    track: "aws",
-    prefix: "s1_awsx_",
-    tags: ["IAM", "Security"],
-    prompts: [
-      "What is the safest way for an EC2 instance to access S3?",
-      "You need to audit API activity across the account. What should be enabled?",
-      "What is the main benefit of least privilege IAM policies?",
-      "A public S3 bucket is a concern. What should you check first?",
-      "Which is the best practice for root account usage?",
-      "What does a Network ACL do that Security Groups do not?",
-      "You need private connectivity between subnets. What controls routing?",
-      "A developer needs temporary admin access. What is the preferred approach?",
-      "How do you protect data at rest in S3?",
-      "What is the difference between Security Groups and NACLs?",
-      "Where do you configure inbound instance firewall rules?",
-      "How do you avoid hardcoding credentials in code?",
-      "What is a common use case for AWS KMS?",
-      "What improves resilience for EC2 workloads?",
-      "How do you restrict SSH/RDP access to instances?",
-      "What is the purpose of VPC route tables?",
-      "Which service helps distribute traffic globally with caching?",
-      "How do you ensure logs are tamper-resistant?",
-      "What is the best way to rotate credentials?",
-      "When should you use an IAM role vs IAM user?",
-      "How do you protect management console logins?",
-    ],
-    options: [
-      "Use the root account for daily work",
-      "Use IAM roles + least privilege + MFA",
-      "Store credentials in public repos",
-      "Disable CloudTrail",
-    ],
-    correctIndex: 1,
-    idealAnswer: "Use roles, least privilege, and MFA; avoid root usage and avoid hardcoded credentials.",
-  }),
-
-  // --- Help Desk base ---
-  {
-    id: "s1_hd1",
-    track: "helpdesk",
-    kind: "mcq",
-    question: "A user can ping 8.8.8.8 but cannot access google.com. What is the most likely issue?",
-    options: ["DHCP failure", "DNS resolution issue", "CPU overheating", "Broken monitor"],
-    correctIndex: 1,
-    idealAnswer: "If IP connectivity works but name resolution fails, it points to DNS problems.",
-    difficulty: "easy",
-    tags: ["DNS", "Troubleshooting"],
-  },
-  {
-    id: "s1_hd2",
-    track: "helpdesk",
-    kind: "mcq",
-    question: "Ticket priority should primarily be determined by…",
-    options: [
-      "Who submitted it first",
-      "Impact and urgency (users affected + business criticality)",
-      "How loud the requester is",
-      "Whether it involves a printer",
-    ],
-    correctIndex: 1,
-    idealAnswer: "Prioritization is based on impact and urgency aligned to SLAs.",
-    difficulty: "easy",
-    tags: ["ITIL", "Process"],
-  },
-  {
-    id: "s1_hd3",
-    track: "helpdesk",
-    kind: "mcq",
-    question: "Which command quickly shows IP configuration on Windows?",
-    options: ["ipconfig /all", "nslookup", "ping -t", "net user"],
-    correctIndex: 0,
-    idealAnswer: "ipconfig /all shows IP, gateway, DNS, and DHCP info.",
-    difficulty: "easy",
-    tags: ["Windows", "Networking"],
-  },
-  ...makePromptMCQs({
-    track: "helpdesk",
-    prefix: "s1_hdx_",
-    tags: ["Troubleshooting", "Process"],
-    prompts: [
-      "A user says 'nothing works' after lunch. What is your first troubleshooting step?",
-      "A ticket says 'VPN broken' with no details. What should you do first?",
-      "Multiple users report slow internet. What is your first action?",
-      "A printer is 'offline' for one user. What's the first thing to confirm?",
-      "A user can't log in. What's your first check?",
-      "Email isn't sending for one mailbox. What's the first step?",
-      "A laptop won't connect to Wi‑Fi. What's the first step?",
-      "Teams calls drop every 5 minutes. What's your first check?",
-      "A user reports 'pop-ups' and ads. What's the first step?",
-      "A ticket mentions 'blue screen'. What's the first step?",
-      "A user can't access a shared drive. What's the first step?",
-      "A user says 'my password keeps failing'. What's the first check?",
-      "A user can't print to a network printer. What's the first step?",
-      "A user says the PC is 'super slow'. What's the first step?",
-      "A new hire can't access required apps. What's your first check?",
-      "A user can't open internal websites but internet works. What's first?",
-      "A user can't access a specific SaaS app. What's your first step?",
-      "A ticket says 'monitor flickering'. What's your first check?",
-      "A user can't open PDFs. What's your first step?",
-      "A user is locked out frequently. What's your first check?",
-      "A request comes in for admin rights. What's your first step?",
-      "A user reports missing files. What's your first step?",
-    ],
-    options: [
-      "Immediately reimage the device",
-      "Clarify the issue, scope, impact, and recent changes",
-      "Ignore the user",
-      "Disable all security tools",
-    ],
-    correctIndex: 1,
-    idealAnswer: "Start by gathering facts: symptoms, scope/impact, recent changes, and error messages before acting.",
-  }),
-
-  // --- Desktop Support base ---
-  {
-    id: "s1_ds1",
-    track: "desktop",
-    kind: "mcq",
-    question: "BitLocker recovery prompts after a motherboard replacement are most commonly caused by…",
-    options: [
-      "DNS cache corruption",
-      "TPM/hardware measurement changes triggering recovery mode",
-      "A missing printer driver",
-      "Low disk space",
-    ],
-    correctIndex: 1,
-    idealAnswer: "Hardware changes affect TPM measurements, triggering BitLocker recovery until re-sealed.",
-    difficulty: "medium",
-    tags: ["BitLocker", "Security"],
-  },
-  {
-    id: "s1_ds2",
-    track: "desktop",
-    kind: "mcq",
-    question: "To isolate a user profile issue vs an application issue, the BEST next step is to…",
-    options: [
-      "Reinstall Windows immediately",
-      "Test the same app with a different user or a new profile",
-      "Disable the network adapter",
-      "Delete System32",
-    ],
-    correctIndex: 1,
-    idealAnswer: "Testing with another user/new profile isolates whether the issue follows the user or the app.",
-    difficulty: "easy",
-    tags: ["Troubleshooting", "Windows"],
-  },
-  {
-    id: "s1_ds3",
-    track: "desktop",
-    kind: "mcq",
-    question: "Which tool is commonly used to view Windows event logs?",
-    options: ["Event Viewer", "Task Manager", "Paint", "Notepad"],
-    correctIndex: 0,
-    idealAnswer: "Event Viewer is used to inspect application/system/security event logs.",
-    difficulty: "easy",
-    tags: ["Windows", "Logs"],
-  },
-  ...makePromptMCQs({
-    track: "desktop",
-    prefix: "s1_dsx_",
-    tags: ["Windows", "Repair"],
-    prompts: [
-      "Windows features are failing after an update. What is a safe built-in repair step?",
-      "System apps crash at launch. What safe repair command helps restore system files?",
-      "A user reports corrupted Windows components. What tool repairs the component store?",
-      "A machine is acting unstable after power loss. What safe remediation do you try first?",
-      "Start Menu is broken. Which safe repair command is commonly used?",
-      "Explorer keeps crashing. What safe first remediation step applies?",
-      "Windows Update errors persist. What safe built-in repair sequence helps?",
-      "A user reports random app failures system-wide. What safe repair step?",
-      "A driver install failed and OS feels inconsistent. What safe system check?",
-      "You suspect system file corruption. What's a safe built-in remediation?",
-      "DISM reports corruption. What do you run to repair it?",
-      "After malware cleanup, the OS is flaky. What safe repair step?",
-      "A user profile loads but apps fail. What safe repair step applies globally?",
-      "PC crashes during normal operations. What safe first repair step?",
-      "Windows settings pages won't open. What safe remediation?",
-      "An endpoint has weird errors after disk cleanup. What safe remediation?",
-      "A user can't open Control Panel items. What safe repair step?",
-      "System components are missing. What safe tool can restore them?",
-      "After a feature update, services won't start. What safe repair step?",
-      "You want a low-risk repair before reimage. What do you run?",
-      "Multiple built-in apps fail. What safe remediation?",
-      "System seems corrupted. What's a safe command-line repair approach?",
-    ],
-    options: [
-      "Run sfc /scannow and DISM /RestoreHealth",
-      "Delete System32",
-      "Disable firewall permanently",
-      "Turn off updates forever",
-    ],
-    correctIndex: 0,
-    idealAnswer: "SFC and DISM are safe built-in tools to repair system files and the Windows component store.",
-  }),
-].flat() as Question[];
-
-// ===== Stage 2 pool: mixed =====
-const BANK_STAGE2 = [
-  {
-    id: "az2_1",
-    track: "azure_m365",
-    kind: "short",
-    question: "Explain the difference between Entra ID (Azure AD) and on-prem Active Directory.",
-    idealAnswer:
-      "AD DS is on-prem domain services (Kerberos/LDAP, domain join). Entra ID is cloud identity for apps/SaaS using OAuth/OIDC/SAML and Conditional Access.",
-    rubricKeywords: ["entra", "azure ad", "active directory", "kerberos", "ldap", "oauth", "saml", "conditional access"],
-    difficulty: "easy",
-    tags: ["Identity"],
-  },
-  {
-    id: "az2_2",
-    track: "azure_m365",
-    kind: "mcq",
-    question: "Which signal is commonly evaluated by Conditional Access?",
-    options: ["CPU temperature", "Device compliance", "Printer toner level", "Monitor resolution"],
-    correctIndex: 1,
-    idealAnswer: "Conditional Access can evaluate device compliance and other signals.",
-    difficulty: "easy",
-    tags: ["Conditional Access"],
-  },
-  {
-    id: "aws2_1",
-    track: "aws",
-    kind: "short",
-    question: "Explain Security Groups vs NACLs in AWS.",
-    idealAnswer:
-      "Security Groups are stateful instance-level firewalls (allow rules). NACLs are stateless subnet-level controls and can include deny rules.",
-    rubricKeywords: ["security group", "stateful", "instance", "nacl", "stateless", "subnet", "deny"],
-    difficulty: "medium",
-    tags: ["Networking"],
-  },
-  {
-    id: "aws2_2",
-    track: "aws",
-    kind: "mcq",
-    question: "Which service provides managed relational databases?",
-    options: ["RDS", "S3", "CloudFront", "Route 53"],
-    correctIndex: 0,
-    idealAnswer: "RDS provides managed relational database engines.",
-    difficulty: "easy",
-    tags: ["RDS"],
-  },
-  {
-    id: "hd2_1",
-    track: "helpdesk",
-    kind: "short",
-    question: "Walk through your steps to troubleshoot a user who cannot access Teams.",
-    idealAnswer:
-      "Check service health, user licensing, network connectivity, sign-in status, client cache, and logs; test web vs desktop; escalate if service-wide.",
-    rubricKeywords: ["service health", "license", "network", "sign in", "cache", "web", "desktop", "escalate"],
-    difficulty: "medium",
-    tags: ["M365", "Troubleshooting"],
-  },
-  {
-    id: "ds2_1",
-    track: "desktop",
-    kind: "short",
-    question: "Explain BitLocker recovery mode and how you would remediate it.",
-    idealAnswer:
-      "Hardware/TPM measurement changes can trigger recovery. Use recovery key, verify TPM/BIOS, and re-seal protectors as needed.",
-    rubricKeywords: ["bitlocker", "recovery", "tpm", "bios", "re-seal", "protector", "key"],
-    difficulty: "hard",
-    tags: ["Security", "Windows"],
-  },
-].flat() as Question[];
-
-function normalize(s: string) {
-  return s.toLowerCase().replace(/[^a-z0-9\s\-\+\.]/g, " ");
-}
-
-function keywordScore(answer: string, keywords: string[]) {
-  const a = " " + normalize(answer) + " ";
-  let hit = 0;
-  for (const k of keywords) {
-    const kn = normalize(k).trim();
-    if (!kn) continue;
-    if (a.includes(" " + kn + " ") || a.includes(kn)) hit++;
-  }
-  return { hit, total: keywords.length };
-}
-
-function deltaFromPct(pct: number) {
-  if (pct >= 0.85) return { delta: 10, rating: "great" as const };
-  if (pct >= 0.65) return { delta: 5, rating: "good" as const };
-  if (pct >= 0.45) return { delta: -4, rating: "ok" as const };
-  return { delta: -12, rating: "poor" as const };
-}
-
-function shuffle<T>(arr: T[]) {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
-
-function pickN<T>(arr: T[], n: number) {
-  const a = shuffle(arr);
-  return a.slice(0, Math.min(n, a.length));
-}
-
-function ConfettiBurst() {
-  const pieces = useMemo(() => {
-    return Array.from({ length: 42 }).map((_, i) => ({
-      id: i,
-      left: Math.random() * 100,
-      delay: Math.random() * 0.15,
-      dur: 0.9 + Math.random() * 0.7,
-      rot: Math.random() * 360,
-      size: 6 + Math.random() * 6,
-      top: -10 - Math.random() * 40,
-    }));
-  }, []);
-
-  return (
-    <div style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 9999 }}>
-      {pieces.map((p) => (
-        <span
-          key={p.id}
-          style={{
-            position: "absolute",
-            left: `${p.left}vw`,
-            top: `${p.top}px`,
-            width: p.size,
-            height: p.size * 0.6,
-            background: "linear-gradient(90deg, rgba(56,189,248,.95), rgba(236,72,153,.95), rgba(250,204,21,.95))",
-            borderRadius: 3,
-            animation: `lu_confetti ${p.dur}s ease-out ${p.delay}s forwards`,
-            transform: `rotate(${p.rot}deg)`,
-          }}
-        />
-      ))}
-    </div>
-  );
-}
-
-
-async function tryLoadDbInterviewQuestions(count: number) {
-  try {
-    const res = await fetch(`/api/content/active?lane=INTERVIEW&questionCount=${count}&shuffle=1&nonce=${Date.now()}`, { cache: "no-store" as any });
-    const json = await res.json().catch(() => null);
-    if (!res.ok || !Array.isArray(json?.questions) || !json.questions.length) return null;
-    return json.questions.map((q: any) => ({
-      track: "azure_m365",
-      stage: 1,
-      kind: "mcq",
-      difficulty: Number(q?.difficulty || q?.level || 1) >= 3 ? "hard" : Number(q?.difficulty || q?.level || 1) >= 2 ? "medium" : "easy",
-      question: String(q?.prompt || ""),
-      options: Array.isArray(q?.choices) ? q.choices : [],
-      correctIndex: typeof q?.correctIndex === "number" ? q.correctIndex : 0,
-      idealAnswer: q?.explanation || undefined,
-      tags: Array.isArray(q?.tags) ? q.tags : [],
-      rubricKeywords: [],
-    }));
-  } catch {
-    return null;
-  }
-}
+const STAGE_TWO_BANK: Record<Track, BossQuestion[]> = {
+  azure_m365: [
+    { id: "azs2_1", prompt: "Why is least privilege important for Microsoft 365 admins?", type: "fill_blank", explanation: "Least privilege reduces blast radius and standing risk.", domainId: "azure", level: 2, data: { answers: ["reduces risk", "blast radius", "least privilege"], placeholder: "Give the core reason in a short phrase" } },
+    { id: "azs2_2", prompt: "Which feature provides just-in-time admin access?", type: "multiple_choice", choices: ["PIM", "Intune", "Exchange transport rules", "OneDrive sync"], correctIndex: 0, explanation: "PIM provides just-in-time privileged access.", domainId: "azure", level: 2 },
+    { id: "azs2_3", prompt: "Enter the PowerShell command to connect to Microsoft Graph", type: "cli_command", explanation: "Use Connect-MgGraph.", domainId: "azure", level: 2, data: { expectedCommands: ["Connect-MgGraph"], placeholder: "Type a Microsoft Graph sign-in command", allowContains: true } },
+  ],
+  aws: [
+    { id: "awss2_1", prompt: "Why are IAM roles preferred over long-lived keys on workloads?", type: "fill_blank", explanation: "Roles provide temporary credentials and reduce credential risk.", domainId: "aws", level: 2, data: { answers: ["temporary credentials", "reduce risk", "least privilege"], placeholder: "Give the main security reason" } },
+    { id: "awss2_2", prompt: "Which service records AWS API activity for auditing?", type: "multiple_choice", choices: ["CloudTrail", "CloudFront", "Trusted Advisor", "GuardDuty"], correctIndex: 0, explanation: "CloudTrail records AWS API activity.", domainId: "aws", level: 2 },
+    { id: "awss2_3", prompt: "Enter the AWS CLI command to identify the caller identity", type: "cli_command", explanation: "Use aws sts get-caller-identity.", domainId: "aws", level: 2, data: { expectedCommands: ["aws sts get-caller-identity"], placeholder: "Type an STS command", allowContains: true } },
+  ],
+  helpdesk: [
+    { id: "hds2_1", prompt: "What is the best first action when many users report the same outage?", type: "fill_blank", explanation: "Check service health and confirm if it is a wider incident.", domainId: "helpdesk", level: 2, data: { answers: ["check service health", "confirm incident", "service health"], placeholder: "Answer in a short phrase" } },
+    { id: "hds2_2", prompt: "Which troubleshooting principle avoids unnecessary changes?", type: "multiple_choice", choices: ["Random trial and error", "Start with the simplest likely cause", "Skip documentation", "Ignore user impact"], correctIndex: 1, explanation: "Start with the simplest likely cause before making bigger changes.", domainId: "helpdesk", level: 2 },
+    { id: "hds2_3", prompt: "Enter the command to flush DNS on Windows", type: "cli_command", explanation: "Use ipconfig /flushdns.", domainId: "helpdesk", level: 2, data: { expectedCommands: ["ipconfig /flushdns"], placeholder: "Type a DNS repair command", allowContains: true } },
+  ],
+  desktop: [
+    { id: "dss2_1", prompt: "Why should you test with a new Windows profile during troubleshooting?", type: "fill_blank", explanation: "It helps determine whether the issue is profile-specific.", domainId: "desktop", level: 2, data: { answers: ["isolate the profile", "profile-specific", "isolate user issue"], placeholder: "Give the main reason" } },
+    { id: "dss2_2", prompt: "Which built-in tool repairs the Windows image store?", type: "multiple_choice", choices: ["DISM", "Disk Cleanup", "Defrag", "Taskkill"], correctIndex: 0, explanation: "DISM repairs the Windows image store.", domainId: "desktop", level: 2 },
+    { id: "dss2_3", prompt: "Enter the DISM command to restore the Windows image health", type: "cli_command", explanation: "Use DISM /Online /Cleanup-Image /RestoreHealth.", domainId: "desktop", level: 2, data: { expectedCommands: ["DISM /Online /Cleanup-Image /RestoreHealth"], placeholder: "Type the repair command", allowContains: true } },
+  ],
+};
 
 export default function MockInterviewModal(props: { open: boolean; onClose: () => void }) {
   const { open, onClose } = props;
-
   const [track, setTrack] = useState<Track>("azure_m365");
-  const [stage, setStage] = useState<1 | 2>(1);
+  const [stage, setStage] = useState<Stage>(1);
   const [step, setStep] = useState<"setup" | "quiz" | "summary">("setup");
-  const [answer, setAnswer] = useState("");
-  const [lastFeedback, setLastFeedback] = useState<string | null>(null);
-  const [sessionQuestions, setSessionQuestions] = useState<Question[]>([]);
+  const [lastSummary, setLastSummary] = useState<any>(null);
 
-  const combatQuestions = useMemo(() => {
-    return (sessionQuestions ?? []).map((q, i) => {
-      const diff = q.difficulty === "hard" ? 3 : q.difficulty === "medium" ? 2 : 1;
-      return {
-        id: `${i}-${q.track}-${q.kind}`,
-        prompt: q.question,
-        choices: q.kind === "mcq" ? (q.options ?? []) : ["(type your answer)"],
-        correctIndex: q.kind === "mcq" ? (typeof q.correctIndex === "number" ? q.correctIndex : -1) : 0,
-        explanation: q.idealAnswer ?? null,
-        domainId: (q.tags?.[0] ?? q.track) as string,
-        level: diff as 1 | 2 | 3,
-      };
-    });
-  }, [sessionQuestions]);
-
-  const engine = useCombatQuiz({
-    questions: combatQuestions,
-    timed: true,
-    onXp: (delta) => {
-      // mirror existing XP behavior
-      awardXp(delta);
-    },
-    onSubmit: (r) => {
-      // keep a stable feedback string for UI blocks that render outside engine state timing
-      setLastFeedback(r.correct ? "Direct hit." : "Not quite.");
-    },
-  });
-
-  const {
-    state: combat,
-    question: combatQ,
-    select,
-    clear: clearChoice,
-    submit: submitChoice,
-    submitManual,
-    next: nextQuestion,
-    reset: resetCombat,
-    currentDomainId,
-    currentMastery,
-    outcome,
-  } = engine;
-
-  const idx = combat.idx;
-  const playerHealth = combat.playerHP;
-  const enemyHealth = combat.enemyHP;
-  const selected = combat.selected;
-  const locked = combat.locked;
-  const feedbackText = combat.feedback;
-  const lastWasCorrect = combat.lastWasCorrect;
-  const [showConfetti, setShowConfetti] = useState(false);
-  const [pulseUnlock, setPulseUnlock] = useState(false);
-  const [xpToast, setXpToast] = useState<string | null>(null);
-
-  useEffect(() => {
-    try {
-      getActiveUser();
-    } catch {}
-  }, []);
-
-  useEffect(() => {
-    if (!xpToast) return;
-    const t = setTimeout(() => setXpToast(null), 1200);
-    return () => clearTimeout(t);
-  }, [xpToast]);
-
+  const activeUser = getActiveUser();
+  const trackPct = activeUser.trackProgress?.[track as TrackId] ?? 0;
   const passedStage1 = useMemo(() => {
     try {
       return localStorage.getItem(`lu_mock_passed_s1_${track}`) === "1";
@@ -685,126 +95,30 @@ export default function MockInterviewModal(props: { open: boolean; onClose: () =
     }
   }, [track, step]);
 
-  const activeUser = getActiveUser();
-  const trackPct = activeUser.trackProgress?.[track as TrackId] ?? 0;
+  const questions = useMemo(() => {
+    return (stage === 1 ? STAGE_ONE_BANK[track] : STAGE_TWO_BANK[track]).map((q) => ({ ...q }));
+  }, [track, stage]);
 
-  const current = sessionQuestions[idx];
-
-  
-  function resetSession() {
-    setAnswer("");
-    resetCombat();
-    setLastFeedback(null);
-    try {
-      sessionStorage.setItem("lu_mock_history", JSON.stringify([]));
-    } catch {}
-  }
-
-
-  async function start(nextStage: 1 | 2) {
+  function start(nextStage: Stage) {
     setStage(nextStage);
-    resetSession();
-    const count = nextStage === 1 ? 12 : 8;
-    const dbQuestions = await tryLoadDbInterviewQuestions(count);
-    if (dbQuestions?.length) {
-      setSessionQuestions(dbQuestions as any);
-      setStep("quiz");
-      return;
-    }
-    const src = nextStage === 1 ? BANK_STAGE1 : BANK_STAGE2;
-    const pool = src.filter((q) => q.track === track);
-    setSessionQuestions(pickN(pool, count));
+    setLastSummary(null);
     setStep("quiz");
   }
 
-  useEffect(() => {
-    if (!open) return;
-    if (step !== "quiz") return;
-    if (!sessionQuestions || sessionQuestions.length === 0) return;
-    // New run each time modal opens / quiz starts
-    resetCombat();
-  }, [open, step, sessionQuestions.length, resetCombat]);
-
-  useEffect(() => {
-    if (step !== "quiz") return;
-    if (!combat.finished) return;
-
-    setStep("summary");
-
-    const passedThisRun = outcome === "victory";
-
-    // Persist unlock/progress like before (stage 1 unlocks stage 2, etc.)
-    if (stage === 1 && passedThisRun) {
-      try {
-        localStorage.setItem(`lu_mock_passed_s1_${track}`, "1");
-      } catch {}
-      setTrackProgress(track as TrackId, 50);
-      addActivity(activeUser.id, { type: "PASS_INTERVIEW_STAGE1", title: "Mock Interview: Stage 1 cleared", body: track });
-      setShowConfetti(true);
-      setTimeout(() => setShowConfetti(false), 1800);
+  function finishSummary(summary: any) {
+    setLastSummary(summary);
+    const passed = summary?.outcome === "victory" || summary?.enemyHP === 0;
+    if (stage === 1 && passed) {
+      try { localStorage.setItem(`lu_mock_passed_s1_${track}`, "1"); } catch {}
+      setTrackProgress(track as TrackId, Math.max(trackPct, 50));
+      addActivity(activeUser.id, { type: "PASS_INTERVIEW_STAGE1", title: "Boss battle cleared", body: track });
     }
-    if (stage === 2 && passedThisRun) {
+    if (stage === 2 && passed) {
       setTrackProgress(track as TrackId, 100);
-      addActivity(activeUser.id, { type: "PASS_INTERVIEW_STAGE2", title: "Mock Interview: Stage 2 cleared", body: track });
-      setShowConfetti(true);
-      setTimeout(() => setShowConfetti(false), 1800);
+      addActivity(activeUser.id, { type: "PASS_INTERVIEW_STAGE2", title: "Advanced boss battle cleared", body: track });
     }
-  }, [combat.finished, step, outcome, stage, track]);
-
-
-
-  
-  function submit() {
-    if (!current) return;
-    if (locked) return;
-
-    // MCQ: engine handles selection + correctness
-    if (current.kind === "mcq") {
-      submitChoice();
-      return;
-    }
-
-    // SHORT: evaluate with rubric keywords (existing helpers) and submit manually
-    const keys = current.rubricKeywords ?? [];
-    const score = keywordScore(answer, keys);
-    const hit = score.hit;
-    const total = score.total;
-    const pct = total ? hit / total : 0;
-
-    const r = deltaFromPct(pct);
-    const isCorrect = r.rating === "great" || r.rating === "good" || r.rating === "ok";
-
-    const fb =
-      r.rating === "great"
-        ? `Strong answer. You hit most points (${hit}/${total}).`
-        : r.rating === "good"
-        ? `Good answer. You covered several points (${hit}/${total}).`
-        : r.rating === "ok"
-        ? `Decent. You got some points (${hit}/${total}).`
-        : r.rating === "poor"
-        ? `A bit thin (${hit}/${total}).`
-        : `Not quite (${hit}/${total}).`;
-
-    submitManual({
-      correct: isCorrect,
-      domainId: current.tags?.[0] ?? current.track,
-      level: current.difficulty === "hard" ? 3 : current.difficulty === "medium" ? 2 : 1,
-      feedback: (current.idealAnswer ? `${fb} ${current.idealAnswer}` : fb) as string,
-    });
+    setStep("summary");
   }
-
-
-  const title =
-    track === "azure_m365" ? "Azure / Microsoft 365" : track === "aws" ? "AWS" : track === "helpdesk" ? "Help Desk" : "Desktop Support";
-
-  const subtitle =
-    track === "azure_m365"
-      ? "Identity, security, Intune, M365 troubleshooting"
-      : track === "aws"
-      ? "IAM, VPC, compute, storage"
-      : track === "helpdesk"
-      ? "Ticketing, triage, networking basics"
-      : "Windows troubleshooting, endpoint security";
 
   if (!open) return null;
 
@@ -815,276 +129,88 @@ export default function MockInterviewModal(props: { open: boolean; onClose: () =
         <div className="luVideoVignette" />
       </div>
 
-
-      {showConfetti && <ConfettiBurst />}
-      {xpToast && (
-        <div style={{ position: "fixed", top: 18, right: 18, zIndex: 9999 }}>
-          <div className="badge" style={{ background: "rgba(0,0,0,.55)", border: "1px solid rgba(255,255,255,.15)" }}>
-            {xpToast}
-          </div>
-        </div>
-      )}
-
-      <div className="modal" style={{ maxWidth: 980, position: "relative", overflow: "hidden" }}>
-
+      <div className="modal" style={{ maxWidth: 1540, position: "relative", overflow: "hidden" }}>
         <div style={{ position: "relative", zIndex: 1 }}>
-<div className="modalHeader">
-          <div>
-            <div className="modalTitle">Mock Tech Interview</div>
-            <div className="muted">Randomized quiz + feedback + health bar + XP</div>
-          </div>
-          <button className="btn" onClick={onClose}>
-            Close
-          </button>
-        </div>
-
-        {step === "setup" && (
-          <div className="modalBody">
-            <div className="grid2">
-              <div className="card" style={{ gridColumn: "1 / -1" }}>
-                <div className="cardTitle">Choose a track</div>
-                <div className="muted">Interview 1 is MCQ-only. Pass to unlock Interview 2 (mixed).</div>
-
-                <div className="trackGrid" style={{ marginTop: 14 }}>
-                  {(
-                    [
-                      { id: "azure_m365", label: "Azure / M365", sub: "Identity • Intune • Security" },
-                      { id: "aws", label: "AWS", sub: "IAM • VPC • Compute" },
-                      { id: "helpdesk", label: "Help Desk", sub: "Triage • Tickets • Basics" },
-                      { id: "desktop", label: "Desktop Support", sub: "Windows • Endpoint • Fixes" },
-                    ] as const
-                  ).map((t) => {
-                    const passed = (() => {
-                      try {
-                        return localStorage.getItem(`lu_mock_passed_s1_${t.id}`) === "1";
-                      } catch {
-                        return false;
-                      }
-                    })();
-
-                    return (
-                      <button
-                        key={t.id}
-                        className={"trackBtn" + (track === t.id ? " active" : "")}
-                        onClick={() => setTrack(t.id)}
-                      >
-                        <div style={{ fontWeight: 800 }}>{t.label}</div>
-                        <div className="muted" style={{ fontSize: 12 }}>{t.sub}</div>
-                        {passed && <div className="badge" style={{ position: "absolute", top: 10, right: 10 }}>✓ Interview 1 Passed</div>}
-                      </button>
-                    );
-                  })}
-                </div>
-
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14, marginTop: 16 }}>
-                  <div>
-                    <div className="cardTitle" style={{ margin: 0 }}>{title}</div>
-                    <div className="muted">{subtitle}</div>
-                    <div className="muted" style={{ marginTop: 6 }}>Active user: <b>{activeUser.displayName}</b> • XP: <b>{activeUser.xp}</b></div>
-                  </div>
-                  <div style={{ minWidth: 220 }}>
-                    <div className="muted" style={{ fontSize: 12, marginBottom: 6 }}>Track Completion</div>
-                    <ProgressBar value={trackPct} max={100} />
-                    <div className="muted" style={{ fontSize: 12, marginTop: 6 }}>{trackPct}%</div>
-                  </div>
-                </div>
-
-                <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 14 }}>
-                  <button className="btn primary" onClick={() => start(1)}>
-                    Start Interview 1 (MCQ) →
-                  </button>
-                  <button
-                    className={pulseUnlock ? "btn neonPulse" : "btn"}
-                    disabled={!passedStage1}
-                    onClick={() => start(2)}
-                    title={passedStage1 ? "" : "Pass Interview 1 to unlock"}
-                  >
-                    Start Interview 2 (Mixed)
-                  </button>
-                  <button className="btn" onClick={resetSession}>
-                    Reset
-                  </button>
-                </div>
-
-                <div style={{ marginTop: 10 }}>
-                  {passedStage1 ? (
-                    <span className="badge">✓ Interview 1 Passed — Interview 2 unlocked</span>
-                  ) : (
-                    <span className="badge">Pass requirement: defeat Lagger before you get dropped to 0</span>
-                  )}
-                </div>
-              </div>
-
-              {/* Health is used during the quiz; keep the setup screen clean. */}
+          <div className="modalHeader">
+            <div>
+              <div className="modalTitle">Boss Battle Interview</div>
+              <div className="muted">Certification-style combat UI for tech and HR interview practice.</div>
             </div>
+            <button className="btn" onClick={onClose}>Close</button>
           </div>
-        )}
 
-        {step === "quiz" && (
-          <div className="modalBody">
-            <div className="d2InterviewGrid">
-              <div>
-                <D2LifeOrb value={playerHealth} name={(getActiveUser()?.displayName || "Player").slice(0, 18)} />
-              </div>
-              <div className="d2QuestionCard">
-              <span className="d2Rivet" style={{ left: 12, top: 12 }} />
-              <span className="d2Rivet" style={{ right: 12, top: 12 }} />
-              <span className="d2Rivet" style={{ left: 12, bottom: 12 }} />
-              <span className="d2Rivet" style={{ right: 12, bottom: 12 }} />
-                <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
-                  <div className="muted">
-                    Stage {stage} • Question {idx + 1} / {sessionQuestions.length}
-                  </div>
-                  <div className="muted" style={{ fontSize: 12 }}>{current?.tags?.slice(0, 3).join(" • ")}</div>
-                </div>
-
-                <div className="d2QuestionTitle">{current?.question}</div>
-                <div style={{ marginTop: 10 }}>
-                  <DomainRuneBar
-                    domainLabel={(current?.tags?.[0] ?? current?.track ?? "Domain").toString()}
-                    mastery={currentMastery}
-                    tier={combat.tier}
-                  />
-                </div>
-
-
-                {current?.kind === "mcq" ? (
-                  <div style={{ marginTop: 12, display: "grid", gap: 10 }}>
-                    {(current.options ?? []).map((opt, i) => (
-                      <button
-                        key={i}
-                        className={"d2ChoiceBtn" + (selected === i ? " selected" : "")}
-                        onClick={() => select(i)}
-                      >
-                        {opt}
+          {step === "setup" && (
+            <div className="modalBody">
+              <div className="grid2">
+                <div className="card" style={{ gridColumn: "1 / -1" }}>
+                  <div className="cardTitle">Choose a track</div>
+                  <div className="muted">Stage 1 unlocks Stage 2 for the selected track.</div>
+                  <div className="trackGrid" style={{ marginTop: 14 }}>
+                    {(Object.entries(TRACK_META) as [Track, { title: string; subtitle: string }][]) .map(([id, meta]) => (
+                      <button key={id} className={"trackBtn" + (track === id ? " active" : "")} onClick={() => setTrack(id)}>
+                        <div style={{ fontWeight: 800 }}>{meta.title}</div>
+                        <div className="muted" style={{ fontSize: 12 }}>{meta.subtitle}</div>
+                        {track === id ? <div className="badge" style={{ position: "absolute", top: 10, right: 10 }}>Selected</div> : null}
                       </button>
                     ))}
                   </div>
-                ) : (
-                  <textarea
-                    className="luInput"
-                    style={{ width: "100%", minHeight: 140, marginTop: 12 }}
-                    value={answer}
-                    onChange={(e) => setAnswer(e.target.value)}
-                    placeholder="Answer like you're speaking in an interview…"
-                  />
-                )}
-
-                
-                <div style={{ marginTop: 14, display: "flex", gap: 10 }}>
-                  {!locked ? (
-                    <>
-                      <button className="d2Btn primary d2Roman" onClick={submit}>
-                        Submit
-                      </button>
-                      <button
-                        className="d2Btn d2Roman"
-                        onClick={() => {
-                          clearChoice();
-                          setAnswer("");
-                        }}
-                      >
-                        Clear
-                      </button>
-                    </>
-                  ) : (
-                    <button className="d2Btn primary d2Roman" onClick={nextQuestion}>
-                      Next
-                    </button>
-                  )}
-                </div>
-
-
-                {locked && feedbackText && (
-                  <div className="card" style={{ marginTop: 12, background: "rgba(0,0,0,.25)" }}>
-                    <div className="muted" style={{ fontSize: 12 }}>Feedback</div>
-                    <div style={{ marginTop: 6 }}>{feedbackText}</div>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14, marginTop: 16, flexWrap: "wrap" }}>
+                    <div>
+                      <div className="cardTitle" style={{ margin: 0 }}>{TRACK_META[track].title}</div>
+                      <div className="muted">{TRACK_META[track].subtitle}</div>
+                      <div className="muted" style={{ marginTop: 6 }}>Active user: <b>{activeUser.displayName}</b> • XP: <b>{activeUser.xp}</b></div>
+                    </div>
+                    <div style={{ minWidth: 220 }}>
+                      <div className="muted" style={{ fontSize: 12, marginBottom: 6 }}>Track Completion</div>
+                      <ProgressBar value={trackPct} max={100} />
+                      <div className="muted" style={{ fontSize: 12, marginTop: 6 }}>{trackPct}%</div>
+                    </div>
                   </div>
-                )}
-              </div>
-              <div>
-                <D2EnemyHealthBar name="Lagger" value={enemyHealth} max={100} />
+                  <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 14 }}>
+                    <button className="btn primary" onClick={() => start(1)}>Start Boss Battle 1 →</button>
+                    <button className="btn" disabled={!passedStage1} onClick={() => start(2)} title={passedStage1 ? "" : "Pass Stage 1 to unlock"}>Start Boss Battle 2</button>
+                  </div>
+                  <div style={{ marginTop: 10 }}>
+                    {passedStage1 ? <span className="badge">✓ Stage 2 unlocked for this track</span> : <span className="badge">Defeat the first boss battle to unlock the second stage.</span>}
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        )}
-
-        {step === "summary" && <SummaryView title={title} stage={stage} track={track} health={playerHealth} enemyHealth={enemyHealth} totalQuestions={sessionQuestions.length} passedStage1={passedStage1} onStartStage2={() => start(2)} onRestart={() => setStep("setup")} onClose={onClose} />}
-      </div>
-      </div>
-    </div>
-  );
-}
-
-function SummaryView(props: {
-  title: string;
-  stage: 1 | 2;
-  track: Track;
-  health: number;
-  enemyHealth: number;
-  totalQuestions: number;
-  passedStage1: boolean;
-  onStartStage2: () => void;
-  onRestart: () => void;
-  onClose: () => void;
-}) {
-  const { title, stage, health, enemyHealth, totalQuestions, passedStage1, onStartStage2, onRestart, onClose } = props;
-
-  const rows = useMemo(() => {
-    try {
-      const raw = sessionStorage.getItem("lu_mock_history") || "[]";
-      const parsed = JSON.parse(raw);
-      return Array.isArray(parsed) ? parsed : [];
-    } catch {
-      return [];
-    }
-  }, [stage, totalQuestions]);
-
-  const passedThisRun = enemyHealth <= 0 && health > 0;
-
-  return (
-    <div className="modalBody">
-      <div className="card">
-        <div className="cardTitle">Session Summary — {title}</div>
-        <div className="muted" style={{ marginTop: 6 }}>
-          Stage {stage} • Final health: <b>{health}</b> • Questions: <b>{totalQuestions}</b>
-        </div>
-
-        <div style={{ marginTop: 12 }}>
-          {passedThisRun ? (
-            <span className="badge">✅ Passed</span>
-          ) : (
-            <span className="badge">❌ Defeated (0 HP)</span>
           )}
-        </div>
 
-        <hr style={{ margin: "12px 0" }} />
+          {step === "quiz" && (
+            <div className="modalBody">
+              <DiabloQuizRunner
+                title={stage === 1 ? "Mock Tech Interview" : "Mock HR Interview"}
+                subtitle={`${TRACK_META[track].title} • ${stage === 1 ? "Boss Battle 1" : "Boss Battle 2"}`}
+                enemyName="Lagger"
+                questions={questions as any}
+                timed
+                metaLeft={`Stage ${stage}`}
+                metaRight={TRACK_META[track].title.toUpperCase()}
+                exitLabel="Close"
+                onExit={onClose}
+                onComplete={finishSummary}
+              />
+            </div>
+          )}
 
-        {rows.length === 0 ? (
-          <div className="muted">No answers recorded yet.</div>
-        ) : (
-          <div style={{ display: "grid", gap: 10 }}>
-            {rows.map((r: any, i: number) => (
-              <div key={i} className="card" style={{ background: "rgba(0,0,0,.25)" }}>
-                <div style={{ fontWeight: 800 }}>Q{i + 1}: {r.q}</div>
-                <div className="muted" style={{ fontSize: 12, marginTop: 6 }}>Your answer</div>
-                <div style={{ whiteSpace: "pre-wrap" }}>{r.a}</div>
-                <div className="muted" style={{ fontSize: 12, marginTop: 6 }}>Feedback</div>
-                <div>{r.feedback}</div>
+          {step === "summary" && (
+            <div className="modalBody">
+              <div className="card" style={{ padding: 18 }}>
+                <div className="cardTitle">Boss battle summary</div>
+                <div className="muted" style={{ marginTop: 8 }}>
+                  Outcome: <b>{lastSummary?.outcome || "complete"}</b> • Score <b>{Number(lastSummary?.correctCount || 0)}</b> / <b>{Number(lastSummary?.totalQuestions || 0)}</b> • XP +<b>{Number(lastSummary?.xpEarned || 0)}</b>
+                </div>
+                <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 16 }}>
+                  <button className="btn primary" onClick={() => setStep("setup")}>Back to setup</button>
+                  <button className="btn" onClick={onClose}>Close</button>
+                </div>
               </div>
-            ))}
-          </div>
-        )}
-
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 14 }}>
-          <button className="btn" onClick={onRestart}>Back</button>
-          {stage === 1 && (passedThisRun || passedStage1) && (
-            <button className="btn primary" onClick={onStartStage2}>Start Stage 2</button>
+            </div>
           )}
-          <button className="btn" onClick={onClose}>Close</button>
         </div>
       </div>
-
     </div>
   );
 }

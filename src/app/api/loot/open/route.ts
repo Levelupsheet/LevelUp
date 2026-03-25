@@ -31,25 +31,29 @@ function randInt(min: number, max: number) {
 async function generateBronzeDrops(): Promise<DropSpec[]> {
   const rows = (await readLootVaultRows().catch(() => [])).filter((row) => row.isActive !== false && Number(row.dropWeight ?? 0) > 0);
   const customPool = rows.map((row: any) => {
+    const rawType = String(row.type || "PRIZE").toUpperCase();
     let rewardType: DropSpec["rewardType"] = "PRIZE";
     let quantity = 1;
-    if (String(row.type) === "SWEEPSTAKES_ENTRY") { rewardType = "RAFFLE_ENTRY"; quantity = Math.max(1, Number(row.sweepstakesEntries || 1)); }
-    else if (String(row.type) === "CASH_OUT") { rewardType = "COUPON"; }
-    else if (String(row.type) === "MERCH") { rewardType = "PRIZE"; }
+    if (rawType === "TOKENS") { rewardType = "TOKENS"; quantity = Math.max(1, Number(row.quantity || row.costTokens || 25)); }
+    else if (rawType === "XP_BOOST") { rewardType = "XP_BOOST"; quantity = Math.max(1, Number(row.quantity || 100)); }
+    else if (rawType === "BADGE") { rewardType = "BADGE"; }
+    else if (rawType === "RAFFLE_ENTRY" || rawType === "SWEEPSTAKES_ENTRY") { rewardType = "RAFFLE_ENTRY"; quantity = Math.max(1, Number(row.sweepstakesEntries || row.quantity || 1)); }
+    else if (rawType === "COUPON" || rawType === "CASH_OUT") { rewardType = "COUPON"; }
+    else { rewardType = "PRIZE"; }
     return {
       w: Math.max(1, Number(row.dropWeight || 1)),
       item: {
         rewardType,
         rewardRef: row.name,
         quantity,
-        rarity: rewardType === "RAFFLE_ENTRY" ? "rare" : "uncommon",
+        rarity: String(row.rarity || (rewardType === "TOKENS" ? "common" : rewardType === "XP_BOOST" ? "uncommon" : rewardType === "RAFFLE_ENTRY" ? "rare" : "epic")).toLowerCase(),
         visualIcon: row.spinnerSymbol || null,
         visualImageUrl: row.iconUrl || null,
       } as DropSpec,
     };
   });
 
-  const basePool: { item: DropSpec; w: number }[] = [
+  const basePool: { item: DropSpec; w: number }[] = customPool.length ? [] : [
     { w: 70, item: { rewardType: "TOKENS", quantity: randInt(10, 30), rarity: "common", visualIcon: "🪙" } },
     { w: 25, item: { rewardType: "XP_BOOST", rewardRef: "xp_boost_small", quantity: randInt(50, 150), rarity: "uncommon", visualIcon: "⚡" } },
     { w: 5, item: { rewardType: "BADGE", rewardRef: pickWeighted([{ w: 60, item: "Consistency" }, { w: 40, item: "Quick Learner" }]), quantity: 1, rarity: "rare", visualIcon: "🏅" } },

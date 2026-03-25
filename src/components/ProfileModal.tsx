@@ -16,6 +16,7 @@ export default function ProfileModal(props: {
   const [email, setEmail] = useState("");
   const [tick, setTick] = useState(0);
   const [rewardsOpen, setRewardsOpen] = useState(false);
+  const [sweepStats, setSweepStats] = useState<any>(null);
   const active = useMemo(() => getActiveUser(), [open, tick]);
   const userId = (active as any)?.id ?? "demo-user";
 
@@ -43,6 +44,15 @@ export default function ProfileModal(props: {
       document.body.style.overflow = prev;
     };
   }, [open]);
+
+
+  useEffect(() => {
+    if (!open) return;
+    fetch("/api/sweepstakes/summary", { cache: "no-store" as any })
+      .then((r) => r.ok ? r.json() : Promise.reject(new Error("Failed to load sweepstakes")))
+      .then((j) => setSweepStats(j?.user || null))
+      .catch(() => setSweepStats(null));
+  }, [open, userId, tick]);
 
   if (!open || !mountNode) return null;
   const users = getUsers();
@@ -73,7 +83,7 @@ export default function ProfileModal(props: {
             <div className="card" style={{ gridColumn: "1 / -1" }}>
               <h3 style={{ marginTop: 0 }}>Account</h3>
               <p className="muted" style={{ marginTop: 6 }}>
-                For now, accounts are stored locally in your browser. Later this will map to Google login.
+                Manage your training identity, rewards, and sweepstakes activity from one place.
               </p>
               <div className="divider" />
 
@@ -107,6 +117,20 @@ export default function ProfileModal(props: {
               </div>
 
               <div className="divider" />
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 10, marginBottom: 14 }}>
+                <div className="luInset" style={{ padding: 12 }}>
+                  <div className="muted" style={{ fontSize: 12 }}>Level</div>
+                  <div style={{ fontSize: 24, fontWeight: 900 }}>{Math.max(1, Math.floor(Number(active.xp || 0) / 500) + 1)}</div>
+                </div>
+                <div className="luInset" style={{ padding: 12 }}>
+                  <div className="muted" style={{ fontSize: 12 }}>Sweepstakes entered</div>
+                  <div style={{ fontSize: 24, fontWeight: 900 }}>{Array.isArray(sweepStats?.activeEnteredCampaignIds) ? sweepStats.activeEnteredCampaignIds.length : 0}</div>
+                </div>
+                <div className="luInset" style={{ padding: 12 }}>
+                  <div className="muted" style={{ fontSize: 12 }}>Entries this week</div>
+                  <div style={{ fontSize: 24, fontWeight: 900 }}>{Number(sweepStats?.weeklyCount || 0)} / {Number(sweepStats?.weeklyLimit || 5)}</div>
+                </div>
+              </div>
               <div className="muted" style={{ fontSize: 12, marginBottom: 8 }}>Create a new local account</div>
               <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
                 <input
@@ -144,28 +168,28 @@ export default function ProfileModal(props: {
             <div className="card">
               <h3 style={{ marginTop: 0 }}>Student</h3>
               <p className="muted" style={{ marginTop: 6 }}>
-                Rank up by completing lessons and tests.
+                Rank up by completing lessons, tests, and boss battles.
               </p>
               <div className="divider" />
               <p className="muted" style={{ margin: 0 }}>
-                Monthly drawings unlock at <b>Professional</b> status.
+                Active sweepstakes joined: <b>{Array.isArray(sweepStats?.activeEnteredCampaignIds) ? sweepStats.activeEnteredCampaignIds.length : 0}</b>
               </p>
             </div>
             <div className="card">
               <h3 style={{ marginTop: 0 }}>Quick links</h3>
               <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-                <a className="btn" href="/profile">
-                  Open full profile →
-                </a>
                 <a className="btn" href="/dashboard">
                   Go to dashboard →
+                </a>
+                <a className="btn" href="/sweepstakes">
+                  Open sweepstakes →
                 </a>
               </div>
             </div>
             <div className="card" style={{ gridColumn: "1 / -1" }}>
-              <h3 style={{ marginTop: 0 }}>Resume</h3>
+              <h3 style={{ marginTop: 0 }}>Sweepstakes activity</h3>
               <p className="muted" style={{ marginTop: 6 }}>
-                Resume upload + ATS templates will appear here in the next update.
+                Token balance: <b>{Number(sweepStats?.tokenBalance || 0)}</b> • Weekly entries: <b>{Number(sweepStats?.weeklyCount || 0)}</b>
               </p>
             </div>
           </div>

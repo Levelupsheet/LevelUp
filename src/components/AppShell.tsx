@@ -4,7 +4,6 @@ import ThemeToggle from "@/components/ThemeToggle";
 import AmbientFX from "@/components/AmbientFX";
 import NotificationBell from "@/components/NotificationBell";
 import AvatarMenu from "@/components/AvatarMenu";
-import GoogleLoginButton from "@/components/ui/GoogleLoginButton";
 
 export default function AppShell({
   title,
@@ -52,7 +51,6 @@ export default function AppShell({
             </div>
 
             <div className="kpiRow">
-              <GoogleLoginButton authenticated={Boolean(userId && !String(userId).startsWith("demo-user"))} compact />
               <NotificationBell userId={userId} />
               <ThemeToggle />
               <AvatarMenu

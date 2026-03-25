@@ -216,13 +216,14 @@ export function evaluateQuestionAnswer(input: {
   }
 
   if (type === "cli_command") {
-    const allowContains = Boolean(data.allowContains);
+    const allowContains = Boolean(data.allowContains ?? true);
     const expectedCommands = safeArray<string>(data.expectedCommands);
     const rawAnswer = String(input.answer ?? "").trim();
     const normalizedAnswer = normalizeText(rawAnswer);
+    const compactAnswer = normalizedAnswer.replace(/\s+/g, " ");
     const correct = expectedCommands.some((command) => {
-      const normalizedCommand = normalizeText(command);
-      return allowContains ? normalizedAnswer.includes(normalizedCommand) : normalizedAnswer === normalizedCommand;
+      const normalizedCommand = normalizeText(command).replace(/\s+/g, " ");
+      return allowContains ? compactAnswer.includes(normalizedCommand) || normalizedCommand.includes(compactAnswer) : compactAnswer === normalizedCommand;
     });
     return {
       correct,
@@ -232,6 +233,15 @@ export function evaluateQuestionAnswer(input: {
 
   if (type === "log_analysis") {
     const caseSensitive = Boolean(data.caseSensitive);
+    const choices = safeArray<string>(data.choices);
+    if (choices.length) {
+      const selectedIndex = Number(input.answer);
+      const correctIndex = Number(data.correctIndex ?? input.correctIndex ?? -1);
+      return {
+        correct: selectedIndex === correctIndex,
+        feedback: correctIndex >= 0 && choices[correctIndex] ? `Correct finding: ${choices[correctIndex]}` : "Review the log details and try again.",
+      };
+    }
     const acceptable = safeArray<string>(data.answers).length
       ? safeArray<string>(data.answers)
       : safeArray<string>(data.expectedFindings);

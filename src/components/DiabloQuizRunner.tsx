@@ -132,6 +132,7 @@ function renderQuestionInput(args: {
   matchingSelections: string[];
   setMatchingSelection: (index: number, value: string) => void;
   hiddenChoiceIndices: number[];
+  commandHistory: string[];
 }) {
   const {
     question,
@@ -151,6 +152,7 @@ function renderQuestionInput(args: {
     matchingSelections,
     setMatchingSelection,
     hiddenChoiceIndices,
+    commandHistory,
   } = args;
 
   const type = normalizeQuestionType(question.type);
@@ -237,22 +239,40 @@ function renderQuestionInput(args: {
   }
 
   if (type === "cli_command") {
+    const commandSuggestions = Array.from(new Set([
+      ...safeArray<string>((data as any).expectedCommands),
+      ...commandHistory,
+    ].filter(Boolean))).slice(0, 4);
     return (
       <div style={{ marginTop: 14, display: "grid", gap: 10 }}>
         {data.hint ? <div className="badge">Hint: {String(data.hint)}</div> : null}
-        <textarea
-          value={cliValue}
-          onChange={(e) => setCliValue(e.target.value)}
-          disabled={state.locked}
-          placeholder={String(data.placeholder || "Enter the command")}
-          className="input"
-          style={{ width: "100%", minHeight: 120, resize: "vertical", fontFamily: "monospace" }}
-        />
+        <div className="card" style={{ padding: 12, background: "rgba(4,8,18,0.78)", borderColor: "rgba(110,190,255,0.20)" }}>
+          <div style={{ fontSize: 12, fontWeight: 900, letterSpacing: 0.6, opacity: 0.8, marginBottom: 8 }}>COMMAND CONSOLE</div>
+          <textarea
+            value={cliValue}
+            onChange={(e) => setCliValue(e.target.value)}
+            disabled={state.locked}
+            placeholder={String(data.placeholder || "Enter the command")}
+            className="input"
+            spellCheck={false}
+            style={{ width: "100%", minHeight: 120, resize: "vertical", fontFamily: "monospace", background: "rgba(0,0,0,0.42)" }}
+          />
+          {commandSuggestions.length ? (
+            <div style={{ marginTop: 10, display: "flex", gap: 8, flexWrap: "wrap" }}>
+              {commandSuggestions.map((command) => (
+                <button key={command} type="button" className="d2Btn" disabled={state.locked} onClick={() => setCliValue(command)} style={{ fontFamily: "monospace", fontSize: 12 }}>
+                  {command}
+                </button>
+              ))}
+            </div>
+          ) : null}
+        </div>
       </div>
     );
   }
 
   if (type === "log_analysis") {
+    const logChoices = safeArray<string>((data as any).choices);
     return (
       <div style={{ marginTop: 14, display: "grid", gap: 10 }}>
         {data.logText ? (
@@ -261,7 +281,20 @@ function renderQuestionInput(args: {
             <div>{String(data.logText)}</div>
           </div>
         ) : null}
-        <textarea value={logValue} onChange={(e) => setLogValue(e.target.value)} disabled={state.locked} placeholder={String(data.placeholder || "Describe the issue shown in the log")} className="input" style={{ width: "100%", minHeight: 120, resize: "vertical" }} />
+        {logChoices.length ? (
+          <div style={{ display: "grid", gap: 10 }}>
+            {logChoices.map((choice, index) => {
+              const isSel = mcqSelected === index;
+              return (
+                <button key={`${choice}_${index}`} type="button" className={"d2ChoiceBtn" + (isSel ? " selected" : "")} onClick={() => onSelectMcq(index)} disabled={state.locked}>
+                  {choice}
+                </button>
+              );
+            })}
+          </div>
+        ) : (
+          <textarea value={logValue} onChange={(e) => setLogValue(e.target.value)} disabled={state.locked} placeholder={String(data.placeholder || "Describe the issue shown in the log")} className="input" style={{ width: "100%", minHeight: 120, resize: "vertical" }} />
+        )}
       </div>
     );
   }
@@ -439,17 +472,12 @@ export default function DiabloQuizRunner(props: {
   const [fillValue, setFillValue] = useState("");
   const [cliValue, setCliValue] = useState("");
   const [logValue, setLogValue] = useState("");
+  const [commandHistory, setCommandHistory] = useState<string[]>([]);
   const [sequenceItems, setSequenceItems] = useState<string[]>([]);
   const [multiSelected, setMultiSelected] = useState<number[]>([]);
   const [isMobileLayout, setIsMobileLayout] = useState(false);
   const [goldenEntryFlash, setGoldenEntryFlash] = useState<string | null>(null);
   const finishedOnceRef = useRef(false);
-
-  const [hiddenChoiceIndices, setHiddenChoiceIndices] = useState<number[]>([]);
-  const [matchingSelections, setMatchingSelections] = useState<string[]>([]);
-  const [hintMessage, setHintMessage] = useState<string | null>(null);
-  const [hintXpSpent, setHintXpSpent] = useState<number>(0);
-  const [hintsUsedCount, setHintsUsedCount] = useState<number>(0);
 
   const { state, question, select, clear, submit, submitManual, next, currentDomainId, currentMastery, outcome } = useCombatQuiz({
     questions: combatQuestions,
@@ -564,7 +592,10 @@ export default function DiabloQuizRunner(props: {
     }
     if (questionType === "fill_blank") return fillValue;
     if (questionType === "cli_command") return cliValue;
-    if (questionType === "log_analysis") return logValue;
+    if (questionType === "log_analysis") {
+      const logChoices = safeArray<string>((data as any).choices);
+      return logChoices.length && typeof state.selected === "number" ? logChoices[state.selected] ?? state.selected : logValue;
+    }
     if (questionType === "sequence_order") return sequenceItems;
     if (questionType === "multi_select") return multiSelected;
     return state.selected;
@@ -602,7 +633,10 @@ export default function DiabloQuizRunner(props: {
     if (questionType === "sequence_order") answer = sequenceItems;
     if (questionType === "multi_select") answer = multiSelected;
     if (questionType === "cli_command") answer = cliValue;
-    if (questionType === "log_analysis") answer = logValue;
+    if (questionType === "log_analysis") {
+      const logChoices = safeArray<string>(((question.data || {}) as any).choices);
+      answer = logChoices.length ? state.selected : logValue;
+    }
     if (questionType === "matching") answer = matchingSelections;
 
     const result = evaluateQuestionAnswer({
@@ -613,6 +647,11 @@ export default function DiabloQuizRunner(props: {
       data: question.data,
       answer,
     });
+
+    if (questionType === "cli_command") {
+      const nextCommand = cliValue.trim();
+      if (nextCommand) setCommandHistory((current) => [nextCommand, ...current.filter((value) => value !== nextCommand)].slice(0, 4));
+    }
 
     submitManual({
       correct: result.correct,
@@ -629,7 +668,10 @@ export default function DiabloQuizRunner(props: {
     if (questionType === "sequence_order") return sequenceItems.length > 0;
     if (questionType === "multi_select") return multiSelected.length > 0;
     if (questionType === "cli_command") return cliValue.trim().length > 0;
-    if (questionType === "log_analysis") return logValue.trim().length > 0;
+    if (questionType === "log_analysis") {
+      const logChoices = safeArray<string>((((question.data || {}) as any).choices));
+      return logChoices.length ? state.selected != null : logValue.trim().length > 0;
+    }
     if (questionType === "matching") return matchingSelections.length > 0 && matchingSelections.every((value) => value.trim().length > 0);
     return false;
   }
@@ -707,6 +749,7 @@ export default function DiabloQuizRunner(props: {
                     matchingSelections,
                     setMatchingSelection: (index, value) => setMatchingSelections((current) => current.map((row, i) => i === index ? value : row)),
                     hiddenChoiceIndices,
+                    commandHistory,
                   })}
 
                   {!state.locked ? (
@@ -818,6 +861,7 @@ export default function DiabloQuizRunner(props: {
                     matchingSelections,
                     setMatchingSelection: (index, value) => setMatchingSelections((current) => current.map((row, i) => i === index ? value : row)),
                     hiddenChoiceIndices,
+                    commandHistory,
                   })}
 
                   {!state.locked ? (
