@@ -89,34 +89,32 @@ function RaffleReel({ campaign }: { campaign: Campaign | null }) {
   const winnerName = campaign?.winner?.displayName || null;
   const [index, setIndex] = useState(0);
 
+  function centerIndexForName(list: string[], name: string | null) {
+    if (!name || !list.length) return 0;
+    const target = list.findIndex((n) => n === name);
+    if (target < 0) return 0;
+    return (target - 3 + list.length) % list.length;
+  }
+
   useEffect(() => {
     if (!campaign) return;
+    if (winnerName) {
+      setIndex(centerIndexForName(names, winnerName));
+      return;
+    }
     let idx = 0;
     let timer: any;
     const tick = () => {
       idx += 1;
-      setIndex(idx);
-      let delay = 120;
-      if (winnerName) {
-        const remaining = Math.max(0, 18 - idx);
-        delay = 80 + Math.min(520, remaining * 26);
-      } else if (idx % 18 > 12) {
-        delay = 260;
-      }
-      timer = setTimeout(() => {
-        if (winnerName && idx > 18) {
-          const target = names.findIndex((n) => n === winnerName);
-          setIndex(target >= 0 ? target : idx);
-          return;
-        }
-        tick();
-      }, delay);
+      setIndex(idx % names.length);
+      const delay = idx % 18 > 12 ? 260 : 120;
+      timer = setTimeout(tick, delay);
     };
     tick();
     return () => clearTimeout(timer);
   }, [campaign?.id, winnerName, names.join('|')]);
 
-  const visible = Array.from({ length: 7 }, (_, i) => names[(index + i) % names.length]);
+  const visible = Array.from({ length: 7 }, (_, i) => names[(index + i + names.length) % names.length]);
 
   return (
     <div className="featureCard" style={{ marginTop: 14, padding: 14, background: 'linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02))' }}>
@@ -149,7 +147,7 @@ function RaffleReel({ campaign }: { campaign: Campaign | null }) {
         </div>
       </div>
       <div className="muted" style={{ marginTop: 10, fontSize: 13 }}>
-        The actual winner is still drawn randomly from the live entries pool.
+        {winnerName ? 'The reel is locked on the selected winner.' : 'The actual winner is still drawn randomly from the live entries pool.'}
       </div>
     </div>
   );

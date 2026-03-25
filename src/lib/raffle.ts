@@ -232,6 +232,14 @@ export async function drawSweepstakesWinner(tx: typeof prisma, campaignId: strin
   const campaign = await findSweepstakesCampaignById(campaignId, tx as any);
   if (!campaign) throw new Error("Sweepstakes campaign not found");
 
+  if (campaign.winnerUserId) {
+    const existingWinner = await tx.$queryRawUnsafe(
+      `SELECT * FROM "RaffleEntry" WHERE "id" = $1 LIMIT 1`,
+      campaign.winnerEntryId || null
+    ).catch(() => [] as any[]);
+    return Array.isArray(existingWinner) ? existingWinner[0] || null : null;
+  }
+
   const entries = await listRaffleEntriesForCampaignWindow(campaignId, campaign.startsAt, campaign.endsAt, tx as any);
   const weighted: typeof entries = [];
   for (const entry of entries) {
@@ -248,6 +256,27 @@ export async function drawSweepstakesWinner(tx: typeof prisma, campaignId: strin
     status: 'DRAWN',
     drawnAt: new Date(),
   }, tx as any);
+
+  try {
+    const user = await tx.user.findUnique({ where: { id: winner.userId }, select: { displayName: true, email: true } });
+    const displayName = String(user?.displayName || user?.email || 'there');
+    const title = `Sweepstakes winner selected: ${campaign.title}`;
+    const body = `Congrats ${displayName}! You were selected as the winner for ${campaign.prizePoolLabel || campaign.title}. Please check with the admin team for prize fulfillment details.`;
+    const existing = await tx.notification.findFirst({
+      where: { userId: winner.userId, type: 'LOOT_BOX_EARNED', title, readAt: null },
+      orderBy: { createdAt: 'desc' },
+    }).catch(() => null);
+    if (!existing) {
+      await tx.notification.create({
+        data: {
+          userId: winner.userId,
+          type: 'LOOT_BOX_EARNED',
+          title,
+          body,
+        },
+      }).catch(() => null);
+    }
+  } catch {}
 
   return winner;
 }

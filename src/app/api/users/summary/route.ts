@@ -44,17 +44,19 @@ export async function GET(req: Request) {
       } catch {}
       downgradeSubscriptionByEmail(user.email, 'EXPIRED');
     } else {
-      // keep file/meta and DB aligned on reads
+      // Keep file/meta aligned as a best-effort cache only.
       if (user.email) {
-        setSubscriptionTierByEmail(user.email, subscriptionTier as any);
-        setSubscriptionMetaByEmail(user.email, {
-          tier: subscriptionTier as any,
-          status: (subscriptionStatus as any),
-          expiresAt: subscriptionExpiresAt ? new Date(subscriptionExpiresAt).toISOString() : null,
-          paypalSubscriptionId: (user as any).paypalSubscriptionId || fileMeta?.paypalSubscriptionId || null,
-          paypalPlanId: (user as any).paypalPlanId || fileMeta?.paypalPlanId || null,
-          startedAt: (user as any).subscriptionStartedAt ? new Date((user as any).subscriptionStartedAt).toISOString() : fileMeta?.startedAt || null,
-        });
+        try {
+          setSubscriptionTierByEmail(user.email, subscriptionTier as any);
+          setSubscriptionMetaByEmail(user.email, {
+            tier: subscriptionTier as any,
+            status: (subscriptionStatus as any),
+            expiresAt: subscriptionExpiresAt ? new Date(subscriptionExpiresAt).toISOString() : null,
+            paypalSubscriptionId: (user as any).paypalSubscriptionId || fileMeta?.paypalSubscriptionId || null,
+            paypalPlanId: (user as any).paypalPlanId || fileMeta?.paypalPlanId || null,
+            startedAt: (user as any).subscriptionStartedAt ? new Date((user as any).subscriptionStartedAt).toISOString() : fileMeta?.startedAt || null,
+          });
+        } catch {}
       }
     }
 

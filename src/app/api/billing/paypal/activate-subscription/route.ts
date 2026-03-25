@@ -35,7 +35,7 @@ export async function POST(req: Request) {
       customId: user.id,
     });
 
-    const done = await finalizePayPalSubscription(subscriptionId, user.id);
+    const done: any = await finalizePayPalSubscription(subscriptionId, user.id);
 
     await prisma.user.update({
       where: { id: user.id },
@@ -43,9 +43,9 @@ export async function POST(req: Request) {
         subscriptionTier: done.tier,
         subscriptionStatus: done.status,
         paypalSubscriptionId: subscriptionId,
-        paypalPlanId: (done as any).planId || paypalPlanIdForTier(tier),
+        paypalPlanId: done.planId || paypalPlanIdForTier(tier),
         subscriptionStartedAt: new Date(),
-        subscriptionExpiresAt: (done as any).expiresAt || null,
+        subscriptionExpiresAt: done.expiresAt || null,
       } as any,
     });
 
@@ -54,8 +54,8 @@ export async function POST(req: Request) {
       subscriptionTier: done.tier,
       status: done.status,
       subscriptionId,
-      expiresAt: (done as any).expiresAt || null,
-      planId: (done as any).planId || paypalPlanIdForTier(tier),
+      expiresAt: done.expiresAt || null,
+      planId: done.planId || paypalPlanIdForTier(tier),
     });
   } catch (err: any) {
     return NextResponse.json({ ok: false, error: err?.message || 'Failed to activate PayPal subscription.' }, { status: 500 });

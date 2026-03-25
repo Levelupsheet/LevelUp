@@ -106,16 +106,18 @@ export async function PATCH(req: Request){
         (user as any).subscriptionStatus || (isPaid ? "ACTIVE" : "FREE")
       ).toUpperCase() as any;
 
-      setSubscriptionTierByEmail(user.email, tier);
-      setSubscriptionMetaByEmail(user.email, {
-        tier,
-        status,
-        expiresAt: (user as any).subscriptionExpiresAt
-          ? new Date((user as any).subscriptionExpiresAt).toISOString()
-          : (isPaid ? "2099-12-31T23:59:59.000Z" : null),
-        paypalSubscriptionId: (user as any).paypalSubscriptionId || null,
-        paypalPlanId: (user as any).paypalPlanId || null,
-      });
+      try {
+        setSubscriptionTierByEmail(user.email, tier);
+        setSubscriptionMetaByEmail(user.email, {
+          tier,
+          status,
+          expiresAt: (user as any).subscriptionExpiresAt
+            ? new Date((user as any).subscriptionExpiresAt).toISOString()
+            : (isPaid ? "2099-12-31T23:59:59.000Z" : null),
+          paypalSubscriptionId: (user as any).paypalSubscriptionId || null,
+          paypalPlanId: (user as any).paypalPlanId || null,
+        });
+      } catch {}
     }
 
     return NextResponse.json({

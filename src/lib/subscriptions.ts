@@ -29,23 +29,38 @@ function normalizeEmail(email?: string | null) {
   return String(email || '').trim().toLowerCase();
 }
 
-export function readSubscriptionMap(): PlanMap {
+function ensureDataDir() {
   try {
-    const raw = fs.readFileSync(FILE, 'utf8');
+    fs.mkdirSync(path.dirname(FILE), { recursive: true });
+  } catch {}
+}
+
+function safeReadJson<T>(file: string, fallback: T): T {
+  try {
+    const raw = fs.readFileSync(file, 'utf8');
     const parsed = JSON.parse(raw);
-    return { ...DEFAULTS, ...(parsed && typeof parsed === 'object' ? parsed : {}) };
+    return parsed && typeof parsed === 'object' ? parsed as T : fallback;
   } catch {
-    try {
-      fs.mkdirSync(path.dirname(FILE), { recursive: true });
-      fs.writeFileSync(FILE, JSON.stringify(DEFAULTS, null, 2));
-    } catch {}
-    return { ...DEFAULTS };
+    return fallback;
   }
 }
 
+function safeWriteJson(file: string, value: unknown) {
+  try {
+    ensureDataDir();
+    fs.writeFileSync(file, JSON.stringify(value, null, 2));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export function readSubscriptionMap(): PlanMap {
+  return { ...DEFAULTS, ...safeReadJson<Record<string, SubscriptionTier>>(FILE, {}) };
+}
+
 export function writeSubscriptionMap(map: PlanMap) {
-  fs.mkdirSync(path.dirname(FILE), { recursive: true });
-  fs.writeFileSync(FILE, JSON.stringify(map, null, 2));
+  safeWriteJson(FILE, map);
 }
 
 export function getSubscriptionTierByEmail(email?: string | null): SubscriptionTier {
@@ -68,22 +83,11 @@ export function setSubscriptionTierByEmail(email: string, tier: SubscriptionTier
 
 
 export function readSubscriptionMetaMap(): SubscriptionMetaMap {
-  try {
-    const raw = fs.readFileSync(META_FILE, 'utf8');
-    const parsed = JSON.parse(raw);
-    return parsed && typeof parsed === 'object' ? parsed : {};
-  } catch {
-    try {
-      fs.mkdirSync(path.dirname(META_FILE), { recursive: true });
-      fs.writeFileSync(META_FILE, JSON.stringify({}, null, 2));
-    } catch {}
-    return {};
-  }
+  return safeReadJson<SubscriptionMetaMap>(META_FILE, {});
 }
 
 export function writeSubscriptionMetaMap(map: SubscriptionMetaMap) {
-  fs.mkdirSync(path.dirname(META_FILE), { recursive: true });
-  fs.writeFileSync(META_FILE, JSON.stringify(map, null, 2));
+  safeWriteJson(META_FILE, map);
 }
 
 export function getSubscriptionMetaByEmail(email?: string | null): SubscriptionMeta | null {
