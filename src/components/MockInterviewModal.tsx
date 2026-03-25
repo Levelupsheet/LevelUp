@@ -73,8 +73,8 @@ const STAGE_TWO_BANK: Record<Track, BossQuestion[]> = {
   ],
   desktop: [
     { id: "dss2_1", prompt: "Why should you test with a new Windows profile during troubleshooting?", type: "fill_blank", explanation: "It helps determine whether the issue is profile-specific.", domainId: "desktop", level: 2, data: { answers: ["isolate the profile", "profile-specific", "isolate user issue"], placeholder: "Give the main reason" } },
-    { id: "dss2_2", prompt: "Which built-in tool repairs the Windows image store?", type: "multiple_choice", choices: ["DISM", "Disk Cleanup", "Defrag", "Taskkill"], correctIndex: 0, explanation: "DISM repairs the Windows image store.", domainId: "desktop", level: 2 },
-    { id: "dss2_3", prompt: "Enter the DISM command to restore the Windows image health", type: "cli_command", explanation: "Use DISM /Online /Cleanup-Image /RestoreHealth.", domainId: "desktop", level: 2, data: { expectedCommands: ["DISM /Online /Cleanup-Image /RestoreHealth"], distractorCommands: ["sfc /verifyonly", "chkdsk /scan", "Get-Service"], placeholder: "Type the repair command", allowContains: true } },
+    { id: "dss2_2", prompt: "Which built-in Windows tool repairs the component store?", type: "multiple_choice", choices: ["DISM", "Paint", "Task Manager", "Regedit"], correctIndex: 0, explanation: "DISM repairs the Windows component store.", domainId: "desktop", level: 2 },
+    { id: "dss2_3", prompt: "Enter the command to launch Windows System File Checker", type: "cli_command", explanation: "Use sfc /scannow.", domainId: "desktop", level: 2, data: { expectedCommands: ["sfc /scannow"], distractorCommands: ["dism /online /cleanup-image /restorehealth", "gpupdate /force", "shutdown /r /t 0"], placeholder: "Type a Windows repair command", allowContains: true } },
   ],
 };
 
@@ -123,91 +123,90 @@ export default function MockInterviewModal(props: { open: boolean; onClose: () =
   if (!open) return null;
 
   return (
-    <div className="modalOverlay" role="dialog" aria-modal="true">
-      <div className="luVideoBg" aria-hidden="true">
-        <div className="luGifEl" />
-        <div className="luVideoVignette" />
-      </div>
+    <div className="luModalOverlay" role="dialog" aria-modal="true" aria-label="Boss Battle Interview" onMouseDown={onClose}>
+      <div
+        className="luModal"
+        onMouseDown={(e) => e.stopPropagation()}
+        style={{ width: step === "quiz" ? "min(96vw, 1800px)" : "min(92vw, 1100px)", maxWidth: step === "quiz" ? 1800 : 1100, position: "relative", overflow: "hidden" }}
+      >
+        <div className="luVideoBg" aria-hidden="true">
+          <video className="luVideoEl" autoPlay loop muted playsInline preload="metadata"><source src="/video/blackhole-loop.mp4" type="video/mp4" /></video>
+          <div className="luVideoVignette" />
+        </div>
 
-      <div className="modal" style={{ maxWidth: 1540, position: "relative", overflow: "hidden" }}>
-        <div style={{ position: "relative", zIndex: 1 }}>
-          {step !== "quiz" && (
-            <div className="modalHeader">
-              <div>
-                <div className="modalTitle">Boss Battle Interview</div>
-                <div className="muted">Certification-style combat UI for tech and HR interview practice.</div>
-              </div>
-              <button className="btn" onClick={onClose}>Close</button>
+        {step !== "quiz" && (
+          <div className="luModalHeader" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div>
+              <b style={{ fontSize: 18 }}>Boss Battle Interview</b>
+              <div><small className="luHint">Certification-style combat UI for tech and HR interview practice.</small></div>
             </div>
-          )}
+            <button className="secondaryBtn" type="button" onClick={onClose}>✕</button>
+          </div>
+        )}
 
+        <div className="luModalBody">
           {step === "setup" && (
-            <div className="modalBody">
-              <div className="grid2">
-                <div className="card" style={{ gridColumn: "1 / -1" }}>
-                  <div className="cardTitle">Choose a track</div>
-                  <div className="muted">Stage 1 unlocks Stage 2 for the selected track.</div>
-                  <div className="trackGrid" style={{ marginTop: 14 }}>
-                    {(Object.entries(TRACK_META) as [Track, { title: string; subtitle: string }][]) .map(([id, meta]) => (
-                      <button key={id} className={"trackBtn" + (track === id ? " active" : "")} onClick={() => setTrack(id)}>
-                        <div style={{ fontWeight: 800 }}>{meta.title}</div>
-                        <div className="muted" style={{ fontSize: 12 }}>{meta.subtitle}</div>
-                        {track === id ? <div className="badge" style={{ position: "absolute", top: 10, right: 10 }}>Selected</div> : null}
-                      </button>
-                    ))}
+            <div className="grid2">
+              <div className="card" style={{ gridColumn: "1 / -1" }}>
+                <div className="cardTitle">Choose a track</div>
+                <div className="muted">Stage 1 unlocks Stage 2 for the selected track.</div>
+                <div className="trackGrid" style={{ marginTop: 14 }}>
+                  {(Object.entries(TRACK_META) as [Track, { title: string; subtitle: string }][]) .map(([id, meta]) => (
+                    <button key={id} className={"trackBtn" + (track === id ? " active" : "")} onClick={() => setTrack(id)}>
+                      <div style={{ fontWeight: 800 }}>{meta.title}</div>
+                      <div className="muted" style={{ fontSize: 12 }}>{meta.subtitle}</div>
+                      {track === id ? <div className="badge" style={{ position: "absolute", top: 10, right: 10 }}>Selected</div> : null}
+                    </button>
+                  ))}
+                </div>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14, marginTop: 16, flexWrap: "wrap" }}>
+                  <div>
+                    <div className="cardTitle" style={{ margin: 0 }}>{TRACK_META[track].title}</div>
+                    <div className="muted">{TRACK_META[track].subtitle}</div>
+                    <div className="muted" style={{ marginTop: 6 }}>Active user: <b>{activeUser.displayName}</b> • XP: <b>{activeUser.xp}</b></div>
                   </div>
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14, marginTop: 16, flexWrap: "wrap" }}>
-                    <div>
-                      <div className="cardTitle" style={{ margin: 0 }}>{TRACK_META[track].title}</div>
-                      <div className="muted">{TRACK_META[track].subtitle}</div>
-                      <div className="muted" style={{ marginTop: 6 }}>Active user: <b>{activeUser.displayName}</b> • XP: <b>{activeUser.xp}</b></div>
-                    </div>
-                    <div style={{ minWidth: 220 }}>
-                      <div className="muted" style={{ fontSize: 12, marginBottom: 6 }}>Track Completion</div>
-                      <ProgressBar value={trackPct} max={100} />
-                      <div className="muted" style={{ fontSize: 12, marginTop: 6 }}>{trackPct}%</div>
-                    </div>
+                  <div style={{ minWidth: 220 }}>
+                    <div className="muted" style={{ fontSize: 12, marginBottom: 6 }}>Track Completion</div>
+                    <ProgressBar value={trackPct} max={100} />
+                    <div className="muted" style={{ fontSize: 12, marginTop: 6 }}>{trackPct}%</div>
                   </div>
-                  <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 14 }}>
-                    <button className="btn primary" onClick={() => start(1)}>Start Boss Battle 1 →</button>
-                    <button className="btn" disabled={!passedStage1} onClick={() => start(2)} title={passedStage1 ? "" : "Pass Stage 1 to unlock"}>Start Boss Battle 2</button>
-                  </div>
-                  <div style={{ marginTop: 10 }}>
-                    {passedStage1 ? <span className="badge">✓ Stage 2 unlocked for this track</span> : <span className="badge">Defeat the first boss battle to unlock the second stage.</span>}
-                  </div>
+                </div>
+                <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 14 }}>
+                  <button className="btn primary" onClick={() => start(1)}>Start Boss Battle 1 →</button>
+                  <button className="btn" disabled={!passedStage1} onClick={() => start(2)} title={passedStage1 ? "" : "Pass Stage 1 to unlock"}>Start Boss Battle 2</button>
+                </div>
+                <div style={{ marginTop: 10 }}>
+                  {passedStage1 ? <span className="badge">✓ Stage 2 unlocked for this track</span> : <span className="badge">Defeat the first boss battle to unlock the second stage.</span>}
                 </div>
               </div>
             </div>
           )}
 
           {step === "quiz" && (
-            <div className="modalBody">
-              <DiabloQuizRunner
-                title={stage === 1 ? "Mock Tech Interview" : "Mock HR Interview"}
-                subtitle={`${TRACK_META[track].title} • ${stage === 1 ? "Boss Battle 1" : "Boss Battle 2"}`}
-                enemyName="Lagger"
-                questions={questions as any}
-                timed
-                metaLeft={`Stage ${stage}`}
-                metaRight={TRACK_META[track].title.toUpperCase()}
-                exitLabel="Close"
-                onExit={onClose}
-                onComplete={finishSummary}
-              />
-            </div>
+            <DiabloQuizRunner
+              title={stage === 1 ? "Mock Tech Interview" : "Mock HR Interview"}
+              subtitle={`${TRACK_META[track].title} • ${stage === 1 ? "Boss Battle 1" : "Boss Battle 2"}`}
+              enemyName="Lagger"
+              questions={questions as any}
+              timed
+              metaLeft={`Stage ${stage}`}
+              metaRight={TRACK_META[track].title.toUpperCase()}
+              exitLabel="Close"
+              onExit={onClose}
+              onComplete={finishSummary}
+              media={{ playerIdleSrc: "/video/player-idle.mp4", playerAttackSrc: "/video/player-attack.mp4", enemyIdleSrc: "/video/enemy-idle.mp4", enemyHitSrc: "/video/enemy-damage.mp4", width: 1600, height: 900 }}
+            />
           )}
 
           {step === "summary" && (
-            <div className="modalBody">
-              <div className="card" style={{ padding: 18 }}>
-                <div className="cardTitle">Boss battle summary</div>
-                <div className="muted" style={{ marginTop: 8 }}>
-                  Outcome: <b>{lastSummary?.outcome || "complete"}</b> • Score <b>{Number(lastSummary?.correctCount || 0)}</b> / <b>{Number(lastSummary?.totalQuestions || 0)}</b> • XP +<b>{Number(lastSummary?.xpEarned || 0)}</b>
-                </div>
-                <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 16 }}>
-                  <button className="btn primary" onClick={() => setStep("setup")}>Back to setup</button>
-                  <button className="btn" onClick={onClose}>Close</button>
-                </div>
+            <div className="card" style={{ padding: 18 }}>
+              <div className="cardTitle">Boss battle summary</div>
+              <div className="muted" style={{ marginTop: 8 }}>
+                Outcome: <b>{lastSummary?.outcome || "complete"}</b> • Score <b>{Number(lastSummary?.correctCount || 0)}</b> / <b>{Number(lastSummary?.totalQuestions || 0)}</b> • XP +<b>{Number(lastSummary?.xpEarned || 0)}</b>
+              </div>
+              <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 16 }}>
+                <button className="btn primary" onClick={() => setStep("setup")}>Back to setup</button>
+                <button className="btn" onClick={onClose}>Close</button>
               </div>
             </div>
           )}
