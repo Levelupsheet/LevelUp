@@ -445,6 +445,12 @@ export default function DiabloQuizRunner(props: {
   const [goldenEntryFlash, setGoldenEntryFlash] = useState<string | null>(null);
   const finishedOnceRef = useRef(false);
 
+  const [hiddenChoiceIndices, setHiddenChoiceIndices] = useState<number[]>([]);
+  const [matchingSelections, setMatchingSelections] = useState<string[]>([]);
+  const [hintMessage, setHintMessage] = useState<string | null>(null);
+  const [hintXpSpent, setHintXpSpent] = useState<number>(0);
+  const [hintsUsedCount, setHintsUsedCount] = useState<number>(0);
+
   const { state, question, select, clear, submit, submitManual, next, currentDomainId, currentMastery, outcome } = useCombatQuiz({
     questions: combatQuestions,
     timed,
