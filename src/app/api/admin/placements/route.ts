@@ -3,10 +3,14 @@ import { requireAdminRequest } from "@/app/api/_lib/adminGuard";
 import { prisma } from "@/lib/prisma";
 
 /**
- * Admin: Assign a QuestionSet to a "lane" (TEST_NOW / TRAINING / CERTIFICATIONS).
- * - For TRAINING: include startingPosition
- * - For CERTIFICATIONS: include certExam
- * Creates a new active placement and deactivates prior active placements for the same lane+filter.
+ * Admin: Assign a QuestionSet to a lane.
+ *
+ * By default this ADDS the set into the live bank for the selected lane/filter,
+ * allowing multiple active sets to contribute questions to a single quiz mode.
+ *
+ * Optional request flags:
+ * - exclusive: true => deactivate prior active placements for the same lane/filter first
+ * - isActive: false => create an inactive placement record
  */
 export async function POST(req: Request) {
   const admin = await requireAdminRequest();
@@ -17,6 +21,8 @@ export async function POST(req: Request) {
     const lane = body?.lane as "TEST_NOW" | "TRAINING" | "CERTIFICATIONS" | "INTERVIEW";
     const startingPosition = body?.startingPosition ?? null;
     const certExam = body?.certExam ?? null;
+    const exclusive = Boolean(body?.exclusive);
+    const isActive = body?.isActive === false ? false : true;
 
     if (!setId || !lane) {
       return NextResponse.json({ error: "setId and lane are required" }, { status: 400 });
@@ -36,22 +42,36 @@ export async function POST(req: Request) {
     }
 
     const created = await prisma.$transaction(async (tx: any) => {
-      await tx.questionSetPlacement.updateMany({
-        where: whereDeactivate,
-        data: { isActive: false },
+      if (exclusive) {
+        await tx.questionSetPlacement.updateMany({
+          where: whereDeactivate,
+          data: { isActive: false },
+        });
+      }
+
+      const existing = await tx.questionSetPlacement.findFirst({
+        where: {
+          setId,
+          lane,
+          isActive,
+          startingPosition: lane === "TRAINING" ? startingPosition : null,
+          certExam: lane === "CERTIFICATIONS" ? certExam : null,
+        },
       });
+      if (existing) return existing;
+
       return tx.questionSetPlacement.create({
         data: {
           setId,
           lane,
           startingPosition: lane === "TRAINING" ? startingPosition : null,
           certExam: lane === "CERTIFICATIONS" ? certExam : null,
-          isActive: true,
+          isActive,
         },
       });
     });
 
-    return NextResponse.json({ ok: true, placement: created });
+    return NextResponse.json({ ok: true, placement: created, mode: exclusive ? "replaced" : "added_to_bank" });
   } catch (e: any) {
     return NextResponse.json({ error: e?.message || "Failed to assign placement" }, { status: 500 });
   }

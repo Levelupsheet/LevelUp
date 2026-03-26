@@ -2,8 +2,9 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { ensureUser } from "@/app/api/_lib/ensureUser";
 import { getRequestUserId } from "@/app/api/_lib/authUser";
-import { normalizeDifficultyLevel, sampleQuestions, shuffleQuestionPayload } from "@/lib/questionTransforms";
+import { normalizeDifficultyLevel, shuffleQuestionPayload } from "@/lib/questionTransforms";
 import { normalizeQuestionType } from "@/lib/questionTypes";
+import { buildQuestionBankSelection } from "@/lib/questionBank";
 import { getSweepstakesCampaignMetaMap } from "@/lib/sweepstakesCampaignMeta";
 import { awardRaffleEntries, getOrCreateActiveGoldenSweepstakes } from "@/lib/raffle";
 
@@ -40,7 +41,7 @@ function mapQuestion(q: any) {
     difficulty: normalizeDifficultyLevel(q.difficulty),
     level: normalizeDifficultyLevel(q.difficulty),
     tags: q.tags,
-    domainId: Array.isArray(q.tags) && q.tags[0] ? String(q.tags[0]).toLowerCase() : undefined,
+    domainId: q.domainId ? String(q.domainId).toLowerCase() : Array.isArray(q.tags) && q.tags[0] ? String(q.tags[0]).toLowerCase() : undefined,
     isGoldenEligible: Boolean(q.isGoldenEligible),
     goldenWeight: Number(q.goldenWeight || 1),
     goldenBonusXp: Number(q.goldenBonusXp || 50),
@@ -78,16 +79,18 @@ async function findActiveSession(userId: string) {
 }
 
 async function buildNewSession(userId: string, questionCount = 10) {
-  const placement = await prisma.questionSetPlacement.findFirst({
-    where: { lane: "TEST_NOW", isActive: true },
-    orderBy: { createdAt: "desc" },
-    include: { set: { include: { questions: { orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }] } } } },
+  const bank = await buildQuestionBankSelection({
+    lane: "TEST_NOW",
+    questionCount,
+    shouldShuffle: true,
+    userId,
   });
-  if (!placement?.set?.questions?.length) throw new Error("No active Test Now question set found");
+  if (!bank.placements.length || !bank.questions.length) throw new Error("No active Test Now question bank found");
 
   await ensureGoldenQuestionHistoryTable();
-  const pool = placement.set.questions.map(mapQuestion);
-  const selected = sampleQuestions(pool, questionCount).map((q) => shuffleQuestionPayload(q));
+  const primaryPlacement = bank.placements[0];
+  const pool = bank.questions.map(mapQuestion);
+  const selected = bank.selectedQuestions.map((q: any) => mapQuestion(q));
   const goldenPool = pool.filter((q: any) => q.isGoldenEligible);
   let goldenQuestionId: string | null = null;
   let goldenQuestionIndex: number | null = null;
@@ -120,8 +123,8 @@ async function buildNewSession(userId: string, questionCount = 10) {
         mode: "TEST_NOW",
         status: "ACTIVE",
         lane: "TEST_NOW",
-        placementId: placement.id,
-        setId: placement.set.id,
+        placementId: primaryPlacement.id,
+        setId: primaryPlacement.set.id,
         questionCount: finalQuestions.length,
         goldenSpawned: Boolean(goldenQuestionId),
         currentIndex: 0,

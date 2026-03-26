@@ -1588,13 +1588,13 @@ export default function AdminPage(){
             </div>
 
             <div className="card" style={{ background:"rgba(255,255,255,0.03)" }}>
-              <div style={{ fontWeight: 800, marginBottom: 10 }}>Assign live placement</div>
+              <div style={{ fontWeight: 800, marginBottom: 10 }}>Assign to live question bank</div>
               <div style={{ display:"grid", gap: 10 }}>
                 <div className="row" style={{ gap: 8, flexWrap:"wrap" }}>
-                  <button onClick={() => assignPlacement("TEST_NOW")} disabled={!selectedSet}>Set as Test Now</button>
-                  <button onClick={() => assignPlacement("TRAINING")} disabled={!selectedSet}>Set as Training</button>
-                  <button onClick={() => assignPlacement("CERTIFICATIONS")} disabled={!selectedSet}>Set as Certification</button>
-                  <button onClick={() => assignPlacement("INTERVIEW")} disabled={!selectedSet}>Set as Interview</button>
+                  <button onClick={() => assignPlacement("TEST_NOW")} disabled={!selectedSet}>Add to Test Now bank</button>
+                  <button onClick={() => assignPlacement("TRAINING")} disabled={!selectedSet}>Add to Training bank</button>
+                  <button onClick={() => assignPlacement("CERTIFICATIONS")} disabled={!selectedSet}>Add to Certification bank</button>
+                  <button onClick={() => assignPlacement("INTERVIEW")} disabled={!selectedSet}>Add to Interview bank</button>
                 </div>
                 <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(180px, 1fr))", gap: 10 }}>
                   <label style={{ display:"grid", gap: 6 }}>
@@ -1616,7 +1616,7 @@ export default function AdminPage(){
                     </select>
                   </label>
                 </div>
-                <small style={{ opacity: 0.78 }}>Placements assign a full set to a live mode. For per-mode targeting, use the bulk importer to auto-create separate sets by tag/domain.</small>
+                <small style={{ opacity: 0.78 }}>Each active placement adds that set into the live bank for the selected mode. Multiple active sets can now feed one quiz/test, and duplicate questions are filtered at runtime.</small>
                 {assignMsg ? <small style={{ opacity: 0.92 }}>{assignMsg}</small> : null}
               </div>
             </div>

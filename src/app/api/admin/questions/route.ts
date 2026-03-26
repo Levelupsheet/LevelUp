@@ -189,6 +189,15 @@ function toDbQuestionPayload(input: any, sortOrder: number) {
   throw new Error(`Unsupported question type: ${type}`);
 }
 
+
+function normalizePromptSignature(input: any) {
+  const prompt = String(input?.prompt || "").trim().toLowerCase().replace(/\s+/g, " ");
+  const type = String(input?.type || "").trim().toUpperCase();
+  const data = input?.data && typeof input.data === "object" ? input.data : {};
+  const choices = Array.isArray(input?.choices) ? input.choices : Array.isArray((data as any)?.choices) ? (data as any).choices : [];
+  return JSON.stringify({ prompt, type, choices: choices.map((v: any) => String(v).trim().toLowerCase()) });
+}
+
 export async function GET(req: Request) {
   const admin = await requireAdminRequest();
   if (!admin.ok) return admin.response;
@@ -224,10 +233,31 @@ export async function POST(req: Request) {
 
     if (Array.isArray(body.questions)) {
       const incoming = body.questions;
-      if (incoming.length === 0) return NextResponse.json({ inserted: 0 });
-      const data = incoming.map((q: any) => ({ setId, ...toDbQuestionPayload(q, typeof q.sortOrder === "number" ? q.sortOrder : nextOrder++) }));
+      if (incoming.length === 0) return NextResponse.json({ inserted: 0, skippedDuplicates: 0 });
+
+      const existingQuestions = await prisma.mCQQuestion.findMany({
+        where: { setId },
+        select: { prompt: true, type: true, choices: true, data: true },
+      });
+      const seen = new Set(existingQuestions.map((q) => normalizePromptSignature(q)));
+      const localSeen = new Set<string>();
+      const data: any[] = [];
+      let skippedDuplicates = 0;
+
+      for (const q of incoming) {
+        const payload = { setId, ...toDbQuestionPayload(q, typeof q.sortOrder === "number" ? q.sortOrder : nextOrder++) };
+        const signature = normalizePromptSignature(payload);
+        if (seen.has(signature) || localSeen.has(signature)) {
+          skippedDuplicates += 1;
+          continue;
+        }
+        localSeen.add(signature);
+        data.push(payload);
+      }
+
+      if (!data.length) return NextResponse.json({ inserted: 0, skippedDuplicates });
       const res = await prisma.mCQQuestion.createMany({ data: data as any });
-      return NextResponse.json({ inserted: res.count });
+      return NextResponse.json({ inserted: res.count, skippedDuplicates });
     }
 
     const payload = toDbQuestionPayload(body, typeof body.sortOrder === "number" ? body.sortOrder : nextOrder);
