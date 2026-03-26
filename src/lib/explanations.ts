@@ -26,7 +26,9 @@ export function buildQuestionExplanation(input: { question: any; userAnswer?: an
   const correctIndex = typeof q?.correctIndex === 'number' ? q.correctIndex : (typeof q?.data?.correctIndex === 'number' ? q.data.correctIndex : null);
   const correctChoice = correctIndex != null ? choices[correctIndex] : q?.data?.answer ?? q?.data?.correctAnswer ?? null;
   const userAnswer = input.userAnswer;
-  const partialScore = Number(evaln?.partialScore ?? evaln?.score ?? (evaln?.correct ? 1 : 0) ?? 0);
+  const partialScore = Number(
+    evaln?.partialScore ?? evaln?.score ?? (evaln?.correct === true ? 1 : 0)
+  );
   const status = evaln?.correct ? 'correct' : partialScore > 0 ? 'partial' : 'incorrect';
   const whyCorrect = q?.explanation || `The best answer aligns with the core concept being tested: ${concepts.join(', ') || 'the underlying technical objective'}.`;
   let whyUser = '';

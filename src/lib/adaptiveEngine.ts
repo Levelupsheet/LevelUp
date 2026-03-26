@@ -256,7 +256,7 @@ export async function getQuestionCalibrationMap(questionIds: string[]) {
   if (!ids.length) return new Map<string, any>();
   await ensureAdaptiveLearningTables();
   const rows = await (prisma as any).$queryRawUnsafe(`SELECT * FROM "QuestionCalibration" WHERE "questionId" = ANY($1)`, ids).catch(() => []);
-  return new Map((rows || []).map((row: any) => [String(row.questionId), row]));
+  return new Map<string, any>((rows || []).map((row: any) => [String(row.questionId), row] as [string, any]));
 }
 
 export function weightedAdaptiveQuestionPlan<T extends RuntimeQuestion>(args: {
