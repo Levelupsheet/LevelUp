@@ -35,6 +35,7 @@ type Offer = { id: string; title: string; salaryText: string; createdAt: string;
 type LearningRow = { domain: string; mastery: number; accuracy: number; currentDifficulty: number; correctCount: number; wrongCount: number };
 type CareerMatchRow = { id: string; title: string; domain: string; description: string; url: string; location?: string; salary?: string; minLevel: number; minMastery: number };
 type SweepstakesSummary = { current?: any | null; user?: any | null; campaigns?: any[] }
+type Entitlements = { tier: string; sessionCooldownMinutes: number; xpMultiplier: number; lootLuck: number; advancedAnalytics: boolean; interviewSimulationsPerDay: number; adaptiveDepth: string; prioritySupport: boolean; rewardsTrack: string; label: string; upgradeCta: string; perks: string[] };
 
 
 const FREE_SESSION_COOLDOWN_MS = 30 * 60 * 1000;
@@ -105,6 +106,7 @@ export default function Dashboard() {
   const [careerMatches, setCareerMatches] = useState<CareerMatchRow[]>([]);
   const [sweepSummary, setSweepSummary] = useState<SweepstakesSummary | null>(null);
   const [subscriptionTier, setSubscriptionTier] = useState<string>("FREE");
+  const [entitlements, setEntitlements] = useState<Entitlements | null>(null);
   const [freeStartCooldownUntil, setFreeStartCooldownUntil] = useState<number>(0);
   const [cooldownNow, setCooldownNow] = useState<number>(Date.now());
 
@@ -203,6 +205,7 @@ export default function Dashboard() {
       setNotes(data.notifications ?? []);
       setUser(data.user ?? null);
       setSubscriptionTier(String(data.subscriptionTier ?? data.user?.subscriptionTier ?? "FREE").toUpperCase());
+      setEntitlements((data.entitlements as any) ?? null);
       setLocalXp(Number(data.xp ?? data.user?.xp ?? 0) || 0);
       setLocalLevel(levelFromXp(Number(data.xp ?? data.user?.xp ?? 0) || 0));
       setTokenBalance(Number(data.tokenBalance ?? data.user?.tokenBalance ?? 0) || 0);
@@ -411,6 +414,8 @@ export default function Dashboard() {
     const server = (notes as any[]).map((n) => ({ ...n, _source: "server" }));
     return [...local, ...server].slice(0, 8);
   }, [activity, notes]);
+
+  const nextPlanLabel = normalizedTier === "FREE" ? "Pro" : normalizedTier === "PRO" ? "Premium" : null;
 
   const recommendedRoles = useMemo(() => {
     if ((localLevel || 1) < 7) return [] as CareerMatchRow[];
@@ -771,9 +776,54 @@ export default function Dashboard() {
             </div>
           </div>
 
+          <div className="card" style={{ marginBottom: 14, borderColor: normalizedTier === "FREE" ? "rgba(255,196,107,0.25)" : "rgba(93,168,255,0.24)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+              <div>
+                <h3 style={{ margin: 0 }}>Plan perks</h3>
+                <div><small>{entitlements?.label || tierLabel} plan • Adaptive depth: <b>{entitlements?.adaptiveDepth || "standard"}</b> • Reward track: <b>{entitlements?.rewardsTrack || "core"}</b></small></div>
+              </div>
+              {nextPlanLabel ? <a href="/start#pricing" className="secondaryBtn" style={{ textDecoration: 'none' }}>Upgrade to {nextPlanLabel}</a> : <span className="badge">Top tier unlocked</span>}
+            </div>
+            <div style={{ marginTop: 12, display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 10 }}>
+              <div className="featureCard">
+                <div><small>XP boost</small></div>
+                <div style={{ fontWeight: 900, fontSize: 22 }}>{Number(entitlements?.xpMultiplier || 1).toFixed(2)}x</div>
+              </div>
+              <div className="featureCard">
+                <div><small>Loot luck</small></div>
+                <div style={{ fontWeight: 900, fontSize: 22 }}>{Number(entitlements?.lootLuck || 1).toFixed(2)}x</div>
+              </div>
+              <div className="featureCard">
+                <div><small>Interview sims / day</small></div>
+                <div style={{ fontWeight: 900, fontSize: 22 }}>{Number(entitlements?.interviewSimulationsPerDay || 2)}</div>
+              </div>
+              <div className="featureCard">
+                <div><small>Analytics</small></div>
+                <div style={{ fontWeight: 900, fontSize: 22 }}>{entitlements?.advancedAnalytics ? "Advanced" : "Core"}</div>
+              </div>
+            </div>
+            <div style={{ marginTop: 10, opacity: 0.86 }}><small>{entitlements?.upgradeCta || "Upgrade to unlock more systems."}</small></div>
+          </div>
+
           <div className="card">
             <h3 style={{ marginTop: 0 }}>Notifications</h3>
             {combinedNotes.length ? (
+              <>
+              <div style={{ marginTop: 10, display: "flex", justifyContent: "flex-end" }}>
+                <button
+                  className="secondaryBtn"
+                  type="button"
+                  onClick={async () => {
+                    try {
+                      await fetch('/api/notifications/clear', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ userId, all: true }) });
+                    } catch {}
+                    setNotes([]);
+                    try { clearActivities(userId); setActivity([]); } catch {}
+                  }}
+                >
+                  Clear all
+                </button>
+              </div>
               <div style={{ display: "grid", gap: 10, marginTop: 10 }}>
                 {combinedNotes.map((n: any) => (
                   <div
@@ -812,6 +862,7 @@ export default function Dashboard() {
                   </div>
                 ))}
               </div>
+              </>
             ) : (
               <p><small>No notifications yet.</small></p>
             )}

@@ -2,7 +2,9 @@
 
 import React, { useEffect, useState } from "react";
 import GameEngine from "@/components/GameEngine";
-import type { DiabloQuizRunSummary } from "@/components/DiabloQuizRunner";
+import type { DiabloQuestion, DiabloQuizRunSummary } from "@/components/DiabloQuizRunner";
+import { applyBossAbilitiesToQuestions, bossCombatRules, bossVisualMeta, buildBossProfile, mapBossQuestion, selectBossQuestions } from "@/lib/bossBattle";
+import { getActiveUser } from "@/lib/userStore";
 
 type Kind = "position" | "cert" | "test";
 type PositionPath = "HELPDESK_SUPPORT" | "DESKTOP_TECHNICIAN" | "CLOUD_ENGINEER";
@@ -16,17 +18,29 @@ export default function PracticeMiniGameModal(props: {
   onXpChange?: (xp: number, level: number) => void;
 }) {
   const { open, kind, defaultPath, onClose, onXpChange } = props;
-  const [step, setStep] = useState<"setup" | "quiz" | "summary">("setup");
+  const [step, setStep] = useState<"setup" | "quiz" | "summary" | "boss">("setup");
   const [path, setPath] = useState<PositionPath>(defaultPath ?? "HELPDESK_SUPPORT");
   const [cert, setCert] = useState<CertTrack>("A_PLUS");
-  const [finalScore, setFinalScore] = useState<{ correct: number; total: number; xp: number; timeLeft?: number }>({ correct: 0, total: 0, xp: 0 });
+  const [finalScore, setFinalScore] = useState<{ correct: number; total: number; xp: number; timeLeft?: number; bestStreak?: number }>({ correct: 0, total: 0, xp: 0 });
   const [learningPath, setLearningPath] = useState<any | null>(null);
+  const [bossReady, setBossReady] = useState(false);
+  const [bossLoading, setBossLoading] = useState(false);
+  const [bossQuestions, setBossQuestions] = useState<DiabloQuestion[]>([]);
+  const [bossRules, setBossRules] = useState<any>(null);
+  const [bossMeta, setBossMeta] = useState<{ bossName: string; bossLabel: string; introTitle: string; variant: string } | null>(null);
+  const [bossReward, setBossReward] = useState<{ xp: number; won: boolean } | null>(null);
 
   useEffect(() => {
     if (!open) return;
     setStep("setup");
     setFinalScore({ correct: 0, total: 0, xp: 0 });
     setLearningPath(null);
+    setBossReady(false);
+    setBossLoading(false);
+    setBossQuestions([]);
+    setBossRules(null);
+    setBossMeta(null);
+    setBossReward(null);
   }, [open]);
 
   if (!open) return null;
@@ -34,19 +48,96 @@ export default function PracticeMiniGameModal(props: {
   const title = kind === "position" ? "Position training" : kind === "cert" ? "Certification practice" : "Test now!";
   const subtitle = kind === "position" ? "Role-based questions from your DB" : kind === "cert" ? "Certification pack from your DB" : "Timed combat quiz from your DB";
 
+  const lane = kind === "position" ? "TRAINING" : kind === "cert" ? "CERTIFICATIONS" : "TEST_NOW";
+
+  function bossProgressKey() {
+    return `lu_boss_progress_${lane}_${path}_${cert}`;
+  }
+
+  function shouldOfferBoss(summary: DiabloQuizRunSummary & { awardedXp?: number }) {
+    const accuracy = summary.totalQuestions > 0 ? summary.correctCount / summary.totalQuestions : 0;
+    if (accuracy < 0.7) return false;
+    let chance = 0.2;
+    if (accuracy >= 0.8) chance = 0.35;
+    if (accuracy >= 0.9) chance = 0.5;
+    if (accuracy >= 1) chance = 0.75;
+    try {
+      const raw = localStorage.getItem(bossProgressKey());
+      const parsed = raw ? JSON.parse(raw) : { misses: 0 };
+      const misses = Number(parsed?.misses || 0);
+      if (misses >= 2) {
+        localStorage.setItem(bossProgressKey(), JSON.stringify({ misses: 0 }));
+        return true;
+      }
+      const hit = Math.random() < chance;
+      localStorage.setItem(bossProgressKey(), JSON.stringify({ misses: hit ? 0 : misses + 1 }));
+      return hit;
+    } catch {
+      return Math.random() < chance;
+    }
+  }
+
+  async function buildBossRun(summary: DiabloQuizRunSummary & { awardedXp?: number }) {
+    setBossLoading(true);
+    try {
+      const search = new URLSearchParams();
+      search.set("lane", lane);
+      search.set("questionCount", "8");
+      search.set("shuffle", "1");
+      if (kind === "position") search.set("startingPosition", path);
+      if (kind === "cert") search.set("certExam", cert);
+      const res = await fetch(`/api/content/active?${search.toString()}`, { cache: "no-store" as any });
+      const json = await res.json().catch(() => null);
+      const sourceQuestions = Array.isArray(json?.questions) ? json.questions : [];
+      const activeUser = getActiveUser();
+      const weakestDomain = learningPath?.weakAreas?.[0]?.domain || learningPath?.predictedWeaknesses?.[0]?.domain || learningPath?.focusDomain || "general";
+      const isGolden = summary.correctCount === summary.totalQuestions && Math.random() < 0.12;
+      const profile = buildBossProfile({
+        weakestDomain,
+        userXp: Number((activeUser as any)?.xp || 0),
+        sessionCorrectCount: summary.correctCount,
+        sessionTotalQuestions: summary.totalQuestions,
+        selectedQuestions: sourceQuestions,
+        isGolden,
+      });
+      const picked = selectBossQuestions(sourceQuestions, 3, weakestDomain).map((q: any) => mapBossQuestion(q, weakestDomain));
+      const applied = applyBossAbilitiesToQuestions(picked, profile);
+      const visual = bossVisualMeta(isGolden);
+      setBossQuestions(applied.map((q: any) => ({
+        id: q.id,
+        prompt: q.prompt,
+        type: q.type as any,
+        choices: q.choices,
+        correctIndex: q.correctIndex,
+        data: q.data as any,
+        explanation: q.explanation,
+        domainId: q.domainId,
+        level: q.level,
+      })));
+      setBossRules(bossCombatRules(profile));
+      setBossMeta(visual);
+      setBossReady(true);
+    } catch {
+      setBossReady(false);
+    } finally {
+      setBossLoading(false);
+    }
+  }
+
   function finishRun(summary: DiabloQuizRunSummary & { awardedXp?: number }) {
-    setFinalScore({ correct: summary.correctCount, total: summary.totalQuestions, xp: summary.awardedXp ?? summary.xpEarned, timeLeft: summary.timeLeft });
+    setFinalScore({ correct: summary.correctCount, total: summary.totalQuestions, xp: summary.awardedXp ?? summary.xpEarned, timeLeft: summary.timeLeft, bestStreak: summary.bestStreak });
     setStep("summary");
     fetch("/api/learning/path", { cache: "no-store" as any })
       .then((res) => res.json().catch(() => null))
       .then((json) => { if (json?.learningPath) setLearningPath(json.learningPath); })
       .catch(() => {});
     try { const raw = localStorage.getItem("lu_users"); if (raw && onXpChange) { const list = JSON.parse(raw); const activeId = localStorage.getItem("lu_active_user_id"); const active = Array.isArray(list) ? list.find((x: any) => x.id === activeId) : null; if (active) onXpChange(Number(active.xp || 0), Number(active.level || 1)); } } catch {}
+    if (step !== "boss" && shouldOfferBoss(summary)) buildBossRun(summary);
   }
 
   return (
     <div className="luModalOverlay" onMouseDown={onClose}>
-      <div className="luModal" role="dialog" aria-modal="true" aria-label={title} onMouseDown={(e) => e.stopPropagation()} style={{ width: step === "quiz" ? "min(96vw, 1800px)" : "min(92vw, 980px)", maxWidth: step === "quiz" ? 1800 : 980 }}>
+      <div className="luModal" role="dialog" aria-modal="true" aria-label={title} onMouseDown={(e) => e.stopPropagation()} style={{ width: (step === "quiz" || step === "boss") ? "min(96vw, 1800px)" : "min(92vw, 980px)", maxWidth: (step === "quiz" || step === "boss") ? 1800 : 980 }}>
         <div className="luVideoBg" aria-hidden="true">
           <video className="luVideoEl" autoPlay loop muted playsInline preload="metadata"><source src="/video/blackhole-loop.mp4" type="video/mp4" /></video>
           <div className="luVideoVignette" />
@@ -68,7 +159,7 @@ export default function PracticeMiniGameModal(props: {
 
           {step === "quiz" && (
             <GameEngine
-              lane={kind === "position" ? "TRAINING" : kind === "cert" ? "CERTIFICATIONS" : "TEST_NOW"}
+              lane={lane}
               title={title}
               subtitle={subtitle}
               timed={kind === "test"}
@@ -81,10 +172,44 @@ export default function PracticeMiniGameModal(props: {
             />
           )}
 
+          {step === "boss" && bossReady && bossMeta && (
+            <GameEngine
+              lane={lane}
+              title={bossMeta.bossLabel}
+              subtitle={`${title} • bonus challenge`}
+              timed
+              enemyName={bossMeta.bossName}
+              exitLabel="Back"
+              onExit={() => setStep("summary")}
+              metaLeft="Bonus boss"
+              metaRight="3 questions"
+              questionsOverride={bossQuestions}
+              rulesOverride={bossRules}
+              onComplete={(summary: any) => {
+                setBossReward({ xp: Number(summary?.awardedXp || summary?.xpEarned || 0), won: summary?.outcome === "victory" });
+                setStep("summary");
+              }}
+            />
+          )}
+
           {step === "summary" && (
             <div className="card" style={{ padding: 14 }}>
               <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}><div><div style={{ fontSize: 18, fontWeight: 950 }}>Run complete</div><small className="luHint">XP was synced to the user profile and DB.</small></div><span className="badge">+{finalScore.xp} XP</span></div>
-              <div style={{ marginTop: 12, display: "grid", gap: 10 }}><div className="card" style={{ padding: 12, background: "rgba(255,255,255,0.04)" }}><b>Score</b>: {finalScore.correct} / {finalScore.total}</div>{kind === "test" && <div className="card" style={{ padding: 12, background: "rgba(255,255,255,0.04)" }}><b>Time left</b>: {Math.max(0, finalScore.timeLeft || 0)}s</div>}</div>
+              <div style={{ marginTop: 12, display: "grid", gap: 10 }}>
+                <div className="card" style={{ padding: 12, background: "rgba(255,255,255,0.04)" }}><b>Score</b>: {finalScore.correct} / {finalScore.total}</div>
+                {kind === "test" && <div className="card" style={{ padding: 12, background: "rgba(255,255,255,0.04)" }}><b>Time left</b>: {Math.max(0, finalScore.timeLeft || 0)}s</div>}
+                {typeof finalScore.bestStreak === "number" ? <div className="card" style={{ padding: 12, background: "rgba(255,255,255,0.04)" }}><b>Best streak</b>: {finalScore.bestStreak}</div> : null}
+                {bossMeta ? (
+                  <div className="card" style={{ padding: 12, background: "rgba(255,215,64,0.06)", borderColor: "rgba(255,215,64,0.28)" }}>
+                    <div style={{ fontWeight: 900 }}>{bossMeta.introTitle}</div>
+                    <div className="muted" style={{ marginTop: 6 }}>A bonus boss battle is available for extra XP. Bosses only roll after clearing 70% accuracy.</div>
+                    <div style={{ marginTop: 10, display: "flex", gap: 10, flexWrap: "wrap" }}>
+                      <button className="primaryBtn" type="button" onClick={() => setStep("boss")} disabled={!bossReady || bossLoading}>{bossLoading ? "Preparing…" : `Start ${bossMeta.bossLabel}`}</button>
+                    </div>
+                  </div>
+                ) : null}
+                {bossReward ? <div className="card" style={{ padding: 12, background: bossReward.won ? "rgba(46,204,113,0.08)" : "rgba(255,255,255,0.04)" }}><b>{bossReward.won ? "Boss cleared" : "Boss attempt completed"}</b>: +{bossReward.xp} XP</div> : null}
+              </div>
               <div className="stage5SummaryGrid" style={{ marginTop: 12 }}>
                 <div className="card" style={{ padding: 12, background: "rgba(255,255,255,0.04)" }}>
                   <div style={{ fontWeight: 900, marginBottom: 6 }}>Next learning focus</div>

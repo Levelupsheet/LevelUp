@@ -1,4 +1,5 @@
 import { prisma } from "../../_lib/prisma";
+import { getTierEntitlements } from "@/lib/entitlements";
 import { ensureUser } from "../../_lib/ensureUser";
 import { getRequestUserId } from "../../_lib/authUser";
 import {
@@ -60,6 +61,18 @@ export async function GET(req: Request) {
       }
     }
 
+    const entitlements = getTierEntitlements(subscriptionTier as any);
+
+    if (subscriptionTier !== "FREE") {
+      const expiresSoon = subscriptionExpiresAt ? (new Date(subscriptionExpiresAt).getTime() - Date.now()) <= (7 * 24 * 60 * 60 * 1000) : false;
+      if (expiresSoon) {
+        const existing = await prisma.notification.findFirst({ where: { userId, type: "BADGE_EXPIRES_SOON", title: { contains: "Subscription" }, readAt: null } as any });
+        if (!existing) {
+          await prisma.notification.create({ data: { userId, type: "BADGE_EXPIRES_SOON", title: "Subscription renewal reminder", body: `Your ${subscriptionTier} plan renews or expires soon. Keep premium features active to preserve your best progression loop.`, scheduledAt: subscriptionExpiresAt ? new Date(subscriptionExpiresAt) : null } as any }).catch(() => {});
+        }
+      }
+    }
+
     const cappedXp = capXpForTier(user.xp, subscriptionTier as any);
     if (cappedXp !== user.xp) {
       user = await prisma.user.update({ where: { id: userId }, data: { xp: cappedXp } });
@@ -92,6 +105,7 @@ export async function GET(req: Request) {
       subscriptionTier,
       subscriptionStatus,
       subscriptionExpiresAt,
+      entitlements,
       notifications,
       badges,
       offers,

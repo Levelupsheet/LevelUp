@@ -31,6 +31,17 @@ export default function NotificationBell({ userId }: { userId: string }) {
     return () => clearInterval(t);
   }, []);
 
+  async function clearAll() {
+    try {
+      await fetch('/api/notifications/clear', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ userId, all: true }),
+      });
+      setItems([]);
+    } catch {}
+  }
+
   return (
     <div style={{ position: "relative" }}>
       <button onClick={() => setOpen(v => !v)} title="Notifications">
@@ -41,7 +52,10 @@ export default function NotificationBell({ userId }: { userId: string }) {
         <div className="drawer">
           <div style={{ padding: 12, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <b>Notifications</b>
-            <button onClick={() => setOpen(false)}>Close</button>
+            <div style={{ display: 'flex', gap: 8 }}>
+              {!!items.length && <button onClick={clearAll}>Mark all read</button>}
+              <button onClick={() => setOpen(false)}>Close</button>
+            </div>
           </div>
           <div style={{ padding: "0 12px 12px 12px" }}>
             {items.length ? items.map(n => (

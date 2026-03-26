@@ -12,6 +12,12 @@ import {
   masteryAverage,
 } from "./CombatQuizEngine";
 
+export type CombatRuntimeModifiers = {
+  shieldActive?: boolean;
+  furyActive?: boolean;
+  timeWarpActive?: boolean;
+};
+
 export type CombatEngineOptions = {
   questions: CombatQuestion[];
   rules?: Partial<CombatRules>;
@@ -23,6 +29,8 @@ export type CombatEngineOptions = {
   onSubmit?: (result: SubmitResult) => void;
   initialState?: Partial<CombatState> | null;
   onStateChange?: (state: CombatState) => void;
+  getActiveModifiers?: () => CombatRuntimeModifiers;
+  onConsumeModifier?: (name: keyof CombatRuntimeModifiers) => void;
 };
 
 export function useCombatQuiz(opts: CombatEngineOptions) {
@@ -33,11 +41,15 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
   const onXpRef = useRef(opts.onXp);
   const onSubmitRef = useRef(opts.onSubmit);
   const onStateChangeRef = useRef(opts.onStateChange);
+  const getActiveModifiersRef = useRef(opts.getActiveModifiers);
+  const onConsumeModifierRef = useRef(opts.onConsumeModifier);
   useEffect(() => {
     onXpRef.current = opts.onXp;
     onSubmitRef.current = opts.onSubmit;
     onStateChangeRef.current = opts.onStateChange;
-  }, [opts.onXp, opts.onSubmit, opts.onStateChange]);
+    getActiveModifiersRef.current = opts.getActiveModifiers;
+    onConsumeModifierRef.current = opts.onConsumeModifier;
+  }, [opts.onXp, opts.onSubmit, opts.onStateChange, opts.getActiveModifiers, opts.onConsumeModifier]);
 
   function buildInitialState() {
     return { ...initialCombatState(rules, timed), ...(opts.initialState || {}) } as CombatState;
@@ -108,7 +120,9 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
 
       const correct = false;
       const xpDelta = 0;
-      const playerHP = clamp(s.playerHP - rules.playerDamageByTier[effTier], 0, rules.startHP);
+      const modifiers = getActiveModifiersRef.current?.() || {};
+      const usedShield = Boolean(modifiers.shieldActive);
+      const playerHP = clamp(s.playerHP - (usedShield ? 0 : rules.playerDamageByTier[effTier]), 0, rules.startHP);
       const enemyHP = s.enemyHP;
 
       const prevMastery = s.mastery[domainId] ?? 0;
@@ -130,6 +144,7 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
       };
 
       queueMicrotask(() => {
+        if (usedShield) onConsumeModifierRef.current?.("shieldActive");
         onSubmitRef.current?.({
           correct,
           playerHP,
@@ -164,10 +179,13 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
       const lvl = inferLevel(q);
       const effTier: DifficultyTier = Math.max(s.tier, lvl) as DifficultyTier;
       const correct = s.selected === q.correctIndex;
-      const xpDelta = correct ? rules.xpByTier[effTier] : 0;
+      const modifiers = getActiveModifiersRef.current?.() || {};
+      const usedShield = !correct && Boolean(modifiers.shieldActive);
+      const usedFury = correct && Boolean(modifiers.furyActive);
+      const xpDelta = correct ? Math.round(rules.xpByTier[effTier] * (usedFury ? 1.5 : 1)) : 0;
 
-      const playerHP = clamp(correct ? s.playerHP : s.playerHP - rules.playerDamageByTier[effTier], 0, rules.startHP);
-      const enemyHP = clamp(correct ? s.enemyHP - rules.enemyDamageByTier[effTier] : s.enemyHP, 0, rules.startHP);
+      const playerHP = clamp(correct ? s.playerHP : s.playerHP - (usedShield ? 0 : rules.playerDamageByTier[effTier]), 0, rules.startHP);
+      const enemyHP = clamp(correct ? s.enemyHP - rules.enemyDamageByTier[effTier] * (usedFury ? 2 : 1) : s.enemyHP, 0, rules.startHP);
 
       const prevMastery = s.mastery[domainId] ?? 0;
       const masteryDelta = correct ? rules.masteryGainBase * effTier : -rules.masteryLossWrong;
@@ -191,6 +209,8 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
       };
 
       queueMicrotask(() => {
+        if (usedShield) onConsumeModifierRef.current?.("shieldActive");
+        if (usedFury) onConsumeModifierRef.current?.("furyActive");
         if (xpDelta > 0) onXpRef.current?.(xpDelta, next.xpEarned);
         onSubmitRef.current?.({
           correct,
@@ -222,10 +242,14 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
       const lvl = (manual.level ?? inferLevel(q)) as DifficultyTier;
       const effTier: DifficultyTier = Math.max(s.tier, lvl) as DifficultyTier;
       const correct = manual.correct;
-      const xpDelta = typeof manual.xpDelta === "number" ? manual.xpDelta : (correct ? rules.xpByTier[effTier] : 0);
+      const modifiers = getActiveModifiersRef.current?.() || {};
+      const usedShield = !correct && Boolean(modifiers.shieldActive);
+      const usedFury = correct && Boolean(modifiers.furyActive);
+      const baseXp = typeof manual.xpDelta === "number" ? manual.xpDelta : (correct ? rules.xpByTier[effTier] : 0);
+      const xpDelta = Math.round(baseXp * (usedFury ? 1.5 : 1));
 
-      const playerHP = clamp(correct ? s.playerHP : s.playerHP - rules.playerDamageByTier[effTier], 0, rules.startHP);
-      const enemyHP = clamp(correct ? s.enemyHP - rules.enemyDamageByTier[effTier] : s.enemyHP, 0, rules.startHP);
+      const playerHP = clamp(correct ? s.playerHP : s.playerHP - (usedShield ? 0 : rules.playerDamageByTier[effTier]), 0, rules.startHP);
+      const enemyHP = clamp(correct ? s.enemyHP - rules.enemyDamageByTier[effTier] * (usedFury ? 2 : 1) : s.enemyHP, 0, rules.startHP);
 
       const prevMastery = s.mastery[domainId] ?? 0;
       const masteryDelta = correct ? rules.masteryGainBase * effTier : -rules.masteryLossWrong;
@@ -248,6 +272,8 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
       };
 
       queueMicrotask(() => {
+        if (usedShield) onConsumeModifierRef.current?.("shieldActive");
+        if (usedFury) onConsumeModifierRef.current?.("furyActive");
         if (xpDelta > 0) onXpRef.current?.(xpDelta, next.xpEarned);
         onSubmitRef.current?.({
           correct,

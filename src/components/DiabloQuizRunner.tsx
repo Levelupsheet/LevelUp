@@ -45,6 +45,8 @@ export type DiabloQuizRunSummary = {
   enemyHP: number;
   timeLeft: number;
   masteryByDomain?: Record<string, number>;
+  bestStreak?: number;
+  bossEligible?: boolean;
 };
 
 export type QuizMediaConfig = {
@@ -114,6 +116,13 @@ function reorderItem(items: string[], from: number, to: number) {
   next.splice(to, 0, moved);
   return next;
 }
+
+type Stage7PowerupState = {
+  shieldActive: boolean;
+  furyActive: boolean;
+  shieldUses: number;
+  furyUses: number;
+};
 
 function renderQuestionInput(args: {
   question: CombatQuestion;
@@ -447,6 +456,7 @@ export default function DiabloQuizRunner(props: {
   onStateChange?: (state: any) => void;
   onAdvanceQuestion?: (payload: { question: DiabloQuestion; isCorrect: boolean | null; selectedAnswer?: unknown; nextIndex: number; stateSnapshot?: any }) => Promise<{ goldenAwarded?: boolean } | void> | ({ goldenAwarded?: boolean } | void);
   media?: QuizMediaConfig;
+  rules?: any;
 }) {
   const {
     title,
@@ -466,6 +476,7 @@ export default function DiabloQuizRunner(props: {
     onStateChange,
     onAdvanceQuestion,
     media,
+    rules,
   } = props;
 
   const combatQuestions: CombatQuestion[] = useMemo(
@@ -505,13 +516,25 @@ export default function DiabloQuizRunner(props: {
   const [answerInsight, setAnswerInsight] = useState<any>(null);
   const [isExplaining, setIsExplaining] = useState(false);
   const [damageFloat, setDamageFloat] = useState<{ player?: string | null; enemy?: string | null }>({});
+  const [streak, setStreak] = useState(0);
+  const [bestStreak, setBestStreak] = useState(0);
+  const [powerups, setPowerups] = useState<Stage7PowerupState>({ shieldActive: false, furyActive: false, shieldUses: 0, furyUses: 0 });
 
   const finishedOnceRef = useRef(false);
 
   const { state, question, select, clear, submit, submitManual, next, currentDomainId, currentMastery, outcome } = useCombatQuiz({
     questions: combatQuestions,
+    rules,
     timed,
     onXp,
+    getActiveModifiers: () => ({ shieldActive: powerups.shieldActive, furyActive: powerups.furyActive }),
+    onConsumeModifier: (name) => {
+      setPowerups((current) => ({
+        ...current,
+        shieldActive: name === "shieldActive" ? false : current.shieldActive,
+        furyActive: name === "furyActive" ? false : current.furyActive,
+      }));
+    },
     onSubmit: (r) => {
       setHitPulse(r.correct ? "enemy" : "player");
       if (r.correct) {
@@ -520,6 +543,21 @@ export default function DiabloQuizRunner(props: {
         setDamageFloat({ player: `-${Math.max(1, 100 - r.playerHP)} HP` });
       }
       window.setTimeout(() => setDamageFloat({}), 900);
+      if (r.correct) {
+        setStreak((current) => {
+          const nextValue = current + 1;
+          setBestStreak((best) => Math.max(best, nextValue));
+          setPowerups((currentPowerups) => {
+            const next = { ...currentPowerups };
+            if (nextValue === 3 && next.shieldUses < 1 && !next.shieldActive) next.shieldUses = 1;
+            if (nextValue === 5 && next.furyUses < 1 && !next.furyActive) next.furyUses = 1;
+            return next;
+          });
+          return nextValue;
+        });
+      } else {
+        setStreak(0);
+      }
       if ((r.correct && !media?.enemyHitSrc) || (!r.correct && !media?.playerHitSrc)) {
         window.setTimeout(() => setHitPulse(null), 900);
       }
@@ -533,6 +571,9 @@ export default function DiabloQuizRunner(props: {
 
   useEffect(() => {
     finishedOnceRef.current = false;
+    setStreak(0);
+    setBestStreak(0);
+    setPowerups({ shieldActive: false, furyActive: false, shieldUses: 0, furyUses: 0 });
   }, [combatQuestions.length, timed, title]);
 
   useEffect(() => {
@@ -608,8 +649,10 @@ export default function DiabloQuizRunner(props: {
       enemyHP: state.enemyHP,
       timeLeft: state.timeLeft,
       masteryByDomain: state.mastery,
+      bestStreak,
+      bossEligible: combatQuestions.length > 0 ? (state.correctCount / combatQuestions.length) >= 0.7 : false,
     });
-  }, [state.finished, state.xpEarned, state.correctCount, state.playerHP, state.enemyHP, state.timeLeft, combatQuestions.length, onComplete, outcome, hintXpSpent, hintsUsedCount]);
+  }, [state.finished, state.xpEarned, state.correctCount, state.playerHP, state.enemyHP, state.timeLeft, combatQuestions.length, onComplete, outcome, hintXpSpent, hintsUsedCount, bestStreak]);
 
   const playerName = useMemo(() => {
     try {
@@ -734,6 +777,14 @@ export default function DiabloQuizRunner(props: {
     });
   }
 
+  function activateShield() {
+    setPowerups((current) => current.shieldUses > 0 && !current.shieldActive ? { ...current, shieldUses: current.shieldUses - 1, shieldActive: true } : current);
+  }
+
+  function activateFury() {
+    setPowerups((current) => current.furyUses > 0 && !current.furyActive ? { ...current, furyUses: current.furyUses - 1, furyActive: true } : current);
+  }
+
   function canSubmitCurrentQuestion() {
     if (!question || state.locked) return false;
     if (!usesManualSubmit) return state.selected != null;
@@ -804,7 +855,15 @@ export default function DiabloQuizRunner(props: {
                   <div className="stage5MetaStrip">
                     <span className="badge">Mastery {masteryPercent}%</span>
                     <span className="badge">Question {Math.min(state.idx + 1, combatQuestions.length)} / {combatQuestions.length}</span>
+                    <span className="badge">Streak {streak}</span>
+                    {bestStreak > 0 ? <span className="badge">Best {bestStreak}</span> : null}
                     {partialPercent > 0 && state.locked ? <span className="badge">Partial credit {partialPercent}%</span> : null}
+                  </div>
+
+                  <div className="stage7PowerStrip">
+                    <button className={"d2Btn power" + (powerups.shieldActive ? " active" : "")} type="button" disabled={state.locked || powerups.shieldActive || powerups.shieldUses <= 0} onClick={activateShield}>Shield {powerups.shieldActive ? "Armed" : powerups.shieldUses > 0 ? `x${powerups.shieldUses}` : "Locked"}</button>
+                    <button className={"d2Btn power" + (powerups.furyActive ? " active" : "")} type="button" disabled={state.locked || powerups.furyActive || powerups.furyUses <= 0} onClick={activateFury}>Fury {powerups.furyActive ? "Armed" : powerups.furyUses > 0 ? `x${powerups.furyUses}` : "Locked"}</button>
+                    <span className="stage7PowerHint">Streak 3 unlocks Shield • Streak 5 unlocks Fury</span>
                   </div>
 
                   {renderQuestionInput({
@@ -908,7 +967,13 @@ export default function DiabloQuizRunner(props: {
               <div className="mobileQuizBadges">
                 {timed ? <span className="badge" style={{ fontVariantNumeric: "tabular-nums" }}>⏱ {Math.max(0, state.timeLeft)}s</span> : null}
                 <span className="badge">XP +{displayedXp}</span>
+                <span className="badge">Streak {streak}</span>
               </div>
+            </div>
+
+            <div className="stage7PowerStrip mobile">
+              <button className={"d2Btn power" + (powerups.shieldActive ? " active" : "")} type="button" disabled={state.locked || powerups.shieldActive || powerups.shieldUses <= 0} onClick={activateShield}>Shield {powerups.shieldActive ? "Armed" : powerups.shieldUses > 0 ? `x${powerups.shieldUses}` : "Locked"}</button>
+              <button className={"d2Btn power" + (powerups.furyActive ? " active" : "")} type="button" disabled={state.locked || powerups.furyActive || powerups.furyUses <= 0} onClick={activateFury}>Fury {powerups.furyActive ? "Armed" : powerups.furyUses > 0 ? `x${powerups.furyUses}` : "Locked"}</button>
             </div>
 
             <div className="mobileCombatCard">

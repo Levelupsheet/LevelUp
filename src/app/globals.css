@@ -2349,3 +2349,9 @@ button.gold, a.gold{
 @media (max-width: 860px){
   .stage5SummaryGrid{ grid-template-columns: 1fr; }
 }
+
+.stage7PowerStrip{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:10px 0 12px;}
+.stage7PowerStrip.mobile{margin:0 0 10px;}
+.stage7PowerHint{font-size:12px;opacity:.72;}
+.d2Btn.power{border-color: rgba(110,190,255,0.24);background: rgba(12,18,32,0.88);}
+.d2Btn.power.active{border-color: rgba(255,215,64,0.48);box-shadow: 0 0 0 1px rgba(255,215,64,0.18) inset, 0 0 18px rgba(255,215,64,0.14);}

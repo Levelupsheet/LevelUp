@@ -284,6 +284,14 @@ export default function Home() {
                 <b>Checkout options</b>
                 <div className="muted" style={{ marginTop: 6, fontSize: 13 }}>
                   PayPal recurring subscriptions are processed securely on the server. Sign in first so your account can be upgraded automatically after approval.
+                <div className="card" style={{ marginTop: 12, padding: 12 }}>
+                  <b>Plan perks snapshot</b>
+                  <div style={{ marginTop: 8, display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))", gap: 10 }}>
+                    <div className="featureCard"><small>Free</small><div style={{ fontWeight: 800 }}>Core rewards • 30m cooldown after level 3</div></div>
+                    <div className="featureCard"><small>Pro</small><div style={{ fontWeight: 800 }}>No cooldown • 1.10x XP • advanced analytics</div></div>
+                    <div className="featureCard"><small>Premium</small><div style={{ fontWeight: 800 }}>1.25x XP • premium rewards • elite adaptive depth</div></div>
+                  </div>
+                </div>
                 </div>
               </div>
 
