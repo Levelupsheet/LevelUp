@@ -1,12 +1,21 @@
 import { z } from "zod";
 import { prisma } from "../../../_lib/prisma";
-import { gradeAnswer } from "../../../_lib/scoring";
-import { nextHRQuestion } from "../../../_lib/questions";
+import { buildInterviewPlan, evaluateInterviewAnswerDetailed, generateInterviewerReply } from "@/lib/interviewIntelligence";
 
 const Body = z.object({
   sessionId: z.string().min(1),
   answer: z.string().min(20),
 });
+
+function readPlan(summary?: string | null) {
+  if (!summary) return null;
+  try {
+    const parsed = JSON.parse(summary);
+    return Array.isArray(parsed?.plan) ? parsed.plan : null;
+  } catch {
+    return null;
+  }
+}
 
 export async function POST(req: Request) {
   try {
@@ -15,8 +24,11 @@ export async function POST(req: Request) {
     if (!session) return Response.json({ error: "Session not found" }, { status: 404 });
     if (session.status !== "IN_PROGRESS") return Response.json({ error: "Session not active" }, { status: 400 });
 
-    const turnIndex = await prisma.interviewTurn.count({ where: { sessionId: session.id } });
-    const score = gradeAnswer({ tier: 2, answerText: body.answer }); // HR uses mid-tier scoring heuristics for now.
+    const candidateTurns = await prisma.interviewTurn.findMany({ where: { sessionId: session.id, speaker: "CANDIDATE" }, orderBy: { turnIndex: "asc" } });
+    const plan = readPlan(session.summary) || await buildInterviewPlan(session.userId, "HR" as any);
+    const turnIndex = candidateTurns.length;
+    const focus = plan[turnIndex]?.focus || null;
+    const score = evaluateInterviewAnswerDetailed({ kind: "HR", answer: body.answer, focus, turnIndex });
 
     await prisma.interviewTurn.create({
       data: {
@@ -24,13 +36,14 @@ export async function POST(req: Request) {
         speaker: "CANDIDATE",
         content: body.answer,
         scoreTotal: score.total,
-        breakdownJson: score,
+        breakdownJson: score as any,
         turnIndex,
       },
     });
 
-    const nextQ = nextHRQuestion(turnIndex + 1);
-    return Response.json({ ok: true, nextQuestion: nextQ });
+    const nextQuestion = plan[turnIndex + 1]?.prompt || null;
+    const interviewerReply = generateInterviewerReply({ kind: "HR", focus, score, nextQuestion });
+    return Response.json({ ok: true, nextQuestion, interviewerReply, score, focus, done: !nextQuestion });
   } catch (e: any) {
     return Response.json({ error: e?.message ?? "Bad request" }, { status: 400 });
   }

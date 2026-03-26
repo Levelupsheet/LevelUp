@@ -58,6 +58,7 @@ export async function GET(req: Request) {
       returnedQuestions: questions.length,
       randomized: shouldShuffle,
       adaptive: true,
+      weakestDomain: Object.entries(result.learning?.masteryByDomain || {}).sort((a: any, b: any) => Number(a[1]) - Number(b[1]))[0]?.[0] || null,
     },
     questions,
   });

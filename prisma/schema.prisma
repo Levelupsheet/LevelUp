@@ -316,6 +316,7 @@ model MCQQuestion {
   sortOrder    Int          @default(0)
   explanation  String?
   difficulty   Int          @default(1)
+  subdomain    String?
   tags         String[]     @default([])
   testNowEligible Boolean   @default(false)
   isGoldenEligible Boolean  @default(false)
@@ -551,4 +552,52 @@ model InventoryItem {
 
   user User @relation(fields: [userId], references: [id])
   @@index([userId, createdAt])
+}
+
+
+model UserSkill {
+  id            String   @id @default(cuid())
+  userId        String
+  domain        String
+  subdomain     String   @default("GENERAL")
+  questionType  String   @default("GENERAL")
+  mastery       Float    @default(50)
+  attempts      Int      @default(0)
+  correct       Int      @default(0)
+  avgScore      Float    @default(0)
+  avgResponseMs Float?
+  lastSeenAt    DateTime @default(now())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([userId, domain])
+  @@index([userId, domain, subdomain])
+}
+
+model QuestionExposure {
+  id           String   @id @default(cuid())
+  userId       String
+  questionId   String
+  domain       String?
+  subdomain    String?
+  questionType String?
+  score        Float?
+  isCorrect    Boolean?
+  seenAt       DateTime @default(now())
+
+  @@index([userId, seenAt(sort: Desc)])
+  @@index([userId, questionId, seenAt(sort: Desc)])
+}
+
+
+model QuestionCalibration {
+  questionId        String   @id
+  timesSeen         Int      @default(0)
+  correctCount      Int      @default(0)
+  observedAccuracy  Float    @default(0)
+  avgResponseMs     Float?
+  difficultyDrift   Float    @default(0)
+  updatedAt         DateTime @default(now())
+
+  @@index([updatedAt(sort: Desc)])
 }

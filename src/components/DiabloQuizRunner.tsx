@@ -79,12 +79,12 @@ function labelForType(type: QuestionType) {
   return "Question";
 }
 
-function ModelPanel(props: { title: string; src?: string; mirrored?: boolean; loop?: boolean; onEnded?: () => void; height?: number | string }) {
-  const { title, src, mirrored = false, loop = true, onEnded, height = 230 } = props;
+function ModelPanel(props: { title: string; src?: string; mirrored?: boolean; loop?: boolean; onEnded?: () => void; height?: number | string; damageText?: string | null; damageTone?: "enemy" | "player" | null }) {
+  const { title, src, mirrored = false, loop = true, onEnded, height = 230, damageText, damageTone } = props;
   return (
     <div className="card" style={{ padding: 10, background: "rgba(255,255,255,0.04)", minHeight: 250 }}>
       <div style={{ fontSize: 12, fontWeight: 900, letterSpacing: 0.6, opacity: 0.88, marginBottom: 8 }}>{title}</div>
-      <div style={{ borderRadius: 16, overflow: "hidden", border: "1px solid rgba(255,255,255,0.08)", background: "rgba(5,10,20,0.85)" }}>
+      <div style={{ position: "relative", borderRadius: 16, overflow: "hidden", border: "1px solid rgba(255,255,255,0.08)", background: "rgba(5,10,20,0.85)" }}>
         {src ? (
           <video
             key={src}
@@ -101,6 +101,7 @@ function ModelPanel(props: { title: string; src?: string; mirrored?: boolean; lo
         ) : (
           <div style={{ height, display: "grid", placeItems: "center", opacity: 0.7 }}>Video slot ready</div>
         )}
+        {damageText ? <div className={"d2DamageFloat " + (damageTone === "enemy" ? "enemy" : "player")}>{damageText}</div> : null}
       </div>
     </div>
   );
@@ -501,6 +502,9 @@ export default function DiabloQuizRunner(props: {
   const [hintMessage, setHintMessage] = useState<string | null>(null);
   const [hintXpSpent, setHintXpSpent] = useState<number>(0);
   const [hintsUsedCount, setHintsUsedCount] = useState<number>(0);
+  const [answerInsight, setAnswerInsight] = useState<any>(null);
+  const [isExplaining, setIsExplaining] = useState(false);
+  const [damageFloat, setDamageFloat] = useState<{ player?: string | null; enemy?: string | null }>({});
 
   const finishedOnceRef = useRef(false);
 
@@ -510,6 +514,12 @@ export default function DiabloQuizRunner(props: {
     onXp,
     onSubmit: (r) => {
       setHitPulse(r.correct ? "enemy" : "player");
+      if (r.correct) {
+        setDamageFloat({ enemy: `-${Math.max(1, 100 - r.enemyHP)} HP` });
+      } else {
+        setDamageFloat({ player: `-${Math.max(1, 100 - r.playerHP)} HP` });
+      }
+      window.setTimeout(() => setDamageFloat({}), 900);
       if ((r.correct && !media?.enemyHitSrc) || (!r.correct && !media?.playerHitSrc)) {
         window.setTimeout(() => setHitPulse(null), 900);
       }
@@ -540,6 +550,7 @@ export default function DiabloQuizRunner(props: {
     setMultiSelected([]);
     setHiddenChoiceIndices([]);
     setHintMessage(null);
+    setAnswerInsight(null);
     if (questionType === "matching") {
       const pairs = safeArray<any>((data as any).pairs).filter((pair) => pair?.left && pair?.right);
       setMatchingSelections(Array.from({ length: pairs.length }, () => ""));
@@ -554,6 +565,33 @@ export default function DiabloQuizRunner(props: {
       setSequenceItems([]);
     }
   }, [question?.id, questionType]);
+
+  useEffect(() => {
+    if (!question || !state.locked || state.finished) return;
+    let active = true;
+    const answer = deriveSelectedAnswer();
+    setIsExplaining(true);
+    fetch("/api/questions/explain", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ question, answer }),
+    })
+      .then((res) => res.json().catch(() => null))
+      .then((json) => {
+        if (!active) return;
+        if (json?.explanation || json?.evaluation) setAnswerInsight(json);
+      })
+      .catch(() => {
+        if (!active) return;
+        setAnswerInsight(null);
+      })
+      .finally(() => {
+        if (active) setIsExplaining(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [question?.id, state.locked, state.finished]);
 
   useEffect(() => {
     if (!state.finished || finishedOnceRef.current) return;
@@ -585,6 +623,9 @@ export default function DiabloQuizRunner(props: {
   const domainLabel = labelForDomain(currentDomainId);
   const finished = Boolean(forceFinish) || state.finished;
   const displayedXp = Math.max(0, state.xpEarned - hintXpSpent);
+  const partialScore = Number(answerInsight?.evaluation?.partialScore ?? answerInsight?.evaluation?.score ?? 0);
+  const partialPercent = Math.max(0, Math.min(100, Math.round(partialScore * 100)));
+  const masteryPercent = Math.max(0, Math.min(100, Math.round(currentMastery)));
 
   function useHint(type: HintType) {
     if (!question || state.locked) return;
@@ -678,11 +719,18 @@ export default function DiabloQuizRunner(props: {
       if (nextCommand) setCommandHistory((current) => [nextCommand, ...current.filter((value) => value !== nextCommand)].slice(0, 4));
     }
 
+    const partialRatio = Number(result?.partialScore ?? result?.score ?? 0);
+    const scaledXp = result.correct ? undefined : Math.round(((question.level || 1) * 15) * Math.max(0, Math.min(1, partialRatio)));
     submitManual({
       correct: result.correct,
       domainId: question.domainId,
       level: question.level,
-      feedback: result.correct ? question.explanation || null : result.feedback || question.explanation || null,
+      xpDelta: scaledXp,
+      feedback: result.correct
+        ? question.explanation || null
+        : partialRatio > 0
+          ? `Partial credit: ${Math.round(partialRatio * 100)}%. ${result.feedback || question.explanation || "Review the explanation and continue."}`
+          : result.feedback || question.explanation || null,
     });
   }
 
@@ -725,7 +773,7 @@ export default function DiabloQuizRunner(props: {
               <div className={hitPulse === "player" ? "d2Shake" : ""}>
                 <D2LifeOrb value={state.playerHP} name={playerName} />
               </div>
-              <ModelPanel title={playerName} src={playerVideo} loop={!isPlayerHitVideo} onEnded={isPlayerHitVideo ? () => setHitPulse(null) : undefined} height="clamp(260px, 30vh, 420px)" />
+              <ModelPanel title={playerName} src={playerVideo} loop={!isPlayerHitVideo} onEnded={isPlayerHitVideo ? () => setHitPulse(null) : undefined} height="clamp(260px, 30vh, 420px)" damageText={damageFloat.player || null} damageTone="player" />
             </div>
 
             <div className={"d2QuestionCard d2QuizQuestionCard " + (hitPulse === "enemy" ? "d2HitFlash" : "") + ((question as any)?.isGolden ? " d2GoldenQuestionCard" : "") } style={{ minHeight: 560 }}>
@@ -753,6 +801,11 @@ export default function DiabloQuizRunner(props: {
                   <div style={{ marginTop: 12, fontSize: 22, lineHeight: 1.35, fontWeight: 900 }}>{question.prompt}</div>
 
                   <DomainRuneBar domainLabel={domainLabel} mastery={currentMastery} tier={state.tier} />
+                  <div className="stage5MetaStrip">
+                    <span className="badge">Mastery {masteryPercent}%</span>
+                    <span className="badge">Question {Math.min(state.idx + 1, combatQuestions.length)} / {combatQuestions.length}</span>
+                    {partialPercent > 0 && state.locked ? <span className="badge">Partial credit {partialPercent}%</span> : null}
+                  </div>
 
                   {renderQuestionInput({
                     question,
@@ -816,11 +869,20 @@ export default function DiabloQuizRunner(props: {
                   </div>
 
                   {state.locked && (
-                    <div style={{ marginTop: 12 }}>
-                      <div className="card" style={{ padding: 12, background: (question as any)?.isGolden ? "rgba(255,215,64,0.08)" : "rgba(255,255,255,0.04)", borderColor: (question as any)?.isGolden ? "rgba(255,215,64,0.35)" : undefined }}>
-                        <div style={{ fontWeight: 950 }}>{state.lastWasCorrect ? "✅ Correct" : "❌ Not quite"}</div>
+                    <div style={{ marginTop: 12, display: "grid", gap: 10 }}>
+                      <div className="card stage5FeedbackCard" style={{ padding: 12, background: (question as any)?.isGolden ? "rgba(255,215,64,0.08)" : "rgba(255,255,255,0.04)", borderColor: (question as any)?.isGolden ? "rgba(255,215,64,0.35)" : undefined }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+                          <div style={{ fontWeight: 950 }}>{state.lastWasCorrect ? "✅ Correct" : partialPercent > 0 ? "🟨 Partial credit" : "❌ Not quite"}</div>
+                          <div className="stage5ScorePill">{partialPercent}% accuracy</div>
+                        </div>
                         <div className="muted" style={{ marginTop: 6 }}>{state.feedback || "Review the explanation and continue."}</div>
                         {(question as any)?.isGolden && state.lastWasCorrect ? <div style={{ marginTop: 8, color: "#ffe28a", fontWeight: 700 }}>Golden question cleared — click NEXT to enter the golden sweepstakes draw.</div> : null}
+                      </div>
+                      <div className="card stage5ExplanationCard" style={{ padding: 12 }}>
+                        <div style={{ fontWeight: 900, marginBottom: 6 }}>Why this answer worked</div>
+                        <div className="muted" style={{ whiteSpace: "pre-wrap", lineHeight: 1.45 }}>
+                          {isExplaining ? "Building smart explanation…" : answerInsight?.explanation || question.explanation || state.feedback || "Review the explanation and continue."}
+                        </div>
                       </div>
                     </div>
                   )}
@@ -836,7 +898,7 @@ export default function DiabloQuizRunner(props: {
 
             <div style={{ display: "grid", gap: 12 }}>
               <D2EnemyHealthBar value={state.enemyHP} name={enemyName.toUpperCase().slice(0, 18)} />
-              <ModelPanel title={enemyName.toUpperCase().slice(0, 18)} src={enemyVideo} loop={!isEnemyHitVideo} onEnded={isEnemyHitVideo ? () => setHitPulse(null) : undefined} height="clamp(260px, 30vh, 420px)" />
+              <ModelPanel title={enemyName.toUpperCase().slice(0, 18)} src={enemyVideo} loop={!isEnemyHitVideo} onEnded={isEnemyHitVideo ? () => setHitPulse(null) : undefined} height="clamp(260px, 30vh, 420px)" damageText={damageFloat.enemy || null} damageTone="enemy" />
             </div>
           </div>
         ) : (
@@ -852,7 +914,7 @@ export default function DiabloQuizRunner(props: {
             <div className="mobileCombatCard">
               <D2EnemyHealthBar value={state.enemyHP} name={enemyName.toUpperCase().slice(0, 18)} />
               <div style={{ marginTop: 10 }}>
-                <ModelPanel title={enemyName.toUpperCase().slice(0, 18)} src={enemyVideo} loop={!isEnemyHitVideo} onEnded={isEnemyHitVideo ? () => setHitPulse(null) : undefined} height={230} />
+                <ModelPanel title={enemyName.toUpperCase().slice(0, 18)} src={enemyVideo} loop={!isEnemyHitVideo} onEnded={isEnemyHitVideo ? () => setHitPulse(null) : undefined} height={230} damageText={damageFloat.enemy || null} damageTone="enemy" />
               </div>
             </div>
 
@@ -927,11 +989,20 @@ export default function DiabloQuizRunner(props: {
                     )}
                   </div>
                   {state.locked && (
-                    <div style={{ marginTop: 12 }}>
-                      <div className="card" style={{ padding: 12, background: (question as any)?.isGolden ? "rgba(255,215,64,0.08)" : "rgba(255,255,255,0.04)", borderColor: (question as any)?.isGolden ? "rgba(255,215,64,0.35)" : undefined }}>
-                        <div style={{ fontWeight: 950 }}>{state.lastWasCorrect ? "✅ Correct" : "❌ Not quite"}</div>
+                    <div style={{ marginTop: 12, display: "grid", gap: 10 }}>
+                      <div className="card stage5FeedbackCard" style={{ padding: 12, background: (question as any)?.isGolden ? "rgba(255,215,64,0.08)" : "rgba(255,255,255,0.04)", borderColor: (question as any)?.isGolden ? "rgba(255,215,64,0.35)" : undefined }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+                          <div style={{ fontWeight: 950 }}>{state.lastWasCorrect ? "✅ Correct" : partialPercent > 0 ? "🟨 Partial credit" : "❌ Not quite"}</div>
+                          <div className="stage5ScorePill">{partialPercent}% accuracy</div>
+                        </div>
                         <div className="muted" style={{ marginTop: 6 }}>{state.feedback || "Review the explanation and continue."}</div>
                         {(question as any)?.isGolden && state.lastWasCorrect ? <div style={{ marginTop: 8, color: "#ffe28a", fontWeight: 700 }}>Golden question cleared — click NEXT to enter the golden sweepstakes draw.</div> : null}
+                      </div>
+                      <div className="card stage5ExplanationCard" style={{ padding: 12 }}>
+                        <div style={{ fontWeight: 900, marginBottom: 6 }}>Why this answer worked</div>
+                        <div className="muted" style={{ whiteSpace: "pre-wrap", lineHeight: 1.45 }}>
+                          {isExplaining ? "Building smart explanation…" : answerInsight?.explanation || question.explanation || state.feedback || "Review the explanation and continue."}
+                        </div>
                       </div>
                     </div>
                   )}
@@ -949,7 +1020,7 @@ export default function DiabloQuizRunner(props: {
                 <D2LifeOrb value={state.playerHP} name={playerName} />
               </div>
               <div style={{ marginTop: 10 }}>
-                <ModelPanel title={playerName} src={playerVideo} loop={!isPlayerHitVideo} onEnded={isPlayerHitVideo ? () => setHitPulse(null) : undefined} height="clamp(260px, 30vh, 420px)" />
+                <ModelPanel title={playerName} src={playerVideo} loop={!isPlayerHitVideo} onEnded={isPlayerHitVideo ? () => setHitPulse(null) : undefined} height="clamp(260px, 30vh, 420px)" damageText={damageFloat.player || null} damageTone="player" />
               </div>
             </div>
           </div>

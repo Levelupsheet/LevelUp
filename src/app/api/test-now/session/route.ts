@@ -2,11 +2,13 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { ensureUser } from "@/app/api/_lib/ensureUser";
 import { getRequestUserId } from "@/app/api/_lib/authUser";
-import { normalizeDifficultyLevel, shuffleQuestionPayload } from "@/lib/questionTransforms";
+import { evaluateQuestionAnswer, normalizeDifficultyLevel, shuffleQuestionPayload } from "@/lib/questionTransforms";
 import { normalizeQuestionType } from "@/lib/questionTypes";
 import { buildQuestionBankSelection } from "@/lib/questionBank";
+import { calculateConfidenceScore, recordQuestionExposure, upsertQuestionCalibration, upsertUserSkillFromAnswer } from "@/lib/adaptiveEngine";
 import { getSweepstakesCampaignMetaMap } from "@/lib/sweepstakesCampaignMeta";
 import { awardRaffleEntries, getOrCreateActiveGoldenSweepstakes } from "@/lib/raffle";
+import { buildQuestionExplanation } from "@/lib/explanations";
 
 async function ensureGoldenQuestionHistoryTable() {
   try {
@@ -42,6 +44,7 @@ function mapQuestion(q: any) {
     level: normalizeDifficultyLevel(q.difficulty),
     tags: q.tags,
     domainId: q.domainId ? String(q.domainId).toLowerCase() : Array.isArray(q.tags) && q.tags[0] ? String(q.tags[0]).toLowerCase() : undefined,
+    subdomain: q.subdomain ? String(q.subdomain).toLowerCase() : ((rawData as any)?.subdomain ? String((rawData as any).subdomain).toLowerCase() : undefined),
     isGoldenEligible: Boolean(q.isGoldenEligible),
     goldenWeight: Number(q.goldenWeight || 1),
     goldenBonusXp: Number(q.goldenBonusXp || 50),
@@ -84,6 +87,7 @@ async function buildNewSession(userId: string, questionCount = 10) {
     questionCount,
     shouldShuffle: true,
     userId,
+    sessionState: { wrongStreak: 0, inRecovery: false, typeCounts: {} },
   });
   if (!bank.placements.length || !bank.questions.length) throw new Error("No active Test Now question bank found");
 
@@ -128,7 +132,7 @@ async function buildNewSession(userId: string, questionCount = 10) {
         questionCount: finalQuestions.length,
         goldenSpawned: Boolean(goldenQuestionId),
         currentIndex: 0,
-        stateJson: { idx: 0, playerHP: 100, enemyHP: 100, correctCount: 0, xpEarned: 0, tier: 1, mastery: {}, timeLeft: 25, lastWasCorrect: null, feedback: null, locked: false, selected: null, finished: false },
+        stateJson: { idx: 0, playerHP: 100, enemyHP: 100, correctCount: 0, xpEarned: 0, tier: 1, mastery: {}, timeLeft: 25, lastWasCorrect: null, feedback: null, locked: false, selected: null, finished: false, wrongStreak: 0, inRecovery: false, blueprint: bank.blueprint || [], typeCounts: Object.fromEntries((bank.selectedQuestions || []).reduce((acc: Map<string, number>, q: any) => { const t = String(q?.type || "multiple_choice").toLowerCase(); acc.set(t, (acc.get(t) || 0) + 1); return acc; }, new Map())), },
       },
     });
     for (let i = 0; i < finalQuestions.length; i += 1) {
@@ -195,12 +199,31 @@ export async function PATCH(req: Request) {
         for (const row of answered) {
           const sessionQuestionId = String(row?.sessionQuestionId || "").trim();
           if (!sessionQuestionId) continue;
+          const existingQuestion = await tx.gameSessionQuestion.findUnique({ where: { id: sessionQuestionId } });
+          const payload = existingQuestion?.payloadJson && typeof existingQuestion.payloadJson === "object" ? existingQuestion.payloadJson : {};
+          const evaluation = evaluateQuestionAnswer({
+            type: (payload as any)?.type,
+            prompt: (payload as any)?.prompt,
+            correctIndex: (payload as any)?.correctIndex,
+            choices: Array.isArray((payload as any)?.choices) ? (payload as any).choices : undefined,
+            data: (payload as any)?.data,
+            answer: row?.selectedAnswer,
+          });
+          const explanation = buildQuestionExplanation({ question: payload, userAnswer: row?.selectedAnswer, evaluation });
           await tx.gameSessionQuestion.update({
             where: { id: sessionQuestionId },
             data: {
               answered: true,
-              isCorrect: typeof row?.isCorrect === "boolean" ? row.isCorrect : null,
-              selectedAnswer: row?.selectedAnswer === undefined ? undefined : row.selectedAnswer,
+              isCorrect: evaluation.correct,
+              selectedAnswer: row?.selectedAnswer === undefined ? undefined : {
+                value: row.selectedAnswer,
+                score: Number((evaluation as any)?.score ?? (evaluation.correct ? 1 : 0)),
+                partialScore: Number((evaluation as any)?.partialScore ?? (evaluation.correct ? 1 : 0)),
+                feedback: {
+                  rubric: (evaluation as any)?.feedback ?? null,
+                  explanation,
+                },
+              },
               answeredAt: new Date(),
             },
           });
@@ -219,6 +242,62 @@ export async function PATCH(req: Request) {
     await ensureGoldenQuestionHistoryTable();
     const session = await (prisma as any).gameSession.findUnique({ where: { id: sessionId }, include: { questions: { orderBy: { orderIndex: "asc" } } } });
 
+    if (session && answered.length) {
+      let wrongStreak = Number((session.stateJson as any)?.wrongStreak || 0);
+      let inRecovery = Boolean((session.stateJson as any)?.inRecovery);
+      for (const row of answered) {
+        const sessionQuestionId = String(row?.sessionQuestionId || "").trim();
+        if (!sessionQuestionId) continue;
+        const q = (session.questions || []).find((it: any) => String(it.id) === sessionQuestionId);
+        const payload = q?.payloadJson && typeof q.payloadJson === "object" ? q.payloadJson : {};
+        const evaluation = evaluateQuestionAnswer({
+          type: (payload as any)?.type,
+          prompt: (payload as any)?.prompt,
+          correctIndex: (payload as any)?.correctIndex,
+          choices: Array.isArray((payload as any)?.choices) ? (payload as any).choices : undefined,
+          data: (payload as any)?.data,
+          answer: row?.selectedAnswer,
+        });
+        const responseMs = Number(row?.responseMs || row?.elapsedMs || 0) || null;
+        const hintsUsed = Number(row?.hintsUsed || 0) || 0;
+        const attemptsUsed = Number(row?.attempts || 1) || 1;
+        const rawScore = Number((evaluation as any)?.score ?? (evaluation.correct ? 1 : 0));
+        const confidence = calculateConfidenceScore({ correct: evaluation.correct, score: rawScore, responseMs, hintsUsed, attempts: attemptsUsed });
+        wrongStreak = evaluation.correct ? 0 : wrongStreak + 1;
+        inRecovery = wrongStreak >= 2;
+        await recordQuestionExposure({
+          userId: session.userId,
+          questionId: String(q?.questionId || (payload as any)?.id || sessionQuestionId),
+          domain: String((payload as any)?.domainId || (payload as any)?.data?.domainId || "GENERAL"),
+          subdomain: String((payload as any)?.subdomain || (payload as any)?.data?.subdomain || "GENERAL"),
+          questionType: String((payload as any)?.type || "multiple_choice"),
+          isCorrect: evaluation.correct,
+          score: rawScore,
+        });
+        await upsertQuestionCalibration({
+          questionId: String(q?.questionId || (payload as any)?.id || sessionQuestionId),
+          isCorrect: evaluation.correct,
+          responseMs,
+        });
+        await upsertUserSkillFromAnswer({
+          userId: session.userId,
+          question: {
+            id: String((payload as any)?.id || q?.questionId || sessionQuestionId),
+            type: String((payload as any)?.type || "multiple_choice"),
+            domainId: String((payload as any)?.domainId || (payload as any)?.data?.domainId || "general"),
+            subdomain: String((payload as any)?.subdomain || (payload as any)?.data?.subdomain || "GENERAL"),
+            level: Number((payload as any)?.level || (payload as any)?.difficulty || 1),
+            data: (payload as any)?.data,
+          },
+          isCorrect: evaluation.correct,
+          score: rawScore,
+          responseMs,
+          hintsUsed,
+          attempts: attemptsUsed,
+        });
+        await prisma.gameSession.update({ where: { id: session.id }, data: { stateJson: { ...((session.stateJson as any) || {}), wrongStreak, inRecovery, lastConfidence: confidence, lastPartialScore: Number((evaluation as any)?.partialScore ?? rawScore) } } }).catch(() => null);
+      }
+    }
     let goldenAwarded = false;
     if (session && answered.length) {
       const activeCampaign = await getOrCreateActiveGoldenSweepstakes(prisma as any).catch(() => null);
@@ -228,8 +307,18 @@ export async function PATCH(req: Request) {
         if (meta?.allowGoldenQuestion || true) {
           for (const row of answered) {
             const sessionQuestionId = String(row?.sessionQuestionId || "").trim();
-            if (!sessionQuestionId || row?.isCorrect !== true) continue;
+            if (!sessionQuestionId) continue;
             const q = (session.questions || []).find((it: any) => String(it.id) === sessionQuestionId);
+            const payload = q?.payloadJson && typeof q.payloadJson === "object" ? q.payloadJson : {};
+            const evaluation = evaluateQuestionAnswer({
+              type: (payload as any)?.type,
+              prompt: (payload as any)?.prompt,
+              correctIndex: (payload as any)?.correctIndex,
+              choices: Array.isArray((payload as any)?.choices) ? (payload as any).choices : undefined,
+              data: (payload as any)?.data,
+              answer: row?.selectedAnswer,
+            });
+            if (evaluation.correct !== true) continue;
             if (!q?.isGolden) continue;
             const already = await (prisma as any).$queryRawUnsafe(`SELECT 1 FROM "GoldenQuestionHistory" WHERE "sessionId" = $1 AND "questionId" = $2 AND "awarded" = TRUE LIMIT 1`, session.id, String(q.questionId || q.id)).then((rows: any[]) => Array.isArray(rows) && rows.length > 0).catch(() => false);
             if (already) continue;

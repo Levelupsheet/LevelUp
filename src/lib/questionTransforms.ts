@@ -155,11 +155,16 @@ export function evaluateQuestionAnswer(input: {
   const data = (input.data || {}) as Record<string, unknown>;
 
   if (type === "multiple_choice" || type === "incident") {
-    const selected = Number(input.answer);
+    const choices = safeArray<string>(input.choices ?? data.choices);
+    const selected = typeof input.answer === "number" ? Number(input.answer) : choices.findIndex((choice) => normalizeText(choice) === normalizeText(input.answer));
     const correctIndex = Number(input.correctIndex ?? data.correctIndex ?? -1);
+    const correct = selected === correctIndex;
     return {
-      correct: selected === correctIndex,
-      feedback: selected === correctIndex ? null : "Review the best response and try again.",
+      correct,
+      score: correct ? 1 : 0,
+      partialScore: correct ? 1 : 0,
+      maxScore: 1,
+      feedback: correct ? null : "Review the best response and try again.",
     };
   }
 
@@ -170,6 +175,9 @@ export function evaluateQuestionAnswer(input: {
     const correct = picked === expected || (picked === "true" && expected === "1") || (picked === "false" && expected === "0");
     return {
       correct,
+      score: correct ? 1 : 0,
+      partialScore: correct ? 1 : 0,
+      maxScore: 1,
       feedback: correct ? null : `Correct answer: ${expected === "true" || expected === "1" ? "True" : "False"}`,
     };
   }
@@ -178,8 +186,12 @@ export function evaluateQuestionAnswer(input: {
     const caseSensitive = Boolean(data.caseSensitive);
     const acceptable = safeArray<string>(data.answers).map((value) => normalizeText(value, caseSensitive));
     const guess = normalizeText(input.answer, caseSensitive);
+    const correct = Boolean(guess) && acceptable.includes(guess);
     return {
-      correct: Boolean(guess) && acceptable.includes(guess),
+      correct,
+      score: correct ? 1 : 0,
+      partialScore: correct ? 1 : 0,
+      maxScore: 1,
       feedback: acceptable.length ? `Accepted answer: ${safeArray<string>(data.answers)[0]}` : "Check the expected term and try again.",
     };
   }
@@ -188,9 +200,17 @@ export function evaluateQuestionAnswer(input: {
     const answerItems = safeArray<string>(input.answer).map((value) => normalizeText(value));
     const correctOrderRaw = safeArray<string>(data.correctOrder).length ? safeArray<string>(data.correctOrder) : safeArray<string>(data.items);
     const correctOrder = correctOrderRaw.map((value) => normalizeText(value));
-    const correct = answerItems.length === correctOrder.length && answerItems.every((value, index) => value === correctOrder[index]);
+    let matches = 0;
+    for (let i = 0; i < Math.min(answerItems.length, correctOrder.length); i += 1) {
+      if (answerItems[i] === correctOrder[i]) matches += 1;
+    }
+    const partialScore = correctOrder.length ? Number((matches / correctOrder.length).toFixed(3)) : 0;
+    const correct = partialScore === 1;
     return {
       correct,
+      score: partialScore,
+      partialScore,
+      maxScore: 1,
       feedback: correct ? null : `Correct order: ${correctOrderRaw.join(" → ")}`,
     };
   }
@@ -198,9 +218,15 @@ export function evaluateQuestionAnswer(input: {
   if (type === "multi_select") {
     const picked = uniqueSortedNumbers(input.answer);
     const expected = uniqueSortedNumbers(data.correctIndices);
+    const overlap = picked.filter((value) => expected.includes(value)).length;
+    const union = Array.from(new Set([...picked, ...expected])).length || 1;
+    const partialScore = Number((overlap / union).toFixed(3));
     const correct = picked.length === expected.length && picked.every((value, index) => value === expected[index]);
     return {
       correct,
+      score: correct ? 1 : partialScore,
+      partialScore: correct ? 1 : partialScore,
+      maxScore: 1,
       feedback: correct ? null : `Correct selections: ${expected.map((n) => n + 1).join(", ")}`,
     };
   }
@@ -208,9 +234,17 @@ export function evaluateQuestionAnswer(input: {
   if (type === "matching") {
     const expected = safeArray<string>(data.correctMatches).map((value) => normalizeText(value));
     const submitted = safeArray<string>(input.answer).map((value) => normalizeText(value));
+    let matches = 0;
+    for (let i = 0; i < Math.min(submitted.length, expected.length); i += 1) {
+      if (submitted[i] === expected[i]) matches += 1;
+    }
+    const partialScore = expected.length ? Number((matches / expected.length).toFixed(3)) : 0;
     const correct = submitted.length === expected.length && submitted.every((value, index) => value === expected[index]);
     return {
       correct,
+      score: correct ? 1 : partialScore,
+      partialScore: correct ? 1 : partialScore,
+      maxScore: 1,
       feedback: correct ? null : `Correct matches: ${safeArray<any>(data.pairs).map((pair) => `${pair.left} → ${pair.right}`).join(" • ")}`,
     };
   }
@@ -221,12 +255,25 @@ export function evaluateQuestionAnswer(input: {
     const rawAnswer = String(input.answer ?? "").trim();
     const normalizedAnswer = normalizeText(rawAnswer);
     const compactAnswer = normalizedAnswer.replace(/\s+/g, " ");
-    const correct = expectedCommands.some((command) => {
+    const exact = expectedCommands.some((command) => {
       const normalizedCommand = normalizeText(command).replace(/\s+/g, " ");
       return allowContains ? compactAnswer.includes(normalizedCommand) || normalizedCommand.includes(compactAnswer) : compactAnswer === normalizedCommand;
     });
+    let bestPartial = 0;
+    for (const command of expectedCommands) {
+      const expectedParts = normalizeText(command).replace(/\s+/g, " ").split(" ").filter(Boolean);
+      const answerParts = compactAnswer.split(" ").filter(Boolean);
+      if (!expectedParts.length || !answerParts.length) continue;
+      const overlap = answerParts.filter((part) => expectedParts.includes(part)).length;
+      bestPartial = Math.max(bestPartial, overlap / Math.max(expectedParts.length, answerParts.length));
+      if (answerParts[0] && expectedParts[0] && answerParts[0] === expectedParts[0]) bestPartial = Math.max(bestPartial, 0.6);
+    }
+    const partialScore = exact ? 1 : Number(bestPartial.toFixed(3));
     return {
-      correct,
+      correct: exact,
+      score: partialScore,
+      partialScore,
+      maxScore: 1,
       feedback: expectedCommands.length ? `Expected command: ${expectedCommands[0]}` : "Check the command syntax and try again.",
     };
   }
@@ -235,10 +282,14 @@ export function evaluateQuestionAnswer(input: {
     const caseSensitive = Boolean(data.caseSensitive);
     const choices = safeArray<string>(data.choices);
     if (choices.length) {
-      const selectedIndex = Number(input.answer);
+      const selectedIndex = typeof input.answer === "number" ? Number(input.answer) : choices.findIndex((choice) => normalizeText(choice, caseSensitive) === normalizeText(input.answer, caseSensitive));
       const correctIndex = Number(data.correctIndex ?? input.correctIndex ?? -1);
+      const correct = selectedIndex === correctIndex;
       return {
-        correct: selectedIndex === correctIndex,
+        correct,
+        score: correct ? 1 : 0,
+        partialScore: correct ? 1 : 0,
+        maxScore: 1,
         feedback: correctIndex >= 0 && choices[correctIndex] ? `Correct finding: ${choices[correctIndex]}` : "Review the log details and try again.",
       };
     }
@@ -248,11 +299,15 @@ export function evaluateQuestionAnswer(input: {
     const normalizedExpected = acceptable.map((value) => normalizeText(value, caseSensitive));
     const guess = normalizeText(input.answer, caseSensitive);
     const correct = Boolean(guess) && normalizedExpected.some((value) => guess === value || guess.includes(value) || value.includes(guess));
+    const partialScore = correct ? 1 : (Boolean(guess) && normalizedExpected.some((value) => guess.includes(value.split(" ")[0]) || value.includes(guess.split(" ")[0])) ? 0.5 : 0);
     return {
       correct,
+      score: partialScore,
+      partialScore,
+      maxScore: 1,
       feedback: acceptable.length ? `Expected finding: ${acceptable[0]}` : "Review the log details and try again.",
     };
   }
 
-  return { correct: false, feedback: "Unsupported question type." };
+  return { correct: false, score: 0, partialScore: 0, maxScore: 1, feedback: "Unsupported question type." };
 }

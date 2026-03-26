@@ -1,15 +1,13 @@
 import { prisma } from "@/lib/prisma";
-import { buildAdaptiveQuestionPlan, inferDomainFromQuestion, normalizeQuestionDomain } from "@/lib/learningProfile";
+import { inferDomainFromQuestion } from "@/lib/learningProfile";
+import { getAdaptiveLearningContext, getQuestionCalibrationMap, weightedAdaptiveQuestionPlan } from "@/lib/adaptiveEngine";
+import { buildSessionBlueprint } from "@/lib/bankRules";
 import { normalizeDifficultyLevel, shuffleQuestionPayload } from "@/lib/questionTransforms";
 import { normalizeQuestionType } from "@/lib/questionTypes";
+import { clusterQuestionsBySimilarity, promptSignature } from "@/lib/questionQuality";
 
-function stableQuestionSignature(input: { prompt?: string | null; type?: string | null; data?: any; choices?: any; }) {
-  const prompt = String(input.prompt || "").trim().toLowerCase().replace(/\s+/g, " ");
-  const type = String(input.type || "").trim().toLowerCase();
-  const choices = Array.isArray(input.choices) ? input.choices.map((v) => String(v).trim().toLowerCase()) : [];
-  const data = input.data && typeof input.data === "object" ? input.data : {};
-  const expected = Array.isArray((data as any).expectedCommands) ? (data as any).expectedCommands : Array.isArray((data as any).answers) ? (data as any).answers : Array.isArray((data as any).correctOrder) ? (data as any).correctOrder : [];
-  return JSON.stringify({ prompt, type, choices, expected });
+function stableQuestionSignature(input: { prompt?: string | null; type?: string | null; data?: any; choices?: any; subdomain?: string | null }) {
+  return promptSignature(input);
 }
 
 export function mapDbQuestionToRuntime(q: any) {
@@ -38,6 +36,7 @@ export function mapDbQuestionToRuntime(q: any) {
     tags: Array.isArray(q.tags) ? q.tags : [],
     sortOrder: Number(q.sortOrder || 0),
     domainId: domain.toLowerCase(),
+    subdomain: String((q as any).subdomain || (rawData as any)?.subdomain || (rawData as any)?.topic || "GENERAL").toLowerCase(),
     setId: q.setId,
     setName: q.setName,
     setDomain: q.setDomain,
@@ -74,6 +73,8 @@ export async function loadActiveBank(args: {
   for (const placement of placements) {
     for (const raw of placement?.set?.questions || []) {
       const runtime = mapDbQuestionToRuntime({ ...raw, setName: placement.set.name, setDomain: placement.set.domain });
+      const lifecycleStatus = String((runtime.data as any)?.lifecycleStatus || "ACTIVE").toUpperCase();
+      if (["RETIRED", "ARCHIVED"].includes(lifecycleStatus)) continue;
       const signature = stableQuestionSignature(runtime);
       if (seen.has(signature)) continue;
       seen.add(signature);
@@ -81,40 +82,23 @@ export async function loadActiveBank(args: {
     }
   }
 
+  const clusters = clusterQuestionsBySimilarity(deduped, 0.9);
+  const clusteredOut = new Set<string>();
+  for (const cluster of clusters) {
+    for (const id of cluster.ids.slice(1)) clusteredOut.add(String(id));
+  }
+  const filtered = deduped.filter((q) => !clusteredOut.has(String(q.id)));
+
   return {
     placements,
-    questions: deduped,
+    questions: filtered,
+    similarClusters: clusters.filter((c) => c.ids.length > 1),
     totalQuestionsBeforeDedup: placements.reduce((sum, placement) => sum + (placement?.set?.questions?.length || 0), 0),
   };
 }
 
 export async function getLearningContext(userId?: string | null) {
-  const safeUserId = String(userId || "").trim();
-  if (!safeUserId) return { masteryByDomain: {}, recentHistory: [] as Array<{ questionId: string; correct: boolean }> };
-
-  const [masteries, recent] = await Promise.all([
-    prisma.userDomain.findMany({ where: { userId: safeUserId }, select: { domain: true, xp: true } }).catch(() => []),
-    (prisma as any).gameSessionQuestion.findMany({
-      where: { session: { userId: safeUserId } },
-      orderBy: { answeredAt: "desc" },
-      take: 120,
-      select: { questionId: true, isCorrect: true, payloadJson: true },
-    }).catch(() => []),
-  ]);
-
-  const masteryByDomain: Record<string, number> = {};
-  for (const row of masteries || []) {
-    const domainId = normalizeQuestionDomain(String(row.domain || "GENERAL")).toLowerCase();
-    const xp = Number((row as any).xp || 0);
-    masteryByDomain[domainId] = Math.max(0, Math.min(100, Number(((xp / 8000) * 100).toFixed(1))));
-  }
-
-  const recentHistory = (recent || []).map((row: any) => ({
-    questionId: String(row?.questionId || row?.payloadJson?.id || "").trim(),
-    correct: row?.isCorrect === true,
-  })).filter((row: any) => row.questionId);
-
-  return { masteryByDomain, recentHistory };
+  return getAdaptiveLearningContext(userId);
 }
 
 export async function buildQuestionBankSelection(args: {
@@ -125,17 +109,23 @@ export async function buildQuestionBankSelection(args: {
   startingPosition?: string | null;
   certExam?: string | null;
   userId?: string | null;
+  sessionState?: { wrongStreak?: number; inRecovery?: boolean; typeCounts?: Record<string, number> } | null;
 }) {
   const bank = await loadActiveBank({ lane: args.lane, startingPosition: args.startingPosition, certExam: args.certExam });
   const excludeSet = new Set((args.excludeIds || []).map((v) => String(v)));
   const candidatePool = bank.questions.filter((q) => !excludeSet.has(String(q.id)));
   const sourcePool = candidatePool.length >= args.questionCount ? candidatePool : [...candidatePool, ...bank.questions.filter((q) => !candidatePool.some((c) => c.id === q.id))];
   const learning = await getLearningContext(args.userId);
-  const planned = buildAdaptiveQuestionPlan({
+  const calibrationMap = await getQuestionCalibrationMap(sourcePool.map((q) => String(q.id)));
+  const blueprint = buildSessionBlueprint(args.questionCount, learning.weakestTargetDifficulty);
+  const planned = weightedAdaptiveQuestionPlan({
     questions: sourcePool,
     questionCount: args.questionCount,
-    masteryByDomain: learning.masteryByDomain,
-    recentHistory: learning.recentHistory,
+    learning,
+    lane: args.lane,
+    calibrationMap,
+    blueprint,
+    sessionState: args.sessionState,
   });
   const questions = (args.shouldShuffle === false ? planned : planned.map((q) => shuffleQuestionPayload(q))).slice(0, Math.max(0, args.questionCount || 0) || planned.length);
 
@@ -143,5 +133,7 @@ export async function buildQuestionBankSelection(args: {
     ...bank,
     selectedQuestions: questions,
     learning,
+    blueprint,
+    calibrationMap,
   };
 }

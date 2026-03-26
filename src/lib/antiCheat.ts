@@ -154,6 +154,16 @@ export async function evaluateQuizAntiCheat(input: {
     },
   });
 
+  const behaviorRisk = deriveBehaviorRisk({
+    rapidAnswerCount,
+    reasons: Array.from(reasons),
+    captchaRequired,
+    blocked,
+    recentAccountAttempts,
+    recentIpAttempts,
+    fingerprintReuseCount: sameFingerprintUsers.filter((row) => row.userId).length,
+  });
+
   return {
     ok: !blocked,
     blocked,
@@ -164,5 +174,22 @@ export async function evaluateQuizAntiCheat(input: {
     rapidAnswerCount,
     reasons: Array.from(reasons),
     cooldownUntil,
+    behaviorRisk,
   };
+}
+
+
+export function deriveBehaviorRisk(input: { rapidAnswerCount?: number; reasons?: string[]; captchaRequired?: boolean; blocked?: boolean; recentAccountAttempts?: number; recentIpAttempts?: number; fingerprintReuseCount?: number; }) {
+  const reasons = new Set((input.reasons || []).map((v) => String(v || "").toUpperCase()));
+  let riskScore = 0;
+  riskScore += Math.min(40, Number(input.rapidAnswerCount || 0) * 8);
+  riskScore += reasons.has("ACCOUNT_RATE_LIMIT") ? 18 : 0;
+  riskScore += reasons.has("IP_RATE_LIMIT") ? 18 : 0;
+  riskScore += reasons.has("DEVICE_FINGERPRINT_REUSE") ? 14 : 0;
+  riskScore += reasons.has("CAPTCHA_FAILED") ? 20 : 0;
+  riskScore += input.captchaRequired ? 10 : 0;
+  riskScore += input.blocked ? 15 : 0;
+  const band = riskScore >= 70 ? "HIGH" : riskScore >= 40 ? "MEDIUM" : "LOW";
+  const recommendation = band === "HIGH" ? "Cooldown the user, require CAPTCHA, and review suspicious patterns." : band === "MEDIUM" ? "Require CAPTCHA and watch for repeat rapid answers or device reuse." : "Allow normal flow but keep telemetry for anomaly trends.";
+  return { riskScore, band, recommendation };
 }

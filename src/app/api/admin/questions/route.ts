@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { requireAdminRequest } from "@/app/api/_lib/adminGuard";
 import { prisma } from "@/lib/prisma";
 import { normalizeQuestionType, safeArray, uniqueSortedNumbers } from "@/lib/questionTypes";
+import { validateQuestionQuality } from "@/lib/questionQuality";
 
 function toDbQuestionPayload(input: any, sortOrder: number) {
   const type = normalizeQuestionType(input?.type);
@@ -10,6 +11,8 @@ function toDbQuestionPayload(input: any, sortOrder: number) {
   const difficulty = Number(input?.difficulty ?? 1) || 1;
   const tags = Array.isArray(input?.tags) ? input.tags : [];
   const sourceData = input?.data && typeof input.data === "object" ? input.data : {};
+  const subdomain = String(input?.subdomain ?? (sourceData as any)?.subdomain ?? "").trim();
+  const lifecycleStatus = String(input?.lifecycleStatus ?? (sourceData as any)?.lifecycleStatus ?? "ACTIVE").trim().toUpperCase();
 
   if (!prompt) throw new Error("Each question requires prompt");
 
@@ -26,6 +29,7 @@ function toDbQuestionPayload(input: any, sortOrder: number) {
       correctIndex,
       data: {
         ...(sourceData || {}),
+        ...(subdomain ? { subdomain } : {}),
         choices,
         correctIndex,
       },
@@ -47,6 +51,7 @@ function toDbQuestionPayload(input: any, sortOrder: number) {
       correctIndex,
       data: {
         ...sourceData,
+        ...(subdomain ? { subdomain } : {}),
         choices,
         correctIndex,
         correctAnswer: correctIndex === 0,
@@ -68,6 +73,7 @@ function toDbQuestionPayload(input: any, sortOrder: number) {
       correctIndex: null,
       data: {
         ...sourceData,
+        ...(subdomain ? { subdomain } : {}),
         answers,
       },
       explanation,
@@ -88,6 +94,7 @@ function toDbQuestionPayload(input: any, sortOrder: number) {
       correctIndex: null,
       data: {
         ...sourceData,
+        ...(subdomain ? { subdomain } : {}),
         items,
         correctOrder,
       },
@@ -109,6 +116,7 @@ function toDbQuestionPayload(input: any, sortOrder: number) {
       correctIndex: null,
       data: {
         ...sourceData,
+        ...(subdomain ? { subdomain } : {}),
         choices,
         correctIndices,
       },
@@ -131,6 +139,7 @@ function toDbQuestionPayload(input: any, sortOrder: number) {
       correctIndex: null,
       data: {
         ...sourceData,
+        ...(subdomain ? { subdomain } : {}),
         pairs,
         leftItems: pairs.map((pair) => pair.left),
         rightItems: Array.from(new Set(pairs.map((pair) => pair.right))),
@@ -153,6 +162,7 @@ function toDbQuestionPayload(input: any, sortOrder: number) {
       correctIndex: null,
       data: {
         ...sourceData,
+        ...(subdomain ? { subdomain } : {}),
         expectedCommands,
       },
       explanation,
@@ -175,6 +185,7 @@ function toDbQuestionPayload(input: any, sortOrder: number) {
       correctIndex: null,
       data: {
         ...sourceData,
+        ...(subdomain ? { subdomain } : {}),
         logText,
         answers: acceptable,
         expectedFindings: expectedFindings.length ? expectedFindings : acceptable,
@@ -195,7 +206,8 @@ function normalizePromptSignature(input: any) {
   const type = String(input?.type || "").trim().toUpperCase();
   const data = input?.data && typeof input.data === "object" ? input.data : {};
   const choices = Array.isArray(input?.choices) ? input.choices : Array.isArray((data as any)?.choices) ? (data as any).choices : [];
-  return JSON.stringify({ prompt, type, choices: choices.map((v: any) => String(v).trim().toLowerCase()) });
+  const subdomain = String((data as any)?.subdomain || input?.subdomain || "").trim().toLowerCase();
+  return JSON.stringify({ prompt, type, subdomain, choices: choices.map((v: any) => String(v).trim().toLowerCase()) });
 }
 
 export async function GET(req: Request) {
@@ -245,7 +257,9 @@ export async function POST(req: Request) {
       let skippedDuplicates = 0;
 
       for (const q of incoming) {
-        const payload = { setId, ...toDbQuestionPayload(q, typeof q.sortOrder === "number" ? q.sortOrder : nextOrder++) };
+        const normalized = toDbQuestionPayload(q, typeof q.sortOrder === "number" ? q.sortOrder : nextOrder++);
+        const quality = validateQuestionQuality(normalized as any);
+        const payload = { setId, ...normalized, data: { ...((normalized as any).data || {}), lifecycleStatus: String((q?.lifecycleStatus || (normalized as any)?.data?.lifecycleStatus || "ACTIVE")).toUpperCase(), qualityScore: quality.qualityScore, qualityIssues: quality.issues } };
         const signature = normalizePromptSignature(payload);
         if (seen.has(signature) || localSeen.has(signature)) {
           skippedDuplicates += 1;
@@ -261,7 +275,8 @@ export async function POST(req: Request) {
     }
 
     const payload = toDbQuestionPayload(body, typeof body.sortOrder === "number" ? body.sortOrder : nextOrder);
-    const q = await prisma.mCQQuestion.create({ data: { setId, ...(payload as any) } });
+    const quality = validateQuestionQuality(payload as any);
+    const q = await prisma.mCQQuestion.create({ data: { setId, ...(payload as any), data: { ...((payload as any).data || {}), lifecycleStatus: String((body?.lifecycleStatus || (payload as any)?.data?.lifecycleStatus || "ACTIVE")).toUpperCase(), qualityScore: quality.qualityScore, qualityIssues: quality.issues } } });
     return NextResponse.json({ question: q });
   } catch (e: any) {
     return NextResponse.json({ error: e?.message || "Failed" }, { status: 500 });
@@ -292,13 +307,25 @@ export async function PATCH(req: Request) {
       if (typeof body.prompt === "string") updateData.prompt = body.prompt.trim();
       if (body.difficulty !== undefined) updateData.difficulty = Math.max(1, Math.min(5, Number(body.difficulty) || 1));
       if (body.explanation !== undefined) updateData.explanation = body.explanation === null ? null : String(body.explanation);
+      if (body.lifecycleStatus !== undefined) updateData.data = { lifecycleStatus: String(body.lifecycleStatus || "ACTIVE").toUpperCase() } as any;
       if (Array.isArray(body.tags)) updateData.tags = body.tags.map((v: any) => String(v).trim()).filter(Boolean);
       if (body.testNowEligible !== undefined) updateData.testNowEligible = Boolean(body.testNowEligible);
       if (body.isGoldenEligible !== undefined) updateData.isGoldenEligible = Boolean(body.isGoldenEligible);
       if (body.goldenWeight !== undefined) updateData.goldenWeight = Math.max(1, Number(body.goldenWeight) || 1);
       if (body.goldenBonusXp !== undefined) updateData.goldenBonusXp = Math.max(0, Number(body.goldenBonusXp) || 0);
+      const existing = await prisma.mCQQuestion.findUnique({ where: { id } });
+      const mergedData = { ...(((existing as any)?.data && typeof (existing as any).data === "object") ? (existing as any).data : {}), ...((updateData.data && typeof updateData.data === "object") ? updateData.data : {}) } as any;
+      const quality = validateQuestionQuality({
+        prompt: updateData.prompt ?? (existing as any)?.prompt,
+        type: (existing as any)?.type,
+        choices: (existing as any)?.choices,
+        correctIndex: (existing as any)?.correctIndex,
+        data: mergedData,
+        explanation: updateData.explanation ?? (existing as any)?.explanation,
+      });
+      updateData.data = { ...mergedData, qualityScore: quality.qualityScore, qualityIssues: quality.issues };
       const question = await prisma.mCQQuestion.update({ where: { id }, data: updateData });
-      return NextResponse.json({ ok: true, question });
+      return NextResponse.json({ ok: true, question, quality });
     }
 
     if (Array.isArray(body?.ids) && body?.patch && typeof body.patch === "object") {

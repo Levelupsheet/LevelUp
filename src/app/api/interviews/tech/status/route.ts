@@ -11,7 +11,7 @@ export async function GET(req: Request) {
   if (!userId) return Response.json({ error: "userId required" }, { status: 400 });
 
   const latest = await prisma.interviewSession.findFirst({
-    where: { userId, kind: "HR", status: "FINISHED" },
+    where: { userId, kind: "TECH", status: "FINISHED" },
     orderBy: { finishedAt: "desc" },
     select: { pass: true, finishedAt: true, scoreAvg: true, summary: true },
   });

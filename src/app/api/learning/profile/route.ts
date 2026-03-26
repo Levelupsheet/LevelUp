@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getRequestUserId } from "@/app/api/_lib/authUser";
 import { inferDomainFromQuestion, type LearningProfileSnapshot } from "@/lib/learningProfile";
+import { buildPersonalizedLearningPath } from "@/lib/learningPath";
 
 const TARGET_DOMAINS = ["IDENTITY", "NETWORKING", "SECURITY", "AWS", "AZURE", "WINDOWS"] as const;
 
@@ -129,7 +130,14 @@ export async function GET(req: Request) {
       recentHistory: [],
     };
 
-    return NextResponse.json({ ok: true, profile: snapshot });
+    const learningPath = await buildPersonalizedLearningPath(userId).catch(() => null);
+    const predictedWeakness = (learningPath?.subdomainWeakness || []).slice(0, 3).map((row: any) => ({
+      domain: row.domain,
+      subdomain: row.subdomain,
+      predictedRisk: row.mastery <= 40 ? "HIGH" : row.mastery <= 60 ? "MEDIUM" : "LOW",
+    }));
+
+    return NextResponse.json({ ok: true, profile: snapshot, learningPath, predictedWeakness });
   } catch (error: any) {
     return NextResponse.json({ error: error?.message || "Failed to load learning profile" }, { status: 500 });
   }

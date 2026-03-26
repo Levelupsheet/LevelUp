@@ -20,11 +20,13 @@ export default function PracticeMiniGameModal(props: {
   const [path, setPath] = useState<PositionPath>(defaultPath ?? "HELPDESK_SUPPORT");
   const [cert, setCert] = useState<CertTrack>("A_PLUS");
   const [finalScore, setFinalScore] = useState<{ correct: number; total: number; xp: number; timeLeft?: number }>({ correct: 0, total: 0, xp: 0 });
+  const [learningPath, setLearningPath] = useState<any | null>(null);
 
   useEffect(() => {
     if (!open) return;
     setStep("setup");
     setFinalScore({ correct: 0, total: 0, xp: 0 });
+    setLearningPath(null);
   }, [open]);
 
   if (!open) return null;
@@ -35,6 +37,10 @@ export default function PracticeMiniGameModal(props: {
   function finishRun(summary: DiabloQuizRunSummary & { awardedXp?: number }) {
     setFinalScore({ correct: summary.correctCount, total: summary.totalQuestions, xp: summary.awardedXp ?? summary.xpEarned, timeLeft: summary.timeLeft });
     setStep("summary");
+    fetch("/api/learning/path", { cache: "no-store" as any })
+      .then((res) => res.json().catch(() => null))
+      .then((json) => { if (json?.learningPath) setLearningPath(json.learningPath); })
+      .catch(() => {});
     try { const raw = localStorage.getItem("lu_users"); if (raw && onXpChange) { const list = JSON.parse(raw); const activeId = localStorage.getItem("lu_active_user_id"); const active = Array.isArray(list) ? list.find((x: any) => x.id === activeId) : null; if (active) onXpChange(Number(active.xp || 0), Number(active.level || 1)); } } catch {}
   }
 
@@ -77,9 +83,26 @@ export default function PracticeMiniGameModal(props: {
 
           {step === "summary" && (
             <div className="card" style={{ padding: 14 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center" }}><div><div style={{ fontSize: 18, fontWeight: 950 }}>Run complete</div><small className="luHint">XP was synced to the user profile and DB.</small></div><span className="badge">+{finalScore.xp} XP</span></div>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}><div><div style={{ fontSize: 18, fontWeight: 950 }}>Run complete</div><small className="luHint">XP was synced to the user profile and DB.</small></div><span className="badge">+{finalScore.xp} XP</span></div>
               <div style={{ marginTop: 12, display: "grid", gap: 10 }}><div className="card" style={{ padding: 12, background: "rgba(255,255,255,0.04)" }}><b>Score</b>: {finalScore.correct} / {finalScore.total}</div>{kind === "test" && <div className="card" style={{ padding: 12, background: "rgba(255,255,255,0.04)" }}><b>Time left</b>: {Math.max(0, finalScore.timeLeft || 0)}s</div>}</div>
-              <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 14 }}><button className="secondaryBtn" type="button" onClick={() => setStep("setup")}>Try again</button><button className="primaryBtn" type="button" onClick={onClose}>Done</button></div>
+              <div className="stage5SummaryGrid" style={{ marginTop: 12 }}>
+                <div className="card" style={{ padding: 12, background: "rgba(255,255,255,0.04)" }}>
+                  <div style={{ fontWeight: 900, marginBottom: 6 }}>Next learning focus</div>
+                  {learningPath?.recommendations?.length ? (
+                    <div style={{ display: "grid", gap: 8 }}>
+                      {learningPath.recommendations.slice(0, 3).map((item: string, idx: number) => (
+                        <div key={idx} className="stage5SummaryNote">{item}</div>
+                      ))}
+                    </div>
+                  ) : <div className="muted">Complete more sessions to build your adaptive path.</div>}
+                </div>
+                <div className="card" style={{ padding: 12, background: "rgba(255,255,255,0.04)" }}>
+                  <div style={{ fontWeight: 900, marginBottom: 6 }}>Readiness snapshot</div>
+                  <div className="stage5SummaryMetric">{typeof learningPath?.readinessScore === "number" ? `${learningPath.readinessScore}%` : "—"}</div>
+                  <div className="muted">Momentum: {learningPath?.momentum || "BUILDING"}</div>
+                </div>
+              </div>
+              <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 14, flexWrap: "wrap" }}><button className="secondaryBtn" type="button" onClick={() => setStep("setup")}>Try again</button><button className="primaryBtn" type="button" onClick={onClose}>Done</button></div>
             </div>
           )}
         </div>
