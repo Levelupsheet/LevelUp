@@ -2516,3 +2516,75 @@ button.gold, a.gold{
 .toggle .label{ font-size: 13px; opacity: .9; }
 @media (max-width: 1280px){ .d2InterviewGrid.stage8CompactGrid{ grid-template-columns: 240px minmax(0,1fr) 260px; gap: 12px; } }
 @media (max-width: 1100px){ .content-grid{ grid-template-columns: 1fr; } }
+
+
+/* Stage 8.6 final quiz polish */
+.d2EnemyHint{ display:none; }
+.d2QuestionPrompt{
+  font-size: clamp(17px, 1.75vw, 22px);
+  line-height: 1.18;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  word-break: break-word;
+  text-wrap: balance;
+}
+.stage5MergedFeedbackCard{
+  background: rgba(255,255,255,0.045);
+}
+.stage5MergedExplanation{
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+.stage5MergedExplanationTitle{
+  font-weight: 900;
+  margin-bottom: 6px;
+}
+@media (min-width: 861px){
+  .d2QuizShell .modalHead{
+    padding-bottom: 4px;
+  }
+  .d2QuizShell .modalTitle{
+    margin-bottom: 0;
+  }
+  .d2QuizQuestionCard{
+    padding: 12px 12px 10px;
+  }
+  .d2QuizQuestionCard .badge{
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+  .d2QuizQuestionCard .card{
+    padding: 8px;
+  }
+  .d2QuizQuestionCard textarea.input{
+    min-height: 72px !important;
+    font-size: 14px;
+  }
+  .d2QuizQuestionCard .input,
+  .d2QuizQuestionCard select{
+    min-height: 42px;
+    font-size: 14px;
+  }
+  .d2QuizQuestionCard .d2ChoiceBtn{
+    padding: 9px 11px;
+    font-size: 14px;
+    line-height: 1.22;
+  }
+  .d2QuizQuestionCard .d2Btn{
+    min-height: 40px;
+    padding: 10px 12px;
+  }
+  .stage5MetaStrip{
+    gap: 6px;
+    margin-top: 8px;
+  }
+  .stage8CompactBar{
+    margin-top: 8px !important;
+    padding: 8px !important;
+  }
+  .stage7PowerStrip{
+    margin: 6px 0 8px;
+    padding: 8px 10px;
+  }
+}

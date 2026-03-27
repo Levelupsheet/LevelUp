@@ -896,6 +896,47 @@ export default function DiabloQuizRunner(props: {
     return false;
   }
 
+  function triggerPrimaryAction() {
+    if (!question) return;
+    if (state.locked) {
+      void handleNext();
+      return;
+    }
+    if (!canSubmitCurrentQuestion()) return;
+    if (usesManualSubmit) {
+      handleManualSubmit();
+    } else {
+      submit();
+    }
+  }
+
+  useEffect(() => {
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key !== "Enter") return;
+      if (event.shiftKey || event.ctrlKey || event.altKey || event.metaKey) return;
+      const target = event.target as HTMLElement | null;
+      const tag = (target?.tagName || "").toLowerCase();
+      const editable = target?.getAttribute?.("contenteditable");
+      if (editable === "true" || tag === "button") return;
+      event.preventDefault();
+      triggerPrimaryAction();
+    }
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [
+    question?.id,
+    state.locked,
+    state.selected,
+    usesManualSubmit,
+    fillValue,
+    cliValue,
+    logValue,
+    sequenceItems,
+    multiSelected,
+    matchingSelections,
+  ]);
+
   return (
     <div
       className="modalShell d2QuizShell"
@@ -904,7 +945,7 @@ export default function DiabloQuizRunner(props: {
       <div className="modalHead">
         <div>
           <div className="modalTitle d2Roman">{title}</div>
-          {subtitle ? <div className="muted">{subtitle}</div> : null}
+          
         </div>
         {onExit ? (
           <button className="btn" type="button" onClick={onExit}>{exitLabel}</button>
@@ -1024,7 +1065,7 @@ export default function DiabloQuizRunner(props: {
                   <div className="d2ActionRow stage8ActionDock" style={{ marginTop: 12 }}>
                     {!state.locked ? (
                       <>
-                        <button className="d2Btn" onClick={() => (usesManualSubmit ? handleManualSubmit() : submit())} disabled={!canSubmitCurrentQuestion()}>SUBMIT</button>
+                        <button className="d2Btn" onClick={() => triggerPrimaryAction()} disabled={!canSubmitCurrentQuestion()}>SUBMIT</button>
                         <button
                           className="d2Btn"
                           onClick={() => {
@@ -1052,19 +1093,19 @@ export default function DiabloQuizRunner(props: {
 
                   {state.locked && (
                     <div style={{ marginTop: 12, display: "grid", gap: 10 }}>
-                      <div className="card stage5FeedbackCard" style={{ padding: 12, background: (question as any)?.isGolden ? "rgba(255,215,64,0.08)" : "rgba(255,255,255,0.04)", borderColor: (question as any)?.isGolden ? "rgba(255,215,64,0.35)" : undefined }}>
+                      <div className="card stage5FeedbackCard stage5MergedFeedbackCard" style={{ padding: 12, background: (question as any)?.isGolden ? "rgba(255,215,64,0.08)" : "rgba(255,255,255,0.04)", borderColor: (question as any)?.isGolden ? "rgba(255,215,64,0.35)" : undefined }}>
                         <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
                           <div style={{ fontWeight: 950 }}>{state.lastWasCorrect ? "✅ Correct" : partialPercent > 0 ? "🟨 Partial credit" : "❌ Not quite"}</div>
                           <div className="stage5ScorePill">{partialPercent}% accuracy</div>
                         </div>
                         <div className="muted" style={{ marginTop: 6 }}>{state.feedback || "Review the explanation and continue."}</div>
-                        {(question as any)?.isGolden && state.lastWasCorrect ? <div style={{ marginTop: 8, color: "#ffe28a", fontWeight: 700 }}>Golden question cleared — click NEXT to enter the golden sweepstakes draw.</div> : null}
-                      </div>
-                      <div className="card stage5ExplanationCard" style={{ padding: 12 }}>
-                        <div style={{ fontWeight: 900, marginBottom: 6 }}>Why this answer worked</div>
-                        <div className="muted" style={{ whiteSpace: "pre-wrap", lineHeight: 1.45 }}>
-                          {isExplaining ? "Building smart explanation…" : (typeof answerInsight?.explanation === "string" ? answerInsight.explanation : answerInsight?.explanation?.whyCorrect || answerInsight?.explanation?.whyUser || question.explanation || state.feedback || "Review the explanation and continue.")}
+                        <div className="stage5MergedExplanation">
+                          <div className="stage5MergedExplanationTitle">Why this answer worked</div>
+                          <div className="muted" style={{ whiteSpace: "pre-wrap", lineHeight: 1.42 }}>
+                            {isExplaining ? "Building smart explanation…" : (typeof answerInsight?.explanation === "string" ? answerInsight.explanation : answerInsight?.explanation?.whyCorrect || answerInsight?.explanation?.whyUser || question.explanation || state.feedback || "Review the explanation and continue.")}
+                          </div>
                         </div>
+                        {(question as any)?.isGolden && state.lastWasCorrect ? <div style={{ marginTop: 8, color: "#ffe28a", fontWeight: 700 }}>Golden question cleared — click NEXT to enter the golden sweepstakes draw.</div> : null}
                       </div>
                     </div>
                   )}
@@ -1173,7 +1214,7 @@ export default function DiabloQuizRunner(props: {
                   <div className="d2ActionRow mobileQuizActions" style={{ marginTop: 14 }}>
                     {!state.locked ? (
                       <>
-                        <button className="d2Btn" onClick={() => (usesManualSubmit ? handleManualSubmit() : submit())} disabled={!canSubmitCurrentQuestion()}>SUBMIT</button>
+                        <button className="d2Btn" onClick={() => triggerPrimaryAction()} disabled={!canSubmitCurrentQuestion()}>SUBMIT</button>
                         <button
                           className="d2Btn"
                           onClick={() => {
@@ -1200,19 +1241,19 @@ export default function DiabloQuizRunner(props: {
                   </div>
                   {state.locked && (
                     <div style={{ marginTop: 12, display: "grid", gap: 10 }}>
-                      <div className="card stage5FeedbackCard" style={{ padding: 12, background: (question as any)?.isGolden ? "rgba(255,215,64,0.08)" : "rgba(255,255,255,0.04)", borderColor: (question as any)?.isGolden ? "rgba(255,215,64,0.35)" : undefined }}>
+                      <div className="card stage5FeedbackCard stage5MergedFeedbackCard" style={{ padding: 12, background: (question as any)?.isGolden ? "rgba(255,215,64,0.08)" : "rgba(255,255,255,0.04)", borderColor: (question as any)?.isGolden ? "rgba(255,215,64,0.35)" : undefined }}>
                         <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
                           <div style={{ fontWeight: 950 }}>{state.lastWasCorrect ? "✅ Correct" : partialPercent > 0 ? "🟨 Partial credit" : "❌ Not quite"}</div>
                           <div className="stage5ScorePill">{partialPercent}% accuracy</div>
                         </div>
                         <div className="muted" style={{ marginTop: 6 }}>{state.feedback || "Review the explanation and continue."}</div>
-                        {(question as any)?.isGolden && state.lastWasCorrect ? <div style={{ marginTop: 8, color: "#ffe28a", fontWeight: 700 }}>Golden question cleared — click NEXT to enter the golden sweepstakes draw.</div> : null}
-                      </div>
-                      <div className="card stage5ExplanationCard" style={{ padding: 12 }}>
-                        <div style={{ fontWeight: 900, marginBottom: 6 }}>Why this answer worked</div>
-                        <div className="muted" style={{ whiteSpace: "pre-wrap", lineHeight: 1.45 }}>
-                          {isExplaining ? "Building smart explanation…" : (typeof answerInsight?.explanation === "string" ? answerInsight.explanation : answerInsight?.explanation?.whyCorrect || answerInsight?.explanation?.whyUser || question.explanation || state.feedback || "Review the explanation and continue.")}
+                        <div className="stage5MergedExplanation">
+                          <div className="stage5MergedExplanationTitle">Why this answer worked</div>
+                          <div className="muted" style={{ whiteSpace: "pre-wrap", lineHeight: 1.42 }}>
+                            {isExplaining ? "Building smart explanation…" : (typeof answerInsight?.explanation === "string" ? answerInsight.explanation : answerInsight?.explanation?.whyCorrect || answerInsight?.explanation?.whyUser || question.explanation || state.feedback || "Review the explanation and continue.")}
+                          </div>
                         </div>
+                        {(question as any)?.isGolden && state.lastWasCorrect ? <div style={{ marginTop: 8, color: "#ffe28a", fontWeight: 700 }}>Golden question cleared — click NEXT to enter the golden sweepstakes draw.</div> : null}
                       </div>
                     </div>
                   )}

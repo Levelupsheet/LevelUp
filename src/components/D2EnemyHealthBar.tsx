@@ -50,9 +50,6 @@ export default function D2EnemyHealthBar(props: {
         </div>
       </div>
 
-      <div className="d2EnemyHint">
-        Right answers damage the enemy • Wrong answers damage you
-      </div>
     </div>
   );
 }
