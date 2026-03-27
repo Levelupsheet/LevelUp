@@ -332,9 +332,9 @@ function renderQuestionInput(args: {
       <div style={{ marginTop: 14, display: "grid", gap: 10 }}>
         {data.instructions ? <div className="badge">{String(data.instructions)}</div> : null}
         {sequenceItems.map((item, index) => (
-          <div key={`${item}_${index}`} className="card" style={{ padding: 10, background: "rgba(255,255,255,0.04)", display: "flex", gap: 10, alignItems: "center" }}>
+          <div key={`${item}_${index}`} className="card d2CompactSequenceRow" style={{ padding: 8, background: "rgba(255,255,255,0.04)", display: "flex", gap: 8, alignItems: "center" }}>
             <div style={{ fontWeight: 900, minWidth: 28 }}>{index + 1}.</div>
-            <div style={{ flex: 1 }}>{item}</div>
+            <div className="d2CompactSequenceText" style={{ flex: 1 }}>{item}</div>
             <div style={{ display: "flex", gap: 8 }}>
               <button type="button" className="d2Btn compact" disabled={state.locked || index === 0} onClick={() => moveSequenceItem(index, index - 1)}>UP</button>
               <button type="button" className="d2Btn compact" disabled={state.locked || index === sequenceItems.length - 1} onClick={() => moveSequenceItem(index, index + 1)}>DOWN</button>
@@ -405,11 +405,11 @@ function renderQuestionInput(args: {
           return (
             <div
               key={`${left}_${index}`}
-              className="card"
+              className="card d2CompactMatchRow"
               style={{
-                padding: 12,
+                padding: 10,
                 display: "grid",
-                gridTemplateColumns: "minmax(180px, 1.2fr) minmax(180px, 1fr)",
+                gridTemplateColumns: "minmax(140px, 1.1fr) minmax(160px, 0.9fr)",
                 gap: 12,
                 alignItems: "center",
                 background: "rgba(255,255,255,0.04)",
@@ -525,6 +525,7 @@ export default function DiabloQuizRunner(props: {
   const [stage8History, setStage8History] = useState<Stage8QuestionResult[]>([]);
   const [xpBoostRemaining, setXpBoostRemaining] = useState(0);
   const [microRewardFlash, setMicroRewardFlash] = useState<string | null>(null);
+  const [showSessionIntel, setShowSessionIntel] = useState(false);
   const [achievementFlash, setAchievementFlash] = useState<string | null>(null);
   const [fatigueState, setFatigueState] = useState<Stage8Fatigue>({ fatigued: false, reason: null, suggestion: null });
   const questionStartRef = useRef(Date.now());
@@ -860,6 +861,26 @@ export default function DiabloQuizRunner(props: {
     setPowerups((current) => current.furyUses > 0 && !current.furyActive ? { ...current, furyUses: current.furyUses - 1, furyActive: true } : current);
   }
 
+
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key !== "Enter" || e.defaultPrevented) return;
+      const target = e.target as HTMLElement | null;
+      const tag = (target?.tagName || "").toLowerCase();
+      if (tag === "textarea") return;
+      if (!state.locked && canSubmitCurrentQuestion()) {
+        e.preventDefault();
+        if (usesManualSubmit) handleManualSubmit();
+        else submit();
+      } else if (state.locked) {
+        e.preventDefault();
+        void handleNext();
+      }
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [state.locked, fillValue, cliValue, logValue, matchingSelections, multiSelected, sequenceItems, state.selected, usesManualSubmit, question]);
+
   function canSubmitCurrentQuestion() {
     if (!question || state.locked) return false;
     if (!usesManualSubmit) return state.selected != null;
@@ -895,11 +916,15 @@ export default function DiabloQuizRunner(props: {
       <div className="modalBody d2QuizBody" style={{ flex: 1, overflow: "hidden", paddingTop: 0 }}>
         {!isMobileLayout ? (
           <div className="d2InterviewGrid d2QuizGrid stage8CompactGrid" style={{ height: "100%", alignItems: "stretch" }}>
-            <div style={{ display: "grid", gap: 10, alignContent: "start" }}>
+            <div style={{ display: "grid", gap: 10, alignContent: "start", minHeight: 0 }}>
               <div className={hitPulse === "player" ? "d2Shake" : ""}>
                 <D2LifeOrb value={state.playerHP} name={playerName} />
               </div>
               <ModelPanel title={playerName} src={playerVideo} loop={!isPlayerHitVideo} onEnded={isPlayerHitVideo ? () => setHitPulse(null) : undefined} height="clamp(180px, 22vh, 280px)" damageText={damageFloat.player || null} damageTone="player" />
+              <div className="stage7PowerStrip underPlayer">
+                <button className={"d2Btn power" + (powerups.shieldActive ? " active" : "")} type="button" disabled={state.locked || powerups.shieldActive || powerups.shieldUses <= 0} onClick={activateShield}>Shield {powerups.shieldActive ? "On" : powerups.shieldUses > 0 ? `x${powerups.shieldUses}` : "Locked"}</button>
+                <button className={"d2Btn power" + (powerups.furyActive ? " active" : "")} type="button" disabled={state.locked || powerups.furyActive || powerups.furyUses <= 0} onClick={activateFury}>Fury {powerups.furyActive ? "On" : powerups.furyUses > 0 ? `x${powerups.furyUses}` : "Locked"}</button>
+              </div>
             </div>
 
             <div className={"d2QuestionCard d2QuizQuestionCard " + (hitPulse === "enemy" ? "d2HitFlash" : "") + ((question as any)?.isGolden ? " d2GoldenQuestionCard" : "") } style={{ minHeight: 0, height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
@@ -924,7 +949,7 @@ export default function DiabloQuizRunner(props: {
                     </div>
                   </div>
 
-                  <div style={{ marginTop: 10, fontSize: 18, lineHeight: 1.28, fontWeight: 900 }}>{question.prompt}</div>
+                  <div style={{ marginTop: 10, fontSize: "clamp(16px, 1.5vw, 28px)", lineHeight: 1.18, fontWeight: 900 }}>{question.prompt}</div>
 
                   <DomainRuneBar domainLabel={domainLabel} mastery={currentMastery} tier={state.tier} />
                   <div className="stage5MetaStrip">
@@ -935,16 +960,27 @@ export default function DiabloQuizRunner(props: {
                     {partialPercent > 0 && state.locked ? <span className="badge">Partial credit {partialPercent}%</span> : null}
                   </div>
 
-                  <div className="card stage8CompactBar" style={{ marginTop: 10, padding: 10, background: "rgba(110,190,255,0.07)", borderColor: fatigueState.fatigued ? "rgba(255,170,90,0.30)" : "rgba(110,190,255,0.18)" }}>
-                    <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center", justifyContent: "space-between" }}>
-                      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+                  <div className="stage8CompactBar" style={{ marginTop: 10 }}>
+                    <div className="stage8CompactBarRow">
+                      <div className="stage8CompactMini">
                         <span className="badge">🔥 Reward in {stage8Momentum.nextRewardIn}</span>
                         <span className="badge">{stage8Momentum.xpBoostActive ? `⚡ Boost ${stage8Momentum.xpBoostRemaining}` : "⚡ Boost readying"}</span>
                         <span className="badge">Tier {effectiveQuestionTier}</span>
+                        {microRewardFlash ? <span className="badge stage8MicroFlash">{microRewardFlash}</span> : null}
                       </div>
-                      {microRewardFlash ? <span className="badge stage8MicroFlash">{microRewardFlash}</span> : null}
+                      <button type="button" className="d2Btn compact" onClick={() => setShowSessionIntel((v) => !v)}>
+                        {showSessionIntel ? "Hide session info" : "Session info"}
+                      </button>
                     </div>
-                    {fatigueState.fatigued ? <div className="muted stage8AssistText">💡 Easier question incoming.</div> : null}
+                    {showSessionIntel ? (
+                      <div className="card stage8IntelPanel" style={{ marginTop: 8, padding: 10, background: "rgba(110,190,255,0.07)", borderColor: fatigueState.fatigued ? "rgba(255,170,90,0.30)" : "rgba(110,190,255,0.18)" }}>
+                        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+                          <span className="badge">Pace {fatigueState.fatigued ? "recovering" : "steady"}</span>
+                          <span className="badge">Difficulty {effectiveQuestionTier}</span>
+                        </div>
+                        {fatigueState.fatigued ? <div className="muted stage8AssistText">💡 Easier question incoming.</div> : null}
+                      </div>
+                    ) : null}
                   </div>
 
                   <div className="stage7PowerStrip">
@@ -1058,13 +1094,26 @@ export default function DiabloQuizRunner(props: {
               </div>
             </div>
 
-            <div className="card stage8CompactBar" style={{ padding: 10, background: "rgba(110,190,255,0.07)", borderColor: fatigueState.fatigued ? "rgba(255,170,90,0.30)" : "rgba(110,190,255,0.18)" }}>
-              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                <span className="badge">🔥 {stage8Momentum.nextRewardIn} to reward</span>
-                <span className="badge">{stage8Momentum.xpBoostActive ? `⚡ Boost ${stage8Momentum.xpBoostRemaining}` : "⚡ Boost readying"}</span>
-                <span className="badge">Tier {effectiveQuestionTier}</span>
+            <div className="stage8CompactBar">
+              <div className="stage8CompactBarRow">
+                <div className="stage8CompactMini">
+                  <span className="badge">🔥 {stage8Momentum.nextRewardIn} to reward</span>
+                  <span className="badge">{stage8Momentum.xpBoostActive ? `⚡ Boost ${stage8Momentum.xpBoostRemaining}` : "⚡ Boost readying"}</span>
+                  <span className="badge">Tier {effectiveQuestionTier}</span>
+                </div>
+                <button type="button" className="d2Btn compact" onClick={() => setShowSessionIntel((v) => !v)}>
+                  {showSessionIntel ? "Hide" : "Info"}
+                </button>
               </div>
-              {fatigueState.fatigued ? <div className="muted stage8AssistText">💡 Easier question incoming.</div> : null}
+              {showSessionIntel ? (
+                <div className="card stage8IntelPanel" style={{ marginTop: 8, padding: 10, background: "rgba(110,190,255,0.07)", borderColor: fatigueState.fatigued ? "rgba(255,170,90,0.30)" : "rgba(110,190,255,0.18)" }}>
+                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                    <span className="badge">Pace {fatigueState.fatigued ? "recovering" : "steady"}</span>
+                    <span className="badge">Difficulty {effectiveQuestionTier}</span>
+                  </div>
+                  {fatigueState.fatigued ? <div className="muted stage8AssistText">💡 Easier question incoming.</div> : null}
+                </div>
+              ) : null}
             </div>
 
             <div className="stage7PowerStrip mobile">

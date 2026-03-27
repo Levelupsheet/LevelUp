@@ -2480,3 +2480,39 @@ button.gold, a.gold{
     max-height: none !important;
   }
 }
+
+
+/* === Stage 8.5 quiz fit + admin content restore === */
+.d2QuizShell{ overflow: hidden; }
+.d2InterviewGrid.stage8CompactGrid{ grid-template-columns: 280px minmax(0,1fr) 300px; gap: 14px; }
+.d2QuizQuestionCard{ min-width: 0; }
+.stage8CompactBarRow{ display:flex; gap:8px; align-items:center; justify-content:space-between; flex-wrap:wrap; }
+.stage8CompactMini{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+.stage8IntelPanel{ border-radius: 14px; }
+.stage7PowerStrip.underPlayer{ display:grid; grid-template-columns: 1fr 1fr; gap:8px; }
+.stage7PowerStrip.underPlayer .d2Btn{ min-width:0; }
+.d2CompactSequenceRow{ min-height: 46px; }
+.d2CompactSequenceText{ white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: clamp(12px, 1vw, 18px); }
+.d2CompactMatchRow{ min-height: 54px; }
+.d2CompactMatchRow > div:first-child{ font-size: clamp(12px, 1vw, 17px); line-height: 1.2; }
+.d2CompactMatchRow select, .d2CompactMatchRow .input{ min-height: 42px !important; padding-top: 8px; padding-bottom: 8px; font-size: 14px; }
+.d2QuestionCard .badge{ max-width: 100%; }
+.d2QuestionCard .d2ChoiceBtn{ padding: 11px 12px; font-size: clamp(13px, .95vw, 17px); }
+.d2QuestionCard textarea.input{ min-height: 74px !important; }
+.d2QuestionCard .input{ font-size: clamp(13px, .95vw, 16px); }
+.d2ActionRow{ margin-top: 10px; }
+.mobileQuizQuestionCard{ overflow:hidden; }
+.content-grid{ display:grid; grid-template-columns: 320px minmax(0,1fr); gap: 18px; align-items:start; }
+.content-sidebar{ max-height: min(70vh, 900px); overflow:auto; }
+.content-actions{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+.live-grid{ display:grid; gap:12px; }
+.mini-btn{ min-height: 36px; padding: 8px 12px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.06); color: inherit; }
+.mini-btn.active{ background: rgba(120,190,255,0.16); border-color: rgba(120,190,255,0.42); }
+.toggle{ display:inline-flex; align-items:center; gap:8px; }
+.toggle .rail{ width: 42px; height: 24px; border-radius: 999px; background: rgba(255,255,255,0.14); position: relative; display:inline-block; vertical-align: middle; }
+.toggle .thumb{ width: 18px; height: 18px; border-radius: 999px; background: #fff; position:absolute; top:3px; left:3px; transition: transform .18s ease; }
+.toggle input:checked + .rail .thumb{ transform: translateX(18px); }
+.toggle input{ display:none; }
+.toggle .label{ font-size: 13px; opacity: .9; }
+@media (max-width: 1280px){ .d2InterviewGrid.stage8CompactGrid{ grid-template-columns: 240px minmax(0,1fr) 260px; gap: 12px; } }
+@media (max-width: 1100px){ .content-grid{ grid-template-columns: 1fr; } }
