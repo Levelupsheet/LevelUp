@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { createUser, getActiveUser, getUsers, setActiveUserId } from "@/lib/userStore";
 import RewardsHistoryModal from "@/components/RewardsHistoryModal";
+import { levelFromXp } from "@/lib/progression";
 
 export default function ProfileModal(props: {
   open: boolean;
@@ -120,7 +121,7 @@ export default function ProfileModal(props: {
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 10, marginBottom: 14 }}>
                 <div className="luInset" style={{ padding: 12 }}>
                   <div className="muted" style={{ fontSize: 12 }}>Level</div>
-                  <div style={{ fontSize: 24, fontWeight: 900 }}>{Math.max(1, Math.floor(Number(active.xp || 0) / 500) + 1)}</div>
+                  <div style={{ fontSize: 24, fontWeight: 900 }}>{levelFromXp(Number(active.xp || 0))}</div>
                 </div>
                 <div className="luInset" style={{ padding: 12 }}>
                   <div className="muted" style={{ fontSize: 12 }}>Sweepstakes entered</div>

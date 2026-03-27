@@ -9,6 +9,7 @@ import { calculateConfidenceScore, recordQuestionExposure, upsertQuestionCalibra
 import { getSweepstakesCampaignMetaMap } from "@/lib/sweepstakesCampaignMeta";
 import { awardRaffleEntries, getOrCreateActiveGoldenSweepstakes } from "@/lib/raffle";
 import { buildQuestionExplanation } from "@/lib/explanations";
+import { levelFromXp } from "@/lib/progression";
 
 async function ensureGoldenQuestionHistoryTable() {
   try {
@@ -100,7 +101,8 @@ async function buildNewSession(userId: string, questionCount = 10) {
   let goldenQuestionIndex: number | null = null;
   let finalQuestions: any[] = [...selected];
 
-  const currentLevel = Math.max(1, Number(Math.floor(((await prisma.user.findUnique({ where: { id: userId }, select: { xp: true } }).catch(() => ({ xp: 0 })) as any).xp || 0) / 500) + 1));
+  const currentXp = Number(((await prisma.user.findUnique({ where: { id: userId }, select: { xp: true } }).catch(() => ({ xp: 0 })) as any).xp || 0));
+  const currentLevel = levelFromXp(currentXp);
   const alreadyHadGolden = await (prisma as any).$queryRawUnsafe(`SELECT 1 FROM "GoldenQuestionHistory" WHERE "userId" = $1 AND "level" = $2 AND "awarded" = TRUE LIMIT 1`, userId, currentLevel).then((rows: any[]) => Array.isArray(rows) && rows.length > 0).catch(() => false);
 
   if (!alreadyHadGolden && finalQuestions.length >= 6) {

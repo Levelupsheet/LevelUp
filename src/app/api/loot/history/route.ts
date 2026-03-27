@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "../../_lib/prisma";
 import { ensureUser } from "../../_lib/ensureUser";
+import { levelFromXp } from "@/lib/progression";
 
 export async function GET(req: Request) {
   try {
@@ -33,7 +34,7 @@ export async function GET(req: Request) {
       }),
     ]);
 
-    const level = user ? Math.max(1, Math.floor((user.xp ?? 0) / 500) + 1) : 1;
+    const level = user ? levelFromXp(user.xp ?? 0) : 1;
 
     return NextResponse.json({
       user: user ? { ...user, level } : null,

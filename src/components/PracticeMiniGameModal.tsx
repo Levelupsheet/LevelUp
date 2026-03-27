@@ -25,6 +25,7 @@ export default function PracticeMiniGameModal(props: {
   const [learningPath, setLearningPath] = useState<any | null>(null);
   const [bossReady, setBossReady] = useState(false);
   const [bossLoading, setBossLoading] = useState(false);
+  const [bossConsumed, setBossConsumed] = useState(false);
   const [bossQuestions, setBossQuestions] = useState<DiabloQuestion[]>([]);
   const [bossRules, setBossRules] = useState<any>(null);
   const [bossMeta, setBossMeta] = useState<{ bossName: string; bossLabel: string; introTitle: string; variant: string } | null>(null);
@@ -37,6 +38,7 @@ export default function PracticeMiniGameModal(props: {
     setLearningPath(null);
     setBossReady(false);
     setBossLoading(false);
+    setBossConsumed(false);
     setBossQuestions([]);
     setBossRules(null);
     setBossMeta(null);
@@ -117,6 +119,7 @@ export default function PracticeMiniGameModal(props: {
       setBossRules(bossCombatRules(profile));
       setBossMeta(visual);
       setBossReady(true);
+      setBossConsumed(false);
     } catch {
       setBossReady(false);
     } finally {
@@ -132,7 +135,7 @@ export default function PracticeMiniGameModal(props: {
       .then((json) => { if (json?.learningPath) setLearningPath(json.learningPath); })
       .catch(() => {});
     try { const raw = localStorage.getItem("lu_users"); if (raw && onXpChange) { const list = JSON.parse(raw); const activeId = localStorage.getItem("lu_active_user_id"); const active = Array.isArray(list) ? list.find((x: any) => x.id === activeId) : null; if (active) onXpChange(Number(active.xp || 0), Number(active.level || 1)); } } catch {}
-    if (step !== "boss" && shouldOfferBoss(summary)) buildBossRun(summary);
+    if (step !== "boss" && !bossConsumed && shouldOfferBoss(summary)) buildBossRun(summary);
   }
 
   return (
@@ -185,8 +188,11 @@ export default function PracticeMiniGameModal(props: {
               metaRight="3 questions"
               questionsOverride={bossQuestions}
               rulesOverride={bossRules}
+              encounterType="boss"
               onComplete={(summary: any) => {
                 setBossReward({ xp: Number(summary?.awardedXp || summary?.xpEarned || 0), won: summary?.outcome === "victory" });
+                setBossConsumed(true);
+                setBossReady(false);
                 setStep("summary");
               }}
             />
@@ -199,16 +205,16 @@ export default function PracticeMiniGameModal(props: {
                 <div className="card" style={{ padding: 12, background: "rgba(255,255,255,0.04)" }}><b>Score</b>: {finalScore.correct} / {finalScore.total}</div>
                 {kind === "test" && <div className="card" style={{ padding: 12, background: "rgba(255,255,255,0.04)" }}><b>Time left</b>: {Math.max(0, finalScore.timeLeft || 0)}s</div>}
                 {typeof finalScore.bestStreak === "number" ? <div className="card" style={{ padding: 12, background: "rgba(255,255,255,0.04)" }}><b>Best streak</b>: {finalScore.bestStreak}</div> : null}
-                {bossMeta ? (
-                  <div className="card" style={{ padding: 12, background: "rgba(255,215,64,0.06)", borderColor: "rgba(255,215,64,0.28)" }}>
-                    <div style={{ fontWeight: 900 }}>{bossMeta.introTitle}</div>
-                    <div className="muted" style={{ marginTop: 6 }}>A bonus boss battle is available for extra XP. Bosses only roll after clearing 70% accuracy.</div>
+                {bossMeta && !bossConsumed ? (
+                  <div className="card stage7BossSummaryCard">
+                    <div className="stage7BossSummaryTitle">{bossMeta.introTitle}</div>
+                    <div className="muted stage7BossSummaryCopy">A rare bonus boss battle rolled for this run. Clear it once for bonus XP. After the fight, this run is complete.</div>
                     <div style={{ marginTop: 10, display: "flex", gap: 10, flexWrap: "wrap" }}>
-                      <button className="primaryBtn" type="button" onClick={() => setStep("boss")} disabled={!bossReady || bossLoading}>{bossLoading ? "Preparing…" : `Start ${bossMeta.bossLabel}`}</button>
+                      <button className="primaryBtn" type="button" onClick={() => { setBossConsumed(true); setStep("boss"); }} disabled={!bossReady || bossLoading}>{bossLoading ? "Preparing…" : `Start ${bossMeta.bossLabel}`}</button>
                     </div>
                   </div>
                 ) : null}
-                {bossReward ? <div className="card" style={{ padding: 12, background: bossReward.won ? "rgba(46,204,113,0.08)" : "rgba(255,255,255,0.04)" }}><b>{bossReward.won ? "Boss cleared" : "Boss attempt completed"}</b>: +{bossReward.xp} XP</div> : null}
+                {bossReward ? <div className="card" style={{ padding: 12, background: bossReward.won ? "rgba(46,204,113,0.08)" : "rgba(255,255,255,0.04)" }}><b>{bossReward.won ? "Boss cleared" : "Boss attempt completed"}</b>: +{bossReward.xp} XP<div className="muted" style={{ marginTop: 6 }}>This bonus fight has been consumed for this run.</div></div> : null}
               </div>
               <div className="stage5SummaryGrid" style={{ marginTop: 12 }}>
                 <div className="card" style={{ padding: 12, background: "rgba(255,255,255,0.04)" }}>
@@ -227,7 +233,10 @@ export default function PracticeMiniGameModal(props: {
                   <div className="muted">Momentum: {learningPath?.momentum || "BUILDING"}</div>
                 </div>
               </div>
-              <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 14, flexWrap: "wrap" }}><button className="secondaryBtn" type="button" onClick={() => setStep("setup")}>Try again</button><button className="primaryBtn" type="button" onClick={onClose}>Done</button></div>
+              <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 14, flexWrap: "wrap" }}>
+                {!bossReward ? <button className="secondaryBtn" type="button" onClick={() => setStep("setup")}>Try again</button> : null}
+                <button className="primaryBtn" type="button" onClick={onClose}>{bossReward ? "Finish" : "Done"}</button>
+              </div>
             </div>
           )}
         </div>

@@ -18,6 +18,7 @@ import {
 } from "@/lib/questionTypes";
 import { evaluateQuestionAnswer } from "@/lib/questionTransforms";
 import { domainHintLabel, getHintCost, partialExplanation, removableIncorrectIndices, type HintType } from "@/lib/hints";
+import { detectFatigue, getDynamicDifficulty, getMicroReward, getSessionMomentum, type Stage8Fatigue, type Stage8QuestionResult } from "@/engine/stage8/RetentionSystem";
 
 export type DiabloQuestion = {
   id?: string;
@@ -335,8 +336,8 @@ function renderQuestionInput(args: {
             <div style={{ fontWeight: 900, minWidth: 28 }}>{index + 1}.</div>
             <div style={{ flex: 1 }}>{item}</div>
             <div style={{ display: "flex", gap: 8 }}>
-              <button type="button" className="d2Btn" disabled={state.locked || index === 0} onClick={() => moveSequenceItem(index, index - 1)}>UP</button>
-              <button type="button" className="d2Btn" disabled={state.locked || index === sequenceItems.length - 1} onClick={() => moveSequenceItem(index, index + 1)}>DOWN</button>
+              <button type="button" className="d2Btn compact" disabled={state.locked || index === 0} onClick={() => moveSequenceItem(index, index - 1)}>UP</button>
+              <button type="button" className="d2Btn compact" disabled={state.locked || index === sequenceItems.length - 1} onClick={() => moveSequenceItem(index, index + 1)}>DOWN</button>
             </div>
           </div>
         ))}
@@ -457,6 +458,7 @@ export default function DiabloQuizRunner(props: {
   onAdvanceQuestion?: (payload: { question: DiabloQuestion; isCorrect: boolean | null; selectedAnswer?: unknown; nextIndex: number; stateSnapshot?: any }) => Promise<{ goldenAwarded?: boolean } | void> | ({ goldenAwarded?: boolean } | void);
   media?: QuizMediaConfig;
   rules?: any;
+  encounterType?: "standard" | "boss";
 }) {
   const {
     title,
@@ -477,6 +479,7 @@ export default function DiabloQuizRunner(props: {
     onAdvanceQuestion,
     media,
     rules,
+    encounterType = "standard",
   } = props;
 
   const combatQuestions: CombatQuestion[] = useMemo(
@@ -519,15 +522,27 @@ export default function DiabloQuizRunner(props: {
   const [streak, setStreak] = useState(0);
   const [bestStreak, setBestStreak] = useState(0);
   const [powerups, setPowerups] = useState<Stage7PowerupState>({ shieldActive: false, furyActive: false, shieldUses: 0, furyUses: 0 });
+  const [stage8History, setStage8History] = useState<Stage8QuestionResult[]>([]);
+  const [xpBoostRemaining, setXpBoostRemaining] = useState(0);
+  const [microRewardFlash, setMicroRewardFlash] = useState<string | null>(null);
+  const [achievementFlash, setAchievementFlash] = useState<string | null>(null);
+  const [fatigueState, setFatigueState] = useState<Stage8Fatigue>({ fatigued: false, reason: null, suggestion: null });
+  const questionStartRef = useRef(Date.now());
 
   const finishedOnceRef = useRef(false);
 
-  const { state, question, select, clear, submit, submitManual, next, currentDomainId, currentMastery, outcome } = useCombatQuiz({
-    questions: combatQuestions,
+  const { state, question, select, clear, submit, submitManual, next, currentDomainId, currentMastery, outcome } = useCombatQuiz({    questions: combatQuestions,
     rules,
     timed,
     onXp,
     getActiveModifiers: () => ({ shieldActive: powerups.shieldActive, furyActive: powerups.furyActive }),
+    getQuestionLevel: () => effectiveQuestionTier,
+    getXpMultiplier: ({ correct }) => (correct && xpBoostRemaining > 0 ? 1.25 : 1),
+    getXpBonus: ({ correct }) => {
+      if (!correct) return 0;
+      const reward = getMicroReward({ streak: streak + 1, questionIndex: state.idx, totalQuestions: combatQuestions.length, correct });
+      return reward?.xp || 0;
+    },
     onConsumeModifier: (name) => {
       setPowerups((current) => ({
         ...current,
@@ -536,6 +551,8 @@ export default function DiabloQuizRunner(props: {
       }));
     },
     onSubmit: (r) => {
+      const responseTimeMs = Math.max(500, Date.now() - questionStartRef.current);
+      const baseTier = ((question?.level || 1) as DifficultyTier);
       setHitPulse(r.correct ? "enemy" : "player");
       if (r.correct) {
         setDamageFloat({ enemy: `-${Math.max(1, 100 - r.enemyHP)} HP` });
@@ -543,6 +560,12 @@ export default function DiabloQuizRunner(props: {
         setDamageFloat({ player: `-${Math.max(1, 100 - r.playerHP)} HP` });
       }
       window.setTimeout(() => setDamageFloat({}), 900);
+
+      const nextHistory = [...stage8History, { correct: Boolean(r.correct), responseTimeMs, baseTier }].slice(-8);
+      setStage8History(nextHistory);
+      const fatigue = detectFatigue(nextHistory);
+      setFatigueState(fatigue);
+
       if (r.correct) {
         setStreak((current) => {
           const nextValue = current + 1;
@@ -553,10 +576,35 @@ export default function DiabloQuizRunner(props: {
             if (nextValue === 5 && next.furyUses < 1 && !next.furyActive) next.furyUses = 1;
             return next;
           });
+
+          const micro = getMicroReward({ streak: nextValue, questionIndex: state.idx, totalQuestions: combatQuestions.length, correct: true });
+          if (micro) {
+            setMicroRewardFlash(`+${micro.xp} XP • ${micro.label}`);
+            window.setTimeout(() => setMicroRewardFlash(null), 2400);
+            if (micro.achievement) {
+              setAchievementFlash(`🏆 ${micro.achievement}`);
+              window.setTimeout(() => setAchievementFlash(null), 3000);
+            }
+          }
+
+          if (nextValue > 0 && nextValue % 3 === 0) {
+            setXpBoostRemaining(3);
+          } else {
+            setXpBoostRemaining((remaining) => Math.max(0, remaining - 1));
+          }
+
           return nextValue;
         });
       } else {
         setStreak(0);
+        setXpBoostRemaining((remaining) => Math.max(0, remaining - 1));
+        if (fatigue.fatigued) {
+          setHintMessage(fatigue.suggestion || "Momentum dipped. Try a hint or use a power-up.");
+          setPowerups((current) => ({
+            ...current,
+            shieldUses: current.shieldUses < 1 ? 1 : current.shieldUses,
+          }));
+        }
       }
       if ((r.correct && !media?.enemyHitSrc) || (!r.correct && !media?.playerHitSrc)) {
         window.setTimeout(() => setHitPulse(null), 900);
@@ -566,6 +614,23 @@ export default function DiabloQuizRunner(props: {
     onStateChange,
   });
 
+  const stage8Momentum = useMemo(
+    () => getSessionMomentum({ streak, currentIndex: Math.max(0, state.idx || 0), totalQuestions: combatQuestions.length, xpBoostRemaining }),
+    [streak, state.idx, combatQuestions.length, xpBoostRemaining]
+  );
+
+  const stage8Difficulty = useMemo(
+    () => getDynamicDifficulty({
+      currentTier: ((state.tier || 1) as DifficultyTier),
+      currentQuestionLevel: (question?.level || 1) as DifficultyTier,
+      fatigue: fatigueState,
+      recentResults: stage8History,
+    }),
+    [state.tier, question?.level, fatigueState, stage8History]
+  );
+
+  const effectiveQuestionTier = stage8Difficulty.adjustedTier as DifficultyTier;
+
   const questionType = normalizeQuestionType(question?.type);
   const usesManualSubmit = questionType !== "multiple_choice" && questionType !== "incident" && questionType !== "true_false";
 
@@ -574,6 +639,12 @@ export default function DiabloQuizRunner(props: {
     setStreak(0);
     setBestStreak(0);
     setPowerups({ shieldActive: false, furyActive: false, shieldUses: 0, furyUses: 0 });
+    setStage8History([]);
+    setXpBoostRemaining(0);
+    setMicroRewardFlash(null);
+    setAchievementFlash(null);
+    setFatigueState({ fatigued: false, reason: null, suggestion: null });
+    questionStartRef.current = Date.now();
   }, [combatQuestions.length, timed, title]);
 
   useEffect(() => {
@@ -582,6 +653,10 @@ export default function DiabloQuizRunner(props: {
     window.addEventListener("resize", apply);
     return () => window.removeEventListener("resize", apply);
   }, []);
+
+  useEffect(() => {
+    questionStartRef.current = Date.now();
+  }, [question?.id]);
 
   useEffect(() => {
     const data = (question?.data || {}) as Record<string, unknown>;
@@ -763,11 +838,11 @@ export default function DiabloQuizRunner(props: {
     }
 
     const partialRatio = Number(result?.partialScore ?? result?.score ?? 0);
-    const scaledXp = result.correct ? undefined : Math.round(((question.level || 1) * 15) * Math.max(0, Math.min(1, partialRatio)));
+    const scaledXp = result.correct ? undefined : Math.round((effectiveQuestionTier * 15) * Math.max(0, Math.min(1, partialRatio)));
     submitManual({
       correct: result.correct,
       domainId: question.domainId,
-      level: question.level,
+      level: effectiveQuestionTier,
       xpDelta: scaledXp,
       feedback: result.correct
         ? question.explanation || null
@@ -858,6 +933,20 @@ export default function DiabloQuizRunner(props: {
                     <span className="badge">Streak {streak}</span>
                     {bestStreak > 0 ? <span className="badge">Best {bestStreak}</span> : null}
                     {partialPercent > 0 && state.locked ? <span className="badge">Partial credit {partialPercent}%</span> : null}
+                  </div>
+
+                  <div className="card" style={{ marginTop: 12, padding: 12, background: "rgba(110,190,255,0.08)", borderColor: fatigueState.fatigued ? "rgba(255,170,90,0.35)" : "rgba(110,190,255,0.20)" }}>
+                    <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center", justifyContent: "space-between" }}>
+                      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+                        <span className="badge">Next reward in {stage8Momentum.nextRewardIn} question{stage8Momentum.nextRewardIn === 1 ? "" : "s"}</span>
+                        <span className="badge">{stage8Momentum.xpBoostActive ? `XP boost active • ${stage8Momentum.xpBoostRemaining} answer${stage8Momentum.xpBoostRemaining === 1 ? "" : "s"} left` : "XP boost inactive"}</span>
+                        <span className="badge">Pace {stage8Momentum.paceLabel.replaceAll("_", " ")}</span>
+                        <span className="badge">Difficulty {effectiveQuestionTier}</span>
+                      </div>
+                      {microRewardFlash ? <span className="badge" style={{ borderColor: "rgba(80,255,180,0.35)", background: "rgba(80,255,180,0.12)" }}>{microRewardFlash}</span> : null}
+                    </div>
+                    {achievementFlash ? <div className="muted" style={{ marginTop: 8, color: "#ffe28a" }}>{achievementFlash}</div> : null}
+                    {fatigueState.fatigued ? <div className="muted" style={{ marginTop: 8 }}>{fatigueState.suggestion}</div> : null}
                   </div>
 
                   <div className="stage7PowerStrip">
@@ -971,6 +1060,16 @@ export default function DiabloQuizRunner(props: {
               </div>
             </div>
 
+            <div className="card" style={{ padding: 10, background: "rgba(110,190,255,0.08)", borderColor: fatigueState.fatigued ? "rgba(255,170,90,0.35)" : "rgba(110,190,255,0.20)" }}>
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                <span className="badge">Next reward in {stage8Momentum.nextRewardIn}</span>
+                <span className="badge">{stage8Momentum.xpBoostActive ? `Boost ${stage8Momentum.xpBoostRemaining}` : "No boost"}</span>
+                <span className="badge">Diff {effectiveQuestionTier}</span>
+              </div>
+              {microRewardFlash ? <div className="muted" style={{ marginTop: 8 }}>{microRewardFlash}</div> : null}
+              {fatigueState.fatigued ? <div className="muted" style={{ marginTop: 8 }}>{fatigueState.suggestion}</div> : null}
+            </div>
+
             <div className="stage7PowerStrip mobile">
               <button className={"d2Btn power" + (powerups.shieldActive ? " active" : "")} type="button" disabled={state.locked || powerups.shieldActive || powerups.shieldUses <= 0} onClick={activateShield}>Shield {powerups.shieldActive ? "Armed" : powerups.shieldUses > 0 ? `x${powerups.shieldUses}` : "Locked"}</button>
               <button className={"d2Btn power" + (powerups.furyActive ? " active" : "")} type="button" disabled={state.locked || powerups.furyActive || powerups.furyUses <= 0} onClick={activateFury}>Fury {powerups.furyActive ? "Armed" : powerups.furyUses > 0 ? `x${powerups.furyUses}` : "Locked"}</button>
@@ -983,7 +1082,7 @@ export default function DiabloQuizRunner(props: {
               </div>
             </div>
 
-            <div className={"d2QuestionCard d2QuizQuestionCard mobileQuizQuestionCard " + (hitPulse === "enemy" ? "d2HitFlash" : "") + ((question as any)?.isGolden ? " d2GoldenQuestionCard" : "")}>
+            <div className={"d2QuestionCard d2QuizQuestionCard mobileQuizQuestionCard " + (encounterType === "boss" ? " bossQuestionCard" : "") + (hitPulse === "enemy" ? " d2HitFlash" : "") + ((question as any)?.isGolden ? " d2GoldenQuestionCard" : "")}>
               {!finished && question ? (
                 <>
                   {goldenEntryFlash ? <div className="badge" style={{ marginBottom: 10, borderColor: "rgba(255,215,64,0.55)", color: "#ffe28a", background: "rgba(255,215,64,0.10)" }}>{goldenEntryFlash}</div> : null}

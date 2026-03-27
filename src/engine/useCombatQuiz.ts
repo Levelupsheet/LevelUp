@@ -31,6 +31,9 @@ export type CombatEngineOptions = {
   onStateChange?: (state: CombatState) => void;
   getActiveModifiers?: () => CombatRuntimeModifiers;
   onConsumeModifier?: (name: keyof CombatRuntimeModifiers) => void;
+  getQuestionLevel?: (question: CombatQuestion, state: CombatState) => DifficultyTier;
+  getXpMultiplier?: (args: { question: CombatQuestion; state: CombatState; correct: boolean; baseXp: number }) => number;
+  getXpBonus?: (args: { question: CombatQuestion; state: CombatState; correct: boolean; baseXp: number }) => number;
 };
 
 export function useCombatQuiz(opts: CombatEngineOptions) {
@@ -43,13 +46,19 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
   const onStateChangeRef = useRef(opts.onStateChange);
   const getActiveModifiersRef = useRef(opts.getActiveModifiers);
   const onConsumeModifierRef = useRef(opts.onConsumeModifier);
+  const getQuestionLevelRef = useRef(opts.getQuestionLevel);
+  const getXpMultiplierRef = useRef(opts.getXpMultiplier);
+  const getXpBonusRef = useRef(opts.getXpBonus);
   useEffect(() => {
     onXpRef.current = opts.onXp;
     onSubmitRef.current = opts.onSubmit;
     onStateChangeRef.current = opts.onStateChange;
     getActiveModifiersRef.current = opts.getActiveModifiers;
     onConsumeModifierRef.current = opts.onConsumeModifier;
-  }, [opts.onXp, opts.onSubmit, opts.onStateChange, opts.getActiveModifiers, opts.onConsumeModifier]);
+    getQuestionLevelRef.current = opts.getQuestionLevel;
+    getXpMultiplierRef.current = opts.getXpMultiplier;
+    getXpBonusRef.current = opts.getXpBonus;
+  }, [opts.onXp, opts.onSubmit, opts.onStateChange, opts.getActiveModifiers, opts.onConsumeModifier, opts.getQuestionLevel, opts.getXpMultiplier, opts.getXpBonus]);
 
   function buildInitialState() {
     return { ...initialCombatState(rules, timed), ...(opts.initialState || {}) } as CombatState;
@@ -58,6 +67,13 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
   const [state, setState] = useState<CombatState>(() => buildInitialState());
   const timerRef = useRef<number | null>(null);
   const timeoutResolvedRef = useRef<string | null>(null);
+
+
+  const resolveQuestionLevel = useCallback((question: CombatQuestion | undefined, combatState: CombatState) => {
+    if (!question) return 1 as DifficultyTier;
+    const resolved = getQuestionLevelRef.current?.(question, combatState);
+    return (resolved === 1 || resolved === 2 || resolved === 3) ? resolved : inferLevel(question);
+  }, []);
 
   const q = opts.questions[state.idx];
 
@@ -100,11 +116,11 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
       return;
     }
 
-    const lvl = inferLevel(q);
+    const lvl = resolveQuestionLevel(q, state);
     const eff: DifficultyTier = Math.max(state.tier, lvl) as DifficultyTier;
     const seconds = rules.timePerQuestionByTier[eff];
     startTimer(seconds);
-  }, [q?.id, state.tier, state.locked, state.finished, timed, rules.timePerQuestionByTier, startTimer, stopTimer]);
+  }, [q?.id, state.tier, state.locked, state.finished, timed, rules.timePerQuestionByTier, startTimer, stopTimer, resolveQuestionLevel]);
 
   useEffect(() => {
     if (!timed || !q || state.finished || state.locked || state.timeLeft !== 0) return;
@@ -115,7 +131,7 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
     setState((s) => {
       if (s.locked || s.finished) return s;
       const domainId = inferDomainId(q);
-      const lvl = inferLevel(q);
+      const lvl = resolveQuestionLevel(q, s);
       const effTier: DifficultyTier = Math.max(s.tier, lvl) as DifficultyTier;
 
       const correct = false;
@@ -158,7 +174,7 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
 
       return next;
     });
-  }, [timed, q, state.timeLeft, state.locked, state.finished, rules]);
+  }, [timed, q, state.timeLeft, state.locked, state.finished, rules, resolveQuestionLevel]);
 
   useEffect(() => () => stopTimer(), [stopTimer]);
 
@@ -176,13 +192,16 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
       if (s.locked || s.finished || s.selected === null) return s;
 
       const domainId = inferDomainId(q);
-      const lvl = inferLevel(q);
+      const lvl = resolveQuestionLevel(q, s);
       const effTier: DifficultyTier = Math.max(s.tier, lvl) as DifficultyTier;
       const correct = s.selected === q.correctIndex;
       const modifiers = getActiveModifiersRef.current?.() || {};
       const usedShield = !correct && Boolean(modifiers.shieldActive);
       const usedFury = correct && Boolean(modifiers.furyActive);
-      const xpDelta = correct ? Math.round(rules.xpByTier[effTier] * (usedFury ? 1.5 : 1)) : 0;
+      const baseXp = correct ? rules.xpByTier[effTier] : 0;
+      const extraMultiplier = getXpMultiplierRef.current?.({ question: q, state: s, correct, baseXp }) ?? 1;
+      const extraBonus = getXpBonusRef.current?.({ question: q, state: s, correct, baseXp }) ?? 0;
+      const xpDelta = correct ? Math.max(0, Math.round(baseXp * (usedFury ? 1.5 : 1) * extraMultiplier) + extraBonus) : 0;
 
       const playerHP = clamp(correct ? s.playerHP : s.playerHP - (usedShield ? 0 : rules.playerDamageByTier[effTier]), 0, rules.startHP);
       const enemyHP = clamp(correct ? s.enemyHP - rules.enemyDamageByTier[effTier] * (usedFury ? 2 : 1) : s.enemyHP, 0, rules.startHP);
@@ -225,7 +244,7 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
 
       return next;
     });
-  }, [q, rules]);
+  }, [q, rules, resolveQuestionLevel]);
 
   const submitManual = useCallback((manual: {
     correct: boolean;
@@ -239,14 +258,16 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
       if (s.locked || s.finished) return s;
 
       const domainId = manual.domainId ?? inferDomainId(q);
-      const lvl = (manual.level ?? inferLevel(q)) as DifficultyTier;
+      const lvl = (manual.level ?? resolveQuestionLevel(q, s)) as DifficultyTier;
       const effTier: DifficultyTier = Math.max(s.tier, lvl) as DifficultyTier;
       const correct = manual.correct;
       const modifiers = getActiveModifiersRef.current?.() || {};
       const usedShield = !correct && Boolean(modifiers.shieldActive);
       const usedFury = correct && Boolean(modifiers.furyActive);
       const baseXp = typeof manual.xpDelta === "number" ? manual.xpDelta : (correct ? rules.xpByTier[effTier] : 0);
-      const xpDelta = Math.round(baseXp * (usedFury ? 1.5 : 1));
+      const extraMultiplier = getXpMultiplierRef.current?.({ question: q, state: s, correct, baseXp }) ?? 1;
+      const extraBonus = getXpBonusRef.current?.({ question: q, state: s, correct, baseXp }) ?? 0;
+      const xpDelta = Math.max(0, Math.round(baseXp * (usedFury ? 1.5 : 1) * extraMultiplier) + extraBonus);
 
       const playerHP = clamp(correct ? s.playerHP : s.playerHP - (usedShield ? 0 : rules.playerDamageByTier[effTier]), 0, rules.startHP);
       const enemyHP = clamp(correct ? s.enemyHP - rules.enemyDamageByTier[effTier] * (usedFury ? 2 : 1) : s.enemyHP, 0, rules.startHP);
@@ -288,7 +309,7 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
 
       return next;
     });
-  }, [q, rules]);
+  }, [q, rules, resolveQuestionLevel]);
 
   const next = useCallback(() => {
     stopTimer();
@@ -300,7 +321,7 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
       if (nextIdx >= opts.questions.length) return { ...s, finished: true };
 
       const nextQ = opts.questions[nextIdx];
-      const nextLvl = nextQ ? inferLevel(nextQ) : 1;
+      const nextLvl = nextQ ? resolveQuestionLevel(nextQ, s) : 1;
       const effNextTier: DifficultyTier = Math.max(s.tier, nextLvl) as DifficultyTier;
       return {
         ...s,
@@ -312,7 +333,7 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
         timeLeft: timed ? rules.timePerQuestionByTier[effNextTier] : s.timeLeft,
       };
     });
-  }, [opts.questions, rules.timePerQuestionByTier, timed, stopTimer]);
+  }, [opts.questions, rules.timePerQuestionByTier, timed, stopTimer, resolveQuestionLevel]);
 
   const reset = useCallback(() => {
     stopTimer();
