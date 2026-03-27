@@ -11,7 +11,7 @@ import WhatsNextPanel from "@/components/WhatsNextPanel";
 import LootVaultModal from "@/components/LootVaultModal";
 import AuthGateCard from "@/components/AuthGateCard";
 import { getActiveUser, setActiveUserId, syncAuthenticatedUser } from "@/lib/userStore";
-import { XP_PER_LEVEL, xpIntoCurrentLevel, levelFromXp, levelTitleFromLevel } from "@/lib/progression";
+import { xpIntoCurrentLevel, xpNeededForCurrentLevel, levelFromXp, levelTitleFromLevel } from "@/lib/progression";
 import { addActivity, getActivities, clearActivitiesByType, clearActivities, removeActivity, type ActivityItem } from "@/lib/activityStore";
 
 type Eligibility = {
@@ -119,7 +119,7 @@ export default function Dashboard() {
   // Prefer local XP (from interviews / practice) so the dashboard reacts immediately.
   const xp = useMemo(() => (localXp ?? elig?.xp ?? 0), [localXp, elig]);
   // Show progress within the CURRENT level.
-  const levelSpan = XP_PER_LEVEL;
+  const levelSpan = xpNeededForCurrentLevel(localLevel || levelFromXp(xp));
   const xpIntoLevel = xpIntoCurrentLevel(xp);
   const levelMax = levelSpan;
   const normalizedTier = String(subscriptionTier || "FREE").toUpperCase();
