@@ -215,6 +215,8 @@ export default function GameEngine(props: Props) {
           totalQuestions: summary.totalQuestions,
           xpEarned: awardedXp,
           outcome: summary.outcome,
+          bestStreak: summary.bestStreak || 0,
+          encounterType,
           masteryByDomain: summary.masteryByDomain || {},
           questionDomains: questions.map((q) => ({ id: String(q.id || ""), domainId: String(q.domainId || "general"), level: Number(q.level || 1) })),
         }),

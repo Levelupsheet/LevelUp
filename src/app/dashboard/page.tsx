@@ -13,6 +13,13 @@ import AuthGateCard from "@/components/AuthGateCard";
 import { getActiveUser, setActiveUserId, syncAuthenticatedUser } from "@/lib/userStore";
 import { xpIntoCurrentLevel, xpNeededForCurrentLevel, levelFromXp, levelTitleFromLevel } from "@/lib/progression";
 import { addActivity, getActivities, clearActivitiesByType, clearActivities, removeActivity, type ActivityItem } from "@/lib/activityStore";
+import { computeDailyStreak, type DailyStreakSnapshot } from "@/lib/stage9Retention";
+
+type Stage9StoreItem = { id: string; name: string; cost: number; description: string; itemType: string; quantity: number; badge: string };
+type Stage9InventoryRow = { itemType: string; itemRef: string | null; quantity: number };
+type Stage9Status = { streakDays: number; lastClaimDate: string | null; claimableToday: boolean; dailyBonusTokens: number; momentumLabel: string; nextHook: string; walletTokens: number; inventory: Stage9InventoryRow[]; store: Stage9StoreItem[]; };
+type Stage10LeaderboardRow = { userId: string; displayName: string; xp?: number; level?: number; rank?: string; domain?: string; wins?: number };
+type Stage10Leaderboards = { weekly: Stage10LeaderboardRow[]; byDomain: Stage10LeaderboardRow[]; bossWins: Stage10LeaderboardRow[]; domain?: string | null };
 
 type Eligibility = {
   eligible: boolean;
@@ -109,6 +116,12 @@ export default function Dashboard() {
   const [entitlements, setEntitlements] = useState<Entitlements | null>(null);
   const [freeStartCooldownUntil, setFreeStartCooldownUntil] = useState<number>(0);
   const [cooldownNow, setCooldownNow] = useState<number>(Date.now());
+  const [dailyStreak, setDailyStreak] = useState<DailyStreakSnapshot>({ streakDays: 1, lastActiveDate: null, tomorrowBonusTokens: 5, momentumLabel: "Fresh start" });
+  const [stage9Status, setStage9Status] = useState<Stage9Status | null>(null);
+  const [claimingDaily, setClaimingDaily] = useState(false);
+  const [buyingItemId, setBuyingItemId] = useState<string | null>(null);
+  const [stage9Message, setStage9Message] = useState<string | null>(null);
+  const [stage10Leaderboards, setStage10Leaderboards] = useState<Stage10Leaderboards | null>(null);
 
   // Level-up detection (notification-only; user opens vault when ready)
   const prevLevelRef = useRef<number>(0);
@@ -148,6 +161,21 @@ export default function Dashboard() {
     try { localStorage.setItem(getFreeSessionCooldownKey(userId), String(until)); } catch {}
   }
 
+
+useEffect(() => {
+  try {
+    const key = `lu_daily_streak_v1:${userId || "anon"}`;
+    const raw = localStorage.getItem(key);
+    const parsed = raw ? JSON.parse(raw) : {};
+    const next = computeDailyStreak(parsed);
+    setDailyStreak(next);
+    localStorage.setItem(key, JSON.stringify(next));
+  } catch {
+    setDailyStreak(computeDailyStreak());
+  }
+}, [userId]);
+
+
   function startLeveledMode(mode: "position" | "cert" | "test") {
     if (hasFreeStartCooldown) return;
     setShowLaunchModal(false);
@@ -166,6 +194,42 @@ export default function Dashboard() {
       setFreeStartCooldownUntil(0);
     }
   }, [userId]);
+
+
+
+  async function claimStage9DailyBonus() {
+    if (!userId || claimingDaily) return;
+    setClaimingDaily(true);
+    setStage9Message(null);
+    try {
+      const res = await fetch(`/api/stage9/claim-daily`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ userId }) });
+      const data = await res.json().catch(() => null);
+      if (!res.ok || !data?.ok) throw new Error(data?.error || "Failed to claim daily bonus");
+      setStage9Message(data?.alreadyClaimed ? "Daily bonus already claimed today." : `Daily bonus claimed: +${Number(data?.awarded || 0)} tokens.`);
+      await refresh(userId);
+    } catch (err: any) {
+      setStage9Message(err?.message || "Failed to claim daily bonus");
+    } finally {
+      setClaimingDaily(false);
+    }
+  }
+
+  async function purchaseStage9StoreItem(itemId: string) {
+    if (!userId || !itemId) return;
+    setBuyingItemId(itemId);
+    setStage9Message(null);
+    try {
+      const res = await fetch(`/api/stage9/store`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ userId, itemId }) });
+      const data = await res.json().catch(() => null);
+      if (!res.ok || !data?.ok) throw new Error(data?.error || "Purchase failed");
+      setStage9Message(`${data?.item?.name || "Item"} purchased successfully.`);
+      await refresh(userId);
+    } catch (err: any) {
+      setStage9Message(err?.message || "Purchase failed");
+    } finally {
+      setBuyingItemId(null);
+    }
+  }
 
   useEffect(() => {
     if (!hasFreeStartCooldown) return;
@@ -246,6 +310,19 @@ export default function Dashboard() {
         const swRes = await fetch(`/api/sweepstakes/summary`, { cache: "no-store" as any });
         const swData = await swRes.json().catch(() => null);
         if (swRes.ok) setSweepSummary(swData || null);
+      } catch {}
+      try {
+        const s9Res = await fetch(`/api/stage9/status?userId=${encodeURIComponent(activeUserId)}`, { cache: "no-store" as any });
+        const s9Data = await s9Res.json().catch(() => null);
+        if (s9Res.ok && s9Data) {
+          setStage9Status(s9Data);
+          setTokenBalance(Number(s9Data.walletTokens ?? data.tokenBalance ?? data.user?.tokenBalance ?? 0) || 0);
+        }
+      } catch {}
+      try {
+        const s10Res = await fetch(`/api/stage10/leaderboards?domain=${encodeURIComponent("AZURE")}`, { cache: "no-store" as any });
+        const s10Data = await s10Res.json().catch(() => null);
+        if (s10Res.ok && s10Data) setStage10Leaderboards(s10Data);
       } catch {}
     } catch (e: any) {
       console.error(e.message ?? "Error");
@@ -463,7 +540,7 @@ export default function Dashboard() {
       <header className="navTop" style={{ marginBottom: 18 }}>
         <div className="navTopInner">
         <a className="brandLock brandLockLink" href="/start">
-          <div className="brandMark brandMark--logo"><img src="/levelup-pro-mark.svg" alt="LevelUp Pro" className="brandMarkImg" /></div>
+          <div className="brandMark brandMark--logo"><img src="/levelup-pro-icon.png" alt="LevelUp Pro" className="brandMarkImg" /></div>
           <div className="brandText">
             <b>LevelUp Pro</b>
             <small>Dashboard</small>
@@ -476,14 +553,13 @@ export default function Dashboard() {
           <a href="/certifications">Certifications</a>
           <a href="/rewards">Rewards</a>
           <a href="/sweepstakes">Sweepstakes</a>
+          <a href="/leaderboard">Leaderboard</a>
           <a href="#" onClick={(e) => (e.preventDefault(), setMerchOpen(true))}>Merch</a>
           {isAdminUser ? <a href="/admin">Admin</a> : null}
+          {isAdminUser ? <a href="/admin/insights">Insights</a> : null}
         </nav>
 
         <div className="navActions">
-          <button className="secondaryBtn" type="button" onClick={() => (window.location.href = "/start#pricing")}>Pricing</button>
-          <button className="primaryBtn" type="button" onClick={() => setShowLaunchModal(true)}>Start Now →</button>
-
           {/* Token balance pill */}
           <div
             className="card"
@@ -692,7 +768,7 @@ export default function Dashboard() {
       <div className="shell">
         <aside className="sidebar">
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
-            <div className="sidebarLogoBox"><img src="/levelup-pro-mark.svg" alt="LevelUp Pro" className="sidebarLogoImg" /></div>
+            <div className="sidebarLogoBox"><img src="/levelup-pro-icon.png" alt="LevelUp Pro" className="sidebarLogoImg" /></div>
             <div>
               <div style={{ fontWeight: 900, fontSize: 22, lineHeight: 1.05 }}>LevelUp Pro</div>
               <div><small>Interview Prep</small></div>
@@ -717,6 +793,13 @@ export default function Dashboard() {
               {(localLevel || 1) >= 5 ? "Boss battle unlocked." : "Unlocks at level 5."}
             </small>
             {hasFreeStartCooldown && <small style={{ display: "block", marginTop: 6, color: "#f5d37b" }}>Free users can start another session in {freeStartCooldownLabel}.</small>}
+          </div>
+
+          <div style={{ marginTop: 10 }}>
+            <button className="secondaryBtn" style={{ width: "100%" }} type="button" onClick={() => (window.location.href = "/pvp")}>
+              Enter PvP Arena
+            </button>
+            <small style={{ display: "block", marginTop: 6, opacity: 0.8 }}>Async PvP challenges, leaderboards, and profile matchups.</small>
           </div>
 
           <hr style={{ margin: "14px 0" }} />
@@ -804,7 +887,122 @@ export default function Dashboard() {
             <div style={{ marginTop: 10, opacity: 0.86 }}><small>{entitlements?.upgradeCta || "Upgrade to unlock more systems."}</small></div>
           </div>
 
-          <div className="card">
+          
+<div className="card" style={{ marginBottom: 14, borderColor: "rgba(255,196,107,0.24)" }}>
+  <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+    <div>
+      <h3 style={{ margin: 0 }}>Stage 9 momentum</h3>
+      <div><small>Daily return streak • retention loop kickoff</small></div>
+    </div>
+    <span className="badge">Tomorrow bonus: +{dailyStreak.tomorrowBonusTokens} tokens</span>
+  </div>
+  <div style={{ marginTop: 12, display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 10 }}>
+    <div className="featureCard">
+      <div><small>Daily streak</small></div>
+      <div style={{ fontWeight: 900, fontSize: 22 }}>{dailyStreak.streakDays} day{dailyStreak.streakDays === 1 ? "" : "s"}</div>
+    </div>
+    <div className="featureCard">
+      <div><small>Momentum state</small></div>
+      <div style={{ fontWeight: 900, fontSize: 22 }}>{dailyStreak.momentumLabel}</div>
+    </div>
+    <div className="featureCard">
+      <div><small>Token bonus queued</small></div>
+      <div style={{ fontWeight: 900, fontSize: 22 }}>+{dailyStreak.tomorrowBonusTokens}</div>
+    </div>
+  </div>
+  <div style={{ marginTop: 10, opacity: 0.86 }}><small>Store, spend, and persistent streak bonuses can now be layered on top of your Stage 8 momentum systems.</small></div>
+</div>
+
+
+<div className="card" style={{ marginBottom: 14, borderColor: "rgba(93,168,255,0.22)" }}>
+  <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+    <div>
+      <h3 style={{ margin: 0 }}>Stage 9 economy</h3>
+      <div><small>Daily claim • token sink • reusable power-up inventory</small></div>
+    </div>
+    <span className="badge">Wallet: {Number.isFinite(tokenBalance) ? tokenBalance : 0} tokens</span>
+  </div>
+  <div style={{ marginTop: 12, display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 10 }}>
+    <div className="featureCard">
+      <div><small>Claim today</small></div>
+      <div style={{ fontWeight: 900, fontSize: 22 }}>{stage9Status?.claimableToday ? `+${stage9Status?.dailyBonusTokens || 0}` : "Claimed"}</div>
+      <div style={{ marginTop: 8 }}>
+        <button className="primary" type="button" disabled={!stage9Status?.claimableToday || claimingDaily} onClick={claimStage9DailyBonus}>{claimingDaily ? "Claiming..." : stage9Status?.claimableToday ? "Claim Daily Bonus" : "Bonus Claimed"}</button>
+      </div>
+    </div>
+    <div className="featureCard">
+      <div><small>Retention hook</small></div>
+      <div style={{ fontWeight: 900, fontSize: 22 }}>{stage9Status?.momentumLabel || dailyStreak.momentumLabel}</div>
+      <div style={{ marginTop: 8, opacity: 0.82 }}><small>{stage9Status?.nextHook || "Keep your streak alive and convert tokens into power-ups."}</small></div>
+    </div>
+    <div className="featureCard">
+      <div><small>Inventory bank</small></div>
+      <div style={{ fontWeight: 900, fontSize: 22 }}>{Array.isArray(stage9Status?.inventory) ? stage9Status!.inventory.reduce((sum, row) => sum + Number(row.quantity || 0), 0) : 0}</div>
+      <div style={{ marginTop: 8, opacity: 0.82 }}><small>{Array.isArray(stage9Status?.inventory) && stage9Status!.inventory.length ? stage9Status!.inventory.map((row) => `${row.itemRef || row.itemType} x${row.quantity}`).slice(0, 2).join(" • ") : "No store items banked yet."}</small></div>
+    </div>
+  </div>
+  {stage9Message ? <div style={{ marginTop: 10, opacity: 0.9 }}><small>{stage9Message}</small></div> : null}
+  <div style={{ marginTop: 12, display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))", gap: 10 }}>
+    {(stage9Status?.store || []).map((item) => (
+      <div key={item.id} className="featureCard" style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: 170 }}>
+        <div>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "center" }}>
+            <div style={{ fontWeight: 900 }}>{item.name}</div>
+            <span className="badge">{item.badge}</span>
+          </div>
+          <div style={{ marginTop: 6, opacity: 0.82 }}><small>{item.description}</small></div>
+          <div style={{ marginTop: 8, fontWeight: 800 }}>{item.cost} tokens</div>
+        </div>
+        <div style={{ marginTop: 10 }}>
+          <button className="secondaryBtn" type="button" disabled={buyingItemId === item.id || tokenBalance < item.cost} onClick={() => purchaseStage9StoreItem(item.id)}>
+            {buyingItemId === item.id ? "Purchasing..." : tokenBalance < item.cost ? "Need more tokens" : "Buy now"}
+          </button>
+        </div>
+      </div>
+    ))}
+  </div>
+</div>
+
+
+<div className="card" style={{ marginBottom: 14, borderColor: "rgba(255,215,100,0.22)" }}>
+  <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+    <div>
+      <h3 style={{ margin: 0 }}>Stage 10 competition</h3>
+      <div><small>Leaderboards • domain rankings • boss wins • public profiles • weekly board resets every 7 days based on earned session XP</small></div>
+    </div>
+    <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}><a className="secondaryBtn" href="/leaderboard">Open leaderboard</a><a className="secondaryBtn" href="/pvp">PvP</a></div>
+  </div>
+  <div style={{ marginTop: 12, display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 10 }}>
+    <div className="featureCard">
+      <div><small>Weekly leaders</small></div>
+      <div style={{ marginTop: 8, display: "grid", gap: 6 }}>
+        {(stage10Leaderboards?.weekly || []).slice(0, 3).map((row, idx) => (
+          <div key={`wk_${row.userId}`} style={{ display: "flex", justifyContent: "space-between", gap: 8 }}><span>{idx + 1}. {row.displayName}</span><b>{row.xp || 0} XP</b></div>
+        ))}
+        {!stage10Leaderboards?.weekly?.length ? <small style={{ opacity: 0.78 }}>Leaderboard will populate as user sessions sync.</small> : null}
+      </div>
+    </div>
+    <div className="featureCard">
+      <div><small>{stage10Leaderboards?.domain || "AZURE"} mastery leaders</small></div>
+      <div style={{ marginTop: 8, display: "grid", gap: 6 }}>
+        {(stage10Leaderboards?.byDomain || []).slice(0, 3).map((row, idx) => (
+          <div key={`dm_${row.userId}`} style={{ display: "flex", justifyContent: "space-between", gap: 8 }}><span>{idx + 1}. {row.displayName}</span><b>{row.xp || 0}</b></div>
+        ))}
+        {!stage10Leaderboards?.byDomain?.length ? <small style={{ opacity: 0.78 }}>No domain board yet.</small> : null}
+      </div>
+    </div>
+    <div className="featureCard">
+      <div><small>Boss wins</small></div>
+      <div style={{ marginTop: 8, display: "grid", gap: 6 }}>
+        {(stage10Leaderboards?.bossWins || []).slice(0, 3).map((row, idx) => (
+          <div key={`bw_${row.userId}`} style={{ display: "flex", justifyContent: "space-between", gap: 8 }}><span>{idx + 1}. {row.displayName}</span><b>{row.wins || 0}</b></div>
+        ))}
+        {!stage10Leaderboards?.bossWins?.length ? <small style={{ opacity: 0.78 }}>Boss records will grow with more clears.</small> : null}
+      </div>
+    </div>
+  </div>
+</div>
+<div className="card">
             <h3 style={{ marginTop: 0 }}>Notifications</h3>
             {combinedNotes.length ? (
               <>

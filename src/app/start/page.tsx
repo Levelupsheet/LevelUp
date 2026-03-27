@@ -121,7 +121,7 @@ export default function Home() {
   const [planError, setPlanError] = useState<string>("");
 
   const [leaderboard, setLeaderboard] = useState<Array<{ id: string; displayName: string; xp: number; level: number; rank: string }> | null>(null);
-  const [leaderboardMetric, setLeaderboardMetric] = useState<"top" | "active" | "improved">("top");
+  const [leaderboardMetric, setLeaderboardMetric] = useState<"top" | "boss" | "domain">("top");
   const [lbSelected, setLbSelected] = useState<{ id: string; displayName: string; xp: number; level: number; rank: string } | null>(null);
   const [aboutOpen, setAboutOpen] = useState<null | "company" | "product" | "contact">(null);
   const [sweepstakesLive, setSweepstakesLive] = useState<SweepCampaignRow[]>([]);
@@ -245,7 +245,7 @@ export default function Home() {
       <header className="navTop">
         <div className="navTopInner">
         <div className="brandLock">
-          <div className="brandMark brandMark--logo"><img src="/levelup-pro-mark.svg" alt="LevelUp Pro" className="brandMarkImg" /></div>
+          <div className="brandMark brandMark--logo"><img src="/levelup-pro-icon.png" alt="LevelUp Pro" className="brandMarkImg" /></div>
           <div className="brandText">
             <b>LevelUp Pro</b>
             <small>Gamified IT training</small>
@@ -258,11 +258,11 @@ export default function Home() {
           <a href="#pricing" onClick={(e) => (e.preventDefault(), scrollToId("pricing"))}>Pricing</a>
           <a href="#about" onClick={(e) => (e.preventDefault(), scrollToId("about"))}>About Us</a>
           <a href="/rewards">Rewards</a>
+          <a href="/leaderboard">Leaderboard</a>
           <a href="#merch" onClick={(e) => (e.preventDefault(), setMerchOpen(true))}>Merch</a>
         </nav>
 
         <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-          <button className="secondaryBtn" onClick={() => scrollToId("pricing")}>View pricing</button>
           <button className="gold" onClick={() => goEnterApp("nav")}>Enter app →</button>
         </div>
         </div>
@@ -382,12 +382,12 @@ export default function Home() {
             <div className="heroCard" data-reveal data-delay="220">
               <div className="kpiMini" style={{ alignItems: "center" }}>
                 <div>
-                  <b>Leaderboard</b> <span className="muted">• {leaderboardMetric === "top" ? "Top candidates" : leaderboardMetric === "active" ? "Most active" : "Most improved"}</span>
+                  <b>Leaderboard</b> <span className="muted">• {leaderboardMetric === "top" ? "Top candidates" : leaderboardMetric === "boss" ? "Boss wins" : "Domain leaders"}</span>
                 </div>
                 <div className="pillTabs" aria-label="Leaderboard tabs">
                   <button className={leaderboardMetric === "top" ? "pillTab active" : "pillTab"} onClick={() => setLeaderboardMetric("top")} type="button">Top</button>
-                  <button className={leaderboardMetric === "active" ? "pillTab active" : "pillTab"} onClick={() => setLeaderboardMetric("active")} type="button">Active</button>
-                  <button className={leaderboardMetric === "improved" ? "pillTab active" : "pillTab"} onClick={() => setLeaderboardMetric("improved")} type="button">Improved</button>
+                  <button className={leaderboardMetric === "boss" ? "pillTab active" : "pillTab"} onClick={() => setLeaderboardMetric("boss")} type="button">Boss Wins</button>
+                  <button className={leaderboardMetric === "domain" ? "pillTab active" : "pillTab"} onClick={() => setLeaderboardMetric("domain")} type="button">Domain</button>
                 </div>
               </div>
 

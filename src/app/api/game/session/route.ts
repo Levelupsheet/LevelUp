@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { ensureUser } from "@/app/api/_lib/ensureUser";
 import { inferDomainFromQuestion } from "@/lib/learningProfile";
 import { applyUserXpIncrement } from "@/lib/xpCaps";
+import { awardSessionRewards } from "@/lib/stage9Economy";
 
 function asNum(v: unknown, fallback = 0) {
   const n = Number(v);
@@ -15,6 +16,11 @@ export async function POST(req: Request) {
     const xpEarned = Math.max(0, Math.floor(asNum(body.xpEarned, 0)));
     const masteryByDomain = body?.masteryByDomain && typeof body.masteryByDomain === "object" ? body.masteryByDomain : {};
     const questionDomains = Array.isArray(body?.questionDomains) ? body.questionDomains : [];
+    const correctCount = Math.max(0, Math.floor(asNum(body?.correctCount, 0)));
+    const totalQuestions = Math.max(0, Math.floor(asNum(body?.totalQuestions, 0)));
+    const outcome = String(body?.outcome || "").trim();
+    const encounterType = String(body?.encounterType || "standard").trim();
+    const bestStreak = Math.max(0, Math.floor(asNum(body?.bestStreak, 0)));
 
     if (!userId) return Response.json({ ok: false, error: "userId required" }, { status: 400 });
     const existing = await prisma.user.findUnique({ where: { id: userId }, select: { id: true } });
@@ -61,7 +67,8 @@ export async function POST(req: Request) {
       return user;
     });
 
-    return Response.json({ ok: true, user: updated });
+    const stage9 = await awardSessionRewards(userId, { correctCount, totalQuestions, outcome, encounterType, bestStreak }).catch(() => null);
+    return Response.json({ ok: true, user: updated, stage9 });
   } catch (err: any) {
     return Response.json({ ok: false, error: "Failed to save game session", detail: String(err?.message ?? err) }, { status: 500 });
   }

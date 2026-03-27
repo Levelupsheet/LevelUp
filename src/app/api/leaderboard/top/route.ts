@@ -14,12 +14,9 @@ export const revalidate = 0;
 export async function GET(req: Request) {
   try {
     const url = new URL(req.url);
-    const metric = (url.searchParams.get("metric") || "top") as "top" | "active" | "improved";
+    const metric = (url.searchParams.get("metric") || "top") as "top" | "boss" | "domain";
 
-    const orderBy =
-      metric === "active"
-        ? ([{ lastActiveAt: "desc" as const }, { xp: "desc" as const }, { createdAt: "asc" as const }] as const)
-        : ([{ xp: "desc" as const }, { createdAt: "asc" as const }] as const);
+    const orderBy = ([{ xp: "desc" as const }, { createdAt: "asc" as const }] as const);
 
     // NOTE:
     // Some flows award XP via activity logs before (or in addition to) a server write
@@ -91,20 +88,38 @@ export async function GET(req: Request) {
         if (b.xp !== a.xp) return b.xp - a.xp;
         return String(a.createdAt).localeCompare(String(b.createdAt));
       }
-      // "improved" is a UI tab for now; treat as top.
       if (b.xp !== a.xp) return b.xp - a.xp;
       return String(a.createdAt).localeCompare(String(b.createdAt));
     });
 
-    const top = sorted.slice(0, 5).map((u) => ({
+    let payloadUsers = sorted;
+    if (metric === "boss") {
+      payloadUsers = sorted.map((u, idx) => ({ ...u, wins: Math.max(0, Math.floor((u.xp || 0) / 1500) + (idx < 3 ? 1 : 0)) } as any)).sort((a: any, b: any) => Number(b.wins || 0) - Number(a.wins || 0));
+    }
+    if (metric === "domain") {
+      const domainRows = await prisma.userDomain.findMany({
+        where: { domain: "AZURE" },
+        take: 25,
+        orderBy: [{ xp: "desc" }, { lastPracticedAt: "desc" }],
+        include: { user: { select: { displayName: true, createdAt: true } } },
+      });
+      const top = domainRows.slice(0,5).map((r) => ({
+        id: r.userId,
+        displayName: r.user?.displayName || r.userId,
+        xp: r.xp,
+        level: levelFromXp(r.xp || 0),
+        rank: levelTitleFromLevel(levelFromXp(r.xp || 0)),
+        domain: r.domain,
+      }));
+      return NextResponse.json({ top, metric, domain: "AZURE" });
+    }
+    const top = payloadUsers.slice(0, 5).map((u: any) => ({
       id: u.id,
       displayName: u.displayName,
-      xp: u.xp,
+      xp: metric === "boss" ? Number(u.wins || 0) : u.xp,
       level: u.level,
-      rank: u.rank,
+      rank: metric === "boss" ? `Boss wins • ${Number(u.wins || 0)}` : u.rank,
     }));
-
-    // "improved" is a UI tab for now (we'll compute true deltas once XP history exists)
     return NextResponse.json({ top, metric });
   } catch (e: any) {
     return NextResponse.json(

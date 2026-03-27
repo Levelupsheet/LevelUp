@@ -48,7 +48,7 @@ export default function PracticeMiniGameModal(props: {
   if (!open) return null;
 
   const title = kind === "position" ? "Position training" : kind === "cert" ? "Certification practice" : "Test now!";
-  const subtitle = kind === "position" ? "Role-based questions from your DB" : kind === "cert" ? "Certification pack from your DB" : "Timed combat quiz from your DB";
+  const subtitle = "";
 
   const lane = kind === "position" ? "TRAINING" : kind === "cert" ? "CERTIFICATIONS" : "TEST_NOW";
 
@@ -146,7 +146,7 @@ export default function PracticeMiniGameModal(props: {
           <div className="luVideoVignette" />
         </div>
         <div className="luModalHeader" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <div><b style={{ fontSize: 18 }}>{title}</b></div>
+          <div><b style={{ fontSize: 18 }}>{title}</b><div><small className="luHint">{subtitle}</small></div></div>
           <button className="secondaryBtn" type="button" onClick={onClose}>✕</button>
         </div>
 

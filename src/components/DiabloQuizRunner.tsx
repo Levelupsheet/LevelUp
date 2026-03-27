@@ -6,6 +6,7 @@ import D2LifeOrb from "@/components/D2LifeOrb";
 import D2EnemyHealthBar from "@/components/D2EnemyHealthBar";
 import DomainRuneBar from "@/components/DomainRuneBar";
 import { getActiveUser } from "@/lib/userStore";
+import { resolveClientUserId } from "@/lib/activeUser";
 import { useCombatQuiz } from "@/engine/useCombatQuiz";
 import type { CombatQuestion, DifficultyTier } from "@/engine/CombatQuizEngine";
 import {
@@ -522,6 +523,8 @@ export default function DiabloQuizRunner(props: {
   const [streak, setStreak] = useState(0);
   const [bestStreak, setBestStreak] = useState(0);
   const [powerups, setPowerups] = useState<Stage7PowerupState>({ shieldActive: false, furyActive: false, shieldUses: 0, furyUses: 0 });
+  const [stage9Inventory, setStage9Inventory] = useState<{ shield: number; fury: number; xpSurge: number; hintDiscount: number; extraLife: number }>({ shield: 0, fury: 0, xpSurge: 0, hintDiscount: 0, extraLife: 0 });
+  const userIdRef = useRef<string>("");
   const [stage8History, setStage8History] = useState<Stage8QuestionResult[]>([]);
   const [xpBoostRemaining, setXpBoostRemaining] = useState(0);
   const [microRewardFlash, setMicroRewardFlash] = useState<string | null>(null);
@@ -635,6 +638,33 @@ export default function DiabloQuizRunner(props: {
   const questionType = normalizeQuestionType(question?.type);
   const usesManualSubmit = questionType !== "multiple_choice" && questionType !== "incident" && questionType !== "true_false";
 
+
+const feedbackText = useMemo(
+  () => String(state.feedback || "Review the explanation and continue.").trim(),
+  [state.feedback]
+);
+
+const explanationText = useMemo(() => {
+  const candidate =
+    typeof answerInsight?.explanation === "string"
+      ? answerInsight.explanation
+      : answerInsight?.explanation?.whyCorrect ||
+        answerInsight?.explanation?.whyUser ||
+        question?.explanation ||
+        state.feedback ||
+        "Review the explanation and continue.";
+  return String(candidate || "").trim();
+}, [answerInsight, question?.explanation, state.feedback]);
+
+const showExpandedExplanation = useMemo(() => {
+  const a = normalizeText(explanationText);
+  const b = normalizeText(feedbackText);
+  if (!a) return false;
+  if (a === b) return false;
+  if (a.includes(b) || b.includes(a)) return false;
+  return true;
+}, [explanationText, feedbackText]);
+
   useEffect(() => {
     finishedOnceRef.current = false;
     setStreak(0);
@@ -739,6 +769,26 @@ export default function DiabloQuizRunner(props: {
     }
   }, []);
 
+  useEffect(() => {
+    const uid = resolveClientUserId();
+    userIdRef.current = uid;
+    if (!uid) return;
+    fetch(`/api/stage9/status?userId=${encodeURIComponent(uid)}`, { cache: "no-store" as any })
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error("stage9"))))
+      .then((json) => {
+        const rows = Array.isArray(json?.inventory) ? json.inventory : [];
+        const countFor = (id: string) => rows.filter((row: any) => String(row?.itemRef || "") === id).reduce((sum: number, row: any) => sum + Number(row?.quantity || 0), 0);
+        setStage9Inventory({
+          shield: countFor("shield_charge"),
+          fury: countFor("fury_charge"),
+          xpSurge: countFor("xp_surge"),
+          hintDiscount: countFor("hint_discount"),
+          extraLife: countFor("extra_life"),
+        });
+      })
+      .catch(() => {});
+  }, [title]);
+
   const domainLabel = labelForDomain(currentDomainId);
   const finished = Boolean(forceFinish) || state.finished;
   const displayedXp = Math.max(0, state.xpEarned - hintXpSpent);
@@ -748,7 +798,13 @@ export default function DiabloQuizRunner(props: {
 
   function useHint(type: HintType) {
     if (!question || state.locked) return;
-    const cost = getHintCost(type);
+    const baseCost = getHintCost(type);
+    const usingDiscount = stage9Inventory.hintDiscount > 0;
+    const cost = usingDiscount ? Math.max(0, baseCost - 10) : baseCost;
+    if (usingDiscount && userIdRef.current) {
+      fetch("/api/stage9/use-item", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ userId: userIdRef.current, itemId: "hint_discount" }) }).catch(() => {});
+      setStage9Inventory((current) => ({ ...current, hintDiscount: Math.max(0, current.hintDiscount - 1) }));
+    }
     setHintXpSpent((v) => v + cost);
     setHintsUsedCount((v) => v + 1);
     if (type === "REMOVE_TWO") {
@@ -853,12 +909,45 @@ export default function DiabloQuizRunner(props: {
     });
   }
 
-  function activateShield() {
-    setPowerups((current) => current.shieldUses > 0 && !current.shieldActive ? { ...current, shieldUses: current.shieldUses - 1, shieldActive: true } : current);
+  async function activateShield() {
+    if (powerups.shieldActive || state.locked) return;
+    if (powerups.shieldUses > 0) {
+      setPowerups((current) => ({ ...current, shieldUses: current.shieldUses - 1, shieldActive: true }));
+      return;
+    }
+    if (stage9Inventory.shield > 0 && userIdRef.current) {
+      const res = await fetch("/api/stage9/use-item", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ userId: userIdRef.current, itemId: "shield_charge" }) }).then((r) => r.json()).catch(() => null);
+      if (res?.ok) {
+        setStage9Inventory((current) => ({ ...current, shield: Math.max(0, current.shield - 1) }));
+        setPowerups((current) => ({ ...current, shieldActive: true }));
+      }
+    }
   }
 
-  function activateFury() {
-    setPowerups((current) => current.furyUses > 0 && !current.furyActive ? { ...current, furyUses: current.furyUses - 1, furyActive: true } : current);
+  async function activateFury() {
+    if (powerups.furyActive || state.locked) return;
+    if (powerups.furyUses > 0) {
+      setPowerups((current) => ({ ...current, furyUses: current.furyUses - 1, furyActive: true }));
+      return;
+    }
+    if (stage9Inventory.fury > 0 && userIdRef.current) {
+      const res = await fetch("/api/stage9/use-item", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ userId: userIdRef.current, itemId: "fury_charge" }) }).then((r) => r.json()).catch(() => null);
+      if (res?.ok) {
+        setStage9Inventory((current) => ({ ...current, fury: Math.max(0, current.fury - 1) }));
+        setPowerups((current) => ({ ...current, furyActive: true }));
+      }
+    }
+  }
+
+  async function activateXpSurge() {
+    if (state.locked || stage9Inventory.xpSurge <= 0 || !userIdRef.current) return;
+    const res = await fetch("/api/stage9/use-item", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ userId: userIdRef.current, itemId: "xp_surge" }) }).then((r) => r.json()).catch(() => null);
+    if (res?.ok) {
+      setStage9Inventory((current) => ({ ...current, xpSurge: Math.max(0, current.xpSurge - 1) }));
+      setXpBoostRemaining((current) => Math.max(current, 5));
+      setMicroRewardFlash("⚡ XP Surge activated");
+      window.setTimeout(() => setMicroRewardFlash(null), 2200);
+    }
   }
 
 
@@ -963,8 +1052,9 @@ export default function DiabloQuizRunner(props: {
               </div>
               <ModelPanel title={playerName} src={playerVideo} loop={!isPlayerHitVideo} onEnded={isPlayerHitVideo ? () => setHitPulse(null) : undefined} height="clamp(180px, 22vh, 280px)" damageText={damageFloat.player || null} damageTone="player" />
               <div className="stage7PowerStrip underPlayer">
-                <button className={"d2Btn power" + (powerups.shieldActive ? " active" : "")} type="button" disabled={state.locked || powerups.shieldActive || powerups.shieldUses <= 0} onClick={activateShield}>Shield {powerups.shieldActive ? "On" : powerups.shieldUses > 0 ? `x${powerups.shieldUses}` : "Locked"}</button>
-                <button className={"d2Btn power" + (powerups.furyActive ? " active" : "")} type="button" disabled={state.locked || powerups.furyActive || powerups.furyUses <= 0} onClick={activateFury}>Fury {powerups.furyActive ? "On" : powerups.furyUses > 0 ? `x${powerups.furyUses}` : "Locked"}</button>
+                <button className={"d2Btn power" + (powerups.shieldActive ? " active" : "")} type="button" disabled={state.locked || powerups.shieldActive || (powerups.shieldUses + stage9Inventory.shield) <= 0} onClick={activateShield}>Shield {powerups.shieldActive ? "On" : (powerups.shieldUses + stage9Inventory.shield) > 0 ? `x${powerups.shieldUses + stage9Inventory.shield}` : "Locked"}</button>
+                <button className={"d2Btn power" + (powerups.furyActive ? " active" : "")} type="button" disabled={state.locked || powerups.furyActive || (powerups.furyUses + stage9Inventory.fury) <= 0} onClick={activateFury}>Fury {powerups.furyActive ? "On" : (powerups.furyUses + stage9Inventory.fury) > 0 ? `x${powerups.furyUses + stage9Inventory.fury}` : "Locked"}</button>
+                <button className="d2Btn power" type="button" disabled={state.locked || stage9Inventory.xpSurge <= 0} onClick={activateXpSurge}>XP Surge {stage9Inventory.xpSurge > 0 ? `x${stage9Inventory.xpSurge}` : "Locked"}</button>
               </div>
             </div>
 
@@ -1025,8 +1115,9 @@ export default function DiabloQuizRunner(props: {
                   </div>
 
                   <div className="stage7PowerStrip">
-                    <button className={"d2Btn power" + (powerups.shieldActive ? " active" : "")} type="button" disabled={state.locked || powerups.shieldActive || powerups.shieldUses <= 0} onClick={activateShield}>Shield {powerups.shieldActive ? "On" : powerups.shieldUses > 0 ? `x${powerups.shieldUses}` : "Locked"}</button>
-                    <button className={"d2Btn power" + (powerups.furyActive ? " active" : "")} type="button" disabled={state.locked || powerups.furyActive || powerups.furyUses <= 0} onClick={activateFury}>Fury {powerups.furyActive ? "On" : powerups.furyUses > 0 ? `x${powerups.furyUses}` : "Locked"}</button>
+                    <button className={"d2Btn power" + (powerups.shieldActive ? " active" : "")} type="button" disabled={state.locked || powerups.shieldActive || (powerups.shieldUses + stage9Inventory.shield) <= 0} onClick={activateShield}>Shield {powerups.shieldActive ? "On" : (powerups.shieldUses + stage9Inventory.shield) > 0 ? `x${powerups.shieldUses + stage9Inventory.shield}` : "Locked"}</button>
+                    <button className={"d2Btn power" + (powerups.furyActive ? " active" : "")} type="button" disabled={state.locked || powerups.furyActive || (powerups.furyUses + stage9Inventory.fury) <= 0} onClick={activateFury}>Fury {powerups.furyActive ? "On" : (powerups.furyUses + stage9Inventory.fury) > 0 ? `x${powerups.furyUses + stage9Inventory.fury}` : "Locked"}</button>
+                <button className="d2Btn power" type="button" disabled={state.locked || stage9Inventory.xpSurge <= 0} onClick={activateXpSurge}>XP Surge {stage9Inventory.xpSurge > 0 ? `x${stage9Inventory.xpSurge}` : "Locked"}</button>
                     <span className="stage7PowerHint">Streak 3: Shield • Streak 5: Fury</span>
                   </div>
 
@@ -1053,10 +1144,19 @@ export default function DiabloQuizRunner(props: {
                     commandHistory,
                   })}
 
-                  <div className="d2ActionRow stage8ActionDock" style={{ marginTop: 8 }}>
+                  {!state.locked ? (
+                    <div style={{ marginTop: 14, display: "flex", gap: 8, flexWrap: "wrap" }}>
+                      <button className="d2Btn" type="button" onClick={() => useHint("REMOVE_TWO")}>Remove 2 (−{getHintCost("REMOVE_TWO")})</button>
+                      <button className="d2Btn" type="button" onClick={() => useHint("PARTIAL_EXPLANATION")}>Explain (−{getHintCost("PARTIAL_EXPLANATION")})</button>
+                      <button className="d2Btn" type="button" onClick={() => useHint("DOMAIN_HINT")}>Domain (−{getHintCost("DOMAIN_HINT")})</button>
+                    </div>
+                  ) : null}
+                  {hintMessage ? <div className="badge" style={{ marginTop: 10, whiteSpace: "normal", lineHeight: 1.4 }}>{hintMessage}</div> : null}
+
+                  <div className="d2ActionRow stage8ActionDock" style={{ marginTop: 8, alignItems: "center" }}>
                     {!state.locked ? (
                       <>
-                        <button className="d2Btn primary" onClick={() => triggerPrimaryAction()} disabled={!canSubmitCurrentQuestion()}>SUBMIT</button>
+                        <button className="d2Btn" onClick={() => triggerPrimaryAction()} disabled={!canSubmitCurrentQuestion()}>SUBMIT</button>
                         <button
                           className="d2Btn"
                           onClick={() => {
@@ -1078,18 +1178,9 @@ export default function DiabloQuizRunner(props: {
                         </button>
                       </>
                     ) : (
-                      <button className={(question as any)?.isGolden ? "gold" : "d2Btn primary"} onClick={() => handleNext()}>NEXT</button>
+                      <button className={(question as any)?.isGolden ? "gold" : "d2Btn"} onClick={() => handleNext()}>NEXT</button>
                     )}
                   </div>
-
-                  {!state.locked ? (
-                    <div style={{ marginTop: 8, display: "flex", gap: 8, flexWrap: "wrap" }}>
-                      <button className="d2Btn" type="button" onClick={() => useHint("REMOVE_TWO")}>Remove 2 (−{getHintCost("REMOVE_TWO")})</button>
-                      <button className="d2Btn" type="button" onClick={() => useHint("PARTIAL_EXPLANATION")}>Explain (−{getHintCost("PARTIAL_EXPLANATION")})</button>
-                      <button className="d2Btn" type="button" onClick={() => useHint("DOMAIN_HINT")}>Domain (−{getHintCost("DOMAIN_HINT")})</button>
-                    </div>
-                  ) : null}
-                  {hintMessage ? <div className="badge" style={{ marginTop: 8, whiteSpace: "normal", lineHeight: 1.4 }}>{hintMessage}</div> : null}
 
                   {state.locked && (
                     <div style={{ marginTop: 12, display: "grid", gap: 10 }}>
@@ -1098,12 +1189,16 @@ export default function DiabloQuizRunner(props: {
                           <div style={{ fontWeight: 950 }}>{state.lastWasCorrect ? "✅ Correct" : partialPercent > 0 ? "🟨 Partial credit" : "❌ Not quite"}</div>
                           <div className="stage5ScorePill">{partialPercent}% accuracy</div>
                         </div>
-                        <div className="muted" style={{ marginTop: 6 }}>{state.feedback || "Review the explanation and continue."}</div>
-                        <div className="stage5MergedExplanation">
-                          <div className="muted" style={{ whiteSpace: "pre-wrap", lineHeight: 1.42 }}>
-                            {isExplaining ? "Building smart explanation…" : (typeof answerInsight?.explanation === "string" ? answerInsight.explanation : answerInsight?.explanation?.whyCorrect || answerInsight?.explanation?.whyUser || question.explanation || state.feedback || "Review the explanation and continue.")}
-                          </div>
+                        <div className="muted" style={{ marginTop: 6, whiteSpace: "pre-wrap", lineHeight: 1.42 }}>
+                          {feedbackText}
                         </div>
+                        {showExpandedExplanation ? (
+                          <div className="stage5MergedExplanation" style={{ marginTop: 8 }}>
+                            <div className="muted" style={{ whiteSpace: "pre-wrap", lineHeight: 1.42 }}>
+                              {isExplaining ? "Building smart explanation…" : explanationText}
+                            </div>
+                          </div>
+                        ) : null}
                         {(question as any)?.isGolden && state.lastWasCorrect ? <div style={{ marginTop: 8, color: "#ffe28a", fontWeight: 700 }}>Golden question cleared — click NEXT to enter the golden sweepstakes draw.</div> : null}
                       </div>
                     </div>
@@ -1157,8 +1252,8 @@ export default function DiabloQuizRunner(props: {
             </div>
 
             <div className="stage7PowerStrip mobile">
-              <button className={"d2Btn power" + (powerups.shieldActive ? " active" : "")} type="button" disabled={state.locked || powerups.shieldActive || powerups.shieldUses <= 0} onClick={activateShield}>Shield {powerups.shieldActive ? "On" : powerups.shieldUses > 0 ? `x${powerups.shieldUses}` : "Locked"}</button>
-              <button className={"d2Btn power" + (powerups.furyActive ? " active" : "")} type="button" disabled={state.locked || powerups.furyActive || powerups.furyUses <= 0} onClick={activateFury}>Fury {powerups.furyActive ? "On" : powerups.furyUses > 0 ? `x${powerups.furyUses}` : "Locked"}</button>
+              <button className={"d2Btn power" + (powerups.shieldActive ? " active" : "")} type="button" disabled={state.locked || powerups.shieldActive || (powerups.shieldUses + stage9Inventory.shield) <= 0} onClick={activateShield}>Shield {powerups.shieldActive ? "On" : (powerups.shieldUses + stage9Inventory.shield) > 0 ? `x${powerups.shieldUses + stage9Inventory.shield}` : "Locked"}</button>
+              <button className={"d2Btn power" + (powerups.furyActive ? " active" : "")} type="button" disabled={state.locked || powerups.furyActive || (powerups.furyUses + stage9Inventory.fury) <= 0} onClick={activateFury}>Fury {powerups.furyActive ? "On" : (powerups.furyUses + stage9Inventory.fury) > 0 ? `x${powerups.furyUses + stage9Inventory.fury}` : "Locked"}</button>
             </div>
 
             <div className="mobileCombatCard">
@@ -1210,7 +1305,7 @@ export default function DiabloQuizRunner(props: {
                   ) : null}
                   {hintMessage ? <div className="badge" style={{ marginTop: 10, whiteSpace: "normal", lineHeight: 1.4 }}>{hintMessage}</div> : null}
 
-                  <div className="d2ActionRow mobileQuizActions" style={{ marginTop: 14 }}>
+                  <div className="d2ActionRow mobileQuizActions" style={{ marginTop: 8, alignItems: "center" }}>
                     {!state.locked ? (
                       <>
                         <button className="d2Btn" onClick={() => triggerPrimaryAction()} disabled={!canSubmitCurrentQuestion()}>SUBMIT</button>
@@ -1245,12 +1340,16 @@ export default function DiabloQuizRunner(props: {
                           <div style={{ fontWeight: 950 }}>{state.lastWasCorrect ? "✅ Correct" : partialPercent > 0 ? "🟨 Partial credit" : "❌ Not quite"}</div>
                           <div className="stage5ScorePill">{partialPercent}% accuracy</div>
                         </div>
-                        <div className="muted" style={{ marginTop: 6 }}>{state.feedback || "Review the explanation and continue."}</div>
-                        <div className="stage5MergedExplanation">
-                          <div className="muted" style={{ whiteSpace: "pre-wrap", lineHeight: 1.42 }}>
-                            {isExplaining ? "Building smart explanation…" : (typeof answerInsight?.explanation === "string" ? answerInsight.explanation : answerInsight?.explanation?.whyCorrect || answerInsight?.explanation?.whyUser || question.explanation || state.feedback || "Review the explanation and continue.")}
-                          </div>
+                        <div className="muted" style={{ marginTop: 6, whiteSpace: "pre-wrap", lineHeight: 1.42 }}>
+                          {feedbackText}
                         </div>
+                        {showExpandedExplanation ? (
+                          <div className="stage5MergedExplanation" style={{ marginTop: 8 }}>
+                            <div className="muted" style={{ whiteSpace: "pre-wrap", lineHeight: 1.42 }}>
+                              {isExplaining ? "Building smart explanation…" : explanationText}
+                            </div>
+                          </div>
+                        ) : null}
                         {(question as any)?.isGolden && state.lastWasCorrect ? <div style={{ marginTop: 8, color: "#ffe28a", fontWeight: 700 }}>Golden question cleared — click NEXT to enter the golden sweepstakes draw.</div> : null}
                       </div>
                     </div>
