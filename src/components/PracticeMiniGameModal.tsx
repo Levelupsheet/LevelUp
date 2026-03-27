@@ -146,7 +146,7 @@ export default function PracticeMiniGameModal(props: {
           <div className="luVideoVignette" />
         </div>
         <div className="luModalHeader" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <div><b style={{ fontSize: 18 }}>{title}</b><div><small className="luHint">{subtitle}</small></div></div>
+          <div><b style={{ fontSize: 18 }}>{title}</b></div>
           <button className="secondaryBtn" type="button" onClick={onClose}>✕</button>
         </div>
 

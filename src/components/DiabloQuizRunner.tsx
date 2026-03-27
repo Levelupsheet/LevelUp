@@ -1053,19 +1053,10 @@ export default function DiabloQuizRunner(props: {
                     commandHistory,
                   })}
 
-                  {!state.locked ? (
-                    <div style={{ marginTop: 14, display: "flex", gap: 8, flexWrap: "wrap" }}>
-                      <button className="d2Btn" type="button" onClick={() => useHint("REMOVE_TWO")}>Remove 2 (−{getHintCost("REMOVE_TWO")})</button>
-                      <button className="d2Btn" type="button" onClick={() => useHint("PARTIAL_EXPLANATION")}>Explain (−{getHintCost("PARTIAL_EXPLANATION")})</button>
-                      <button className="d2Btn" type="button" onClick={() => useHint("DOMAIN_HINT")}>Domain (−{getHintCost("DOMAIN_HINT")})</button>
-                    </div>
-                  ) : null}
-                  {hintMessage ? <div className="badge" style={{ marginTop: 10, whiteSpace: "normal", lineHeight: 1.4 }}>{hintMessage}</div> : null}
-
-                  <div className="d2ActionRow stage8ActionDock" style={{ marginTop: 12 }}>
+                  <div className="d2ActionRow stage8ActionDock" style={{ marginTop: 8 }}>
                     {!state.locked ? (
                       <>
-                        <button className="d2Btn" onClick={() => triggerPrimaryAction()} disabled={!canSubmitCurrentQuestion()}>SUBMIT</button>
+                        <button className="d2Btn primary" onClick={() => triggerPrimaryAction()} disabled={!canSubmitCurrentQuestion()}>SUBMIT</button>
                         <button
                           className="d2Btn"
                           onClick={() => {
@@ -1087,9 +1078,18 @@ export default function DiabloQuizRunner(props: {
                         </button>
                       </>
                     ) : (
-                      <button className={(question as any)?.isGolden ? "gold" : "d2Btn"} onClick={() => handleNext()}>NEXT</button>
+                      <button className={(question as any)?.isGolden ? "gold" : "d2Btn primary"} onClick={() => handleNext()}>NEXT</button>
                     )}
                   </div>
+
+                  {!state.locked ? (
+                    <div style={{ marginTop: 8, display: "flex", gap: 8, flexWrap: "wrap" }}>
+                      <button className="d2Btn" type="button" onClick={() => useHint("REMOVE_TWO")}>Remove 2 (−{getHintCost("REMOVE_TWO")})</button>
+                      <button className="d2Btn" type="button" onClick={() => useHint("PARTIAL_EXPLANATION")}>Explain (−{getHintCost("PARTIAL_EXPLANATION")})</button>
+                      <button className="d2Btn" type="button" onClick={() => useHint("DOMAIN_HINT")}>Domain (−{getHintCost("DOMAIN_HINT")})</button>
+                    </div>
+                  ) : null}
+                  {hintMessage ? <div className="badge" style={{ marginTop: 8, whiteSpace: "normal", lineHeight: 1.4 }}>{hintMessage}</div> : null}
 
                   {state.locked && (
                     <div style={{ marginTop: 12, display: "grid", gap: 10 }}>
@@ -1100,7 +1100,6 @@ export default function DiabloQuizRunner(props: {
                         </div>
                         <div className="muted" style={{ marginTop: 6 }}>{state.feedback || "Review the explanation and continue."}</div>
                         <div className="stage5MergedExplanation">
-                          <div className="stage5MergedExplanationTitle">Why this answer worked</div>
                           <div className="muted" style={{ whiteSpace: "pre-wrap", lineHeight: 1.42 }}>
                             {isExplaining ? "Building smart explanation…" : (typeof answerInsight?.explanation === "string" ? answerInsight.explanation : answerInsight?.explanation?.whyCorrect || answerInsight?.explanation?.whyUser || question.explanation || state.feedback || "Review the explanation and continue.")}
                           </div>
@@ -1248,7 +1247,6 @@ export default function DiabloQuizRunner(props: {
                         </div>
                         <div className="muted" style={{ marginTop: 6 }}>{state.feedback || "Review the explanation and continue."}</div>
                         <div className="stage5MergedExplanation">
-                          <div className="stage5MergedExplanationTitle">Why this answer worked</div>
                           <div className="muted" style={{ whiteSpace: "pre-wrap", lineHeight: 1.42 }}>
                             {isExplaining ? "Building smart explanation…" : (typeof answerInsight?.explanation === "string" ? answerInsight.explanation : answerInsight?.explanation?.whyCorrect || answerInsight?.explanation?.whyUser || question.explanation || state.feedback || "Review the explanation and continue.")}
                           </div>

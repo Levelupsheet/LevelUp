@@ -2447,8 +2447,24 @@ button.gold, a.gold{
   font-size: 11px;
 }
 .stage8ActionDock{
-  margin-top: auto !important;
-  padding-top: 10px;
+  margin-top: 8px !important;
+  padding-top: 4px;
+  align-items: center;
+}
+.stage8ActionDock .d2Btn,
+.mobileQuizActions .d2Btn{
+  min-height: 44px;
+}
+.stage5MergedExplanation{
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 0;
+}
+.stage5MergedExplanationTitle{
+  display: none;
+}
+.stage5MergedFeedbackCard{
+  padding: 10px 12px !important;
 }
 @media (min-width: 861px){
   .d2QuizShell{
