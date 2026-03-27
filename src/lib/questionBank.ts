@@ -10,6 +10,52 @@ function stableQuestionSignature(input: { prompt?: string | null; type?: string 
   return promptSignature(input);
 }
 
+
+
+function isMissingSubdomainColumnError(error: any) {
+  const message = String(error?.message || "").toLowerCase();
+  return message.includes("mcqquestion.subdomain") && message.includes("does not exist");
+}
+
+async function loadPlacementsWithQuestions(where: any) {
+  try {
+    return await prisma.questionSetPlacement.findMany({
+      where,
+      orderBy: [{ createdAt: "desc" }],
+      include: {
+        set: {
+          include: {
+            questions: { orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }] },
+          },
+        },
+      },
+    });
+  } catch (e: any) {
+    if (!isMissingSubdomainColumnError(e)) throw e;
+    const placements = await prisma.questionSetPlacement.findMany({
+      where,
+      orderBy: [{ createdAt: "desc" }],
+      include: { set: true },
+    });
+    const setIds = Array.from(new Set(placements.map((p: any) => String(p?.setId || "")).filter(Boolean)));
+    const questionsBySet = new Map<string, any[]>();
+    for (const setId of setIds) {
+      const rows = await prisma.$queryRawUnsafe(
+        `SELECT "id", "setId", "prompt", "type", "data", "choices", "correctIndex", "sortOrder", "explanation", "difficulty", "tags", "testNowEligible", "isGoldenEligible", "goldenWeight", "goldenBonusXp", "createdAt", "updatedAt" FROM "MCQQuestion" WHERE "setId" = $1 ORDER BY "sortOrder" ASC, "createdAt" ASC`,
+        setId,
+      );
+      questionsBySet.set(String(setId), Array.isArray(rows) ? rows : []);
+    }
+    return placements.map((placement: any) => ({
+      ...placement,
+      set: {
+        ...placement.set,
+        questions: questionsBySet.get(String(placement.setId)) || [],
+      },
+    }));
+  }
+}
+
 export function mapDbQuestionToRuntime(q: any) {
   const type = normalizeQuestionType(q.type);
   const rawData = q.data && typeof q.data === "object" ? q.data : {};
@@ -56,17 +102,7 @@ export async function loadActiveBank(args: {
   if (where.lane === "TRAINING") where.startingPosition = args.startingPosition || null;
   if (where.lane === "CERTIFICATIONS") where.certExam = args.certExam || null;
 
-  const placements = await prisma.questionSetPlacement.findMany({
-    where,
-    orderBy: [{ createdAt: "desc" }],
-    include: {
-      set: {
-        include: {
-          questions: { orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }] },
-        },
-      },
-    },
-  });
+  const placements = await loadPlacementsWithQuestions(where);
 
   const deduped: any[] = [];
   const seen = new Set<string>();

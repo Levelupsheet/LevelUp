@@ -4,6 +4,69 @@ import { prisma } from "@/lib/prisma";
 import { normalizeQuestionType, safeArray, uniqueSortedNumbers } from "@/lib/questionTypes";
 import { validateQuestionQuality } from "@/lib/questionQuality";
 
+
+function isMissingSubdomainColumnError(error: any) {
+  const message = String(error?.message || "").toLowerCase();
+  return message.includes("mcqquestion.subdomain") && message.includes("does not exist");
+}
+
+async function listQuestionsForSet(setId: string) {
+  try {
+    return await prisma.mCQQuestion.findMany({
+      where: { setId },
+      orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+      take: 500,
+    });
+  } catch (e: any) {
+    if (!isMissingSubdomainColumnError(e)) throw e;
+    const rows = await prisma.$queryRawUnsafe(
+      `SELECT "id", "setId", "prompt", "type", "data", "choices", "correctIndex", "sortOrder", "explanation", "difficulty", "tags", "testNowEligible", "isGoldenEligible", "goldenWeight", "goldenBonusXp", "createdAt", "updatedAt" FROM "MCQQuestion" WHERE "setId" = $1 ORDER BY "sortOrder" ASC, "createdAt" ASC LIMIT 500`,
+      setId,
+    );
+    return Array.isArray(rows) ? rows : [];
+  }
+}
+
+async function listExistingQuestionSignatures(setId: string) {
+  try {
+    return await prisma.mCQQuestion.findMany({
+      where: { setId },
+      select: { prompt: true, type: true, choices: true, data: true },
+    });
+  } catch (e: any) {
+    if (!isMissingSubdomainColumnError(e)) throw e;
+    const rows = await prisma.$queryRawUnsafe(
+      `SELECT "prompt", "type", "choices", "data" FROM "MCQQuestion" WHERE "setId" = $1`,
+      setId,
+    );
+    return Array.isArray(rows) ? rows : [];
+  }
+}
+
+function stripUnsupportedColumnsForLegacyDb(payload: any) {
+  const cloned = { ...(payload || {}) };
+  delete (cloned as any).subdomain;
+  return cloned;
+}
+
+async function createQuestionCompat(data: any) {
+  try {
+    return await prisma.mCQQuestion.create({ data });
+  } catch (e: any) {
+    if (!isMissingSubdomainColumnError(e)) throw e;
+    return prisma.mCQQuestion.create({ data: stripUnsupportedColumnsForLegacyDb(data) });
+  }
+}
+
+async function createManyQuestionsCompat(data: any[]) {
+  try {
+    return await prisma.mCQQuestion.createMany({ data: data as any });
+  } catch (e: any) {
+    if (!isMissingSubdomainColumnError(e)) throw e;
+    return prisma.mCQQuestion.createMany({ data: data.map((row) => stripUnsupportedColumnsForLegacyDb(row)) as any });
+  }
+}
+
 function toDbQuestionPayload(input: any, sortOrder: number) {
   const type = normalizeQuestionType(input?.type);
   const prompt = String(input?.prompt || "").trim();
@@ -218,11 +281,7 @@ export async function GET(req: Request) {
     const setId = searchParams.get("setId");
     if (!setId) return NextResponse.json({ error: "setId is required" }, { status: 400 });
 
-    const questions = await prisma.mCQQuestion.findMany({
-      where: { setId },
-      orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
-      take: 500,
-    });
+    const questions = await listQuestionsForSet(setId);
     return NextResponse.json({ questions });
   } catch (e: any) {
     return NextResponse.json({ error: e?.message || "Failed" }, { status: 500 });
@@ -247,10 +306,7 @@ export async function POST(req: Request) {
       const incoming = body.questions;
       if (incoming.length === 0) return NextResponse.json({ inserted: 0, skippedDuplicates: 0 });
 
-      const existingQuestions = await prisma.mCQQuestion.findMany({
-        where: { setId },
-        select: { prompt: true, type: true, choices: true, data: true },
-      });
+      const existingQuestions = await listExistingQuestionSignatures(setId);
       const seen = new Set(existingQuestions.map((q) => normalizePromptSignature(q)));
       const localSeen = new Set<string>();
       const data: any[] = [];
@@ -270,13 +326,13 @@ export async function POST(req: Request) {
       }
 
       if (!data.length) return NextResponse.json({ inserted: 0, skippedDuplicates });
-      const res = await prisma.mCQQuestion.createMany({ data: data as any });
+      const res = await createManyQuestionsCompat(data as any);
       return NextResponse.json({ inserted: res.count, skippedDuplicates });
     }
 
     const payload = toDbQuestionPayload(body, typeof body.sortOrder === "number" ? body.sortOrder : nextOrder);
     const quality = validateQuestionQuality(payload as any);
-    const q = await prisma.mCQQuestion.create({ data: { setId, ...(payload as any), data: { ...((payload as any).data || {}), lifecycleStatus: String((body?.lifecycleStatus || (payload as any)?.data?.lifecycleStatus || "ACTIVE")).toUpperCase(), qualityScore: quality.qualityScore, qualityIssues: quality.issues } } });
+    const q = await createQuestionCompat({ setId, ...(payload as any), data: { ...((payload as any).data || {}), lifecycleStatus: String((body?.lifecycleStatus || (payload as any)?.data?.lifecycleStatus || "ACTIVE")).toUpperCase(), qualityScore: quality.qualityScore, qualityIssues: quality.issues } });
     return NextResponse.json({ question: q });
   } catch (e: any) {
     return NextResponse.json({ error: e?.message || "Failed" }, { status: 500 });

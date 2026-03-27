@@ -940,7 +940,7 @@ export default function DiabloQuizRunner(props: {
                       <div className="card stage5ExplanationCard" style={{ padding: 12 }}>
                         <div style={{ fontWeight: 900, marginBottom: 6 }}>Why this answer worked</div>
                         <div className="muted" style={{ whiteSpace: "pre-wrap", lineHeight: 1.45 }}>
-                          {isExplaining ? "Building smart explanation…" : answerInsight?.explanation || question.explanation || state.feedback || "Review the explanation and continue."}
+                          {isExplaining ? "Building smart explanation…" : (typeof answerInsight?.explanation === "string" ? answerInsight.explanation : answerInsight?.explanation?.whyCorrect || answerInsight?.explanation?.whyUser || question.explanation || state.feedback || "Review the explanation and continue.")}
                         </div>
                       </div>
                     </div>
@@ -1066,7 +1066,7 @@ export default function DiabloQuizRunner(props: {
                       <div className="card stage5ExplanationCard" style={{ padding: 12 }}>
                         <div style={{ fontWeight: 900, marginBottom: 6 }}>Why this answer worked</div>
                         <div className="muted" style={{ whiteSpace: "pre-wrap", lineHeight: 1.45 }}>
-                          {isExplaining ? "Building smart explanation…" : answerInsight?.explanation || question.explanation || state.feedback || "Review the explanation and continue."}
+                          {isExplaining ? "Building smart explanation…" : (typeof answerInsight?.explanation === "string" ? answerInsight.explanation : answerInsight?.explanation?.whyCorrect || answerInsight?.explanation?.whyUser || question.explanation || state.feedback || "Review the explanation and continue.")}
                         </div>
                       </div>
                     </div>

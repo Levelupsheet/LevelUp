@@ -219,10 +219,13 @@ export async function PATCH(req: Request) {
                 value: row.selectedAnswer,
                 score: Number((evaluation as any)?.score ?? (evaluation.correct ? 1 : 0)),
                 partialScore: Number((evaluation as any)?.partialScore ?? (evaluation.correct ? 1 : 0)),
-                feedback: {
-                  rubric: (evaluation as any)?.feedback ?? null,
-                  explanation,
-                },
+                rubric: (evaluation as any)?.feedback ?? null,
+                explanationText:
+                  typeof explanation === "string"
+                    ? explanation
+                    : (explanation as any)?.whyCorrect || (explanation as any)?.whyUser || null,
+                explanationMeta:
+                  explanation && typeof explanation === "object" ? explanation : null,
               },
               answeredAt: new Date(),
             },
@@ -345,6 +348,13 @@ export async function PATCH(req: Request) {
     }
     return NextResponse.json({ ...serializeSession(session), goldenAwarded });
   } catch (e: any) {
-    return NextResponse.json({ error: e?.message || "Failed to update Test Now session" }, { status: 500 });
+    console.error("PATCH /api/test-now/session failed", e);
+    return NextResponse.json(
+      {
+        error: e?.message || "Failed to update Test Now session",
+        stack: process.env.NODE_ENV !== "production" ? e?.stack : undefined,
+      },
+      { status: 500 }
+    );
   }
 }
