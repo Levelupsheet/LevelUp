@@ -14,7 +14,7 @@ export const revalidate = 0;
 export async function GET(req: Request) {
   try {
     const url = new URL(req.url);
-    const metric = (url.searchParams.get("metric") || "top") as "top" | "boss" | "domain";
+    const metric = (url.searchParams.get("metric") || "top") as "top" | "boss" | "domain" | "active";
 
     const orderBy = ([{ xp: "desc" as const }, { createdAt: "asc" as const }] as const);
 
