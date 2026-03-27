@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { prisma } from "../../_lib/prisma";
-import { readFile } from "fs/promises";
+import { readFile, unlink } from "fs/promises";
 
 const Body = z.object({
   userId: z.string().min(1),
@@ -43,6 +43,11 @@ export async function POST(req: Request) {
       // Python service may not be running yet. Keep a safe fallback.
       parsedJson = fallbackParse("Resume service not running. Start it with: docker compose up -d resume");
     }
+
+    if (parsedJson && typeof parsedJson === "object" && "rawTextPreview" in parsedJson) {
+      delete (parsedJson as any).rawTextPreview;
+    }
+    await unlink(resume.storageKey).catch(() => {});
 
     const updated = await prisma.resumeFile.update({
       where: { id: resume.id },

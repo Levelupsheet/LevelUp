@@ -21,6 +21,24 @@ type Stage9Status = { streakDays: number; lastClaimDate: string | null; claimabl
 type Stage10LeaderboardRow = { userId: string; displayName: string; xp?: number; level?: number; rank?: string; domain?: string; wins?: number };
 type Stage10Leaderboards = { weekly: Stage10LeaderboardRow[]; byDomain: Stage10LeaderboardRow[]; bossWins: Stage10LeaderboardRow[]; domain?: string | null };
 
+type Stage12Profile = {
+  analyzedAt: string;
+  targetRole: string;
+  skills: string[];
+  certifications: string[];
+  inferredDomains: { domain: string; score: number }[];
+  gaps: string[];
+  coaching: {
+    summary: string;
+    strengths: string[];
+    focusAreas: string[];
+    nextActions: string[];
+    behaviorNotes: string[];
+  };
+};
+type Stage12Status = { hasResume: boolean; resumeFileName: string | null; analyzedAt: string | null; profile: Stage12Profile | null };
+
+
 type Eligibility = {
   eligible: boolean;
   readiness: number;
@@ -122,6 +140,12 @@ export default function Dashboard() {
   const [buyingItemId, setBuyingItemId] = useState<string | null>(null);
   const [stage9Message, setStage9Message] = useState<string | null>(null);
   const [stage10Leaderboards, setStage10Leaderboards] = useState<Stage10Leaderboards | null>(null);
+
+const [stage12Status, setStage12Status] = useState<Stage12Status | null>(null);
+const [stage12Uploading, setStage12Uploading] = useState(false);
+const [stage12File, setStage12File] = useState<File | null>(null);
+const [stage12Message, setStage12Message] = useState<string | null>(null);
+
 
   // Level-up detection (notification-only; user opens vault when ready)
   const prevLevelRef = useRef<number>(0);
@@ -324,12 +348,51 @@ useEffect(() => {
         const s10Data = await s10Res.json().catch(() => null);
         if (s10Res.ok && s10Data) setStage10Leaderboards(s10Data);
       } catch {}
+
+try {
+  await refreshStage12(activeUserId);
+} catch {}
     } catch (e: any) {
       console.error(e.message ?? "Error");
     } finally {
       setLoading(false);
     }
   }
+
+async function refreshStage12(activeUserId: string) {
+  try {
+    const res = await fetch(`/api/stage12/status?userId=${encodeURIComponent(activeUserId)}`, { cache: "no-store" as any });
+    const data = await res.json().catch(() => null);
+    if (res.ok && data) setStage12Status(data);
+  } catch {}
+}
+
+async function analyzeResumeStage12() {
+  if (!userId) return;
+  setStage12Uploading(true);
+  setStage12Message(null);
+  try {
+    const fd = new FormData();
+    fd.append("userId", userId);
+    if (stage12File) fd.append("file", stage12File);
+    const res = await fetch("/api/stage12/analyze", { method: "POST", body: fd });
+    const data = await res.json().catch(() => null);
+    if (!res.ok) throw new Error(data?.detail || data?.error || "Resume analysis failed");
+    setStage12Status({
+      hasResume: true,
+      resumeFileName: stage12File?.name || data?.profile?.basics?.name || "Resume analyzed",
+      analyzedAt: data?.profile?.analyzedAt || new Date().toISOString(),
+      profile: data?.profile || null,
+    });
+    setStage12Message("Resume analyzed. Skills, gaps, and coaching were updated.");
+    setStage12File(null);
+  } catch (e: any) {
+    setStage12Message(e?.message || "Resume analysis failed");
+  } finally {
+    setStage12Uploading(false);
+  }
+}
+
   async function confirmPosition(){
     if (!pendingPos) return;
     setPosSaving(true);
@@ -1002,6 +1065,66 @@ useEffect(() => {
     </div>
   </div>
 </div>
+
+
+<div className="card" style={{ marginBottom: 14, borderColor: "rgba(100,220,255,0.20)" }}>
+  <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+    <div>
+      <h3 style={{ margin: 0 }}>Stage 12 AI coach</h3>
+      <div><small>Upload a resume temporarily, extract skills, map gaps to mastery, and save only structured profile data.</small></div>
+    </div>
+    <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+      <input
+        type="file"
+        accept=".pdf,.docx"
+        onChange={(e) => setStage12File(e.target.files?.[0] || null)}
+        style={{ maxWidth: 220 }}
+      />
+      <button className="secondaryBtn" type="button" onClick={analyzeResumeStage12} disabled={stage12Uploading || !userId}>
+        {stage12Uploading ? "Analyzing..." : stage12File ? "Upload + analyze" : "Refresh coach"}
+      </button>
+      <a className="secondaryBtn" href="/coach">Open coach</a>
+    </div>
+  </div>
+  {stage12Message ? <div style={{ marginTop: 10, opacity: 0.88 }}><small>{stage12Message}</small></div> : null}
+  <div style={{ marginTop: 12, display: "grid", gridTemplateColumns: "1.15fr 0.95fr", gap: 12 }}>
+    <div className="featureCard">
+      <div><small>AI summary</small></div>
+      <div style={{ marginTop: 8, fontWeight: 800 }}>{stage12Status?.profile?.targetRole || "Career path pending"}</div>
+      <div style={{ marginTop: 8, opacity: 0.88 }}>
+        <small>{stage12Status?.profile?.coaching?.summary || "Upload a PDF or DOCX resume to generate skill gaps and coaching guidance."}</small>
+      </div>
+      <div style={{ marginTop: 10, display: "flex", gap: 8, flexWrap: "wrap" }}>
+        {(stage12Status?.profile?.inferredDomains || []).slice(0, 4).map((row) => (
+          <span key={`s12_dm_${row.domain}`} className="badge">{row.domain} · {row.score}</span>
+        ))}
+        {!stage12Status?.profile?.inferredDomains?.length ? <span className="badge">No domain signals yet</span> : null}
+      </div>
+      <div style={{ marginTop: 10, opacity: 0.76 }}><small>{stage12Status?.analyzedAt ? `Last analyzed ${new Date(stage12Status.analyzedAt).toLocaleString()}` : "Original resume file is not retained long term."}</small></div>
+    </div>
+    <div className="featureCard">
+      <div><small>Skill gaps & next moves</small></div>
+      <div style={{ marginTop: 8, display: "grid", gap: 8 }}>
+        {(stage12Status?.profile?.gaps || []).slice(0, 3).map((row, idx) => (
+          <div key={`s12_gap_${idx}`}><small>• {row}</small></div>
+        ))}
+        {!(stage12Status?.profile?.gaps || []).length ? <small style={{ opacity: 0.78 }}>No gap scan yet.</small> : null}
+      </div>
+      <div style={{ marginTop: 12, fontWeight: 800 }}>Coach next actions</div>
+      <div style={{ marginTop: 8, display: "grid", gap: 8 }}>
+        {(stage12Status?.profile?.coaching?.nextActions || []).slice(0, 3).map((row, idx) => (
+          <div key={`s12_action_${idx}`}><small>• {row}</small></div>
+        ))}
+      </div>
+      {(stage12Status?.profile?.skills || []).length ? (
+        <div style={{ marginTop: 12, display: "flex", gap: 8, flexWrap: "wrap" }}>
+          {stage12Status?.profile?.skills?.slice(0, 8).map((skill) => <span key={`s12_skill_${skill}`} className="badge">{skill}</span>)}
+        </div>
+      ) : null}
+    </div>
+  </div>
+</div>
+
 <div className="card">
             <h3 style={{ marginTop: 0 }}>Notifications</h3>
             {combinedNotes.length ? (
