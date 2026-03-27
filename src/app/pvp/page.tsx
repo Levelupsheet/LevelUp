@@ -1,6 +1,8 @@
+
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import DiabloQuizRunner, { type DiabloQuestion, type DiabloQuizRunSummary } from "@/components/DiabloQuizRunner";
 
 type LeaderRow = { userId: string; displayName: string; xp?: number; level?: number; rank?: string };
 type PvpChallengeView = {
@@ -22,6 +24,8 @@ type PvpChallengeView = {
   you?: string | null;
   youSubmitted?: boolean;
   opponentSubmitted?: boolean;
+  acceptedBy?: string | null;
+  acceptedAt?: string | null;
   submissions?: Record<string, { summary: { correctCount: number; totalQuestions: number; accuracy: number; bestStreak: number; totalTimeMs: number; completedAt: string; awardedTokens?: number } }>;
   winnerUserId?: string | null;
   resultLabel?: string | null;
@@ -52,6 +56,19 @@ function formatMs(ms: number) {
   return `${mins}:${String(rem).padStart(2, "0")}`;
 }
 
+function toDiabloQuestions(rows: PvpChallengeView["questions"]): DiabloQuestion[] {
+  return (rows || []).map((q, i) => ({
+    id: q.id || `pvp_q_${i}`,
+    prompt: q.prompt,
+    type: q.type as any,
+    choices: q.choices,
+    data: q.data,
+    explanation: q.explanation,
+    domainId: String((q.data as any)?.domainId || (q.data as any)?.domain || "pvp").toLowerCase(),
+    level: Number((q.data as any)?.level || 1) as any,
+  }));
+}
+
 export default function PvpPage() {
   const [activeUser, setActiveUser] = useState<{ id: string; displayName: string }>({ id: "", displayName: "" });
   const [leaders, setLeaders] = useState<LeaderRow[]>([]);
@@ -60,16 +77,18 @@ export default function PvpPage() {
   const [outgoing, setOutgoing] = useState<PvpChallengeView[]>([]);
   const [completed, setCompleted] = useState<PvpChallengeView[]>([]);
   const [activeChallenge, setActiveChallenge] = useState<PvpChallengeView | null>(null);
+  const [duelOpen, setDuelOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState("");
-  const [answers, setAnswers] = useState<Record<string, any>>({});
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [startedAt, setStartedAt] = useState<number>(0);
   const [submitting, setSubmitting] = useState(false);
+  const answerRef = useRef<Record<string, unknown>>({});
+  const startedAtRef = useRef<number>(0);
 
-  const currentQuestion = activeChallenge?.questions?.[currentIndex] || null;
   const userId = activeUser.id;
+  const currentOpponentName = activeChallenge
+    ? (activeChallenge.challenger.userId === userId ? activeChallenge.rival.displayName : activeChallenge.challenger.displayName)
+    : "Lagger";
 
   async function loadBoardAndChallenges(targetChallengeId?: string) {
     const user = getActiveUser();
@@ -95,22 +114,15 @@ export default function PvpPage() {
 
       if (challengeRes && challengeRes.ok) {
         const json = await challengeRes.json();
-        setIncoming(Array.isArray(json?.incoming) ? json.incoming : []);
-        setOutgoing(Array.isArray(json?.outgoing) ? json.outgoing : []);
-        setCompleted(Array.isArray(json?.completed) ? json.completed : []);
-        const all = [
-          ...(Array.isArray(json?.incoming) ? json.incoming : []),
-          ...(Array.isArray(json?.outgoing) ? json.outgoing : []),
-          ...(Array.isArray(json?.completed) ? json.completed : []),
-        ];
+        const nextIncoming = Array.isArray(json?.incoming) ? json.incoming : [];
+        const nextOutgoing = Array.isArray(json?.outgoing) ? json.outgoing : [];
+        const nextCompleted = Array.isArray(json?.completed) ? json.completed : [];
+        setIncoming(nextIncoming);
+        setOutgoing(nextOutgoing);
+        setCompleted(nextCompleted);
+        const all = [...nextIncoming, ...nextOutgoing, ...nextCompleted];
         const picked = targetChallengeId ? all.find((row: any) => row.id === targetChallengeId) : activeChallenge ? all.find((row: any) => row.id === activeChallenge.id) : null;
-        if (picked) {
-          setActiveChallenge(picked);
-          if (!picked.youSubmitted) {
-            setCurrentIndex(0);
-            setStartedAt(Date.now());
-          }
-        }
+        if (picked) setActiveChallenge(picked);
       }
     } catch (err: any) {
       setError(String(err?.message || err || "Failed to load PvP arena."));
@@ -122,14 +134,6 @@ export default function PvpPage() {
   useEffect(() => {
     loadBoardAndChallenges();
   }, []);
-
-  useEffect(() => {
-    if (activeChallenge && !activeChallenge.youSubmitted) {
-      setAnswers({});
-      setCurrentIndex(0);
-      setStartedAt(Date.now());
-    }
-  }, [activeChallenge?.id]);
 
   async function createChallenge() {
     if (!userId || !selectedRival) {
@@ -153,7 +157,12 @@ export default function PvpPage() {
       const json = await res.json();
       if (!res.ok) throw new Error(json?.detail || json?.error || "Failed to create challenge");
       const challenge = json?.challenge;
-      if (challenge) setActiveChallenge(challenge);
+      if (challenge) {
+        setActiveChallenge(challenge);
+        setDuelOpen(true);
+        answerRef.current = {};
+        startedAtRef.current = Date.now();
+      }
       await loadBoardAndChallenges(challenge?.id);
     } catch (err: any) {
       setError(String(err?.message || err));
@@ -162,7 +171,7 @@ export default function PvpPage() {
     }
   }
 
-  async function openChallenge(id: string) {
+  async function openChallenge(id: string, autoOpen = false) {
     if (!userId) return;
     setError("");
     try {
@@ -170,22 +179,44 @@ export default function PvpPage() {
       const json = await res.json();
       if (!res.ok) throw new Error(json?.detail || json?.error || "Failed to load challenge");
       setActiveChallenge(json?.challenge || null);
+      if (autoOpen && json?.challenge && !json.challenge.youSubmitted) {
+        setDuelOpen(true);
+        answerRef.current = {};
+        startedAtRef.current = Date.now();
+      }
     } catch (err: any) {
       setError(String(err?.message || err));
     }
   }
 
-  function setAnswer(questionId: string, value: any) {
-    setAnswers((prev) => ({ ...prev, [questionId]: value }));
+  async function acceptChallenge(id: string) {
+    if (!userId) return;
+    setError("");
+    try {
+      const res = await fetch(`/api/pvp/challenges/${encodeURIComponent(id)}/accept`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json?.detail || json?.error || "Failed to accept challenge");
+      setActiveChallenge(json?.challenge || null);
+      setDuelOpen(true);
+      answerRef.current = {};
+      startedAtRef.current = Date.now();
+      await loadBoardAndChallenges(id);
+    } catch (err: any) {
+      setError(String(err?.message || err));
+    }
   }
 
-  async function submitChallenge() {
+  async function submitChallenge(summary: DiabloQuizRunSummary) {
     if (!activeChallenge || !userId) return;
     setSubmitting(true);
     setError("");
     try {
-      const payloadAnswers = activeChallenge.questions.map((q) => answers[q.id] ?? null);
-      const totalTimeMs = startedAt ? Date.now() - startedAt : 0;
+      const payloadAnswers = activeChallenge.questions.map((q) => answerRef.current[q.id] ?? null);
+      const totalTimeMs = startedAtRef.current ? Date.now() - startedAtRef.current : ((summary.totalQuestions || 0) * 1000);
       const res = await fetch(`/api/pvp/challenges/${encodeURIComponent(activeChallenge.id)}/submit`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -194,6 +225,7 @@ export default function PvpPage() {
       const json = await res.json();
       if (!res.ok) throw new Error(json?.detail || json?.error || "Failed to submit challenge");
       setActiveChallenge(json?.challenge || null);
+      setDuelOpen(false);
       await loadBoardAndChallenges(activeChallenge.id);
     } catch (err: any) {
       setError(String(err?.message || err));
@@ -205,7 +237,7 @@ export default function PvpPage() {
   const youSummary = useMemo(() => (activeChallenge?.submissions && userId ? activeChallenge.submissions[userId]?.summary : null), [activeChallenge, userId]);
   const opponentId = activeChallenge ? (activeChallenge.challenger.userId === userId ? activeChallenge.rival.userId : activeChallenge.challenger.userId) : "";
   const opponentSummary = useMemo(() => (activeChallenge?.submissions && opponentId ? activeChallenge.submissions[opponentId]?.summary : null), [activeChallenge, opponentId]);
-  const answeredCount = activeChallenge ? activeChallenge.questions.filter((q) => answers[q.id] !== undefined && answers[q.id] !== null && answers[q.id] !== "").length : 0;
+  const duelQuestions = useMemo(() => toDiabloQuestions(activeChallenge?.questions || []), [activeChallenge?.questions]);
 
   return (
     <main className="page">
@@ -215,7 +247,7 @@ export default function PvpPage() {
             <div>
               <h1 style={{ margin: 0 }}>PvP Arena</h1>
               <div style={{ marginTop: 6, opacity: 0.82 }}>
-                <small>Async PvP is now live: create a seeded duel, answer the same questions, and compare accuracy, speed, and streak for token rewards.</small>
+                <small>Async PvP is now live: create a seeded duel, answer the same questions in the shared combat modal, and compare accuracy, speed, and streak for token rewards.</small>
               </div>
             </div>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
@@ -274,9 +306,9 @@ export default function PvpPage() {
             <div className="featureCard" style={{ padding: 14 }}>
               <ol style={{ margin: 0, paddingLeft: 18, display: "grid", gap: 8 }}>
                 <li>Create a challenge.</li>
-                <li>Both players get the same seeded six-question duel.</li>
+                <li>Your rival gets a dashboard notification and incoming challenge card.</li>
+                <li>Accepting launches the same combat quiz modal used elsewhere in LevelUp Pro.</li>
                 <li>Winner is decided by accuracy first, then time, then streak.</li>
-                <li>Winner gets 25 tokens, runner-up gets 10.</li>
               </ol>
             </div>
             <div style={{ marginTop: 12, opacity: 0.78 }}><small>Active user: {activeUser.displayName || userId}</small></div>
@@ -286,23 +318,34 @@ export default function PvpPage() {
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16, marginTop: 16 }}>
           {[
-            { title: "Incoming challenges", rows: incoming },
-            { title: "Outgoing challenges", rows: outgoing },
-            { title: "Completed duels", rows: completed.slice(0, 6) },
+            { title: "Incoming challenges", rows: incoming, incoming: true },
+            { title: "Outgoing challenges", rows: outgoing, incoming: false },
+            { title: "Completed duels", rows: completed.slice(0, 6), incoming: false },
           ].map((section) => (
             <div className="card" style={{ padding: 18 }} key={section.title}>
               <h3 style={{ marginTop: 0 }}>{section.title}</h3>
               <div style={{ display: "grid", gap: 10 }}>
                 {section.rows.map((row) => {
                   const opponent = row.challenger.userId === userId ? row.rival.displayName : row.challenger.displayName;
+                  const canAccept = section.incoming && row.status === "PENDING" && !row.youSubmitted;
+                  const canPlay = !row.youSubmitted && (!section.incoming || Boolean(row.acceptedAt));
                   return (
-                    <button key={row.id} type="button" className="featureCard" onClick={() => openChallenge(row.id)} style={{ padding: 12, textAlign: "left" }}>
+                    <div key={row.id} className="featureCard" style={{ padding: 12, textAlign: "left" }}>
                       <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
                         <b>{opponent}</b>
                         <span className="badge">{row.status}</span>
                       </div>
                       <div style={{ marginTop: 6, opacity: 0.78 }}><small>{row.questionCount} questions • {new Date(row.createdAt).toLocaleString()}</small></div>
-                    </button>
+                      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 10 }}>
+                        {canAccept ? (
+                          <button type="button" className="primaryBtn" onClick={() => acceptChallenge(row.id)}>Accept duel</button>
+                        ) : null}
+                        {canPlay ? (
+                          <button type="button" className="secondaryBtn" onClick={() => openChallenge(row.id, true)}>Open duel</button>
+                        ) : null}
+                        <button type="button" className="secondaryBtn" onClick={() => openChallenge(row.id, false)}>View details</button>
+                      </div>
+                    </div>
                   );
                 })}
                 {!section.rows.length ? <small style={{ opacity: 0.78 }}>No duels here yet.</small> : null}
@@ -315,111 +358,85 @@ export default function PvpPage() {
           <div className="card" style={{ padding: 18, marginTop: 16 }}>
             <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
               <div>
-                <h3 style={{ margin: 0 }}>Duel vs {activeChallenge.challenger.userId === userId ? activeChallenge.rival.displayName : activeChallenge.challenger.displayName}</h3>
-                <div style={{ marginTop: 6, opacity: 0.78 }}><small>{activeChallenge.questionCount} seeded questions • {activeChallenge.status}</small></div>
+                <h3 style={{ margin: 0 }}>Duel vs {currentOpponentName}</h3>
+                <div style={{ marginTop: 6, opacity: 0.78 }}>
+                  <small>
+                    {activeChallenge.questionCount} seeded questions • {activeChallenge.status}
+                    {activeChallenge.acceptedAt ? ` • Accepted ${new Date(activeChallenge.acceptedAt).toLocaleString()}` : ""}
+                  </small>
+                </div>
               </div>
-              {activeChallenge.resultLabel ? <span className="badge">{activeChallenge.resultLabel}</span> : null}
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                {activeChallenge.resultLabel ? <span className="badge">{activeChallenge.resultLabel}</span> : null}
+                {!activeChallenge.youSubmitted ? (
+                  <button type="button" className="primaryBtn" onClick={() => { setDuelOpen(true); answerRef.current = {}; startedAtRef.current = Date.now(); }}>
+                    Open combat duel
+                  </button>
+                ) : null}
+              </div>
             </div>
 
-            {activeChallenge.youSubmitted ? (
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginTop: 16 }}>
-                <div className="featureCard" style={{ padding: 14 }}>
-                  <h4 style={{ marginTop: 0 }}>Your result</h4>
-                  {youSummary ? (
-                    <div style={{ display: "grid", gap: 8 }}>
-                      <div>Accuracy: <b>{Math.round((youSummary.accuracy || 0) * 100)}%</b></div>
-                      <div>Correct: <b>{youSummary.correctCount}/{youSummary.totalQuestions}</b></div>
-                      <div>Best streak: <b>{youSummary.bestStreak}</b></div>
-                      <div>Time: <b>{formatMs(youSummary.totalTimeMs)}</b></div>
-                      <div>Tokens: <b>{youSummary.awardedTokens || 0}</b></div>
-                    </div>
-                  ) : null}
-                </div>
-                <div className="featureCard" style={{ padding: 14 }}>
-                  <h4 style={{ marginTop: 0 }}>Opponent result</h4>
-                  {opponentSummary ? (
-                    <div style={{ display: "grid", gap: 8 }}>
-                      <div>Accuracy: <b>{Math.round((opponentSummary.accuracy || 0) * 100)}%</b></div>
-                      <div>Correct: <b>{opponentSummary.correctCount}/{opponentSummary.totalQuestions}</b></div>
-                      <div>Best streak: <b>{opponentSummary.bestStreak}</b></div>
-                      <div>Time: <b>{formatMs(opponentSummary.totalTimeMs)}</b></div>
-                      <div>Tokens: <b>{opponentSummary.awardedTokens || 0}</b></div>
-                    </div>
-                  ) : (
-                    <small style={{ opacity: 0.78 }}>Waiting for the other player to finish.</small>
-                  )}
-                </div>
-              </div>
-            ) : currentQuestion ? (
-              <>
-                <div style={{ marginTop: 16, display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
-                  <span className="badge">Question {currentIndex + 1} / {activeChallenge.questionCount}</span>
-                  <span className="badge">Answered {answeredCount} / {activeChallenge.questionCount}</span>
-                </div>
-
-                <div className="featureCard" style={{ padding: 16, marginTop: 14 }}>
-                  <div style={{ fontWeight: 900, fontSize: 22 }}>{currentQuestion.prompt}</div>
-                  <div style={{ marginTop: 8, opacity: 0.72 }}><small>{currentQuestion.type.replaceAll("_", " ")}</small></div>
-
-                  {(currentQuestion.type === "multiple_choice" || currentQuestion.type === "incident" || currentQuestion.type === "true_false") ? (
-                    <div style={{ display: "grid", gap: 10, marginTop: 14 }}>
-                      {(currentQuestion.choices || []).map((choice, idx) => (
-                        <button key={`${currentQuestion.id}_${idx}`} type="button" className="featureCard" onClick={() => setAnswer(currentQuestion.id, idx)} style={{ padding: 12, textAlign: "left", borderColor: answers[currentQuestion.id] === idx ? "rgba(108,175,255,0.65)" : undefined }}>
-                          {choice}
-                        </button>
-                      ))}
-                    </div>
-                  ) : null}
-
-                  {currentQuestion.type === "fill_blank" || currentQuestion.type === "cli_command" ? (
-                    <div style={{ marginTop: 14 }}>
-                      <input
-                        value={answers[currentQuestion.id] || ""}
-                        onChange={(e) => setAnswer(currentQuestion.id, e.target.value)}
-                        placeholder={currentQuestion.data?.placeholder || "Type your answer"}
-                        className="input"
-                        style={{ width: "100%", padding: 12, borderRadius: 12 }}
-                      />
-                    </div>
-                  ) : null}
-
-                  {currentQuestion.type === "multi_select" ? (
-                    <div style={{ display: "grid", gap: 10, marginTop: 14 }}>
-                      {(currentQuestion.choices || []).map((choice, idx) => {
-                        const selected: number[] = Array.isArray(answers[currentQuestion.id]) ? answers[currentQuestion.id] : [];
-                        const checked = selected.includes(idx);
-                        return (
-                          <label key={`${currentQuestion.id}_${idx}`} className="featureCard" style={{ padding: 12, display: "flex", gap: 10, alignItems: "center" }}>
-                            <input
-                              type="checkbox"
-                              checked={checked}
-                              onChange={(e) => {
-                                const current = Array.isArray(answers[currentQuestion.id]) ? [...answers[currentQuestion.id]] : [];
-                                const next = e.target.checked ? [...current, idx] : current.filter((n: number) => n !== idx);
-                                setAnswer(currentQuestion.id, next.sort((a: number, b: number) => a - b));
-                              }}
-                            />
-                            <span>{choice}</span>
-                          </label>
-                        );
-                      })}
-                    </div>
-                  ) : null}
-                </div>
-
-                <div style={{ display: "flex", justifyContent: "space-between", gap: 12, marginTop: 14, flexWrap: "wrap" }}>
-                  <button type="button" className="secondaryBtn" onClick={() => setCurrentIndex((v) => Math.max(0, v - 1))} disabled={currentIndex <= 0}>Previous</button>
-                  <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-                    {currentIndex < activeChallenge.questionCount - 1 ? (
-                      <button type="button" className="secondaryBtn" onClick={() => setCurrentIndex((v) => Math.min(activeChallenge.questionCount - 1, v + 1))}>Next question</button>
-                    ) : null}
-                    <button type="button" className="primaryBtn" onClick={submitChallenge} disabled={submitting || answeredCount < activeChallenge.questionCount}>
-                      {submitting ? "Submitting duel..." : "Submit duel"}
-                    </button>
+            <div style={{ marginTop: 14, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+              <div className="featureCard" style={{ padding: 14 }}>
+                <h4 style={{ marginTop: 0 }}>Your result</h4>
+                {youSummary ? (
+                  <div style={{ display: "grid", gap: 8 }}>
+                    <div>Accuracy: <b>{Math.round((youSummary.accuracy || 0) * 100)}%</b></div>
+                    <div>Correct: <b>{youSummary.correctCount}/{youSummary.totalQuestions}</b></div>
+                    <div>Best streak: <b>{youSummary.bestStreak}</b></div>
+                    <div>Time: <b>{formatMs(youSummary.totalTimeMs)}</b></div>
+                    <div>Tokens: <b>{youSummary.awardedTokens || 0}</b></div>
                   </div>
+                ) : (
+                  <small style={{ opacity: 0.78 }}>Your duel result will appear here after you finish the combat session.</small>
+                )}
+              </div>
+              <div className="featureCard" style={{ padding: 14 }}>
+                <h4 style={{ marginTop: 0 }}>{currentOpponentName} result</h4>
+                {opponentSummary ? (
+                  <div style={{ display: "grid", gap: 8 }}>
+                    <div>Accuracy: <b>{Math.round((opponentSummary.accuracy || 0) * 100)}%</b></div>
+                    <div>Correct: <b>{opponentSummary.correctCount}/{opponentSummary.totalQuestions}</b></div>
+                    <div>Best streak: <b>{opponentSummary.bestStreak}</b></div>
+                    <div>Time: <b>{formatMs(opponentSummary.totalTimeMs)}</b></div>
+                    <div>Tokens: <b>{opponentSummary.awardedTokens || 0}</b></div>
+                  </div>
+                ) : (
+                  <small style={{ opacity: 0.78 }}>Waiting for the other player to finish.</small>
+                )}
+              </div>
+            </div>
+          </div>
+        ) : null}
+
+        {duelOpen && activeChallenge && !activeChallenge.youSubmitted ? (
+          <div style={{ position: "fixed", inset: 0, zIndex: 1200, background: "rgba(4, 8, 18, 0.84)", backdropFilter: "blur(3px)", overflow: "auto" }}>
+            <div style={{ minHeight: "100vh", padding: 12 }}>
+              <DiabloQuizRunner
+                title="PvP Duel"
+                subtitle={`Async duel • ${activeChallenge.questionCount} seeded questions`}
+                enemyName={currentOpponentName}
+                questions={duelQuestions}
+                timed
+                metaLeft={activeChallenge.lane === "TEST_NOW" ? "PvP Arena" : activeChallenge.lane}
+                metaRight={activeChallenge.resultLabel || "Seeded duel"}
+                exitLabel="Close"
+                onExit={() => setDuelOpen(false)}
+                encounterType="standard"
+                rules={{ questionCount: activeChallenge.questionCount, disableStage8Intel: true }}
+                onAdvanceQuestion={({ question, selectedAnswer }) => {
+                  answerRef.current = { ...answerRef.current, [String(question.id || "")]: selectedAnswer ?? null };
+                }}
+                onComplete={(summary) => {
+                  void submitChallenge(summary);
+                }}
+              />
+              {submitting ? (
+                <div className="card" style={{ maxWidth: 520, margin: "12px auto 0", padding: 14, textAlign: "center" }}>
+                  Submitting duel result...
                 </div>
-              </>
-            ) : null}
+              ) : null}
+            </div>
           </div>
         ) : null}
       </div>

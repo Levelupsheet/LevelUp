@@ -21,6 +21,8 @@ export type PvpChallenge = {
   createdAt: string;
   updatedAt: string;
   status: "PENDING" | "IN_PROGRESS" | "COMPLETED";
+  acceptedAt?: string | null;
+  acceptedBy?: string | null;
   lane: string;
   seed: string;
   questionCount: number;
@@ -78,6 +80,13 @@ function safeRead(): Record<string, PvpChallenge> {
 function safeWrite(value: Record<string, PvpChallenge>) {
   fs.mkdirSync(path.dirname(FILE), { recursive: true });
   fs.writeFileSync(FILE, JSON.stringify(value, null, 2));
+}
+
+
+async function createNotification(userId: string, type: string, title: string, body: string) {
+  try {
+    await prisma.notification.create({ data: { userId, type, title, body } });
+  } catch {}
 }
 
 function sanitizePublicData(data: Record<string, any> | undefined) {
@@ -189,6 +198,8 @@ export function toPublicChallenge(challenge: PvpChallenge, userId?: string | nul
     ),
     winnerUserId: challenge.winnerUserId || null,
     resultLabel: challenge.resultLabel || null,
+    acceptedAt: challenge.acceptedAt || null,
+    acceptedBy: challenge.acceptedBy || null,
   };
 }
 
@@ -226,11 +237,38 @@ export async function createPvpChallenge(input: {
     submissions: {},
     winnerUserId: null,
     resultLabel: null,
+    acceptedAt: null,
+    acceptedBy: null,
   };
 
   const store = safeRead();
   store[challenge.id] = challenge;
   safeWrite(store);
+  await createNotification(rivalId, "PVP_CHALLENGE", "New PvP challenge received", `${challengerName} challenged you to a seeded async duel.`);
+  return challenge;
+}
+
+
+export async function acceptPvpChallenge(input: { challengeId: string; userId: string }) {
+  const store = safeRead();
+  const challenge = store[String(input.challengeId || "").trim()];
+  if (!challenge) throw new Error("Challenge not found.");
+  const userId = String(input.userId || "").trim();
+  if (challenge.rival.userId !== userId) throw new Error("Only the challenged rival can accept this duel.");
+  if (!challenge.acceptedAt) {
+    challenge.acceptedAt = nowIso();
+    challenge.acceptedBy = userId;
+    challenge.status = challenge.submissions[userId] ? "IN_PROGRESS" : "IN_PROGRESS";
+    challenge.updatedAt = nowIso();
+    store[challenge.id] = challenge;
+    safeWrite(store);
+    await createNotification(
+      challenge.challenger.userId,
+      "PVP_ACCEPTED",
+      "Your PvP challenge was accepted",
+      `${challenge.rival.displayName} accepted your async PvP duel.`
+    );
+  }
   return challenge;
 }
 
@@ -337,5 +375,11 @@ export async function submitPvpChallenge(input: {
 
   store[challenge.id] = challenge;
   safeWrite(store);
+  if (challenge.status === "COMPLETED") {
+    await Promise.all([
+      createNotification(challenge.challenger.userId, "PVP_RESULT", "PvP duel completed", challenge.resultLabel || "Your async PvP duel is complete."),
+      createNotification(challenge.rival.userId, "PVP_RESULT", "PvP duel completed", challenge.resultLabel || "Your async PvP duel is complete."),
+    ]);
+  }
   return challenge;
 }
