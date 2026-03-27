@@ -137,7 +137,7 @@ export function downgradeSubscriptionByEmail(email: string, status: Subscription
 }
 
 export function xpCapForTier(tier: SubscriptionTier) {
-  if (tier === 'FREE') return xpRequiredToReachLevel(4) - 1; // free can reach level 3, level 4 requires paid tier
+  if (tier === 'FREE') return XP_PER_LEVEL * 3 - 1; // free can reach level 3, level 4 requires paid tier
   return Number.MAX_SAFE_INTEGER;
 }
 

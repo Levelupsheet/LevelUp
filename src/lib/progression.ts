@@ -1,7 +1,7 @@
 export const BASE_XP_PER_LEVEL = 500;
-export const XP_PER_LEVEL = BASE_XP_PER_LEVEL; // backwards-compatible alias for legacy imports
 export const XP_LEVEL_LINEAR_STEP = 125;
 export const XP_LEVEL_CURVE_FACTOR = 20;
+export const XP_PER_LEVEL = BASE_XP_PER_LEVEL;
 
 export function normalizeXp(xp: number) {
   return Number.isFinite(xp) ? Math.max(0, Math.floor(xp)) : 0;

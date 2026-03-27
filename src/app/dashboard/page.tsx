@@ -119,9 +119,8 @@ export default function Dashboard() {
   // Prefer local XP (from interviews / practice) so the dashboard reacts immediately.
   const xp = useMemo(() => (localXp ?? elig?.xp ?? 0), [localXp, elig]);
   // Show progress within the CURRENT level.
-  const levelSpan = xpNeededForCurrentLevel(localLevel || levelFromXp(xp));
   const xpIntoLevel = xpIntoCurrentLevel(xp);
-  const levelMax = levelSpan;
+  const levelMax = xpNeededForCurrentLevel(localLevel || levelFromXp(xp));
   const normalizedTier = String(subscriptionTier || "FREE").toUpperCase();
   const tierLabel = normalizedTier === "PREMIUM" ? "Premium" : normalizedTier === "PRO" ? "Pro" : "Free";
   const tierBadgeStyle = normalizedTier === "PREMIUM"
@@ -516,7 +515,7 @@ export default function Dashboard() {
             title="XP is earned across interviews and practice. Levels auto-save to your local profile."
           >
             <span style={{ fontWeight: 900, fontSize: 12 }}>Lvl {localLevel}</span>
-            <span style={{ opacity: 0.8, fontSize: 12, fontVariantNumeric: "tabular-nums" }}>XP {xp}</span>
+            <span style={{ opacity: 0.8, fontSize: 12, fontVariantNumeric: "tabular-nums" }}>Total XP {xp}</span>
           </div>
           <AvatarMenu
             userLabel={userLabel ?? userId}
@@ -733,7 +732,7 @@ export default function Dashboard() {
               <ProgressBar value={Number.isFinite(xpIntoLevel) ? xpIntoLevel : 0} max={levelMax} />
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8, opacity: 0.85 }}>
-              <small>XP: {Number.isFinite(xpIntoLevel) ? xpIntoLevel : 0} / {levelMax}</small>
+              <small>Level progress: {Number.isFinite(xpIntoLevel) ? xpIntoLevel : 0} / {levelMax} XP</small>
               <small>Tokens: {Number.isFinite(tokenBalance) ? tokenBalance : 0}</small>
             </div>
           </div>
