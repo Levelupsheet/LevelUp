@@ -9,7 +9,8 @@ type PvpChallengeView = {
   id: string;
   createdAt: string;
   updatedAt: string;
-  status: "PENDING" | "IN_PROGRESS" | "COMPLETED";
+  status: "PENDING" | "IN_PROGRESS" | "COMPLETED" | "EXPIRED";
+  lane: string;
   questionCount: number;
   challenger: { userId: string; displayName: string };
   rival: { userId: string; displayName: string };

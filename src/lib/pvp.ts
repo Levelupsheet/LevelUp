@@ -281,11 +281,11 @@ export async function acceptPvpChallenge(input: { challengeId: string; userId: s
   const challenge = store[String(input.challengeId || "").trim()];
   if (!challenge) throw new Error("Challenge not found.");
   expireChallengeIfNeeded(challenge);
-  if (challenge.status === "EXPIRED") throw new Error("This challenge expired after 48 hours.");
+  if (String(challenge.status) === "EXPIRED") throw new Error("This challenge expired after 48 hours.");
   const userId = String(input.userId || "").trim();
   if (challenge.rival.userId !== userId) throw new Error("Only the challenged rival can accept this duel.");
   expireChallengeIfNeeded(challenge);
-  if (challenge.status === "EXPIRED") throw new Error("This challenge expired after 48 hours.");
+  if (String(challenge.status) === "EXPIRED") throw new Error("This challenge expired after 48 hours.");
   if (!challenge.acceptedAt) {
     challenge.acceptedAt = nowIso();
     challenge.acceptedBy = userId;
