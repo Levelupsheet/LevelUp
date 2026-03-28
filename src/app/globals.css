@@ -2267,8 +2267,8 @@ button.gold, a.gold{
 
 .brandLockLink{ color: inherit; text-decoration: none; }
 .brandLockLink:hover{ text-decoration: none; opacity: .96; }
-.d2QuizQuestionCard{ min-height: min(60vh, 680px) !important; max-height: calc(100vh - 180px); overflow: auto; padding-bottom: 18px; }
-.d2QuizQuestionCard .d2ActionRow{ position: sticky; bottom: 0; padding-top: 12px; background: linear-gradient(180deg, rgba(8,10,12,0), rgba(8,10,12,.92) 36%); }
+.d2QuizQuestionCard{ min-height: 0 !important; max-height: none; overflow: hidden; padding-bottom: 10px; }
+.d2QuizQuestionCard .d2ActionRow{ position: relative; bottom: auto; padding-top: 10px; background: transparent; }
 .navActions{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
 .navActions .primaryBtn{ min-width: 150px; }
 .luDropdown{ width: min(320px, 92vw); }
@@ -2730,3 +2730,11 @@ button.gold, a.gold{
   70%{ opacity:1; transform: translateY(-16px) scale(1); }
   100%{ transform: translateY(-30px) scale(1.02); opacity: 0; }
 }
+
+
+/* V4 modal overflow hotfix */
+.d2QuizBody{ overflow:hidden !important; }
+.d2QuizGrid{ min-height:0; }
+.stage8CompactGrid{ min-height:0; }
+.d2QuestionCard .card{ min-width:0; }
+.stage5FeedbackCard{ margin-top: 8px; }

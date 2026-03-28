@@ -37,11 +37,13 @@ export type CombatEngineOptions = {
   getPlayerDamageTaken?: (args: { question: CombatQuestion; state: CombatState; tier: DifficultyTier; correct: boolean; usedShield: boolean }) => number;
   getEnemyDamageDealt?: (args: { question: CombatQuestion; state: CombatState; tier: DifficultyTier; correct: boolean; usedFury: boolean }) => number;
   getHealOnCorrect?: (args: { question: CombatQuestion; state: CombatState; tier: DifficultyTier }) => number;
+  finishOnEnemyDefeat?: boolean;
 };
 
 export function useCombatQuiz(opts: CombatEngineOptions) {
   const rules: CombatRules = useMemo(() => ({ ...DEFAULT_RULES, ...(opts.rules || {}) }), [opts.rules]);
   const timed = Boolean(opts.timed);
+  const finishOnEnemyDefeat = opts.finishOnEnemyDefeat !== false;
   const questionsKey = useMemo(() => opts.questions.map((question) => question.id).join("|"), [opts.questions]);
 
   const onXpRef = useRef(opts.onXp);
@@ -331,7 +333,7 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
     stopTimer();
     setState((s) => {
       if (s.finished) return s;
-      if (s.playerHP <= 0 || s.enemyHP <= 0) return { ...s, finished: true };
+      if (s.playerHP <= 0 || (finishOnEnemyDefeat && s.enemyHP <= 0)) return { ...s, finished: true };
 
       const nextIdx = s.idx + 1;
       if (nextIdx >= opts.questions.length) return { ...s, finished: true };
@@ -349,7 +351,7 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
         timeLeft: timed ? rules.timePerQuestionByTier[effNextTier] : s.timeLeft,
       };
     });
-  }, [opts.questions, rules.timePerQuestionByTier, timed, stopTimer, resolveQuestionLevel]);
+  }, [opts.questions, rules.timePerQuestionByTier, timed, stopTimer, resolveQuestionLevel, finishOnEnemyDefeat]);
 
   const addTime = useCallback((seconds: number) => {
     if (!seconds) return;
@@ -367,10 +369,10 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
 
   const outcome = useMemo(() => {
     if (!state.finished) return null;
-    if (state.enemyHP <= 0 && state.playerHP > 0) return "victory";
+    if (finishOnEnemyDefeat && state.enemyHP <= 0 && state.playerHP > 0) return "victory";
     if (state.playerHP <= 0) return "defeat";
     return "complete";
-  }, [state.finished, state.enemyHP, state.playerHP]);
+  }, [state.finished, state.enemyHP, state.playerHP, finishOnEnemyDefeat]);
 
   return {
     rules,

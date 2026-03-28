@@ -153,9 +153,9 @@ export default function PracticeMiniGameModal(props: {
         <div className="luModalBody">
           {step === "setup" && (
             <div className="card" style={{ padding: 14 }}>
-              {kind === "position" && <div style={{ display: "grid", gap: 10 }}><div style={{ fontWeight: 800 }}>Choose your path</div><div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>{([ ["HELPDESK_SUPPORT", "Helpdesk"], ["DESKTOP_TECHNICIAN", "Desktop"], ["CLOUD_ENGINEER", "Cloud"] ] as const).map(([k, label]) => <button key={k} className={"trackBtn" + (path === k ? " active" : "")} type="button" onClick={() => setPath(k)}>{label}</button>)}</div><small className="luHint">8 randomized MCQs per run • pulled from DB first</small></div>}
-              {kind === "cert" && <div style={{ display: "grid", gap: 10 }}><div style={{ fontWeight: 800 }}>Choose a certification pack</div><div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>{([ ["A_PLUS", "A+"], ["SECURITY_PLUS", "Security+"], ["AZ_900", "AZ-900"], ["AWS", "AWS"], ["AZURE", "Azure"] ] as const).map(([k, label]) => <button key={k} className={"trackBtn" + (cert === k ? " active" : "")} type="button" onClick={() => setCert(k)}>{label}</button>)}</div><small className="luHint">8 randomized MCQs per run • pulled from DB first</small></div>}
-              {kind === "test" && <div style={{ display: "grid", gap: 10 }}><div style={{ fontWeight: 800 }}>Quick timed check</div><small className="luHint">10 mixed questions • timer scales by question difficulty</small></div>}
+              {kind === "position" && <div style={{ display: "grid", gap: 10 }}><div style={{ fontWeight: 800 }}>Choose your path</div><div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>{([ ["HELPDESK_SUPPORT", "Helpdesk"], ["DESKTOP_TECHNICIAN", "Desktop"], ["CLOUD_ENGINEER", "Cloud"] ] as const).map(([k, label]) => <button key={k} className={"trackBtn" + (path === k ? " active" : "")} type="button" onClick={() => setPath(k)}>{label}</button>)}</div><small className="luHint">12 questions • 4 stages • 3 questions per stage</small></div>}
+              {kind === "cert" && <div style={{ display: "grid", gap: 10 }}><div style={{ fontWeight: 800 }}>Choose a certification pack</div><div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>{([ ["A_PLUS", "A+"], ["SECURITY_PLUS", "Security+"], ["AZ_900", "AZ-900"], ["AWS", "AWS"], ["AZURE", "Azure"] ] as const).map(([k, label]) => <button key={k} className={"trackBtn" + (cert === k ? " active" : "")} type="button" onClick={() => setCert(k)}>{label}</button>)}</div><small className="luHint">12 questions • 4 stages • 3 questions per stage</small></div>}
+              {kind === "test" && <div style={{ display: "grid", gap: 10 }}><div style={{ fontWeight: 800 }}>Quick timed check</div><small className="luHint">15 questions • 5 stages • timer scales by question difficulty</small></div>}
               <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 14 }}><button className="primaryBtn" type="button" onClick={() => setStep("quiz")}>Start →</button></div>
             </div>
           )}
@@ -171,6 +171,7 @@ export default function PracticeMiniGameModal(props: {
               exitLabel="Close"
               onExit={onClose}
               metaLeft={kind === "position" ? `Path: ${path.replaceAll("_", " ")}` : kind === "cert" ? `Exam: ${cert.replaceAll("_", " ")}` : "Timed mode"}
+              questionCount={kind === "test" ? 15 : 12}
               onComplete={finishRun as any}
             />
           )}

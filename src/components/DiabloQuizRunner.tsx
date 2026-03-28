@@ -579,7 +579,7 @@ export default function DiabloQuizRunner(props: {
   const stageConfigs = useMemo(() => buildStageConfigs(title, maxStages, encounterType), [title, maxStages, encounterType]);
   const currentStageConfig = useMemo(() => stageConfigs[Math.min(stageConfigs.length - 1, Math.max(0, sessionStage - 1))] || buildStageConfigs(title, 1, encounterType)[0], [stageConfigs, sessionStage, title, encounterType]);
 
-  const { state, question, select, clear, submit, submitManual, next, addTime, currentDomainId, currentMastery, outcome } = useCombatQuiz({    questions: combatQuestions,
+  const { state, question, select, clear, submit, submitManual, next, addTime, reset, currentDomainId, currentMastery, outcome } = useCombatQuiz({    questions: combatQuestions,
     rules,
     timed,
     onXp,
@@ -594,6 +594,7 @@ export default function DiabloQuizRunner(props: {
       const reward = getMicroReward({ streak: streak + 1, questionIndex: state.idx, totalQuestions: combatQuestions.length, correct });
       return reward?.xp || 0;
     },
+    finishOnEnemyDefeat: encounterType === "boss",
     onConsumeModifier: (name) => {
       setPowerups((current) => ({
         ...current,
@@ -1117,7 +1118,7 @@ const showExpandedExplanation = useMemo(() => {
   return (
     <div
       className="modalShell d2QuizShell"
-      style={{ position: "relative", width: "min(96vw, 1600px)", maxWidth: media?.width || 1480, height: "calc(100dvh - 24px)", maxHeight: "calc(100dvh - 24px)", minHeight: "calc(100dvh - 24px)", margin: "0 auto", display: "flex", flexDirection: "column" }}
+      style={{ position: "relative", width: "min(96vw, 1600px)", maxWidth: media?.width || 1480, height: "calc(100dvh - 72px)", maxHeight: "calc(100dvh - 72px)", minHeight: "calc(100dvh - 72px)", margin: "0 auto", display: "flex", flexDirection: "column" }}
     >
       <div className="modalHead">
         <div>
