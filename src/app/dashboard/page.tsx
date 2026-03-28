@@ -989,7 +989,7 @@ async function analyzeResumeStage12() {
               ))}
               {!stage10Leaderboards?.weekly?.length ? <small style={{ opacity: 0.78 }}>Leaderboard populates from live sessions.</small> : null}
             </div>
-          </div></div>
+          </div>
 
         </aside>
 
