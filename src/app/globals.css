@@ -2267,7 +2267,7 @@ button.gold, a.gold{
 
 .brandLockLink{ color: inherit; text-decoration: none; }
 .brandLockLink:hover{ text-decoration: none; opacity: .96; }
-.d2QuizQuestionCard{ min-height: min(72vh, 760px) !important; max-height: none; overflow: visible; }
+.d2QuizQuestionCard{ min-height: min(60vh, 680px) !important; max-height: calc(100vh - 180px); overflow: auto; padding-bottom: 18px; }
 .d2QuizQuestionCard .d2ActionRow{ position: sticky; bottom: 0; padding-top: 12px; background: linear-gradient(180deg, rgba(8,10,12,0), rgba(8,10,12,.92) 36%); }
 .navActions{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
 .navActions .primaryBtn{ min-width: 150px; }
@@ -2302,6 +2302,7 @@ button.gold, a.gold{
   font-size:12px;
 }
 .d2DamageFloat{
+  animation: d2DamageRise 1500ms ease-out forwards;
   position:absolute;
   top:16px;
   right:14px;
@@ -2310,8 +2311,7 @@ button.gold, a.gold{
   border-radius:999px;
   font-weight:900;
   letter-spacing:.02em;
-  animation: d2DamageRise 900ms ease-out forwards;
-  backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
 }
 .d2DamageFloat.enemy{
   background: rgba(255,90,90,0.16);
@@ -2447,8 +2447,12 @@ button.gold, a.gold{
   font-size: 11px;
 }
 .stage8ActionDock{
-  margin-top: auto !important;
+  margin-top: 10px !important;
   padding-top: 10px;
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  background: linear-gradient(180deg, rgba(8,10,12,0), rgba(8,10,12,.94) 38%);
 }
 @media (min-width: 861px){
   .d2QuizShell{
@@ -2718,7 +2722,8 @@ button.gold, a.gold{
 .stageDot{ width:14px; height:14px; border-radius:999px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.05); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02); }
 .stageDot.active{ background:linear-gradient(180deg, rgba(255,180,90,0.95), rgba(255,110,50,0.9)); border-color: rgba(255,180,90,0.45); box-shadow:0 0 14px rgba(255,150,70,0.18); }
 .stageDot.current{ border-color: rgba(110,190,255,0.35); box-shadow:0 0 12px rgba(110,190,255,0.16); }
-.d2DamageFloat{ animation: d2DamageRise 1600ms ease-out forwards; }
+.d2DamageFloat{
+  animation: d2DamageRise 1500ms ease-out forwards; animation: d2DamageRise 1600ms ease-out forwards; }
 @keyframes d2DamageRise{
   0%{ transform: translateY(8px) scale(.96); opacity: 0; }
   12%{ opacity:1; }

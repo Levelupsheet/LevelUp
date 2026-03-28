@@ -95,6 +95,28 @@ function stageEnemyName(base: string, stage: number, maxStages: number, encounte
   return `${base}`;
 }
 
+type StageConfig = { name: string; hp: number; playerDamage: number; healChance: number; healMin: number; healMax: number };
+
+function buildStageConfigs(title: string, maxStages: number, encounterType: "standard" | "boss") : StageConfig[] {
+  const upper = String(title || "").toUpperCase();
+  const boss = encounterType === "boss";
+  const trainingNames = ["Ticket Gremlin", "Patch Warden", "Queue Tyrant", "System Reaper", "Golden Overseer"];
+  const certNames = ["Exam Shade", "Concept Warden", "Cipher Beast", "Proctor Revenant", "Golden Examiner"];
+  const testNames = ["Lagger", "Firewall Sentinel", "Identity Warden", "Cloud Tyrant", "Golden Boss"];
+  const baseNames = upper.includes("CERT") ? certNames : upper.includes("TEST NOW") ? testNames : trainingNames;
+  return Array.from({ length: maxStages }).map((_, idx) => {
+    const stage = idx + 1;
+    return {
+      name: boss && stage === maxStages ? `Golden ${baseNames[Math.min(idx, baseNames.length - 1)]}` : baseNames[Math.min(idx, baseNames.length - 1)],
+      hp: 90 + idx * 20 + (boss ? 25 : 0),
+      playerDamage: 8 + idx * 4 + (boss ? 2 : 0),
+      healChance: Math.max(0.12, 0.28 - idx * 0.03),
+      healMin: 4,
+      healMax: 8 + idx,
+    };
+  });
+}
+
 function ModelPanel(props: { title: string; src?: string; mirrored?: boolean; loop?: boolean; onEnded?: () => void; height?: number | string; damageText?: string | null; damageTone?: "enemy" | "player" | null }) {
   const { title, src, mirrored = false, loop = true, onEnded, height = 230, damageText, damageTone } = props;
   return (
@@ -547,16 +569,25 @@ export default function DiabloQuizRunner(props: {
   const [stageAnswered, setStageAnswered] = useState(0);
   const [stageCorrect, setStageCorrect] = useState(0);
   const [stageBanner, setStageBanner] = useState<string | null>(null);
+  const [stageEnemyHP, setStageEnemyHP] = useState(90);
   const questionStartRef = useRef(Date.now());
+  const timeSlowActiveRef = useRef(false);
 
   const finishedOnceRef = useRef(false);
 
-  const { state, question, select, clear, submit, submitManual, next, currentDomainId, currentMastery, outcome } = useCombatQuiz({    questions: combatQuestions,
+  const maxStages = useMemo(() => inferMaxStages(title, combatQuestions.length), [title, combatQuestions.length]);
+  const stageConfigs = useMemo(() => buildStageConfigs(title, maxStages, encounterType), [title, maxStages, encounterType]);
+  const currentStageConfig = useMemo(() => stageConfigs[Math.min(stageConfigs.length - 1, Math.max(0, sessionStage - 1))] || buildStageConfigs(title, 1, encounterType)[0], [stageConfigs, sessionStage, title, encounterType]);
+
+  const { state, question, select, clear, submit, submitManual, next, addTime, currentDomainId, currentMastery, outcome } = useCombatQuiz({    questions: combatQuestions,
     rules,
     timed,
     onXp,
     getActiveModifiers: () => ({ shieldActive: powerups.shieldActive, furyActive: powerups.furyActive }),
-    getQuestionLevel: () => effectiveQuestionTier,
+    getQuestionLevel: () => (Math.max(effectiveQuestionTier, Math.min(3, Math.ceil(sessionStage / 2))) as DifficultyTier),
+    getPlayerDamageTaken: () => currentStageConfig.playerDamage,
+    getEnemyDamageDealt: ({ correct }) => correct ? Math.ceil(currentStageConfig.hp / 3) : 0,
+    getHealOnCorrect: () => (Math.random() < currentStageConfig.healChance ? (currentStageConfig.healMin + Math.floor(Math.random() * (currentStageConfig.healMax - currentStageConfig.healMin + 1))) : 0),
     getXpMultiplier: ({ correct }) => (correct && xpBoostRemaining > 0 ? 1.25 : 1),
     getXpBonus: ({ correct }) => {
       if (!correct) return 0;
@@ -575,11 +606,13 @@ export default function DiabloQuizRunner(props: {
       const baseTier = ((question?.level || 1) as DifficultyTier);
       setHitPulse(r.correct ? "enemy" : "player");
       if (r.correct) {
-        setDamageFloat({ enemy: `-${Math.max(1, 100 - r.enemyHP)} HP` });
+        const damage = Math.ceil(currentStageConfig.hp / 3);
+        setStageEnemyHP((hp) => Math.max(0, hp - damage));
+        setDamageFloat({ enemy: `-${damage} HP` });
       } else {
-        setDamageFloat({ player: `-${Math.max(1, 100 - r.playerHP)} HP` });
+        setDamageFloat({ player: `-${currentStageConfig.playerDamage} HP` });
       }
-      window.setTimeout(() => setDamageFloat({}), 1600);
+      window.setTimeout(() => setDamageFloat({}), 2200);
 
       setStageAnswered((answered) => {
         const nextAnswered = answered + 1;
@@ -590,8 +623,12 @@ export default function DiabloQuizRunner(props: {
               setSessionStage((current) => {
                 const nextStage = Math.min(maxStages, current + 1);
                 if (nextStage > current) {
-                  setStageBanner(`Stage ${nextStage}`);
-                  window.setTimeout(() => setStageBanner(null), 1800);
+                  const nextConfig = stageConfigs[Math.min(stageConfigs.length - 1, nextStage - 1)];
+                  setStageEnemyHP(nextConfig?.hp || currentStageConfig.hp);
+                  setStageBanner(`Stage ${nextStage} • ${nextConfig?.name || "Enemy Rising"}`);
+                  window.setTimeout(() => setStageBanner(null), 2200);
+                } else {
+                  setStageEnemyHP(currentStageConfig.hp);
                 }
                 return nextStage;
               });
@@ -600,7 +637,7 @@ export default function DiabloQuizRunner(props: {
           }
           return nextCorrect;
         });
-        if (nextAnswered >= 3) return 0;
+        if (nextAnswered >= 3) { setStageEnemyHP(currentStageConfig.hp); return 0; }
         return nextAnswered;
       });
 
@@ -673,8 +710,7 @@ export default function DiabloQuizRunner(props: {
   );
 
   const effectiveQuestionTier = stage8Difficulty.adjustedTier as DifficultyTier;
-  const maxStages = useMemo(() => inferMaxStages(title, combatQuestions.length), [title, combatQuestions.length]);
-  const currentStageEnemyName = useMemo(() => stageEnemyName(enemyName, sessionStage, maxStages, encounterType), [enemyName, sessionStage, maxStages, encounterType]);
+  const currentStageEnemyName = useMemo(() => currentStageConfig?.name || stageEnemyName(enemyName, sessionStage, maxStages, encounterType), [currentStageConfig, enemyName, sessionStage, maxStages, encounterType]);
   const isGoldenBoss = encounterType === "boss" && sessionStage >= maxStages;
 
   const questionType = normalizeQuestionType(question?.type);
@@ -721,6 +757,7 @@ const showExpandedExplanation = useMemo(() => {
     setStageAnswered(0);
     setStageCorrect(0);
     setStageBanner(null);
+    setStageEnemyHP(stageConfigs[0]?.hp || 90);
     questionStartRef.current = Date.now();
   }, [combatQuestions.length, timed, title]);
 
@@ -734,6 +771,10 @@ const showExpandedExplanation = useMemo(() => {
   useEffect(() => {
     questionStartRef.current = Date.now();
   }, [question?.id]);
+
+  useEffect(() => {
+    setStageEnemyHP(currentStageConfig?.hp || 90);
+  }, [sessionStage, currentStageConfig]);
 
   useEffect(() => {
     const data = (question?.data || {}) as Record<string, unknown>;
@@ -990,9 +1031,10 @@ const showExpandedExplanation = useMemo(() => {
     const res = await fetch("/api/stage9/use-item", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ userId: userIdRef.current, itemId: "xp_surge" }) }).then((r) => r.json()).catch(() => null);
     if (res?.ok) {
       setStage9Inventory((current) => ({ ...current, xpSurge: Math.max(0, current.xpSurge - 1) }));
-      setXpBoostRemaining((current) => Math.max(current, 5));
-      setMicroRewardFlash("⚡ XP Surge activated");
-      window.setTimeout(() => setMicroRewardFlash(null), 2200);
+      addTime(10);
+      timeSlowActiveRef.current = true;
+      setMicroRewardFlash("⏳ Time Slow active for +10s");
+      window.setTimeout(() => { timeSlowActiveRef.current = false; setMicroRewardFlash(null); }, 10000);
     }
   }
 
@@ -1101,7 +1143,7 @@ const showExpandedExplanation = useMemo(() => {
               <div className="stage7PowerStrip underPlayer">
                 <button className={"d2Btn power" + (powerups.shieldActive ? " active" : "")} type="button" disabled={state.locked || powerups.shieldActive || (powerups.shieldUses + stage9Inventory.shield) <= 0} onClick={activateShield}>Shield {powerups.shieldActive ? "On" : (powerups.shieldUses + stage9Inventory.shield) > 0 ? `x${powerups.shieldUses + stage9Inventory.shield}` : "Locked"}</button>
                 <button className={"d2Btn power" + (powerups.furyActive ? " active" : "")} type="button" disabled={state.locked || powerups.furyActive || (powerups.furyUses + stage9Inventory.fury) <= 0} onClick={activateFury}>Fury {powerups.furyActive ? "On" : (powerups.furyUses + stage9Inventory.fury) > 0 ? `x${powerups.furyUses + stage9Inventory.fury}` : "Locked"}</button>
-                <button className="d2Btn power" type="button" disabled={state.locked || stage9Inventory.xpSurge <= 0} onClick={activateXpSurge}>XP Surge {stage9Inventory.xpSurge > 0 ? `x${stage9Inventory.xpSurge}` : "Locked"}</button>
+                <button className="d2Btn power" type="button" disabled={state.locked || stage9Inventory.xpSurge <= 0} onClick={activateXpSurge}>Time Slow {stage9Inventory.xpSurge > 0 ? `x${stage9Inventory.xpSurge}` : "Locked"}</button>
               </div>
             </div>
 
@@ -1168,7 +1210,7 @@ const showExpandedExplanation = useMemo(() => {
                   <div className="stage7PowerStrip">
                     <button className={"d2Btn power" + (powerups.shieldActive ? " active" : "")} type="button" disabled={state.locked || powerups.shieldActive || (powerups.shieldUses + stage9Inventory.shield) <= 0} onClick={activateShield}>Shield {powerups.shieldActive ? "On" : (powerups.shieldUses + stage9Inventory.shield) > 0 ? `x${powerups.shieldUses + stage9Inventory.shield}` : "Locked"}</button>
                     <button className={"d2Btn power" + (powerups.furyActive ? " active" : "")} type="button" disabled={state.locked || powerups.furyActive || (powerups.furyUses + stage9Inventory.fury) <= 0} onClick={activateFury}>Fury {powerups.furyActive ? "On" : (powerups.furyUses + stage9Inventory.fury) > 0 ? `x${powerups.furyUses + stage9Inventory.fury}` : "Locked"}</button>
-                <button className="d2Btn power" type="button" disabled={state.locked || stage9Inventory.xpSurge <= 0} onClick={activateXpSurge}>XP Surge {stage9Inventory.xpSurge > 0 ? `x${stage9Inventory.xpSurge}` : "Locked"}</button>
+                <button className="d2Btn power" type="button" disabled={state.locked || stage9Inventory.xpSurge <= 0} onClick={activateXpSurge}>Time Slow {stage9Inventory.xpSurge > 0 ? `x${stage9Inventory.xpSurge}` : "Locked"}</button>
                     <span className="stage7PowerHint">Streak 3: Shield • Streak 5: Fury</span>
                   </div>
 
@@ -1265,7 +1307,7 @@ const showExpandedExplanation = useMemo(() => {
             </div>
 
             <div style={{ display: "grid", gap: 12 }}>
-              <D2EnemyHealthBar value={state.enemyHP} name={currentStageEnemyName.toUpperCase().slice(0, 18)} />
+              <D2EnemyHealthBar value={stageEnemyHP} max={currentStageConfig.hp} name={currentStageEnemyName.toUpperCase().slice(0, 18)} />
               <ModelPanel title={currentStageEnemyName.toUpperCase().slice(0, 18)} src={enemyVideo} loop={!isEnemyHitVideo} onEnded={isEnemyHitVideo ? () => setHitPulse(null) : undefined} height="clamp(180px, 22vh, 280px)" damageText={damageFloat.enemy || null} damageTone="enemy" />
             </div>
           </div>
@@ -1309,7 +1351,7 @@ const showExpandedExplanation = useMemo(() => {
             </div>
 
             <div className="mobileCombatCard">
-              <D2EnemyHealthBar value={state.enemyHP} name={currentStageEnemyName.toUpperCase().slice(0, 18)} />
+              <D2EnemyHealthBar value={stageEnemyHP} max={currentStageConfig.hp} name={currentStageEnemyName.toUpperCase().slice(0, 18)} />
               <div style={{ marginTop: 10 }}>
                 <ModelPanel title={currentStageEnemyName.toUpperCase().slice(0, 18)} src={enemyVideo} loop={!isEnemyHitVideo} onEnded={isEnemyHitVideo ? () => setHitPulse(null) : undefined} height={180} damageText={damageFloat.enemy || null} damageTone="enemy" />
               </div>

@@ -1083,7 +1083,6 @@ async function analyzeResumeStage12() {
       <h3 style={{ margin: 0 }}>AI Coach</h3>
       <div style={{ marginTop: 6, opacity: 0.84 }}><small>Resume insights now live on the Insights page. Your dashboard keeps a quick summary only.</small></div>
     </div>
-    <a className="secondaryBtn" href="/admin/insights" style={{ textDecoration: "none" }}>Open insights</a>
   </div>
 
   <div style={{ marginTop: 12, display: "grid", gridTemplateColumns: "1.15fr 0.85fr", gap: 12 }}>

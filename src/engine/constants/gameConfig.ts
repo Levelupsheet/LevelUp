@@ -1,7 +1,7 @@
 export const GAME_CONFIG = {
   playerMaxHP: 100,
   enemyMaxHP: 100,
-  questionCount: { training: 8, certification: 8, testNow: 10 },
+  questionCount: { training: 12, certification: 12, testNow: 15 },
   timerByTier: { 1: 25, 2: 18, 3: 12 },
   xpByTier: { 1: 15, 2: 25, 3: 40 },
   playerDamageByTier: { 1: 10, 2: 15, 3: 20 },

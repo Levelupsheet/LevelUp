@@ -84,7 +84,7 @@ export default function PracticeMiniGameModal(props: {
     try {
       const search = new URLSearchParams();
       search.set("lane", lane);
-      search.set("questionCount", "8");
+      search.set("questionCount", "12");
       search.set("shuffle", "1");
       if (kind === "position") search.set("startingPosition", path);
       if (kind === "cert") search.set("certExam", cert);

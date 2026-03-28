@@ -34,6 +34,9 @@ export type CombatEngineOptions = {
   getQuestionLevel?: (question: CombatQuestion, state: CombatState) => DifficultyTier;
   getXpMultiplier?: (args: { question: CombatQuestion; state: CombatState; correct: boolean; baseXp: number }) => number;
   getXpBonus?: (args: { question: CombatQuestion; state: CombatState; correct: boolean; baseXp: number }) => number;
+  getPlayerDamageTaken?: (args: { question: CombatQuestion; state: CombatState; tier: DifficultyTier; correct: boolean; usedShield: boolean }) => number;
+  getEnemyDamageDealt?: (args: { question: CombatQuestion; state: CombatState; tier: DifficultyTier; correct: boolean; usedFury: boolean }) => number;
+  getHealOnCorrect?: (args: { question: CombatQuestion; state: CombatState; tier: DifficultyTier }) => number;
 };
 
 export function useCombatQuiz(opts: CombatEngineOptions) {
@@ -49,6 +52,9 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
   const getQuestionLevelRef = useRef(opts.getQuestionLevel);
   const getXpMultiplierRef = useRef(opts.getXpMultiplier);
   const getXpBonusRef = useRef(opts.getXpBonus);
+  const getPlayerDamageTakenRef = useRef(opts.getPlayerDamageTaken);
+  const getEnemyDamageDealtRef = useRef(opts.getEnemyDamageDealt);
+  const getHealOnCorrectRef = useRef(opts.getHealOnCorrect);
   useEffect(() => {
     onXpRef.current = opts.onXp;
     onSubmitRef.current = opts.onSubmit;
@@ -58,7 +64,10 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
     getQuestionLevelRef.current = opts.getQuestionLevel;
     getXpMultiplierRef.current = opts.getXpMultiplier;
     getXpBonusRef.current = opts.getXpBonus;
-  }, [opts.onXp, opts.onSubmit, opts.onStateChange, opts.getActiveModifiers, opts.onConsumeModifier, opts.getQuestionLevel, opts.getXpMultiplier, opts.getXpBonus]);
+    getPlayerDamageTakenRef.current = opts.getPlayerDamageTaken;
+    getEnemyDamageDealtRef.current = opts.getEnemyDamageDealt;
+    getHealOnCorrectRef.current = opts.getHealOnCorrect;
+  }, [opts.onXp, opts.onSubmit, opts.onStateChange, opts.getActiveModifiers, opts.onConsumeModifier, opts.getQuestionLevel, opts.getXpMultiplier, opts.getXpBonus, opts.getPlayerDamageTaken, opts.getEnemyDamageDealt, opts.getHealOnCorrect]);
 
   function buildInitialState() {
     return { ...initialCombatState(rules, timed), ...(opts.initialState || {}) } as CombatState;
@@ -138,7 +147,8 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
       const xpDelta = 0;
       const modifiers = getActiveModifiersRef.current?.() || {};
       const usedShield = Boolean(modifiers.shieldActive);
-      const playerHP = clamp(s.playerHP - (usedShield ? 0 : rules.playerDamageByTier[effTier]), 0, rules.startHP);
+      const playerDamage = getPlayerDamageTakenRef.current?.({ question: q, state: s, tier: effTier, correct: false, usedShield }) ?? (usedShield ? 0 : rules.playerDamageByTier[effTier]);
+      const playerHP = clamp(s.playerHP - Math.max(0, playerDamage), 0, rules.startHP);
       const enemyHP = s.enemyHP;
 
       const prevMastery = s.mastery[domainId] ?? 0;
@@ -203,8 +213,11 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
       const extraBonus = getXpBonusRef.current?.({ question: q, state: s, correct, baseXp }) ?? 0;
       const xpDelta = correct ? Math.max(0, Math.round(baseXp * (usedFury ? 1.5 : 1) * extraMultiplier) + extraBonus) : 0;
 
-      const playerHP = clamp(correct ? s.playerHP : s.playerHP - (usedShield ? 0 : rules.playerDamageByTier[effTier]), 0, rules.startHP);
-      const enemyHP = clamp(correct ? s.enemyHP - rules.enemyDamageByTier[effTier] * (usedFury ? 2 : 1) : s.enemyHP, 0, rules.startHP);
+      const healOnCorrect = correct ? Math.max(0, getHealOnCorrectRef.current?.({ question: q, state: s, tier: effTier }) ?? 0) : 0;
+      const playerDamage = correct ? 0 : (getPlayerDamageTakenRef.current?.({ question: q, state: s, tier: effTier, correct, usedShield }) ?? (usedShield ? 0 : rules.playerDamageByTier[effTier]));
+      const enemyDamage = correct ? Math.max(0, getEnemyDamageDealtRef.current?.({ question: q, state: s, tier: effTier, correct, usedFury }) ?? (rules.enemyDamageByTier[effTier] * (usedFury ? 2 : 1))) : 0;
+      const playerHP = clamp(correct ? s.playerHP + healOnCorrect : s.playerHP - Math.max(0, playerDamage), 0, rules.startHP);
+      const enemyHP = clamp(correct ? s.enemyHP - enemyDamage : s.enemyHP, 0, rules.startHP);
 
       const prevMastery = s.mastery[domainId] ?? 0;
       const masteryDelta = correct ? rules.masteryGainBase * effTier : -rules.masteryLossWrong;
@@ -269,8 +282,11 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
       const extraBonus = getXpBonusRef.current?.({ question: q, state: s, correct, baseXp }) ?? 0;
       const xpDelta = Math.max(0, Math.round(baseXp * (usedFury ? 1.5 : 1) * extraMultiplier) + extraBonus);
 
-      const playerHP = clamp(correct ? s.playerHP : s.playerHP - (usedShield ? 0 : rules.playerDamageByTier[effTier]), 0, rules.startHP);
-      const enemyHP = clamp(correct ? s.enemyHP - rules.enemyDamageByTier[effTier] * (usedFury ? 2 : 1) : s.enemyHP, 0, rules.startHP);
+      const healOnCorrect = correct ? Math.max(0, getHealOnCorrectRef.current?.({ question: q, state: s, tier: effTier }) ?? 0) : 0;
+      const playerDamage = correct ? 0 : (getPlayerDamageTakenRef.current?.({ question: q, state: s, tier: effTier, correct, usedShield }) ?? (usedShield ? 0 : rules.playerDamageByTier[effTier]));
+      const enemyDamage = correct ? Math.max(0, getEnemyDamageDealtRef.current?.({ question: q, state: s, tier: effTier, correct, usedFury }) ?? (rules.enemyDamageByTier[effTier] * (usedFury ? 2 : 1))) : 0;
+      const playerHP = clamp(correct ? s.playerHP + healOnCorrect : s.playerHP - Math.max(0, playerDamage), 0, rules.startHP);
+      const enemyHP = clamp(correct ? s.enemyHP - enemyDamage : s.enemyHP, 0, rules.startHP);
 
       const prevMastery = s.mastery[domainId] ?? 0;
       const masteryDelta = correct ? rules.masteryGainBase * effTier : -rules.masteryLossWrong;
@@ -335,6 +351,11 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
     });
   }, [opts.questions, rules.timePerQuestionByTier, timed, stopTimer, resolveQuestionLevel]);
 
+  const addTime = useCallback((seconds: number) => {
+    if (!seconds) return;
+    setState((s) => ({ ...s, timeLeft: Math.max(0, s.timeLeft + Math.floor(seconds)) }));
+  }, []);
+
   const reset = useCallback(() => {
     stopTimer();
     setState(initialCombatState(rules, timed));
@@ -360,6 +381,7 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
     submit,
     submitManual,
     next,
+    addTime,
     reset,
     timed,
     currentDomainId,

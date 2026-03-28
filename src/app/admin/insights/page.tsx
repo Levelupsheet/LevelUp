@@ -83,7 +83,7 @@ export default function AdminInsightsPage() {
         <div className="card" style={{ padding: 18 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
             <div>
-              <h1 style={{ margin: 0 }}>Stage 11 insights dashboard</h1>
+              <h1 style={{ margin: 0 }}>Insights</h1>
               <div style={{ marginTop: 6, opacity: 0.82 }}><small>Question performance, adaptive mastery, and AI coach guidance from live user data.</small></div>
             </div>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
