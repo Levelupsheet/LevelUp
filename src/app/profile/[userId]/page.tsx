@@ -20,7 +20,7 @@ async function getProfile(userId: string) {
 export default async function PublicProfilePage({ params }: Props) {
   const { userId } = await params;
 
-  const id = String(userId || "").trim();
+  const id = decodeURIComponent(String(userId || "")).trim();
 
   const data = id ? await getProfile(id) : null;
   const user = data?.user;

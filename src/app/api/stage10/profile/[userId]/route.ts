@@ -9,7 +9,7 @@ export async function GET(
   try {
     const { userId } = await context.params;
 
-    const id = String(userId || "").trim();
+    const id = decodeURIComponent(String(userId || "")).trim();
 
     if (!id) {
       return NextResponse.json({ error: "userId required" }, { status: 400 });
