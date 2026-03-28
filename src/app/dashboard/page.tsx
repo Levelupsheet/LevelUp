@@ -891,7 +891,7 @@ async function analyzeResumeStage12() {
             {hasFreeStartCooldown ? `Start Now! (${freeStartCooldownLabel})` : "Start Now!"}
           </button>
 
-          <div style={{ marginTop: 10 }}>
+          <div style={{ marginTop: 10, display: "grid", gap: 10 }}>
             {hrBattleUnlocked ? (
               <button className="gold" style={{ width: "100%" }} onClick={() => (window.location.href = "/interview/hr")}>
                 Start HR Battle →
@@ -901,10 +901,15 @@ async function analyzeResumeStage12() {
                 Begin Boss Battle 🔒
               </button>
             )}
-            <small style={{ display: "block", marginTop: 6, opacity: 0.8 }}>
+            {((localLevel || 1) >= 5 || hasTechReady) ? (
+              <button className="primary" style={{ width: "100%" }} onClick={() => (window.location.href = "/interview/tech")}>
+                Start Tech Battle →
+              </button>
+            ) : null}
+            <small style={{ display: "block", marginTop: 0, opacity: 0.8 }}>
               {hrBattleUnlocked ? "HR Battle Eligibility Unlocked!" : "Unlocks at level 5."}
             </small>
-            {hasFreeStartCooldown && <small style={{ display: "block", marginTop: 6, color: "#f5d37b" }}>Free users can start another session in {freeStartCooldownLabel}.</small>}
+            {hasFreeStartCooldown && <small style={{ display: "block", marginTop: 0, color: "#f5d37b" }}>Free users can start another session in {freeStartCooldownLabel}.</small>}
           </div>
 
           <div style={{ marginTop: 10 }}>
@@ -940,47 +945,58 @@ async function analyzeResumeStage12() {
             <div style={{ marginTop: 8, opacity: 0.82 }}><small>Adaptive mastery details are shown in the main panel.</small></div>
           </div>
 
-          <div className="card powerHudCard" style={{ marginTop: 14, padding: 12, borderColor: "rgba(93,168,255,0.22)" }}>
+          <div className="card powerHudCard" style={{ marginTop: 14, padding: 12, borderColor: "rgba(93,168,255,0.22)", background: "linear-gradient(180deg, rgba(78,114,164,0.16), rgba(44,74,118,0.10))" }}>
             <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
               <div>
                 <div style={{ fontWeight: 900 }}>PowerUps</div>
                 <div style={{ opacity: 0.78 }}><small>Inventory + daily claims</small></div>
               </div>
-              <button className="secondaryBtn" type="button" onClick={() => setPowerupsOpen(true)}>Open</button>
+              <button
+                className="secondaryBtn"
+                type="button"
+                onClick={() => setPowerupsOpen(true)}
+                style={{ padding: "6px 14px", minHeight: 34, fontSize: 13, borderColor: "rgba(108,186,255,0.38)", background: "linear-gradient(180deg, rgba(75,122,181,0.24), rgba(46,82,131,0.18))" }}
+              >
+                Open
+              </button>
             </div>
-            <div className="powerHudTray" style={{ marginTop: 10 }}>
+            <div className="powerHudTray" style={{ marginTop: 10, display: "flex", gap: 8, flexWrap: "wrap" }}>
               {compactInventory.length ? compactInventory.map((row) => (
-                <button
+                <div
                   key={`${row.itemType}_${row.itemRef || "base"}`}
                   className="powerHudChip"
-                  type="button"
-                  onClick={() => setPowerupsOpen(true)}
                   title={`${itemLabel(row.itemType, row.itemRef)} x${row.quantity}`}
+                  style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "6px 10px", borderRadius: 999, border: "1px solid rgba(114,170,255,0.22)", background: "rgba(20,28,40,0.56)", minHeight: 34 }}
                 >
-                  <span className="powerHudIcon" aria-hidden="true">{itemIcon(row.itemType, row.itemRef)}</span>
-                  <span className="powerHudCount">{row.quantity}</span>
-                </button>
+                  <span className="powerHudIcon" aria-hidden="true" style={{ fontSize: 16, lineHeight: 1 }}>{itemIcon(row.itemType, row.itemRef)}</span>
+                  <span className="powerHudCount" style={{ fontWeight: 900, fontSize: 14 }}>{row.quantity}</span>
+                </div>
               )) : <small style={{ opacity: 0.78 }}>No powerups banked yet.</small>}
             </div>
           </div>
 
-          <div className="card leaderboardMiniCard" style={{ marginTop: 14, padding: 12, borderColor: "rgba(255,215,100,0.28)", background: "linear-gradient(180deg, rgba(255,216,120,0.10), rgba(255,175,64,0.05))" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+          <div className="card leaderboardMiniCard" style={{ marginTop: 14, padding: 12, borderColor: "rgba(255,215,100,0.30)", background: "linear-gradient(180deg, rgba(28,54,84,0.46), rgba(15,26,44,0.40))", boxShadow: "0 0 0 1px rgba(255,215,100,0.08) inset" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "flex-start", flexWrap: "wrap" }}>
               <div>
-                <div style={{ fontWeight: 900 }}>Leaderboard</div>
-                <div style={{ opacity: 0.78 }}><small>Top candidates</small></div>
+                <div style={{ fontWeight: 900, fontSize: 16 }}>Leaderboard • Top candidates</div>
               </div>
-              <a className="secondaryBtn" href="/leaderboard">Open</a>
+              <div style={{ display: "flex", gap: 8 }}>
+                <span className="badge" style={{ background: "rgba(255,214,102,0.12)", borderColor: "rgba(255,214,102,0.28)" }}>Top</span>
+                <a className="secondaryBtn" href="/leaderboard" style={{ textDecoration: "none", padding: "8px 14px", minHeight: 38 }}>Open</a>
+              </div>
             </div>
-            <div style={{ marginTop: 10, display: "grid", gap: 10 }}>
+            <div style={{ marginTop: 12, display: "grid", gap: 10 }}>
               {(stage10Leaderboards?.weekly || []).slice(0, 3).map((row, idx) => (
-                <a key={`sb_lb_${row.userId}`} href={`/profile/${encodeURIComponent(row.userId)}`} className="leaderboardMiniRow" style={{ ...(leaderboardTone(idx) as any), textDecoration: "none", color: "inherit" }}>
-                  <div className="badge leaderboardMiniRank">{idx + 1}</div>
+                <a key={`sb_lb_${row.userId}`} href={`/profile/${encodeURIComponent(row.userId)}`} className="leaderboardMiniRow" style={{ ...(leaderboardTone(idx) as any), textDecoration: "none", color: "inherit", display: "grid", gridTemplateColumns: "44px minmax(0,1fr) auto", gap: 12, alignItems: "center", padding: 12, borderRadius: 22, border: "1px solid rgba(255,255,255,0.10)" }}>
+                  <div className="badge leaderboardMiniRank" style={{ width: 36, height: 36, display: "inline-flex", alignItems: "center", justifyContent: "center" }}>{idx + 1}</div>
                   <div style={{ minWidth: 0 }}>
                     <div style={{ fontWeight: 900, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{row.displayName}</div>
-                    <div style={{ opacity: 0.72 }}><small>{row.rank || levelTitleFromLevel(Number(row.level || 1))} • Lvl {row.level || 1}</small></div>
+                    <div style={{ opacity: 0.78, marginTop: 4 }}><small>{row.rank || "Student"} • Lvl {row.level || 1}</small></div>
                   </div>
-                  <div style={{ fontWeight: 900, textAlign: "right" }}>{row.xp || 0} XP</div>
+                  <div style={{ textAlign: "right" }}>
+                    <div style={{ fontWeight: 900, fontSize: 14 }}>{row.xp || 0} XP</div>
+                    <div style={{ opacity: 0.78, marginTop: 4 }}><small>Tap to view</small></div>
+                  </div>
                 </a>
               ))}
               {!stage10Leaderboards?.weekly?.length ? <small style={{ opacity: 0.78 }}>Leaderboard populates from live sessions.</small> : null}
@@ -991,9 +1007,21 @@ async function analyzeResumeStage12() {
 
         <section className="maincol">
           <div className="topbar">
-            <div>
-              <b>Welcome back</b>
-              <div><small><span style={usernameToneStyle as any}>{userLabel ?? userId}</span></small></div>
+            <div style={{ flex: 1, minWidth: 260 }}>
+              <div style={{ fontSize: 18, opacity: 0.82 }}>Welcome back</div>
+              <div
+                style={{
+                  marginTop: 4,
+                  fontWeight: 900,
+                  fontSize: 34,
+                  lineHeight: 1.02,
+                  textAlign: "center",
+                  letterSpacing: 0.2,
+                  textShadow: "0 0 18px rgba(255,255,255,0.14), 0 0 28px rgba(96,188,255,0.10)",
+                }}
+              >
+                <span style={usernameToneStyle as any}>{userLabel ?? userId}</span>
+              </div>
             </div>
 
             <div className="kpiRow">
@@ -1004,7 +1032,12 @@ async function analyzeResumeStage12() {
               }}>
                 <b>Path</b>: {user?.startingPosition ? labelPos(user.startingPosition) : "Choose path"}
               </button>
-              {hasHRInvite ? <button className="primary" type="button" onClick={() => window.location.href="/interview/hr"}>Start HR Battle</button> : null}
+              {((localLevel || 1) >= 5 || hasHRInvite) ? (
+                <button className="gold" type="button" onClick={() => window.location.href="/interview/hr"}>Start HR Battle</button>
+              ) : null}
+              {((localLevel || 1) >= 5 || hasTechReady) ? (
+                <button className="primary" type="button" onClick={() => window.location.href="/interview/tech"}>Start Tech Battle</button>
+              ) : null}
             </div>
           </div>
 
@@ -1070,34 +1103,31 @@ async function analyzeResumeStage12() {
 
 
 
-<div className="card" style={{ marginBottom: 14, borderColor: "rgba(100,220,255,0.20)" }}>
+<div className="card" style={{ marginBottom: 14, borderColor: "rgba(100,220,255,0.20)", background: "linear-gradient(180deg, rgba(66,112,160,0.20), rgba(90,36,64,0.14))" }}>
   <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
     <div>
       <h3 style={{ margin: 0 }}>AI Coach</h3>
-      
+      <div style={{ marginTop: 6, opacity: 0.84 }}><small>Resume insights now live on the Insights page. Your dashboard keeps a quick summary only.</small></div>
     </div>
-      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
-      <label className="secondaryBtn aiCoachFileBtn" style={{ display: "inline-flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
-        <span>{stage12File ? stage12File.name : "Choose resume"}</span>
-        <input
-          type="file"
-          accept=".pdf,.docx"
-          onChange={(e) => setStage12File(e.target.files?.[0] || null)}
-       className="featureCard" />
-      </label>
+    <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
       <div><small>AI summary</small></div>
-      <div style={{ marginTop: 8, fontWeight: 800 }}>{stage12Status?.profile?.targetRole || "Career path pending"}</div>
-      <div style={{ marginTop: 8, opacity: 0.88 }}>
-        <small>{stage12Status?.profile?.coaching?.summary || "Upload a PDF or DOCX resume to generate skill gaps and coaching guidance."}</small>
-      </div>
-      <div style={{ marginTop: 10, display: "flex", gap: 8, flexWrap: "wrap" }}>
-        {(stage12Status?.profile?.inferredDomains || []).slice(0, 4).map((row) => (
-          <span key={`s12_dm_${row.domain}`} className="badge">{row.domain} · {row.score}</span>
-        ))}
-        {!stage12Status?.profile?.inferredDomains?.length ? <span className="badge">No domain signals yet</span> : null}
-      </div>
-      <div style={{ marginTop: 10, opacity: 0.76 }}><small>{stage12Status?.analyzedAt ? `Last analyzed ${new Date(stage12Status.analyzedAt).toLocaleString()}` : "Original resume file is not retained long term."}</small></div>
+      <div style={{ fontWeight: 800, fontSize: 18 }}>{stage12Status?.profile?.targetRole || "Career path pending"}</div>
+      <a className="secondaryBtn" href="/admin/insights" style={{ textDecoration: "none" }}>Open insights</a>
     </div>
+  </div>
+
+  <div style={{ marginTop: 12, opacity: 0.88 }}>
+    <small>{stage12Status?.profile?.coaching?.summary || "Upload a PDF or DOCX resume from the Insights page to generate skill gaps and coaching guidance."}</small>
+  </div>
+
+  <div style={{ marginTop: 12, display: "flex", gap: 8, flexWrap: "wrap" }}>
+    {(stage12Status?.profile?.inferredDomains || []).slice(0, 4).map((row) => (
+      <span key={`s12_dm_${row.domain}`} className="badge">{row.domain} · {row.score}</span>
+    ))}
+    {!stage12Status?.profile?.inferredDomains?.length ? <span className="badge">No domain signals yet</span> : null}
+  </div>
+
+  <div style={{ marginTop: 12, display: "grid", gridTemplateColumns: "1.05fr 0.95fr", gap: 12 }}>
     <div className="featureCard">
       <div><small>Skill gaps & next moves</small></div>
       <div style={{ marginTop: 8, display: "grid", gap: 8 }}>
@@ -1106,50 +1136,50 @@ async function analyzeResumeStage12() {
         ))}
         {!(stage12Status?.profile?.gaps || []).length ? <small style={{ opacity: 0.78 }}>No gap scan yet.</small> : null}
       </div>
-      <div style={{ marginTop: 12, fontWeight: 800 }}>Coach next actions</div>
+    </div>
+    <div className="featureCard">
+      <div style={{ fontWeight: 800 }}>Coach next actions</div>
       <div style={{ marginTop: 8, display: "grid", gap: 8 }}>
         {(stage12Status?.profile?.coaching?.nextActions || []).slice(0, 3).map((row, idx) => (
           <div key={`s12_action_${idx}`}><small>• {row}</small></div>
         ))}
+        {!(stage12Status?.profile?.coaching?.nextActions || []).length ? <small style={{ opacity: 0.78 }}>No recommendations yet.</small> : null}
       </div>
       {(stage12Status?.profile?.skills || []).length ? (
         <div style={{ marginTop: 12, display: "flex", gap: 8, flexWrap: "wrap" }}>
           {stage12Status?.profile?.skills?.slice(0, 8).map((skill) => <span key={`s12_skill_${skill}`} className="badge">{skill}</span>)}
         </div>
       ) : null}
+      <div style={{ marginTop: 10, opacity: 0.76 }}><small>{stage12Status?.analyzedAt ? `Last analyzed ${new Date(stage12Status.analyzedAt).toLocaleString()}` : "Original resume file is not retained long term."}</small></div>
     </div>
   </div>
 </div>
 
-
-
-
-
-          {activeSweepCampaigns.length ? (
-  <div className="card sweepGoldCard" style={{ marginTop: 14, borderColor: 'rgba(255,215,90,.28)', boxShadow: '0 0 0 1px rgba(255,215,90,.08) inset' }}>
-    <div style={{ display:'flex', justifyContent:'space-between', gap:12, alignItems:'center', flexWrap:'wrap' }}>
+{activeSweepCampaigns.length ? (
+  <div className="card sweepGoldCard" style={{ marginTop: 14, borderColor: "rgba(255,215,90,.34)", boxShadow: "0 0 0 1px rgba(255,215,90,.10) inset", background: "linear-gradient(180deg, rgba(44,57,70,0.62), rgba(18,22,34,0.50))" }}>
+    <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "flex-start", flexWrap: "wrap" }}>
       <div>
         <h3 style={{ margin: 0, color: "#f8d36a" }}>Active sweepstakes</h3>
-        <div><small>Campaigns you are currently entered in. Click a drawing card to open that campaign.</small></div>
+        <div style={{ marginTop: 6, opacity: 0.86 }}><small>Campaigns you are currently entered in. Click a drawing card to open that campaign.</small></div>
       </div>
     </div>
-    <div style={{ marginTop: 12, display:'grid', gap:12 }}>
-      {activeSweepCampaigns.map((c: any) => (
-        <a key={`sweep_${c.id}`} href={`/sweepstakes/${c.id}`} className="sweepEntryTile" style={{ textDecoration: 'none', color: 'inherit' }}>
-          <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
-            <div>
-              <div style={{ fontWeight: 900, color: "#ffe59b" }}>{c.title || c.name || "Golden Draw"}</div>
-              <div style={{ marginTop: 6, opacity: 0.84 }}>
-                <small>{Number(sweepSummary?.user?.entriesByCampaign?.[String(c.id)] || 0)} entries • Draw closes: {c?.endsAt ? new Date(c.endsAt).toLocaleString() : 'TBD'}</small>
-              </div>
-            </div>
-            <div style={{ display:'flex', gap:10, flexWrap:'wrap' }}>
-              <span className="badge" style={{ background: "rgba(255,220,120,0.12)", borderColor: "rgba(255,220,120,0.28)" }}>Tokens: {Number(sweepSummary?.user?.tokenBalance || 0)}</span>
-            </div>
+    {activeSweepCampaigns.slice(0, 1).map((c: any) => (
+      <a key={`sweep_${c.id}`} href={`/sweepstakes/${c.id}`} className="sweepEntryTile" style={{ marginTop: 14, textDecoration: "none", color: "inherit", display: "block", padding: 16, borderRadius: 24, border: "1px solid rgba(255,215,90,0.28)", background: "linear-gradient(180deg, rgba(18,24,34,0.86), rgba(8,12,20,0.90))" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+          <div>
+            <div style={{ fontWeight: 900, fontSize: 18, color: "#ffe59b" }}>{c.title || c.name || "Golden Draw"}</div>
+            <div style={{ marginTop: 6, opacity: 0.84 }}><small>{c.prizePoolLabel || "GoldDraw"}</small></div>
           </div>
-        </a>
-      ))}
-    </div>
+          <div style={{ textAlign: "right" }}>
+            <div style={{ fontWeight: 900, fontSize: 20, color: "#ffd86a" }}>{c?.endsAt ? (() => { const ms = new Date(c.endsAt).getTime() - Date.now(); const d = Math.max(0, Math.floor(ms / 86400000)); const h = Math.max(0, Math.floor((ms % 86400000) / 3600000)); const m = Math.max(0, Math.floor((ms % 3600000) / 60000)); return `${d}d ${h}h ${m}m left`; })() : "Live now"}</div>
+            <div style={{ marginTop: 4, opacity: 0.84 }}><small>{Number(sweepSummary?.user?.entriesByCampaign?.[String(c.id)] || 0)} entries</small></div>
+          </div>
+        </div>
+        <div style={{ marginTop: 14 }}>
+          <span className="secondaryBtn" style={{ display: "inline-flex", textDecoration: "none" }}>View countdown</span>
+        </div>
+      </a>
+    ))}
   </div>
 ) : null}
 

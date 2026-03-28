@@ -1,23 +1,100 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 type Payload = {
   summary?: { sessionCount: number; completedSessions: number; abandonedSessions: number; completionRate: number };
   weakDomains?: Array<{ domain: string; xp: number; userId: string }>;
   hardestQuestionTypes?: Array<{ type: string; attempts: number; accuracy: number }>;
-  quitPoints?: Array<{ question: number; count: number }>;
-  calibrationSummary?: Array<{ questionId: string; observedAccuracy: number; avgResponseMs: number; difficultyDrift: number }>;
 };
+
 type LearningRow = { domain: string; mastery: number; accuracy: number; currentDifficulty: number; correctCount: number; wrongCount: number };
+
+type Stage12Profile = {
+  analyzedAt?: string;
+  targetRole?: string;
+  skills?: string[];
+  certifications?: string[];
+  inferredDomains?: { domain: string; score: number }[];
+  gaps?: string[];
+  coaching?: {
+    summary?: string;
+    strengths?: string[];
+    focusAreas?: string[];
+    nextActions?: string[];
+    behaviorNotes?: string[];
+  };
+};
+
+type Stage12Status = {
+  hasResume?: boolean;
+  resumeFileName?: string | null;
+  analyzedAt?: string | null;
+  profile?: Stage12Profile | null;
+};
+
+function getActiveUserId() {
+  if (typeof window === "undefined") return "";
+  try {
+    const explicit = localStorage.getItem("lu_active_user_id") || localStorage.getItem("activeUserId") || "";
+    if (explicit) return explicit;
+    const raw = localStorage.getItem("lu_users") || "[]";
+    const users = JSON.parse(raw);
+    if (Array.isArray(users) && users[0]?.id) return users[0].id;
+  } catch {}
+  return "";
+}
 
 export default function AdminInsightsPage() {
   const [data, setData] = useState<Payload | null>(null);
   const [learningRows, setLearningRows] = useState<LearningRow[]>([]);
   const [overallMastery, setOverallMastery] = useState<number>(0);
+  const [userId, setUserId] = useState("");
+  const [stage12Status, setStage12Status] = useState<Stage12Status | null>(null);
+  const [stage12File, setStage12File] = useState<File | null>(null);
+  const [stage12Uploading, setStage12Uploading] = useState(false);
+  const [stage12Message, setStage12Message] = useState<string | null>(null);
+
+  async function loadStage12(activeUserId: string) {
+    if (!activeUserId) return;
+    try {
+      const res = await fetch(`/api/stage12/status?userId=${encodeURIComponent(activeUserId)}`, { cache: "no-store" });
+      const payload = await res.json().catch(() => null);
+      if (res.ok) setStage12Status(payload);
+    } catch {}
+  }
+
+  async function analyzeResume() {
+    if (!userId || !stage12File) return;
+    setStage12Uploading(true);
+    setStage12Message(null);
+    try {
+      const fd = new FormData();
+      fd.append("userId", userId);
+      fd.append("file", stage12File);
+      const res = await fetch("/api/stage12/analyze", { method: "POST", body: fd });
+      const payload = await res.json().catch(() => null);
+      if (!res.ok) throw new Error(payload?.detail || payload?.error || "Resume analysis failed");
+      setStage12Status({
+        hasResume: true,
+        resumeFileName: stage12File.name,
+        analyzedAt: payload?.profile?.analyzedAt || new Date().toISOString(),
+        profile: payload?.profile || null,
+      });
+      setStage12File(null);
+      setStage12Message("Resume analyzed. AI Coach and learning insights were updated.");
+    } catch (err: any) {
+      setStage12Message(String(err?.message || err || "Resume analysis failed"));
+    } finally {
+      setStage12Uploading(false);
+    }
+  }
 
   useEffect(() => {
+    const activeUserId = getActiveUserId();
+    setUserId(activeUserId);
+
     fetch('/api/stage11/overview', { cache: 'no-store' })
       .then((r) => r.ok ? r.json() : Promise.reject(new Error('overview')))
       .then(setData)
@@ -35,7 +112,14 @@ export default function AdminInsightsPage() {
         setLearningRows([]);
         setOverallMastery(0);
       });
+
+    loadStage12(activeUserId);
   }, []);
+
+  const stage12 = stage12Status?.profile || null;
+  const focusAreas = (stage12?.coaching?.focusAreas || stage12?.gaps || []).slice(0, 4);
+  const nextActions = (stage12?.coaching?.nextActions || []).slice(0, 4);
+  const skills = (stage12?.skills || []).slice(0, 16);
 
   return (
     <main className="page">
@@ -43,12 +127,12 @@ export default function AdminInsightsPage() {
         <div className="card" style={{ padding: 18 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
             <div>
-              <h1 style={{ margin: 0 }}>Stage 11 insights dashboard</h1>
-              <div style={{ marginTop: 6, opacity: 0.82 }}><small>Question performance, quit points, and difficulty calibration from live user data.</small></div>
+              <h1 style={{ margin: 0 }}>Insights & AI Coach</h1>
+              <div style={{ marginTop: 6, opacity: 0.82 }}><small>Performance signals, adaptive learning profile, and resume-driven coaching in one place.</small></div>
             </div>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
               <a className="secondaryBtn" href="/dashboard">Dashboard</a>
-                          </div>
+            </div>
           </div>
         </div>
 
@@ -58,7 +142,6 @@ export default function AdminInsightsPage() {
           <div className="featureCard" style={{ padding: 14 }}><small>Abandoned</small><div style={{ fontWeight: 900, fontSize: 24 }}>{data?.summary?.abandonedSessions || 0}</div></div>
           <div className="featureCard" style={{ padding: 14 }}><small>Completion rate</small><div style={{ fontWeight: 900, fontSize: 24 }}>{data?.summary?.completionRate || 0}%</div></div>
         </div>
-
 
         <div style={{ display: 'grid', gridTemplateColumns: '1.05fr .95fr', gap: 16, marginTop: 16 }}>
           <div className="card" style={{ padding: 18 }}>
@@ -110,36 +193,62 @@ export default function AdminInsightsPage() {
               {(data?.hardestQuestionTypes || []).slice(0,8).map((row) => (
                 <div key={row.type} className="featureCard" style={{ padding: 12, display: 'flex', justifyContent: 'space-between', gap: 10 }}><span>{row.type}</span><b>{row.accuracy}% accuracy</b></div>
               ))}
+              {!(data?.hardestQuestionTypes || []).length ? <small style={{ opacity: 0.78 }}>No question performance data yet.</small> : null}
             </div>
           </div>
-          <div className="card" style={{ padding: 18 }}>
-            <h3 style={{ marginTop: 0 }}>Quit points</h3>
-            <div style={{ display: 'grid', gap: 10 }}>
-              {(data?.quitPoints || []).slice(0,8).map((row) => (
-                <div key={row.question} className="featureCard" style={{ padding: 12, display: 'flex', justifyContent: 'space-between', gap: 10 }}><span>Question {row.question}</span><b>{row.count} quits</b></div>
-              ))}
-            </div>
-          </div>
-        </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginTop: 16 }}>
-          <div className="card" style={{ padding: 18 }}>
-            <h3 style={{ marginTop: 0 }}>Weak domains</h3>
-            <div style={{ display: 'grid', gap: 10 }}>
-              {(data?.weakDomains || []).slice(0,8).map((row, idx) => (
-                <div key={`${row.userId}_${row.domain}_${idx}`} className="featureCard" style={{ padding: 12, display: 'flex', justifyContent: 'space-between', gap: 10 }}><span>{row.domain}</span><b>{row.xp} XP</b></div>
+          <div className="card" style={{ padding: 18, borderColor: 'rgba(100,220,255,0.22)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
+              <div>
+                <h3 style={{ marginTop: 0, marginBottom: 0 }}>AI Coach</h3>
+                <div style={{ marginTop: 6, opacity: 0.82 }}><small>Upload or refresh your resume analysis here. The original file is not retained long term.</small></div>
+              </div>
+            </div>
+
+            <div style={{ marginTop: 14, display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+              <label className="secondaryBtn" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+                <span>{stage12File ? stage12File.name : (stage12Status?.resumeFileName || "Choose resume")}</span>
+                <input type="file" accept=".pdf,.docx" onChange={(e) => setStage12File(e.target.files?.[0] || null)} style={{ display: 'none' }} />
+              </label>
+              <button className="primaryBtn" type="button" disabled={!stage12File || stage12Uploading || !userId} onClick={analyzeResume}>
+                {stage12Uploading ? "Analyzing..." : "Upload + analyze"}
+              </button>
+              {stage12Status?.analyzedAt ? <span className="badge">Last analyzed {new Date(stage12Status.analyzedAt).toLocaleDateString()}</span> : null}
+            </div>
+
+            {stage12Message ? <div style={{ marginTop: 10, opacity: 0.86 }}><small>{stage12Message}</small></div> : null}
+
+            <div style={{ marginTop: 14, fontWeight: 900, fontSize: 24 }}>{stage12?.targetRole || "No analysis yet"}</div>
+            <div style={{ marginTop: 8, opacity: 0.86 }}>
+              <small>{stage12?.coaching?.summary || "Upload and analyze a resume to unlock your coaching summary, focus areas, and next actions."}</small>
+            </div>
+
+            <div style={{ marginTop: 12, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              {(stage12?.inferredDomains || []).slice(0, 5).map((row) => (
+                <span key={row.domain} className="badge">{row.domain} · {row.score}</span>
               ))}
             </div>
-          </div>
-          <div className="card" style={{ padding: 18 }}>
-            <h3 style={{ marginTop: 0 }}>Difficulty calibration</h3>
-            <div style={{ display: 'grid', gap: 10 }}>
-              {(data?.calibrationSummary || []).slice(0,8).map((row) => (
-                <div key={row.questionId} className="featureCard" style={{ padding: 12 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10 }}><span>{row.questionId.slice(0, 10)}…</span><b>{row.observedAccuracy}%</b></div>
-                  <div style={{ opacity: 0.76, marginTop: 4 }}><small>Avg {Math.round(row.avgResponseMs || 0)}ms • drift {row.difficultyDrift}</small></div>
+
+            <div style={{ marginTop: 14, display: 'grid', gap: 10 }}>
+              <div className="featureCard" style={{ padding: 12 }}>
+                <div style={{ fontWeight: 800 }}>Focus areas</div>
+                <div style={{ marginTop: 8, display: 'grid', gap: 8 }}>
+                  {focusAreas.map((row, idx) => <div key={`focus_${idx}`}><small>• {row}</small></div>)}
+                  {!focusAreas.length ? <small style={{ opacity: 0.78 }}>No focus areas yet.</small> : null}
                 </div>
-              ))}
+              </div>
+              <div className="featureCard" style={{ padding: 12 }}>
+                <div style={{ fontWeight: 800 }}>Coach next actions</div>
+                <div style={{ marginTop: 8, display: 'grid', gap: 8 }}>
+                  {nextActions.map((row, idx) => <div key={`next_${idx}`}><small>• {row}</small></div>)}
+                  {!nextActions.length ? <small style={{ opacity: 0.78 }}>No recommendations yet.</small> : null}
+                </div>
+                {skills.length ? (
+                  <div style={{ marginTop: 12, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                    {skills.map((skill) => <span key={skill} className="badge">{skill}</span>)}
+                  </div>
+                ) : null}
+              </div>
             </div>
           </div>
         </div>
