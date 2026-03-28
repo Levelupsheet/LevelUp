@@ -32,8 +32,7 @@ export default function AdminInsightsPage() {
             </div>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
               <a className="secondaryBtn" href="/dashboard">Dashboard</a>
-              <a className="secondaryBtn" href="/admin">Admin</a>
-            </div>
+                          </div>
           </div>
         </div>
 

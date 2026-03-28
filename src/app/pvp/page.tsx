@@ -29,7 +29,6 @@ type PvpChallengeView = {
   submissions?: Record<string, { summary: { correctCount: number; totalQuestions: number; accuracy: number; bestStreak: number; totalTimeMs: number; completedAt: string; awardedTokens?: number } }>;
   winnerUserId?: string | null;
   resultLabel?: string | null;
-  lane?: string | null;
 };
 
 function getActiveUser() {
@@ -419,7 +418,7 @@ export default function PvpPage() {
                 enemyName={currentOpponentName}
                 questions={duelQuestions}
                 timed
-                metaLeft={activeChallenge.lane === "TEST_NOW" ? "PvP Arena" : (activeChallenge.lane || "PvP Arena")}
+                metaLeft={activeChallenge.lane === "TEST_NOW" ? "PvP Arena" : activeChallenge.lane}
                 metaRight={activeChallenge.resultLabel || "Seeded duel"}
                 exitLabel="Close"
                 onExit={() => setDuelOpen(false)}

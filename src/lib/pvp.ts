@@ -20,9 +20,10 @@ export type PvpChallenge = {
   id: string;
   createdAt: string;
   updatedAt: string;
-  status: "PENDING" | "IN_PROGRESS" | "COMPLETED";
+  status: "PENDING" | "IN_PROGRESS" | "COMPLETED" | "EXPIRED";
   acceptedAt?: string | null;
   acceptedBy?: string | null;
+  expiresAt?: string | null;
   lane: string;
   seed: string;
   questionCount: number;
@@ -67,11 +68,34 @@ function nowIso() {
   return new Date().toISOString();
 }
 
+function computeExpiresAt(createdAt?: string | null) {
+  const base = createdAt ? new Date(createdAt).getTime() : Date.now();
+  return new Date(base + 48 * 60 * 60 * 1000).toISOString();
+}
+
+function expireChallengeIfNeeded(challenge: PvpChallenge) {
+  const expiresAt = challenge.expiresAt || computeExpiresAt(challenge.createdAt);
+  challenge.expiresAt = expiresAt;
+  if (challenge.status === "PENDING" && Date.now() > new Date(expiresAt).getTime()) {
+    challenge.status = "EXPIRED";
+    challenge.updatedAt = nowIso();
+  }
+  return challenge;
+}
+
 function safeRead(): Record<string, PvpChallenge> {
   try {
     const raw = fs.readFileSync(FILE, "utf8");
     const parsed = JSON.parse(raw);
-    return parsed && typeof parsed === "object" ? parsed : {};
+    const store = parsed && typeof parsed === "object" ? parsed : {};
+    let dirty = false;
+    for (const key of Object.keys(store)) {
+      const before = JSON.stringify(store[key]);
+      store[key] = expireChallengeIfNeeded(store[key]);
+      if (JSON.stringify(store[key]) !== before) dirty = true;
+    }
+    if (dirty) safeWrite(store);
+    return store;
   } catch {
     return {};
   }
@@ -156,11 +180,12 @@ export function listPvpChallengesForUser(userId: string) {
   const all = Object.values(store)
     .filter((row) => row.challenger.userId === userId || row.rival.userId === userId)
     .sort((a, b) => String(b.updatedAt).localeCompare(String(a.updatedAt)));
+  const live = all.filter((row) => row.status !== "EXPIRED");
   return {
-    incoming: all.filter((row) => row.rival.userId === userId && !row.submissions[userId]),
-    outgoing: all.filter((row) => row.challenger.userId === userId && !row.submissions[row.rival.userId]),
+    incoming: live.filter((row) => row.status === "PENDING" && row.rival.userId === userId && !row.submissions[userId]),
+    outgoing: live.filter((row) => row.status !== "COMPLETED" && row.challenger.userId === userId && !row.submissions[row.rival.userId]),
     completed: all.filter((row) => row.status === "COMPLETED"),
-    all,
+    all: live,
   };
 }
 
@@ -200,6 +225,7 @@ export function toPublicChallenge(challenge: PvpChallenge, userId?: string | nul
     resultLabel: challenge.resultLabel || null,
     acceptedAt: challenge.acceptedAt || null,
     acceptedBy: challenge.acceptedBy || null,
+    expiresAt: challenge.expiresAt || computeExpiresAt(challenge.createdAt),
   };
 }
 
@@ -239,6 +265,7 @@ export async function createPvpChallenge(input: {
     resultLabel: null,
     acceptedAt: null,
     acceptedBy: null,
+    expiresAt: computeExpiresAt(nowIso()),
   };
 
   const store = safeRead();
@@ -253,8 +280,12 @@ export async function acceptPvpChallenge(input: { challengeId: string; userId: s
   const store = safeRead();
   const challenge = store[String(input.challengeId || "").trim()];
   if (!challenge) throw new Error("Challenge not found.");
+  expireChallengeIfNeeded(challenge);
+  if (challenge.status === "EXPIRED") throw new Error("This challenge expired after 48 hours.");
   const userId = String(input.userId || "").trim();
   if (challenge.rival.userId !== userId) throw new Error("Only the challenged rival can accept this duel.");
+  expireChallengeIfNeeded(challenge);
+  if (challenge.status === "EXPIRED") throw new Error("This challenge expired after 48 hours.");
   if (!challenge.acceptedAt) {
     challenge.acceptedAt = nowIso();
     challenge.acceptedBy = userId;
@@ -334,6 +365,8 @@ export async function submitPvpChallenge(input: {
   const store = safeRead();
   const challenge = store[String(input.challengeId || "").trim()];
   if (!challenge) throw new Error("Challenge not found.");
+  expireChallengeIfNeeded(challenge);
+  if (challenge.status === "EXPIRED") throw new Error("This challenge expired after 48 hours.");
   const userId = String(input.userId || "").trim();
   if (![challenge.challenger.userId, challenge.rival.userId].includes(userId)) throw new Error("You are not part of this challenge.");
   if (challenge.submissions[userId]) throw new Error("You already submitted this challenge.");

@@ -2,12 +2,10 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import ProgressBar from "@/components/ProgressBar";
-import AdaptiveLearningCard from "@/components/AdaptiveLearningCard";
 import MerchModal from "@/components/MerchModal";
 import MockInterviewModal from "@/components/MockInterviewModal";
 import PracticeMiniGameModal from "@/components/PracticeMiniGameModal";
 import AvatarMenu from "@/components/AvatarMenu";
-import WhatsNextPanel from "@/components/WhatsNextPanel";
 import LootVaultModal from "@/components/LootVaultModal";
 import AuthGateCard from "@/components/AuthGateCard";
 import { getActiveUser, setActiveUserId, syncAuthenticatedUser } from "@/lib/userStore";
@@ -110,6 +108,8 @@ export default function Dashboard() {
   const [showPositionModal, setShowPositionModal] = useState(false);
   const [merchOpen, setMerchOpen] = useState(false);
   const [showLaunchModal, setShowLaunchModal] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [powerupsOpen, setPowerupsOpen] = useState(false);
   const [positionTrainingOpen, setPositionTrainingOpen] = useState(false);
   const [certPracticeOpen, setCertPracticeOpen] = useState(false);
   const [testNowOpen, setTestNowOpen] = useState(false);
@@ -555,6 +555,13 @@ async function analyzeResumeStage12() {
   }, [activity, notes]);
 
   const nextPlanLabel = normalizedTier === "FREE" ? "Pro" : normalizedTier === "PRO" ? "Premium" : null;
+  const usernameToneStyle = normalizedTier === "PREMIUM"
+    ? { color: "#eef3ff", textShadow: "0 0 14px rgba(220,228,236,0.22)" }
+    : normalizedTier === "PRO"
+      ? { color: "#9ad2ff", textShadow: "0 0 12px rgba(74,126,255,0.24)" }
+      : { color: "#ffca7a", textShadow: "0 0 10px rgba(255,153,0,0.18)" };
+  const compactInventory = (stage9Status?.inventory || []).filter((row) => Number(row.quantity || 0) > 0).slice(0, 4);
+  const activeSweepCampaigns = (sweepSummary?.campaigns || []).filter((c: any) => (c?.status === "ACTIVE" || c?.isLive) && Number(sweepSummary?.user?.entriesByCampaign?.[String(c.id)] || 0) > 0);
 
   const recommendedRoles = useMemo(() => {
     if ((localLevel || 1) < 7) return [] as CareerMatchRow[];
@@ -619,7 +626,6 @@ async function analyzeResumeStage12() {
           <a href="/leaderboard">Leaderboard</a>
           <a href="#" onClick={(e) => (e.preventDefault(), setMerchOpen(true))}>Merch</a>
           {isAdminUser ? <a href="/admin">Admin</a> : null}
-          {isAdminUser ? <a href="/admin/insights">Insights</a> : null}
         </nav>
 
         <div className="navActions">
@@ -656,6 +662,25 @@ async function analyzeResumeStage12() {
             <span style={{ fontWeight: 900, fontSize: 12 }}>Lvl {localLevel}</span>
             <span style={{ opacity: 0.8, fontSize: 12, fontVariantNumeric: "tabular-nums" }}>Total XP {xp}</span>
           </div>
+          <button
+            className="card"
+            type="button"
+            onClick={() => setNotificationsOpen(true)}
+            title="Notifications"
+            style={{
+              padding: "8px 10px",
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              borderRadius: 999,
+              background: combinedNotes.length ? "rgba(255,196,107,0.14)" : "rgba(255,255,255,0.06)",
+              borderColor: combinedNotes.length ? "rgba(255,196,107,0.45)" : undefined,
+              color: combinedNotes.length ? "#ffd48f" : undefined,
+            }}
+          >
+            <span aria-hidden="true" style={{ fontSize: 14 }}>🔔</span>
+            {combinedNotes.length ? <span style={{ fontWeight: 900, fontSize: 12 }}>{combinedNotes.length}</span> : null}
+          </button>
           <AvatarMenu
             userLabel={userLabel ?? userId}
             avatarUrl={userAvatar}
@@ -843,17 +868,17 @@ async function analyzeResumeStage12() {
           </button>
 
           <div style={{ marginTop: 10 }}>
-            {(localLevel || 1) >= 5 ? (
-              <button className="gold" style={{ width: "100%" }} onClick={() => setMockInterviewOpen(true)}>
-                Begin Boss Battle →
+            {hasHRInvite ? (
+              <button className="gold" style={{ width: "100%" }} onClick={() => (window.location.href = "/interview/hr")}>
+                Start HR Battle →
               </button>
             ) : (
-              <button className="gold" style={{ width: "100%", opacity: 0.65, cursor: "not-allowed" }} disabled title="Unlocks at level 5">
+              <button className="gold" style={{ width: "100%", opacity: 0.65, cursor: "not-allowed" }} disabled title="HR battle unlocks automatically when you qualify.">
                 Begin Boss Battle 🔒
               </button>
             )}
             <small style={{ display: "block", marginTop: 6, opacity: 0.8 }}>
-              {(localLevel || 1) >= 5 ? "Boss battle unlocked." : "Unlocks at level 5."}
+              {hasHRInvite ? "HR Battle Eligibility Unlocked!" : "Unlocks at level 5."}
             </small>
             {hasFreeStartCooldown && <small style={{ display: "block", marginTop: 6, color: "#f5d37b" }}>Free users can start another session in {freeStartCooldownLabel}.</small>}
           </div>
@@ -891,33 +916,60 @@ async function analyzeResumeStage12() {
             <div style={{ marginTop: 8, opacity: 0.82 }}><small>Adaptive mastery details are shown in the main panel.</small></div>
           </div>
 
+          <div className="card" style={{ marginTop: 14, padding: 12, borderColor: "rgba(93,168,255,0.22)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+              <div>
+                <div style={{ fontWeight: 900 }}>PowerUps</div>
+                <div style={{ opacity: 0.78 }}><small>Inventory + daily claims</small></div>
+              </div>
+              <button className="secondaryBtn" type="button" onClick={() => setPowerupsOpen(true)}>Open</button>
+            </div>
+            <div style={{ marginTop: 10, display: "flex", gap: 8, flexWrap: "wrap" }}>
+              {compactInventory.length ? compactInventory.map((row) => (
+                <button key={`${row.itemType}_${row.itemRef || "base"}`} className="secondaryBtn" type="button" onClick={() => setPowerupsOpen(true)} style={{ minWidth: 74 }}>
+                  {(row.itemRef || row.itemType).replace(/_/g, " ")} x{row.quantity}
+                </button>
+              )) : <small style={{ opacity: 0.78 }}>No powerups banked yet.</small>}
+            </div>
+          </div>
+
+          <div className="card" style={{ marginTop: 14, padding: 12, borderColor: "rgba(255,215,100,0.28)", background: "linear-gradient(180deg, rgba(255,216,120,0.08), rgba(255,175,64,0.04))" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+              <div>
+                <div style={{ fontWeight: 900 }}>Leaderboard</div>
+                <div style={{ opacity: 0.78 }}><small>Top candidates</small></div>
+              </div>
+              <a className="secondaryBtn" href="/leaderboard">Open</a>
+            </div>
+            <div style={{ marginTop: 10, display: "grid", gap: 8 }}>
+              {(stage10Leaderboards?.weekly || []).slice(0, 3).map((row, idx) => (
+                <div key={`sb_lb_${row.userId}`} className="featureCard" style={{ padding: 10, display: "flex", justifyContent: "space-between", gap: 10 }}>
+                  <div><b>{idx + 1}. {row.displayName}</b><div style={{ opacity: 0.72 }}><small>{row.rank || levelTitleFromLevel(Number(row.level || 1))} • Lvl {row.level || 1}</small></div></div>
+                  <div style={{ fontWeight: 900 }}>{row.xp || 0} XP</div>
+                </div>
+              ))}
+              {!stage10Leaderboards?.weekly?.length ? <small style={{ opacity: 0.78 }}>Leaderboard populates from live sessions.</small> : null}
+            </div>
+          </div>
+
         </aside>
 
         <section className="maincol">
           <div className="topbar">
             <div>
               <b>Welcome back</b>
-              <div><small>Signed in as <span style={{ opacity: 0.95 }}>{userLabel ?? userId}</span></small></div>
-              <div style={{ marginTop: 6 }}><small style={{ padding: "3px 10px", borderRadius: 999, fontWeight: 800, ...(tierBadgeStyle as any) }}>{tierLabel} plan</small></div>
+              <div><small><span style={usernameToneStyle as any}>{userLabel ?? userId}</span></small></div>
             </div>
 
             <div className="kpiRow">
-              <span className="badge"><b>Path</b>: {user?.startingPosition ? labelPos(user.startingPosition) : "Not set"}</span>
-              {user?.startingPosition && (
-                <button className="secondaryBtn" type="button" onClick={() => {
-                  setPendingPos(user.startingPosition);
-                  setPositionChangeMode(true);
-                  setShowPositionModal(true);
-                }}>
-                  Change
-                </button>
-              )}
-
-              <span className="badge"><b>HR</b>: {hrPassed ? "Passed ✅" : "Not passed"}</span>
-              <span className="badge"><b>Tech Ready</b>: {hasTechReady ? "Yes" : "No"}</span>
-              <button onClick={() => userId && refresh(userId)} disabled={loading}>{loading ? "Refreshing..." : "Refresh"}</button>
-              <button className="primary" onClick={checkEligibility} disabled={loading}>Check Eligibility</button>
-              {hasHRInvite && <button className="primary" onClick={() => window.location.href="/interview/hr"}>Start Boss Battle (HR)</button>}
+              <button className="badge" type="button" onClick={() => {
+                setPendingPos(user?.startingPosition || null);
+                setPositionChangeMode(true);
+                setShowPositionModal(true);
+              }}>
+                <b>Path</b>: {user?.startingPosition ? labelPos(user.startingPosition) : "Choose path"}
+              </button>
+              {hasHRInvite ? <button className="primary" type="button" onClick={() => window.location.href="/interview/hr"}>Start HR Battle</button> : null}
             </div>
           </div>
 
@@ -925,7 +977,7 @@ async function analyzeResumeStage12() {
             <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
               <div>
                 <h3 style={{ margin: 0 }}>Plan perks</h3>
-                <div><small>{entitlements?.label || tierLabel} plan • Adaptive depth: <b>{entitlements?.adaptiveDepth || "standard"}</b> • Reward track: <b>{entitlements?.rewardsTrack || "core"}</b></small></div>
+                <div><small style={{ opacity: 0.9 }}>{entitlements?.label || tierLabel} plan • Adaptive depth: <b>{entitlements?.adaptiveDepth || "standard"}</b> • Reward track: <b>{entitlements?.rewardsTrack || "core"}</b></small></div>
               </div>
               {nextPlanLabel ? <a href="/start#pricing" className="secondaryBtn" style={{ textDecoration: 'none' }}>Upgrade to {nextPlanLabel}</a> : <span className="badge">Top tier unlocked</span>}
             </div>
@@ -954,8 +1006,8 @@ async function analyzeResumeStage12() {
 <div className="card" style={{ marginBottom: 14, borderColor: "rgba(255,196,107,0.24)" }}>
   <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
     <div>
-      <h3 style={{ margin: 0 }}>Stage 9 momentum</h3>
-      <div><small>Daily return streak • retention loop kickoff</small></div>
+      <h3 style={{ margin: 0 }}>Momentum & Insights</h3>
+      <div><small>Daily return streak • quick overview</small></div>
     </div>
     <span className="badge">Tomorrow bonus: +{dailyStreak.tomorrowBonusTokens} tokens</span>
   </div>
@@ -969,126 +1021,34 @@ async function analyzeResumeStage12() {
       <div style={{ fontWeight: 900, fontSize: 22 }}>{dailyStreak.momentumLabel}</div>
     </div>
     <div className="featureCard">
-      <div><small>Token bonus queued</small></div>
-      <div style={{ fontWeight: 900, fontSize: 22 }}>+{dailyStreak.tomorrowBonusTokens}</div>
+      <div><small>Insights</small></div>
+      <div style={{ fontWeight: 900, fontSize: 20 }}><a href="/admin/insights" style={{ color: "inherit", textDecoration: "none" }}>Open insights →</a></div>
     </div>
   </div>
   <div style={{ marginTop: 10, opacity: 0.86 }}><small>Store, spend, and persistent streak bonuses can now be layered on top of your Stage 8 momentum systems.</small></div>
 </div>
 
 
-<div className="card" style={{ marginBottom: 14, borderColor: "rgba(93,168,255,0.22)" }}>
-  <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
-    <div>
-      <h3 style={{ margin: 0 }}>Stage 9 economy</h3>
-      <div><small>Daily claim • token sink • reusable power-up inventory</small></div>
-    </div>
-    <span className="badge">Wallet: {Number.isFinite(tokenBalance) ? tokenBalance : 0} tokens</span>
-  </div>
-  <div style={{ marginTop: 12, display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 10 }}>
-    <div className="featureCard">
-      <div><small>Claim today</small></div>
-      <div style={{ fontWeight: 900, fontSize: 22 }}>{stage9Status?.claimableToday ? `+${stage9Status?.dailyBonusTokens || 0}` : "Claimed"}</div>
-      <div style={{ marginTop: 8 }}>
-        <button className="primary" type="button" disabled={!stage9Status?.claimableToday || claimingDaily} onClick={claimStage9DailyBonus}>{claimingDaily ? "Claiming..." : stage9Status?.claimableToday ? "Claim Daily Bonus" : "Bonus Claimed"}</button>
-      </div>
-    </div>
-    <div className="featureCard">
-      <div><small>Retention hook</small></div>
-      <div style={{ fontWeight: 900, fontSize: 22 }}>{stage9Status?.momentumLabel || dailyStreak.momentumLabel}</div>
-      <div style={{ marginTop: 8, opacity: 0.82 }}><small>{stage9Status?.nextHook || "Keep your streak alive and convert tokens into power-ups."}</small></div>
-    </div>
-    <div className="featureCard">
-      <div><small>Inventory bank</small></div>
-      <div style={{ fontWeight: 900, fontSize: 22 }}>{Array.isArray(stage9Status?.inventory) ? stage9Status!.inventory.reduce((sum, row) => sum + Number(row.quantity || 0), 0) : 0}</div>
-      <div style={{ marginTop: 8, opacity: 0.82 }}><small>{Array.isArray(stage9Status?.inventory) && stage9Status!.inventory.length ? stage9Status!.inventory.map((row) => `${row.itemRef || row.itemType} x${row.quantity}`).slice(0, 2).join(" • ") : "No store items banked yet."}</small></div>
-    </div>
-  </div>
-  {stage9Message ? <div style={{ marginTop: 10, opacity: 0.9 }}><small>{stage9Message}</small></div> : null}
-  <div style={{ marginTop: 12, display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))", gap: 10 }}>
-    {(stage9Status?.store || []).map((item) => (
-      <div key={item.id} className="featureCard" style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: 170 }}>
-        <div>
-          <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "center" }}>
-            <div style={{ fontWeight: 900 }}>{item.name}</div>
-            <span className="badge">{item.badge}</span>
-          </div>
-          <div style={{ marginTop: 6, opacity: 0.82 }}><small>{item.description}</small></div>
-          <div style={{ marginTop: 8, fontWeight: 800 }}>{item.cost} tokens</div>
-        </div>
-        <div style={{ marginTop: 10 }}>
-          <button className="secondaryBtn" type="button" disabled={buyingItemId === item.id || tokenBalance < item.cost} onClick={() => purchaseStage9StoreItem(item.id)}>
-            {buyingItemId === item.id ? "Purchasing..." : tokenBalance < item.cost ? "Need more tokens" : "Buy now"}
-          </button>
-        </div>
-      </div>
-    ))}
-  </div>
-</div>
 
 
-<div className="card" style={{ marginBottom: 14, borderColor: "rgba(255,215,100,0.22)" }}>
-  <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
-    <div>
-      <h3 style={{ margin: 0 }}>Stage 10 competition</h3>
-      <div><small>Leaderboards • domain rankings • boss wins • public profiles • weekly board resets every 7 days based on earned session XP</small></div>
-    </div>
-    <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}><a className="secondaryBtn" href="/leaderboard">Open leaderboard</a><a className="secondaryBtn" href="/pvp">PvP</a></div>
-  </div>
-  <div style={{ marginTop: 12, display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 10 }}>
-    <div className="featureCard">
-      <div><small>Weekly leaders</small></div>
-      <div style={{ marginTop: 8, display: "grid", gap: 6 }}>
-        {(stage10Leaderboards?.weekly || []).slice(0, 3).map((row, idx) => (
-          <div key={`wk_${row.userId}`} style={{ display: "flex", justifyContent: "space-between", gap: 8 }}><span>{idx + 1}. {row.displayName}</span><b>{row.xp || 0} XP</b></div>
-        ))}
-        {!stage10Leaderboards?.weekly?.length ? <small style={{ opacity: 0.78 }}>Leaderboard will populate as user sessions sync.</small> : null}
-      </div>
-    </div>
-    <div className="featureCard">
-      <div><small>{stage10Leaderboards?.domain || "AZURE"} mastery leaders</small></div>
-      <div style={{ marginTop: 8, display: "grid", gap: 6 }}>
-        {(stage10Leaderboards?.byDomain || []).slice(0, 3).map((row, idx) => (
-          <div key={`dm_${row.userId}`} style={{ display: "flex", justifyContent: "space-between", gap: 8 }}><span>{idx + 1}. {row.displayName}</span><b>{row.xp || 0}</b></div>
-        ))}
-        {!stage10Leaderboards?.byDomain?.length ? <small style={{ opacity: 0.78 }}>No domain board yet.</small> : null}
-      </div>
-    </div>
-    <div className="featureCard">
-      <div><small>Boss wins</small></div>
-      <div style={{ marginTop: 8, display: "grid", gap: 6 }}>
-        {(stage10Leaderboards?.bossWins || []).slice(0, 3).map((row, idx) => (
-          <div key={`bw_${row.userId}`} style={{ display: "flex", justifyContent: "space-between", gap: 8 }}><span>{idx + 1}. {row.displayName}</span><b>{row.wins || 0}</b></div>
-        ))}
-        {!stage10Leaderboards?.bossWins?.length ? <small style={{ opacity: 0.78 }}>Boss records will grow with more clears.</small> : null}
-      </div>
-    </div>
-  </div>
-</div>
+
+
 
 
 <div className="card" style={{ marginBottom: 14, borderColor: "rgba(100,220,255,0.20)" }}>
   <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
     <div>
-      <h3 style={{ margin: 0 }}>Stage 12 AI coach</h3>
+      <h3 style={{ margin: 0 }}>AI Coach</h3>
       <div><small>Upload a resume temporarily, extract skills, map gaps to mastery, and save only structured profile data.</small></div>
     </div>
     <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
-      <input
-        type="file"
-        accept=".pdf,.docx"
-        onChange={(e) => setStage12File(e.target.files?.[0] || null)}
-        style={{ maxWidth: 220 }}
-      />
-      <button className="secondaryBtn" type="button" onClick={analyzeResumeStage12} disabled={stage12Uploading || !userId}>
-        {stage12Uploading ? "Analyzing..." : stage12File ? "Upload + analyze" : "Refresh coach"}
-      </button>
-      <a className="secondaryBtn" href="/coach">Open coach</a>
-    </div>
-  </div>
-  {stage12Message ? <div style={{ marginTop: 10, opacity: 0.88 }}><small>{stage12Message}</small></div> : null}
-  <div style={{ marginTop: 12, display: "grid", gridTemplateColumns: "1.15fr 0.95fr", gap: 12 }}>
-    <div className="featureCard">
+      <label className="secondaryBtn" style={{ display: "inline-flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
+        <span>{stage12File ? stage12File.name : "Choose resume"}</span>
+        <input
+          type="file"
+          accept=".pdf,.docx"
+          onChange={(e) => setStage12File(e.target.files?.[0] || null)}
+       className="featureCard">
       <div><small>AI summary</small></div>
       <div style={{ marginTop: 8, fontWeight: 800 }}>{stage12Status?.profile?.targetRole || "Career path pending"}</div>
       <div style={{ marginTop: 8, opacity: 0.88 }}>
@@ -1125,68 +1085,7 @@ async function analyzeResumeStage12() {
   </div>
 </div>
 
-<div className="card">
-            <h3 style={{ marginTop: 0 }}>Notifications</h3>
-            {combinedNotes.length ? (
-              <>
-              <div style={{ marginTop: 10, display: "flex", justifyContent: "flex-end" }}>
-                <button
-                  className="secondaryBtn"
-                  type="button"
-                  onClick={async () => {
-                    try {
-                      await fetch('/api/notifications/clear', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ userId, all: true }) });
-                    } catch {}
-                    setNotes([]);
-                    try { clearActivities(userId); setActivity([]); } catch {}
-                  }}
-                >
-                  Clear all
-                </button>
-              </div>
-              <div style={{ display: "grid", gap: 10, marginTop: 10 }}>
-                {combinedNotes.map((n: any) => (
-                  <div
-                    key={n.id}
-                    className={"card " + (n.type === "TECH_INTERVIEW_READY" ? "notifHighlight" : "")}
-                    role="button"
-                    tabIndex={0}
-                    onClick={() => markNotificationReadAndRemove(n)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ") markNotificationReadAndRemove(n);
-                    }}
-                    style={{ cursor: "pointer" }}
-                    title="Click to mark as read"
-                  >
-                    <p style={{ margin: 0 }}><b>{n.title}</b></p>
-                    <p style={{ margin: "6px 0" }}><small>{prettyType(n.type)} • {new Date(n.createdAt).toLocaleString()}</small></p>
-                    <p style={{ margin: 0 }}>{n.body}</p>
-                    {n.scheduledAt && <p style={{ margin: "6px 0 0 0" }}><small>Scheduled: {new Date(n.scheduledAt).toLocaleString()}</small></p>}
 
-                    {(n.type === "LOOT_BOX_EARNED" && !/golden sweepstakes/i.test(`${n.title} ${n.body}`)) && (
-                      <div style={{ marginTop: 10, display: "flex", gap: 10, alignItems: "center" }}>
-                        <button
-                          className="primary"
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            // Keep the notification until the chest is actually claimed/opened.
-                            setLootOpen(true);
-                          }}
-                        >
-                          Open Loot Vault
-                        </button>
-                        <small style={{ opacity: 0.75 }}>Your rewards stack up until you open them.</small>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-              </>
-            ) : (
-              <p><small>No notifications yet.</small></p>
-            )}
-          </div>
 
 
 
@@ -1194,7 +1093,7 @@ async function analyzeResumeStage12() {
             <div className="card" style={{ marginTop: 14, borderColor: 'rgba(255,215,90,.22)', boxShadow: '0 0 0 1px rgba(255,215,90,.06) inset' }}>
               <div style={{ display:'flex', justifyContent:'space-between', gap:12, alignItems:'center', flexWrap:'wrap' }}>
                 <div>
-                  <h3 style={{ margin: 0 }}>Active sweepstakes</h3>
+                  <h3 style={{ margin: 0, color: "#f8d36a" }}>Active sweepstakes</h3>
                   <div><small>Campaigns you are currently entered in. Click a drawing card to open that campaign.</small></div>
                 </div>
               </div>
@@ -1203,19 +1102,7 @@ async function analyzeResumeStage12() {
                   .filter((c: any) => (c?.status === 'ACTIVE' || c?.isLive) && Number(sweepSummary?.user?.entriesByCampaign?.[String(c.id)] || 0) > 0)
                   .map((c: any) => (
                     <a
-                      key={c.id}
-                      href={`/sweepstakes?campaign=${encodeURIComponent(String(c.id))}`}
-                      className="featureCard"
-                      style={{ display:'flex', justifyContent:'space-between', gap:12, alignItems:'center', flexWrap:'wrap', textDecoration:'none', color:'inherit', cursor:'pointer' }}
-                    >
-                      <div>
-                        <div><b>{c.title}</b> • <small>{c.prizePoolLabel || 'Prize drawing'}</small></div>
-                        <div style={{ marginTop:8, display:'flex', gap:10, flexWrap:'wrap' }}>
-                          <span className="badge">Your entries: {Number(sweepSummary?.user?.entriesByCampaign?.[String(c.id)] || 0)}</span>
-                          <span className="badge">Participants: {Number(c.totalParticipants || 0)}</span>
-                          <span className="badge">Entries: {Number(c.totalEntries || 0)}</span>
-                        </div>
-                      </div>
+                 
                       <div style={{ display:'flex', gap:10, flexWrap:'wrap' }}>
                         <span className="badge">Tokens: {Number(sweepSummary?.user?.tokenBalance || 0)}</span>
                         <span className="badge">Draw closes: {c?.endsAt ? new Date(c.endsAt).toLocaleString() : 'TBD'}</span>
@@ -1226,7 +1113,6 @@ async function analyzeResumeStage12() {
             </div>
           ) : null}
 
-          <AdaptiveLearningCard overallMastery={overallMastery} rows={learningRows} />
 
           <div className="card" style={{ marginTop: 14 }}>
             <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
@@ -1234,7 +1120,7 @@ async function analyzeResumeStage12() {
                 <h3 style={{ margin: 0 }}>Career Matches</h3>
                 <div><small>{(localLevel || 1) >= 7 ? "Open roles appear when a mastery domain reaches 40%+." : "Reach level 7 to unlock career matches based on your mastery."}</small></div>
               </div>
-              <span className="badge">AI-guided</span>
+              <span className="badge" style={{ color: "#f8d36a", borderColor: "rgba(248,211,106,0.28)" }}>AI-guided</span>
             </div>
             <div className="careerMatchGrid" style={{ marginTop: 14 }}>
               {recommendedRoles.length ? recommendedRoles.map((role) => (
@@ -1252,24 +1138,92 @@ async function analyzeResumeStage12() {
             </div>
           </div>
 
-          <div style={{ marginTop: 14 }}>
-            <WhatsNextPanel
-              hrPassed={hrPassed}
-              techReady={hasTechReady}
-              onOpenStartNow={() => setShowLaunchModal(true)}
-              onOpenMockInterview={() => setMockInterviewOpen(true)}
-            />
-          </div>
-
-
-          {/* Removed duplicate progress bar in main column (sidebar already contains the primary progress UI). */}
-
-          {/* "What's next" lives in a premium modal now (open via top bar). */}
-        </section>
-            </div>
+          
     </div>
     </main>
       <MerchModal open={merchOpen} onClose={() => setMerchOpen(false)} />
+      {notificationsOpen ? (
+        <div className="luModalOverlay">
+          <div className="luModal" role="dialog" aria-modal="true" aria-label="Notifications">
+            <div className="luModalHeader" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div>
+                <b style={{ fontSize: 18 }}>Notifications</b>
+                <div><small className="luHint">Review alerts, PvP updates, rewards, and invitations.</small></div>
+              </div>
+              <div style={{ display: "flex", gap: 8 }}>
+                <button className="secondaryBtn" type="button" onClick={async () => {
+                  try {
+                    await fetch('/api/notifications/clear', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ userId, all: true }) });
+                  } catch {}
+                  setNotes([]);
+                  try { if (userId) { clearActivities(userId); setActivity([]); } } catch {}
+                }}>Clear all</button>
+                <button className="secondaryBtn" type="button" onClick={() => setNotificationsOpen(false)}>✕</button>
+              </div>
+            </div>
+            <div className="luModalBody">
+              <div style={{ display: "grid", gap: 10 }}>
+                {combinedNotes.length ? combinedNotes.map((n: any) => (
+                  <div key={n.id} className={"card " + (n.type === "TECH_INTERVIEW_READY" ? "notifHighlight" : "")} role="button" tabIndex={0}
+                    onClick={() => markNotificationReadAndRemove(n)}
+                    onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") markNotificationReadAndRemove(n); }}
+                    style={{ cursor: "pointer" }} title="Click to mark as read">
+                    <p style={{ margin: 0 }}><b>{n.title}</b></p>
+                    <p style={{ margin: "6px 0" }}><small>{prettyType(n.type)} • {new Date(n.createdAt).toLocaleString()}</small></p>
+                    <p style={{ margin: 0 }}>{n.body}</p>
+                  </div>
+                )) : <small style={{ opacity: 0.78 }}>No notifications right now.</small>}
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
+      {powerupsOpen ? (
+        <div className="luModalOverlay">
+          <div className="luModal" role="dialog" aria-modal="true" aria-label="PowerUps and Claims">
+            <div className="luModalHeader" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div>
+                <b style={{ fontSize: 18 }}>PowerUps and Claims</b>
+                <div><small className="luHint">Purchase reusable powerups and claim your daily token bonus.</small></div>
+              </div>
+              <button className="secondaryBtn" type="button" onClick={() => setPowerupsOpen(false)}>✕</button>
+            </div>
+            <div className="luModalBody">
+              <div className="card" style={{ marginBottom: 12, borderColor: "rgba(93,168,255,0.22)" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+                  <div>
+                    <h3 style={{ margin: 0 }}>Daily claim</h3>
+                    <div><small>Wallet: {Number.isFinite(tokenBalance) ? tokenBalance : 0} tokens</small></div>
+                  </div>
+                  <button className="primary" type="button" disabled={!stage9Status?.claimableToday || claimingDaily} onClick={claimStage9DailyBonus}>
+                    {claimingDaily ? "Claiming..." : stage9Status?.claimableToday ? `Claim +${stage9Status?.dailyBonusTokens || 0}` : "Bonus claimed"}
+                  </button>
+                </div>
+                {stage9Message ? <div style={{ marginTop: 10, opacity: 0.88 }}><small>{stage9Message}</small></div> : null}
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))", gap: 10 }}>
+                {(stage9Status?.store || []).map((item) => (
+                  <div key={item.id} className="featureCard" style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: 160 }}>
+                    <div>
+                      <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "center" }}>
+                        <div style={{ fontWeight: 900 }}>{item.name}</div>
+                        <span className="badge">{item.badge}</span>
+                      </div>
+                      <div style={{ marginTop: 6, opacity: 0.82 }}><small>{item.description}</small></div>
+                      <div style={{ marginTop: 8, fontWeight: 800 }}>{item.cost} tokens</div>
+                    </div>
+                    <div style={{ marginTop: 10 }}>
+                      <button className="secondaryBtn" type="button" disabled={buyingItemId === item.id || tokenBalance < item.cost} onClick={() => purchaseStage9StoreItem(item.id)}>
+                        {buyingItemId === item.id ? "Purchasing..." : tokenBalance < item.cost ? "Need more tokens" : "Buy now"}
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
       <MockInterviewModal open={mockInterviewOpen} onClose={() => setMockInterviewOpen(false)} />
 </>
   );

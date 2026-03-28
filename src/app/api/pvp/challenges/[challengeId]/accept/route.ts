@@ -13,6 +13,7 @@ export async function POST(req: Request, context: { params: Promise<{ challengeI
     const challenge = await acceptPvpChallenge({ challengeId, userId });
     return NextResponse.json({ ok: true, challenge: toPublicChallenge(challenge, userId) });
   } catch (err: any) {
-    return NextResponse.json({ error: "Failed to accept PvP challenge", detail: String(err?.message ?? err) }, { status: 500 });
+    const detail = String(err?.message ?? err);
+    return NextResponse.json({ error: "Failed to accept PvP challenge", detail }, { status: detail.includes("expired after 48 hours") ? 410 : 500 });
   }
 }
