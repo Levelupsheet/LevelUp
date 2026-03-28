@@ -1041,14 +1041,15 @@ async function analyzeResumeStage12() {
       <h3 style={{ margin: 0 }}>AI Coach</h3>
       <div><small>Upload a resume temporarily, extract skills, map gaps to mastery, and save only structured profile data.</small></div>
     </div>
-    <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
       <label className="secondaryBtn" style={{ display: "inline-flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
         <span>{stage12File ? stage12File.name : "Choose resume"}</span>
         <input
           type="file"
           accept=".pdf,.docx"
           onChange={(e) => setStage12File(e.target.files?.[0] || null)}
-       className="featureCard">
+       className="featureCard" />
+      </label>
       <div><small>AI summary</small></div>
       <div style={{ marginTop: 8, fontWeight: 800 }}>{stage12Status?.profile?.targetRole || "Career path pending"}</div>
       <div style={{ marginTop: 8, opacity: 0.88 }}>
@@ -1101,8 +1102,7 @@ async function analyzeResumeStage12() {
                 {sweepSummary.campaigns
                   .filter((c: any) => (c?.status === 'ACTIVE' || c?.isLive) && Number(sweepSummary?.user?.entriesByCampaign?.[String(c.id)] || 0) > 0)
                   .map((c: any) => (
-                    <a
-                 
+                    <a key={`sweep_${c.id}`} href={`/sweepstakes/${c.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
                       <div style={{ display:'flex', gap:10, flexWrap:'wrap' }}>
                         <span className="badge">Tokens: {Number(sweepSummary?.user?.tokenBalance || 0)}</span>
                         <span className="badge">Draw closes: {c?.endsAt ? new Date(c.endsAt).toLocaleString() : 'TBD'}</span>
@@ -1139,6 +1139,8 @@ async function analyzeResumeStage12() {
           </div>
 
           
+        </section>
+      </div>
     </div>
     </main>
       <MerchModal open={merchOpen} onClose={() => setMerchOpen(false)} />
