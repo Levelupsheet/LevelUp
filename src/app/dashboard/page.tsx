@@ -93,6 +93,29 @@ function prettyType(t: string){
   return t;
 }
 
+
+function itemIcon(itemType?: string | null, itemRef?: string | null) {
+  const key = String(itemRef || itemType || "").toLowerCase();
+  if (key.includes("shield")) return "🛡️";
+  if (key.includes("fury")) return "🔥";
+  if (key.includes("xp")) return "⚡";
+  if (key.includes("hint")) return "💡";
+  if (key.includes("streak")) return "🏁";
+  return "✨";
+}
+
+function itemLabel(itemType?: string | null, itemRef?: string | null) {
+  const raw = String(itemRef || itemType || "powerup").replace(/_/g, " ").trim();
+  return raw.charAt(0).toUpperCase() + raw.slice(1);
+}
+
+function leaderboardTone(idx: number) {
+  if (idx === 0) return { borderColor: "rgba(255,215,110,0.45)", background: "linear-gradient(180deg, rgba(255,214,102,0.14), rgba(255,180,56,0.06))" };
+  if (idx === 1) return { borderColor: "rgba(160,200,255,0.28)", background: "linear-gradient(180deg, rgba(120,160,255,0.10), rgba(80,120,220,0.04))" };
+  if (idx === 2) return { borderColor: "rgba(255,176,124,0.28)", background: "linear-gradient(180deg, rgba(255,164,112,0.10), rgba(180,96,56,0.04))" };
+  return {};
+}
+
 export default function Dashboard() {
   const [userId, setUserId] = useState<string | null>(null);
   const [userLabel, setUserLabel] = useState<string | null>(null);
@@ -152,6 +175,7 @@ const [stage12Message, setStage12Message] = useState<string | null>(null);
 
   const hasHRInvite = useMemo(() => notes.some(n => n.type === "HR_INVITE"), [notes]);
   const hasTechReady = useMemo(() => notes.some(n => n.type === "TECH_INTERVIEW_READY"), [notes]);
+  const hrBattleUnlocked = (localLevel || 1) >= 5 || Boolean(elig?.eligible) || hasHRInvite;
 
   // Prefer local XP (from interviews / practice) so the dashboard reacts immediately.
   const xp = useMemo(() => (localXp ?? elig?.xp ?? 0), [localXp, elig]);
@@ -560,7 +584,7 @@ async function analyzeResumeStage12() {
     : normalizedTier === "PRO"
       ? { color: "#9ad2ff", textShadow: "0 0 12px rgba(74,126,255,0.24)" }
       : { color: "#ffca7a", textShadow: "0 0 10px rgba(255,153,0,0.18)" };
-  const compactInventory = (stage9Status?.inventory || []).filter((row) => Number(row.quantity || 0) > 0).slice(0, 4);
+  const compactInventory = (stage9Status?.inventory || []).filter((row) => Number(row.quantity || 0) > 0).slice(0, 6);
   const activeSweepCampaigns = (sweepSummary?.campaigns || []).filter((c: any) => (c?.status === "ACTIVE" || c?.isLive) && Number(sweepSummary?.user?.entriesByCampaign?.[String(c.id)] || 0) > 0);
 
   const recommendedRoles = useMemo(() => {
@@ -868,7 +892,7 @@ async function analyzeResumeStage12() {
           </button>
 
           <div style={{ marginTop: 10 }}>
-            {hasHRInvite ? (
+            {hrBattleUnlocked ? (
               <button className="gold" style={{ width: "100%" }} onClick={() => (window.location.href = "/interview/hr")}>
                 Start HR Battle →
               </button>
@@ -878,7 +902,7 @@ async function analyzeResumeStage12() {
               </button>
             )}
             <small style={{ display: "block", marginTop: 6, opacity: 0.8 }}>
-              {hasHRInvite ? "HR Battle Eligibility Unlocked!" : "Unlocks at level 5."}
+              {hrBattleUnlocked ? "HR Battle Eligibility Unlocked!" : "Unlocks at level 5."}
             </small>
             {hasFreeStartCooldown && <small style={{ display: "block", marginTop: 6, color: "#f5d37b" }}>Free users can start another session in {freeStartCooldownLabel}.</small>}
           </div>
@@ -916,7 +940,7 @@ async function analyzeResumeStage12() {
             <div style={{ marginTop: 8, opacity: 0.82 }}><small>Adaptive mastery details are shown in the main panel.</small></div>
           </div>
 
-          <div className="card" style={{ marginTop: 14, padding: 12, borderColor: "rgba(93,168,255,0.22)" }}>
+          <div className="card powerHudCard" style={{ marginTop: 14, padding: 12, borderColor: "rgba(93,168,255,0.22)" }}>
             <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
               <div>
                 <div style={{ fontWeight: 900 }}>PowerUps</div>
@@ -924,16 +948,23 @@ async function analyzeResumeStage12() {
               </div>
               <button className="secondaryBtn" type="button" onClick={() => setPowerupsOpen(true)}>Open</button>
             </div>
-            <div style={{ marginTop: 10, display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <div className="powerHudTray" style={{ marginTop: 10 }}>
               {compactInventory.length ? compactInventory.map((row) => (
-                <button key={`${row.itemType}_${row.itemRef || "base"}`} className="secondaryBtn" type="button" onClick={() => setPowerupsOpen(true)} style={{ minWidth: 74 }}>
-                  {(row.itemRef || row.itemType).replace(/_/g, " ")} x{row.quantity}
+                <button
+                  key={`${row.itemType}_${row.itemRef || "base"}`}
+                  className="powerHudChip"
+                  type="button"
+                  onClick={() => setPowerupsOpen(true)}
+                  title={`${itemLabel(row.itemType, row.itemRef)} x${row.quantity}`}
+                >
+                  <span className="powerHudIcon" aria-hidden="true">{itemIcon(row.itemType, row.itemRef)}</span>
+                  <span className="powerHudCount">{row.quantity}</span>
                 </button>
               )) : <small style={{ opacity: 0.78 }}>No powerups banked yet.</small>}
             </div>
           </div>
 
-          <div className="card" style={{ marginTop: 14, padding: 12, borderColor: "rgba(255,215,100,0.28)", background: "linear-gradient(180deg, rgba(255,216,120,0.08), rgba(255,175,64,0.04))" }}>
+          <div className="card leaderboardMiniCard" style={{ marginTop: 14, padding: 12, borderColor: "rgba(255,215,100,0.28)", background: "linear-gradient(180deg, rgba(255,216,120,0.10), rgba(255,175,64,0.05))" }}>
             <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
               <div>
                 <div style={{ fontWeight: 900 }}>Leaderboard</div>
@@ -941,12 +972,16 @@ async function analyzeResumeStage12() {
               </div>
               <a className="secondaryBtn" href="/leaderboard">Open</a>
             </div>
-            <div style={{ marginTop: 10, display: "grid", gap: 8 }}>
+            <div style={{ marginTop: 10, display: "grid", gap: 10 }}>
               {(stage10Leaderboards?.weekly || []).slice(0, 3).map((row, idx) => (
-                <div key={`sb_lb_${row.userId}`} className="featureCard" style={{ padding: 10, display: "flex", justifyContent: "space-between", gap: 10 }}>
-                  <div><b>{idx + 1}. {row.displayName}</b><div style={{ opacity: 0.72 }}><small>{row.rank || levelTitleFromLevel(Number(row.level || 1))} • Lvl {row.level || 1}</small></div></div>
-                  <div style={{ fontWeight: 900 }}>{row.xp || 0} XP</div>
-                </div>
+                <a key={`sb_lb_${row.userId}`} href={`/profile/${encodeURIComponent(row.userId)}`} className="leaderboardMiniRow" style={{ ...(leaderboardTone(idx) as any), textDecoration: "none", color: "inherit" }}>
+                  <div className="badge leaderboardMiniRank">{idx + 1}</div>
+                  <div style={{ minWidth: 0 }}>
+                    <div style={{ fontWeight: 900, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{row.displayName}</div>
+                    <div style={{ opacity: 0.72 }}><small>{row.rank || levelTitleFromLevel(Number(row.level || 1))} • Lvl {row.level || 1}</small></div>
+                  </div>
+                  <div style={{ fontWeight: 900, textAlign: "right" }}>{row.xp || 0} XP</div>
+                </a>
               ))}
               {!stage10Leaderboards?.weekly?.length ? <small style={{ opacity: 0.78 }}>Leaderboard populates from live sessions.</small> : null}
             </div>
@@ -1039,10 +1074,10 @@ async function analyzeResumeStage12() {
   <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
     <div>
       <h3 style={{ margin: 0 }}>AI Coach</h3>
-      <div><small>Upload a resume temporarily, extract skills, map gaps to mastery, and save only structured profile data.</small></div>
+      
     </div>
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
-      <label className="secondaryBtn" style={{ display: "inline-flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
+      <label className="secondaryBtn aiCoachFileBtn" style={{ display: "inline-flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
         <span>{stage12File ? stage12File.name : "Choose resume"}</span>
         <input
           type="file"
@@ -1090,29 +1125,33 @@ async function analyzeResumeStage12() {
 
 
 
-          {Array.isArray(sweepSummary?.campaigns) && sweepSummary.campaigns.length ? (
-            <div className="card" style={{ marginTop: 14, borderColor: 'rgba(255,215,90,.22)', boxShadow: '0 0 0 1px rgba(255,215,90,.06) inset' }}>
-              <div style={{ display:'flex', justifyContent:'space-between', gap:12, alignItems:'center', flexWrap:'wrap' }}>
-                <div>
-                  <h3 style={{ margin: 0, color: "#f8d36a" }}>Active sweepstakes</h3>
-                  <div><small>Campaigns you are currently entered in. Click a drawing card to open that campaign.</small></div>
-                </div>
-              </div>
-              <div style={{ marginTop: 12, display:'grid', gap:10 }}>
-                {sweepSummary.campaigns
-                  .filter((c: any) => (c?.status === 'ACTIVE' || c?.isLive) && Number(sweepSummary?.user?.entriesByCampaign?.[String(c.id)] || 0) > 0)
-                  .map((c: any) => (
-                    <a key={`sweep_${c.id}`} href={`/sweepstakes/${c.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                      <div style={{ display:'flex', gap:10, flexWrap:'wrap' }}>
-                        <span className="badge">Tokens: {Number(sweepSummary?.user?.tokenBalance || 0)}</span>
-                        <span className="badge">Draw closes: {c?.endsAt ? new Date(c.endsAt).toLocaleString() : 'TBD'}</span>
-                      </div>
-                    </a>
-                  ))}
+          {activeSweepCampaigns.length ? (
+  <div className="card sweepGoldCard" style={{ marginTop: 14, borderColor: 'rgba(255,215,90,.28)', boxShadow: '0 0 0 1px rgba(255,215,90,.08) inset' }}>
+    <div style={{ display:'flex', justifyContent:'space-between', gap:12, alignItems:'center', flexWrap:'wrap' }}>
+      <div>
+        <h3 style={{ margin: 0, color: "#f8d36a" }}>Active sweepstakes</h3>
+        <div><small>Campaigns you are currently entered in. Click a drawing card to open that campaign.</small></div>
+      </div>
+    </div>
+    <div style={{ marginTop: 12, display:'grid', gap:12 }}>
+      {activeSweepCampaigns.map((c: any) => (
+        <a key={`sweep_${c.id}`} href={`/sweepstakes/${c.id}`} className="sweepEntryTile" style={{ textDecoration: 'none', color: 'inherit' }}>
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+            <div>
+              <div style={{ fontWeight: 900, color: "#ffe59b" }}>{c.title || c.name || "Golden Draw"}</div>
+              <div style={{ marginTop: 6, opacity: 0.84 }}>
+                <small>{Number(sweepSummary?.user?.entriesByCampaign?.[String(c.id)] || 0)} entries • Draw closes: {c?.endsAt ? new Date(c.endsAt).toLocaleString() : 'TBD'}</small>
               </div>
             </div>
-          ) : null}
-
+            <div style={{ display:'flex', gap:10, flexWrap:'wrap' }}>
+              <span className="badge" style={{ background: "rgba(255,220,120,0.12)", borderColor: "rgba(255,220,120,0.28)" }}>Tokens: {Number(sweepSummary?.user?.tokenBalance || 0)}</span>
+            </div>
+          </div>
+        </a>
+      ))}
+    </div>
+  </div>
+) : null}
 
           <div className="card" style={{ marginTop: 14 }}>
             <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
@@ -1208,7 +1247,7 @@ async function analyzeResumeStage12() {
                   <div key={item.id} className="featureCard" style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: 160 }}>
                     <div>
                       <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "center" }}>
-                        <div style={{ fontWeight: 900 }}>{item.name}</div>
+                        <div style={{ display: "flex", alignItems: "center", gap: 10 }}><span className="powerHudIcon" aria-hidden="true">{itemIcon(item.itemType, item.id)}</span><div style={{ fontWeight: 900 }}>{item.name}</div></div>
                         <span className="badge">{item.badge}</span>
                       </div>
                       <div style={{ marginTop: 6, opacity: 0.82 }}><small>{item.description}</small></div>
