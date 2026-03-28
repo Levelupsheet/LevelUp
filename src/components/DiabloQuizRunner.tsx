@@ -83,6 +83,18 @@ function labelForType(type: QuestionType) {
   return "Question";
 }
 
+function inferMaxStages(title: string, totalQuestions: number) {
+  const upper = String(title || "").toUpperCase();
+  if (upper.includes("TEST NOW")) return 5;
+  if (upper.includes("POSITION TRAINING") || upper.includes("PRACTICE") || upper.includes("CERT")) return 4;
+  return Math.max(1, Math.min(5, Math.ceil(totalQuestions / 3)));
+}
+
+function stageEnemyName(base: string, stage: number, maxStages: number, encounterType: "standard" | "boss") {
+  if (encounterType === "boss" && stage >= maxStages) return `Golden ${base}`;
+  return `${base}`;
+}
+
 function ModelPanel(props: { title: string; src?: string; mirrored?: boolean; loop?: boolean; onEnded?: () => void; height?: number | string; damageText?: string | null; damageTone?: "enemy" | "player" | null }) {
   const { title, src, mirrored = false, loop = true, onEnded, height = 230, damageText, damageTone } = props;
   return (
@@ -531,6 +543,10 @@ export default function DiabloQuizRunner(props: {
   const [showSessionIntel, setShowSessionIntel] = useState(false);
   const [achievementFlash, setAchievementFlash] = useState<string | null>(null);
   const [fatigueState, setFatigueState] = useState<Stage8Fatigue>({ fatigued: false, reason: null, suggestion: null });
+  const [sessionStage, setSessionStage] = useState(1);
+  const [stageAnswered, setStageAnswered] = useState(0);
+  const [stageCorrect, setStageCorrect] = useState(0);
+  const [stageBanner, setStageBanner] = useState<string | null>(null);
   const questionStartRef = useRef(Date.now());
 
   const finishedOnceRef = useRef(false);
@@ -563,7 +579,30 @@ export default function DiabloQuizRunner(props: {
       } else {
         setDamageFloat({ player: `-${Math.max(1, 100 - r.playerHP)} HP` });
       }
-      window.setTimeout(() => setDamageFloat({}), 900);
+      window.setTimeout(() => setDamageFloat({}), 1600);
+
+      setStageAnswered((answered) => {
+        const nextAnswered = answered + 1;
+        setStageCorrect((correctCount) => {
+          const nextCorrect = correctCount + (r.correct ? 1 : 0);
+          if (nextAnswered >= 3) {
+            if (nextCorrect >= 2) {
+              setSessionStage((current) => {
+                const nextStage = Math.min(maxStages, current + 1);
+                if (nextStage > current) {
+                  setStageBanner(`Stage ${nextStage}`);
+                  window.setTimeout(() => setStageBanner(null), 1800);
+                }
+                return nextStage;
+              });
+            }
+            return 0;
+          }
+          return nextCorrect;
+        });
+        if (nextAnswered >= 3) return 0;
+        return nextAnswered;
+      });
 
       const nextHistory = [...stage8History, { correct: Boolean(r.correct), responseTimeMs, baseTier }].slice(-8);
       setStage8History(nextHistory);
@@ -611,7 +650,7 @@ export default function DiabloQuizRunner(props: {
         }
       }
       if ((r.correct && !media?.enemyHitSrc) || (!r.correct && !media?.playerHitSrc)) {
-        window.setTimeout(() => setHitPulse(null), 900);
+        window.setTimeout(() => setHitPulse(null), 1600);
       }
     },
     initialState,
@@ -634,6 +673,9 @@ export default function DiabloQuizRunner(props: {
   );
 
   const effectiveQuestionTier = stage8Difficulty.adjustedTier as DifficultyTier;
+  const maxStages = useMemo(() => inferMaxStages(title, combatQuestions.length), [title, combatQuestions.length]);
+  const currentStageEnemyName = useMemo(() => stageEnemyName(enemyName, sessionStage, maxStages, encounterType), [enemyName, sessionStage, maxStages, encounterType]);
+  const isGoldenBoss = encounterType === "boss" && sessionStage >= maxStages;
 
   const questionType = normalizeQuestionType(question?.type);
   const usesManualSubmit = questionType !== "multiple_choice" && questionType !== "incident" && questionType !== "true_false";
@@ -675,6 +717,10 @@ const showExpandedExplanation = useMemo(() => {
     setMicroRewardFlash(null);
     setAchievementFlash(null);
     setFatigueState({ fatigued: false, reason: null, suggestion: null });
+    setSessionStage(1);
+    setStageAnswered(0);
+    setStageCorrect(0);
+    setStageBanner(null);
     questionStartRef.current = Date.now();
   }, [combatQuestions.length, timed, title]);
 
@@ -1044,6 +1090,7 @@ const showExpandedExplanation = useMemo(() => {
       </div>
 
       <div className="modalBody d2QuizBody" style={{ flex: 1, overflow: "hidden", paddingTop: 0 }}>
+        {stageBanner ? <div className="stageTransitionBanner">{stageBanner}</div> : null}
         {!isMobileLayout ? (
           <div className="d2InterviewGrid d2QuizGrid stage8CompactGrid" style={{ height: "100%", alignItems: "stretch" }}>
             <div style={{ display: "grid", gap: 10, alignContent: "start", minHeight: 0 }}>
@@ -1058,7 +1105,7 @@ const showExpandedExplanation = useMemo(() => {
               </div>
             </div>
 
-            <div className={"d2QuestionCard d2QuizQuestionCard " + (hitPulse === "enemy" ? "d2HitFlash" : "") + ((question as any)?.isGolden ? " d2GoldenQuestionCard" : "") } style={{ minHeight: 0, height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+            <div className={"d2QuestionCard d2QuizQuestionCard " + (hitPulse === "enemy" ? "d2HitFlash" : "") + ((question as any)?.isGolden ? " d2GoldenQuestionCard" : "") + (isGoldenBoss ? " d2GoldenBossCard" : "") } style={{ minHeight: 0, height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
               <span className="d2Rivet" style={{ left: 12, top: 12 }} />
               <span className="d2Rivet" style={{ right: 12, top: 12 }} />
               <span className="d2Rivet" style={{ left: 12, bottom: 12 }} />
@@ -1067,22 +1114,25 @@ const showExpandedExplanation = useMemo(() => {
               {!finished && question ? (
                 <>
                   {goldenEntryFlash ? <div className="badge" style={{ marginBottom: 10, borderColor: "rgba(255,215,64,0.55)", color: "#ffe28a", background: "rgba(255,215,64,0.10)" }}>{goldenEntryFlash}</div> : null}
-                  <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
-                    <div style={{ fontWeight: 900, letterSpacing: 0.6, opacity: 0.9 }}>
-                      Q{state.idx + 1} / {combatQuestions.length}
+                  <div className="stageHeaderRow">
+                    <div>
+                      <div style={{ fontWeight: 900, letterSpacing: 0.6, opacity: 0.9 }}>
+                        Q{state.idx + 1} / {combatQuestions.length}
+                      </div>
+                      <div className="stageLabelPill">Stage {sessionStage} • {metaLeft || "Combat Quiz"}</div>
                     </div>
                     <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap", justifyContent: "flex-end" }}>
-                      {metaLeft ? <span className="badge">{metaLeft}</span> : null}
                       {timed ? <span className="badge" style={{ fontVariantNumeric: "tabular-nums" }}>⏱ {Math.max(0, state.timeLeft)}s</span> : null}
                       <span className="badge">{labelForType(questionType)}</span>
                       {metaRight ? <span className="badge">{metaRight}</span> : null}
-                      <span className="badge">XP +{displayedXp}</span>
                     </div>
                   </div>
 
-                  <div style={{ marginTop: 10, fontSize: "clamp(16px, 1.5vw, 28px)", lineHeight: 1.18, fontWeight: 900 }}>{question.prompt}</div>
+                  <div style={{ marginTop: 10, fontSize: "clamp(18px, 1.7vw, 32px)", lineHeight: 1.16, fontWeight: 900 }}>{question.prompt}</div>
 
                   <DomainRuneBar domainLabel={domainLabel} mastery={currentMastery} tier={state.tier} />
+                  <div className="stageProgressDots">{Array.from({ length: 3 }).map((_, idx) => <span key={idx} className={"stageDot" + (idx < stageAnswered ? " active" : "") + (idx === stageAnswered && !state.locked ? " current" : "") } />)}</div>
+
                   <div className="stage5MetaStrip">
                     <span className="badge">Mastery {masteryPercent}%</span>
                     <span className="badge">Question {Math.min(state.idx + 1, combatQuestions.length)} / {combatQuestions.length}</span>
@@ -1097,6 +1147,7 @@ const showExpandedExplanation = useMemo(() => {
                         <span className="badge">🔥 Reward in {stage8Momentum.nextRewardIn}</span>
                         <span className="badge">{stage8Momentum.xpBoostActive ? `⚡ Boost ${stage8Momentum.xpBoostRemaining}` : "⚡ Boost readying"}</span>
                         <span className="badge">Tier {effectiveQuestionTier}</span>
+                        <span className="badge">Stage {sessionStage}/{maxStages}</span>
                         {microRewardFlash ? <span className="badge stage8MicroFlash">{microRewardFlash}</span> : null}
                       </div>
                       <button type="button" className="d2Btn compact" onClick={() => setShowSessionIntel((v) => !v)}>
@@ -1214,8 +1265,8 @@ const showExpandedExplanation = useMemo(() => {
             </div>
 
             <div style={{ display: "grid", gap: 12 }}>
-              <D2EnemyHealthBar value={state.enemyHP} name={enemyName.toUpperCase().slice(0, 18)} />
-              <ModelPanel title={enemyName.toUpperCase().slice(0, 18)} src={enemyVideo} loop={!isEnemyHitVideo} onEnded={isEnemyHitVideo ? () => setHitPulse(null) : undefined} height="clamp(180px, 22vh, 280px)" damageText={damageFloat.enemy || null} damageTone="enemy" />
+              <D2EnemyHealthBar value={state.enemyHP} name={currentStageEnemyName.toUpperCase().slice(0, 18)} />
+              <ModelPanel title={currentStageEnemyName.toUpperCase().slice(0, 18)} src={enemyVideo} loop={!isEnemyHitVideo} onEnded={isEnemyHitVideo ? () => setHitPulse(null) : undefined} height="clamp(180px, 22vh, 280px)" damageText={damageFloat.enemy || null} damageTone="enemy" />
             </div>
           </div>
         ) : (
@@ -1235,6 +1286,7 @@ const showExpandedExplanation = useMemo(() => {
                   <span className="badge">🔥 {stage8Momentum.nextRewardIn} to reward</span>
                   <span className="badge">{stage8Momentum.xpBoostActive ? `⚡ Boost ${stage8Momentum.xpBoostRemaining}` : "⚡ Boost readying"}</span>
                   <span className="badge">Tier {effectiveQuestionTier}</span>
+                  <span className="badge">Stage {sessionStage}/{maxStages}</span>
                 </div>
                 <button type="button" className="d2Btn compact" onClick={() => setShowSessionIntel((v) => !v)}>
                   {showSessionIntel ? "Hide" : "Info"}
@@ -1257,19 +1309,19 @@ const showExpandedExplanation = useMemo(() => {
             </div>
 
             <div className="mobileCombatCard">
-              <D2EnemyHealthBar value={state.enemyHP} name={enemyName.toUpperCase().slice(0, 18)} />
+              <D2EnemyHealthBar value={state.enemyHP} name={currentStageEnemyName.toUpperCase().slice(0, 18)} />
               <div style={{ marginTop: 10 }}>
-                <ModelPanel title={enemyName.toUpperCase().slice(0, 18)} src={enemyVideo} loop={!isEnemyHitVideo} onEnded={isEnemyHitVideo ? () => setHitPulse(null) : undefined} height={180} damageText={damageFloat.enemy || null} damageTone="enemy" />
+                <ModelPanel title={currentStageEnemyName.toUpperCase().slice(0, 18)} src={enemyVideo} loop={!isEnemyHitVideo} onEnded={isEnemyHitVideo ? () => setHitPulse(null) : undefined} height={180} damageText={damageFloat.enemy || null} damageTone="enemy" />
               </div>
             </div>
 
-            <div className={"d2QuestionCard d2QuizQuestionCard mobileQuizQuestionCard " + (encounterType === "boss" ? " bossQuestionCard" : "") + (hitPulse === "enemy" ? " d2HitFlash" : "") + ((question as any)?.isGolden ? " d2GoldenQuestionCard" : "")}>
+            <div className={"d2QuestionCard d2QuizQuestionCard mobileQuizQuestionCard " + (encounterType === "boss" ? " bossQuestionCard" : "") + (hitPulse === "enemy" ? " d2HitFlash" : "") + ((question as any)?.isGolden ? " d2GoldenQuestionCard" : "") + (isGoldenBoss ? " d2GoldenBossCard" : "")}>
               {!finished && question ? (
                 <>
                   {goldenEntryFlash ? <div className="badge" style={{ marginBottom: 10, borderColor: "rgba(255,215,64,0.55)", color: "#ffe28a", background: "rgba(255,215,64,0.10)" }}>{goldenEntryFlash}</div> : null}
                   <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
                     <span className="badge">{labelForType(questionType)}</span>
-                    <span className="badge">Tier {state.tier}</span>
+                    <span className="badge">Stage {sessionStage}/{maxStages}</span>
                   </div>
                   <div className="mobileQuizPrompt">{question.prompt}</div>
                   <DomainRuneBar domainLabel={domainLabel} mastery={currentMastery} tier={state.tier} />

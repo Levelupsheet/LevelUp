@@ -17,7 +17,7 @@ type BossQuestion = {
   correctIndex?: number;
   explanation?: string;
   domainId: string;
-  level: 1 | 2 | 3;
+  level: 1 | 2 | 3 | 5;
   data?: Record<string, unknown>;
 };
 
@@ -96,7 +96,11 @@ export default function MockInterviewModal(props: { open: boolean; onClose: () =
   }, [track, step]);
 
   const questions = useMemo(() => {
-    return (stage === 1 ? STAGE_ONE_BANK[track] : STAGE_TWO_BANK[track]).map((q) => ({ ...q }));
+    return (stage === 1 ? STAGE_ONE_BANK[track] : STAGE_TWO_BANK[track]).map((q) => ({
+      ...q,
+      level: stage === 2 ? 5 : q.level,
+      isGolden: stage === 2,
+    }));
   }, [track, stage]);
 
   function start(nextStage: Stage) {
@@ -186,10 +190,10 @@ export default function MockInterviewModal(props: { open: boolean; onClose: () =
             <DiabloQuizRunner
               title={stage === 1 ? "Mock Tech Interview" : "Mock HR Interview"}
               subtitle={`${TRACK_META[track].title} • ${stage === 1 ? "Boss Battle 1" : "Boss Battle 2"}`}
-              enemyName="Lagger"
+              enemyName={stage === 2 ? "Golden Boss" : "Lagger"}
               questions={questions as any}
               timed
-              metaLeft={`Stage ${stage}`}
+              metaLeft={`${TRACK_META[track].title} • Boss Stage ${stage}`}
               metaRight={TRACK_META[track].title.toUpperCase()}
               exitLabel="Close"
               onExit={onClose}
