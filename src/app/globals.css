@@ -2738,3 +2738,94 @@ button.gold, a.gold{
 .stage8CompactGrid{ min-height:0; }
 .d2QuestionCard .card{ min-width:0; }
 .stage5FeedbackCard{ margin-top: 8px; }
+
+
+/* Stage V4 scrollbar hotfix */
+.d2QuizShell,
+.d2QuizBody,
+.d2QuizGrid,
+.d2InterviewGrid,
+.stage8CompactGrid,
+.stage8CompactGrid > div,
+.d2QuestionCard,
+.d2QuizQuestionCard,
+.mobileQuizQuestionCard,
+.d2QuestionCard > *,
+.d2QuizQuestionCard > *,
+.stage8CompactBar,
+.stage7PowerStrip,
+.d2ActionRow,
+.stage8ActionDock {
+  min-width: 0;
+  min-height: 0;
+}
+.d2QuizShell,
+.d2QuizBody,
+.d2QuizGrid,
+.d2InterviewGrid,
+.stage8CompactGrid,
+.d2QuestionCard,
+.d2QuizQuestionCard,
+.mobileQuizQuestionCard,
+.stage8CompactBar,
+.stage7PowerStrip,
+.d2ActionRow,
+.stage8ActionDock {
+  overflow: hidden !important;
+}
+.d2QuizQuestionCard,
+.mobileQuizQuestionCard {
+  height: auto !important;
+  max-height: none !important;
+}
+.d2QuizQuestionCard .d2ActionRow,
+.mobileQuizQuestionCard .d2ActionRow,
+.stage8ActionDock {
+  position: relative !important;
+  bottom: auto !important;
+  left: auto !important;
+  right: auto !important;
+  background: transparent !important;
+  padding-bottom: 0 !important;
+}
+.d2QuizQuestionCard textarea,
+.d2QuizQuestionCard input,
+.d2QuizQuestionCard select,
+.mobileQuizQuestionCard textarea,
+.mobileQuizQuestionCard input,
+.mobileQuizQuestionCard select {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+.stage7PowerStrip,
+.stage8CompactBar,
+.stage5MetaStrip,
+.stageProgressDots {
+  flex-shrink: 0;
+}
+@media (min-width: 861px){
+  .d2InterviewGrid.d2QuizGrid.stage8CompactGrid{
+    grid-template-columns: 210px minmax(0, 1fr) 230px !important;
+    gap: 12px !important;
+  }
+  .d2QuizQuestionCard{
+    padding: 10px 10px 8px !important;
+  }
+  .d2QuestionPrompt,
+  .d2QuizQuestionCard > div[style*="font-size: clamp(18px, 1.7vw, 32px)"]{
+    font-size: clamp(16px, 1.45vw, 24px) !important;
+    line-height: 1.12 !important;
+  }
+  .d2QuizQuestionCard .d2ChoiceBtn{
+    padding: 8px 10px !important;
+    font-size: 13px !important;
+  }
+  .d2QuizQuestionCard .badge{
+    padding: 4px 7px !important;
+    font-size: 11px !important;
+  }
+  .d2QuizQuestionCard .card{
+    padding: 8px !important;
+  }
+}

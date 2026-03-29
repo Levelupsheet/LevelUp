@@ -1118,7 +1118,7 @@ const showExpandedExplanation = useMemo(() => {
   return (
     <div
       className="modalShell d2QuizShell"
-      style={{ position: "relative", width: "min(96vw, 1600px)", maxWidth: media?.width || 1480, height: "calc(100dvh - 72px)", maxHeight: "calc(100dvh - 72px)", minHeight: "calc(100dvh - 72px)", margin: "0 auto", display: "flex", flexDirection: "column" }}
+      style={{ position: "relative", width: "min(96vw, 1600px)", maxWidth: media?.width || 1480, height: "min(900px, calc(100dvh - 96px))", maxHeight: "min(900px, calc(100dvh - 96px))", minHeight: "min(900px, calc(100dvh - 96px))", margin: "0 auto", display: "flex", flexDirection: "column", overflow: "hidden" }}
     >
       <div className="modalHead">
         <div>
@@ -1135,7 +1135,7 @@ const showExpandedExplanation = useMemo(() => {
       <div className="modalBody d2QuizBody" style={{ flex: 1, overflow: "hidden", paddingTop: 0 }}>
         {stageBanner ? <div className="stageTransitionBanner">{stageBanner}</div> : null}
         {!isMobileLayout ? (
-          <div className="d2InterviewGrid d2QuizGrid stage8CompactGrid" style={{ height: "100%", alignItems: "stretch" }}>
+          <div className="d2InterviewGrid d2QuizGrid stage8CompactGrid" style={{ height: "100%", alignItems: "stretch", minWidth: 0, minHeight: 0, overflow: "hidden" }}>
             <div style={{ display: "grid", gap: 10, alignContent: "start", minHeight: 0 }}>
               <div className={hitPulse === "player" ? "d2Shake" : ""}>
                 <D2LifeOrb value={state.playerHP} name={playerName} />
