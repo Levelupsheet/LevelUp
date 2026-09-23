@@ -242,8 +242,8 @@ export default function Home() {
 
   return (
     <main className="landing">
-      <header className="navTop">
-        <div className="navTopInner">
+      <header className="navTop landingNav">
+        <div className="navTopInner landingNavInner">
         <div className="brandLock">
           <div className="brandMark brandMark--logo"><img src="/levelup-pro-icon.png" alt="LevelUp Pro" className="brandMarkImg" /></div>
           <div className="brandText">
@@ -252,7 +252,7 @@ export default function Home() {
           </div>
         </div>
 
-        <nav className="navLinks">
+        <nav className="navLinks landingNavLinks">
           <a href="#how" onClick={(e) => (e.preventDefault(), scrollToId("how"))}>How it works</a>
           <a href="#features" onClick={(e) => (e.preventDefault(), scrollToId("features"))}>Features</a>
           <a href="#pricing" onClick={(e) => (e.preventDefault(), scrollToId("pricing"))}>Pricing</a>
@@ -263,7 +263,7 @@ export default function Home() {
         </nav>
 
         <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-          <button className="gold" onClick={() => goEnterApp("nav")}>Enter app →</button>
+          <button className="gold landingEnterButton" onClick={() => goEnterApp("nav")}>Enter app →</button>
         </div>
         </div>
       </header>
