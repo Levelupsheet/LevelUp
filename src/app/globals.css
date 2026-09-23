@@ -2829,3 +2829,70 @@ button.gold, a.gold{
     padding: 8px !important;
   }
 }
+
+
+/* ===== Dashboard P0/P1 responsive + hierarchy pass ===== */
+.dashboardNextAction{
+  margin-bottom:14px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+  padding:20px;
+  border-color:rgba(255,211,102,.30);
+  background:linear-gradient(135deg, rgba(255,196,76,.12), rgba(68,151,255,.10));
+}
+.dashboardNextCopy{ min-width:0; }
+.dashboardNextCopy h2{ margin:4px 0 6px; font-size:clamp(20px,2vw,28px); line-height:1.1; }
+.dashboardNextCopy p{ margin:0; max-width:720px; color:var(--muted); line-height:1.45; }
+.dashboardEyebrow{ font-size:11px; font-weight:900; letter-spacing:.12em; color:#ffe08a; }
+.dashboardNextButton{ flex:0 0 auto; min-width:190px; min-height:46px; font-weight:900; }
+
+@media (max-width: 860px){
+  .dashboardHero{ gap:12px; }
+  .dashboardHero > div:first-child{ min-width:0 !important; width:100%; }
+  .dashboardHero .kpiRow{ display:grid; grid-template-columns:1fr; gap:8px; }
+  .dashboardHero .kpiRow > *{ width:100%; justify-content:center; text-align:center; }
+  .dashboardNextAction{ align-items:stretch; flex-direction:column; padding:16px; }
+  .dashboardNextButton{ width:100%; min-width:0; }
+  .dashboardPlanCard > div:nth-child(2){ grid-template-columns:repeat(2,minmax(0,1fr)) !important; }
+}
+
+@media (max-width: 640px){
+  .navTop{ position:relative; }
+  .navTopInner{ gap:8px; }
+  .navLinks{ scrollbar-width:none; margin:0 -2px; }
+  .navLinks::-webkit-scrollbar{ display:none; }
+  .navActions{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); width:100%; }
+  .navActions > *{ min-width:0 !important; width:100%; }
+  .dashboardSidebar{ display:grid; grid-template-columns:1fr 1fr; gap:8px; padding:10px; }
+  .dashboardSidebar > div:first-child,
+  .dashboardSidebar > hr,
+  .dashboardSidebar > h4,
+  .dashboardSidebar > .leaderboardMiniCard{ grid-column:1 / -1; }
+  .dashboardSidebar > button{ margin-top:0 !important; }
+  .dashboardSidebar .powerHudCard{ margin-top:0 !important; }
+  .dashboardMain{ gap:10px; }
+  .dashboardHero{ padding:14px 12px; }
+  .dashboardHero > div:first-child > div:first-child{ font-size:14px !important; }
+  .dashboardHero > div:first-child > div:nth-child(2){ font-size:clamp(26px,9vw,34px) !important; overflow-wrap:anywhere; }
+  .dashboardNextAction{ margin-bottom:10px; }
+  .dashboardPlanCard{ margin-bottom:10px !important; }
+  .dashboardPlanCard > div:nth-child(2){ grid-template-columns:1fr 1fr !important; gap:8px !important; }
+  .dashboardPlanCard .featureCard{ padding:10px; }
+  .dashboardPlanCard .featureCard > div:last-child{ font-size:18px !important; }
+  .maincol > .card{ overflow:hidden; }
+  .maincol .featureCard{ min-width:0; }
+}
+
+@media (max-width: 430px){
+  .dashboardSidebar{ grid-template-columns:1fr; }
+  .dashboardSidebar > *{ grid-column:1 !important; }
+  .dashboardPlanCard > div:nth-child(2){ grid-template-columns:1fr !important; }
+  .navActions{ grid-template-columns:1fr 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce){
+  *, *::before, *::after{ scroll-behavior:auto !important; animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; }
+  .whatsNextTrack{ animation:none !important; transform:none !important; }
+}
