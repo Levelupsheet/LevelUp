@@ -2938,3 +2938,47 @@ button.gold, a.gold{
   .dashboardMain{ margin-top:10px; }
   .dashboardHero{ border-radius:16px; }
 }
+
+
+/* ===== P1 mobile landing + dashboard screenshot refinements ===== */
+@media (max-width:640px){
+  .landingNav{ position:relative; padding:8px 8px 0; }
+  .landingNavInner{ display:grid; grid-template-columns:minmax(0,1fr) auto; gap:10px; padding:12px; border-radius:16px; }
+  .landingNav .brandLock{ width:auto; min-width:0; }
+  .landingNav .brandMark{ width:42px; height:42px; flex:0 0 42px; }
+  .landingNav .brandText b{ font-size:15px; }
+  .landingNav .brandText small{ font-size:12px; }
+  .landingEnterButton{ grid-column:2; grid-row:1; align-self:center; white-space:nowrap; padding:9px 12px; min-height:40px; }
+  .landingNavLinks{ grid-column:1 / -1; width:100%; flex-wrap:nowrap; overflow-x:auto; scrollbar-width:none; gap:5px; padding:2px 0 0; }
+  .landingNavLinks::-webkit-scrollbar{ display:none; }
+  .landingNavLinks a{ flex:0 0 auto; font-size:12px; padding:7px 9px; white-space:nowrap; }
+
+  .landing .hero{ min-height:auto; padding:52px 16px 36px; align-items:flex-start; }
+  .landing .heroContent{ gap:18px; }
+  .landing .heroH1{ font-size:clamp(34px,10vw,44px); line-height:1.03; letter-spacing:-.025em; }
+  .landing .heroP{ font-size:16px; line-height:1.45; max-width:none; overflow-wrap:anywhere; }
+  .landing .ctaRow{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .landing .ctaRow > *{ width:100%; justify-content:center; min-width:0; }
+  .landing .heroRight{ min-width:0; }
+  .landing .heroCard{ min-width:0; overflow:hidden; }
+  .landing .kpiMini{ min-width:0; gap:8px; }
+  .landing .kpiMini > *{ min-width:0; }
+  .landing .featureCard{ min-width:0; }
+
+  .dashboardNavInner{ overflow:hidden; }
+  .dashboardNavLinks{ max-width:100%; }
+  .dashboardSidebar{ padding:0; background:transparent; border:0; box-shadow:none; backdrop-filter:none; }
+  .dashboardSidebar .dashboardProgressCard{ display:block; border-radius:16px; background:rgba(13,20,32,.86); }
+  .dashboardSidebar > div:not(.dashboardProgressCard){ display:none !important; }
+  .dashboardHero{ margin-top:0; }
+  .dashboardHero .kpiRow{ width:100%; }
+}
+
+@media (max-width:390px){
+  .landingNavInner{ grid-template-columns:minmax(0,1fr) auto; padding:10px; }
+  .landingNav .brandText small{ display:none; }
+  .landingEnterButton{ padding:8px 10px; font-size:12px; }
+  .landing .hero{ padding-left:14px; padding-right:14px; }
+  .landing .heroH1{ font-size:clamp(31px,9.5vw,38px); }
+  .landing .heroP{ font-size:15px; }
+}
