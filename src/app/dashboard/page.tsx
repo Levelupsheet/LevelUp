@@ -631,7 +631,7 @@ async function analyzeResumeStage12() {
 
       <div className="dashBg" aria-hidden="true" />
 
-      <header className="navTop" style={{ marginBottom: 18 }}>
+      <header className="navTop dashboardNav" style={{ marginBottom: 18 }}>
         <div className="navTopInner">
         <a className="brandLock brandLockLink" href="/start">
           <div className="brandMark brandMark--logo"><img src="/levelup-pro-icon.png" alt="LevelUp Pro" className="brandMarkImg" /></div>
@@ -641,7 +641,7 @@ async function analyzeResumeStage12() {
           </div>
         </a>
 
-        <nav className="navLinks">
+        <nav className="navLinks dashboardNavLinks">
           <a href="/dashboard">Dashboard</a>
           <a href="/training">Training</a>
           <a href="/certifications">Certifications</a>
@@ -652,7 +652,7 @@ async function analyzeResumeStage12() {
           {isAdminUser ? <a href="/admin">Admin</a> : null}
         </nav>
 
-        <div className="navActions">
+        <div className="navActions dashboardNavActions">
           {/* Token balance pill */}
           <div
             className="card"
@@ -879,6 +879,7 @@ async function analyzeResumeStage12() {
       <div className="appContainer">
       <div className="shell">
         <aside className="sidebar dashboardSidebar">
+          <div className="dashboardSidebarMobileTitle">Progress & shortcuts</div>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
             <div className="sidebarLogoBox"><img src="/levelup-pro-icon.png" alt="LevelUp Pro" className="sidebarLogoImg" /></div>
             <div>
@@ -891,7 +892,7 @@ async function analyzeResumeStage12() {
             {hasFreeStartCooldown ? `Start Now! (${freeStartCooldownLabel})` : "Start Now!"}
           </button>
 
-          <div style={{ marginTop: 10, display: "grid", gap: 10 }}>
+          <div className="dashboardBattleShortcuts" style={{ marginTop: 10, display: "grid", gap: 10 }}>
             {hrBattleUnlocked ? (
               <button className="gold" style={{ width: "100%" }} onClick={() => setMockInterviewOpen(true)}>
                 Start HR Battle →
