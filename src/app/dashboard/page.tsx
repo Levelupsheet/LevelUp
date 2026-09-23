@@ -878,7 +878,7 @@ async function analyzeResumeStage12() {
 
       <div className="appContainer">
       <div className="shell">
-        <aside className="sidebar">
+        <aside className="sidebar dashboardSidebar">
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
             <div className="sidebarLogoBox"><img src="/levelup-pro-icon.png" alt="LevelUp Pro" className="sidebarLogoImg" /></div>
             <div>
@@ -993,8 +993,8 @@ async function analyzeResumeStage12() {
 
         </aside>
 
-        <section className="maincol">
-          <div className="topbar">
+        <section className="maincol dashboardMain">
+          <div className="topbar dashboardHero">
             <div style={{ flex: 1, minWidth: 260 }}>
               <div style={{ fontSize: 18, opacity: 0.82, textAlign: "center" }}>Welcome back</div>
               <div style={{ marginTop: 4, fontWeight: 900, fontSize: 34, lineHeight: 1.02, textAlign: "center", letterSpacing: 0.2, textShadow: "0 0 18px rgba(255,255,255,0.14), 0 0 28px rgba(96,188,255,0.10)" }}>
@@ -1015,7 +1015,18 @@ async function analyzeResumeStage12() {
             </div>
           </div>
 
-          <div className="card" style={{ marginBottom: 14, borderColor: normalizedTier === "FREE" ? "rgba(255,196,107,0.25)" : "rgba(93,168,255,0.24)" }}>
+          <div className="card dashboardNextAction">
+            <div className="dashboardNextCopy">
+              <div className="dashboardEyebrow">RECOMMENDED NEXT</div>
+              <h2>Continue your {user?.startingPosition ? labelPos(user.startingPosition) : "career"} path</h2>
+              <p>Keep your momentum moving with the next training session. Your XP, mastery, and unlock progress update as you complete challenges.</p>
+            </div>
+            <button className="gold dashboardNextButton" type="button" onClick={() => !hasFreeStartCooldown && setShowLaunchModal(true)} disabled={hasFreeStartCooldown}>
+              {hasFreeStartCooldown ? `Available in ${freeStartCooldownLabel}` : "Continue training →"}
+            </button>
+          </div>
+
+          <div className="card dashboardPlanCard" style={{ marginBottom: 14, borderColor: normalizedTier === "FREE" ? "rgba(255,196,107,0.25)" : "rgba(93,168,255,0.24)" }}>
             <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
               <div>
                 <h3 style={{ margin: 0 }}>Plan perks</h3>
