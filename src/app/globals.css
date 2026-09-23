@@ -2919,3 +2919,22 @@ button.gold, a.gold{
   .dashboardNavActions{ gap:6px; }
   .dashboardNavActions .card{ padding:7px 9px !important; }
 }
+
+
+/* ===== Dashboard P1 compact mobile progress ===== */
+@media (max-width:640px){
+  .dashboardSidebar{ display:block; padding:10px; }
+  .dashboardSidebarMobileTitle{ display:none; }
+  .dashboardSidebarBrand{ display:none !important; }
+  .dashboardSidebarStart{ display:none; }
+  .dashboardBattleShortcuts{ display:none !important; }
+  .dashboardPvpShortcut{ display:none; }
+  .dashboardSidebar > hr{ display:none; }
+  .dashboardProgressHeading{ display:none; }
+  .dashboardProgressCard{ margin:0; padding:10px 12px !important; }
+  .dashboardSidebar > div:not(.dashboardProgressCard):not(.powerHudCard):not(.leaderboardMiniCard):not(.dashboardSidebarBrand):not(.dashboardSidebarMobileTitle):not(.dashboardBattleShortcuts):not(.dashboardPvpShortcut){ margin-top:8px !important; }
+  .dashboardSidebar .powerHudCard{ display:none; }
+  .dashboardSidebar .leaderboardMiniCard{ display:none; }
+  .dashboardMain{ margin-top:10px; }
+  .dashboardHero{ border-radius:16px; }
+}
