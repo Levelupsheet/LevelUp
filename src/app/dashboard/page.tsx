@@ -880,7 +880,7 @@ async function analyzeResumeStage12() {
       <div className="shell">
         <aside className="sidebar dashboardSidebar">
           <div className="dashboardSidebarMobileTitle">Progress & shortcuts</div>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
+          <div className="dashboardSidebarBrand" style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
             <div className="sidebarLogoBox"><img src="/levelup-pro-icon.png" alt="LevelUp Pro" className="sidebarLogoImg" /></div>
             <div>
               <div style={{ fontWeight: 900, fontSize: 22, lineHeight: 1.05 }}>LevelUp Pro</div>
@@ -888,7 +888,7 @@ async function analyzeResumeStage12() {
             </div>
           </div>
 
-          <button className="primary" style={{ width: "100%", marginTop: 8, opacity: hasFreeStartCooldown ? 0.7 : 1 }} onClick={() => !hasFreeStartCooldown && setShowLaunchModal(true)} disabled={hasFreeStartCooldown} title={hasFreeStartCooldown ? `Free tier cooldown: ${freeStartCooldownLabel}` : undefined}>
+          <button className="primary dashboardSidebarStart" style={{ width: "100%", marginTop: 8, opacity: hasFreeStartCooldown ? 0.7 : 1 }} onClick={() => !hasFreeStartCooldown && setShowLaunchModal(true)} disabled={hasFreeStartCooldown} title={hasFreeStartCooldown ? `Free tier cooldown: ${freeStartCooldownLabel}` : undefined}>
             {hasFreeStartCooldown ? `Start Now! (${freeStartCooldownLabel})` : "Start Now!"}
           </button>
 
@@ -913,7 +913,7 @@ async function analyzeResumeStage12() {
             {hasFreeStartCooldown && <small style={{ display: "block", marginTop: 0, color: "#f5d37b" }}>Free users can start another session in {freeStartCooldownLabel}.</small>}
           </div>
 
-          <div style={{ marginTop: 10 }}>
+          <div className="dashboardPvpShortcut" style={{ marginTop: 10 }}>
             <button className="secondaryBtn" style={{ width: "100%" }} type="button" onClick={() => (window.location.href = "/pvp")}>
               Enter PvP Arena
             </button>
@@ -922,9 +922,9 @@ async function analyzeResumeStage12() {
 
           <hr style={{ margin: "14px 0" }} />
 
-          <h4 style={{ margin: "0 0 8px 0" }}>Progress</h4>
+          <h4 className="dashboardProgressHeading" style={{ margin: "0 0 8px 0" }}>Progress</h4>
 
-          <div className="card" style={{ padding: 12 }}>
+          <div className="card dashboardProgressCard" style={{ padding: 12 }}>
             <div style={{ display: "flex", justifyContent: "space-between", gap: 10 }}>
               <small>{levelTitleFromLevel(localLevel)} • Level {localLevel}</small>
               <small style={{ padding: "2px 10px", borderRadius: 999, fontWeight: 800, letterSpacing: 0.2, ...(tierBadgeStyle as any) }}>{tierLabel}</small>
