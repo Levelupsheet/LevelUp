@@ -3374,3 +3374,22 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
  .lootVaultActions>span{ display:none; }
 }
 @media(max-width:430px){ .lootVaultActions{ grid-template-columns:1fr; } }
+
+
+/* ===== Batch 4 checkpoint: combat telemetry + completion ===== */
+.combatRunSummary{ padding:20px; background:rgba(255,255,255,.045); border-color:rgba(255,255,255,.14); }
+.combatRunSummary.victory{ border-color:rgba(118,224,156,.34); background:linear-gradient(180deg,rgba(74,160,108,.13),rgba(255,255,255,.035)); }
+.combatRunSummary.defeat{ border-color:rgba(255,126,126,.28); }
+.combatRunOutcome{ margin-top:4px; font-size:clamp(28px,4vw,42px); font-weight:950; }
+.combatRunStats{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin-top:14px; }
+.combatRunStats>span{ padding:11px 12px; border:1px solid rgba(255,255,255,.10); border-radius:12px; background:rgba(0,0,0,.12); }
+.combatRunStats small,.combatRunStats b{ display:block; }
+.combatRunStats small{ color:var(--muted); margin-bottom:4px; }
+.combatRunStats b{ font-size:18px; }
+.combatRunHintCost{ margin-top:10px; }
+@media(max-width:860px){
+ .mobileSessionIntel{ display:none !important; }
+ .combatRunSummary.mobile{ padding:16px; }
+ .combatRunStats{ grid-template-columns:repeat(3,minmax(0,1fr)); }
+}
+@media(max-width:430px){ .combatRunStats{ grid-template-columns:1fr; } }
