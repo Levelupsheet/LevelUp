@@ -452,14 +452,18 @@ export default function AdminContentStudioPage() {
       <div className="card" style={{ padding: 18 }}>
         <div style={{ display: "flex", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
           <div>
+            <div className="dashboardEyebrow">KNOWLEDGE BANK PIPELINE</div>
             <div style={{ fontWeight: 900, fontSize: 28 }}>Admin Content Studio</div>
-            <div style={{ opacity: 0.85, marginTop: 6 }}>Upload fact banks, generate mixed question types, approve them fast, then manage live Test Now and training sets with better golden eligibility controls.</div>
+            <div style={{ opacity: 0.85, marginTop: 6 }}>Turn verified concepts and learning objectives into original LevelUp Pro questions, review them, then publish approved content into the live learning lanes.</div>
           </div>
           <div className="content-actions">
             <button onClick={() => (window.location.href = "/admin")}>Back to admin</button>
             <button onClick={() => setTab("import")} className={tab === "import" ? "primaryBtn" : "secondaryBtn" as any}>Import</button>
             <button onClick={() => setTab("review")} className={tab === "review" ? "primaryBtn" : "secondaryBtn" as any}>Review & Publish</button>
           </div>
+        </div>
+        <div className="contentPipelineSteps">
+          {["1. Concepts", "2. Generate", "3. Review", "4. Publish", "5. Monitor"].map((step) => <span key={step}>{step}</span>)}
         </div>
         {message ? <div style={{ marginTop: 12, padding: 12, borderRadius: 10, background: "rgba(99,102,241,0.12)", border: "1px solid rgba(99,102,241,0.28)" }}>{message}</div> : null}
       </div>
@@ -497,7 +501,7 @@ export default function AdminContentStudioPage() {
               <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
                 <div>
                   <div style={{ fontWeight: 800, fontSize: 20 }}>Import knowledge blocks</div>
-                  <div style={{ opacity: 0.8, marginTop: 4 }}>Paste JSON blocks here or load a .json file. Use sync when you want the whole pipeline to import, generate, approve, and publish into the correct live set in one pass.</div>
+                  <div style={{ opacity: 0.8, marginTop: 4 }}>Paste JSON blocks here or load a .json file. For the normal production workflow, save blocks first, generate original questions, review them, and then publish. One-pass sync remains available for trusted, pre-reviewed fact banks.</div>
                 </div>
                 <div className="content-actions">
                   <button onClick={() => setRawJson(SAMPLE_BLOCK)}>Load sample</button>
