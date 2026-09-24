@@ -1,57 +1,37 @@
 export default function CertificationsCatalog() {
+  const tracks = [
+    { title: "CompTIA A+", tag: "CORE IT", body: "Hardware, operating systems, networking, troubleshooting, security, and support fundamentals." },
+    { title: "Security+", tag: "SECURITY", body: "Threats, architecture, operations, identity, governance, risk, and practical security concepts." },
+    { title: "AZ-900", tag: "CLOUD", body: "Azure fundamentals, cloud concepts, core services, security, governance, pricing, and support." },
+  ];
   return (
-    <>
-      <div className="bgPattern" />
-      <div className="heroBlur" />
-      <main className="row">
-        <div className="card" style={{ flex: "1 1 720px" }}>
-          <h2 style={{ marginTop: 0 }}>Certifications (catalog)</h2>
-          <p style={{ opacity: 0.9 }}>
-            This page shows what LevelUp Pro supports right now. To start practice, use the <b>Start Now</b> button from the dashboard.
-          </p>
-
-          <hr style={{ margin: "14px 0" }} />
-
-          <h3 style={{ marginTop: 0 }}>Included certification practice tracks</h3>
-          <ul>
-            <li><b>CompTIA A+</b> (practice)</li>
-            <li><b>Security+</b> (practice)</li>
-            <li><b>AZ-900</b> (practice)</li>
-          </ul>
-
-          <h3>Coming next</h3>
-          <ul>
-            <li>Timed exam mode + scoring</li>
-            <li>Domain breakdown analytics</li>
-            <li>More cloud cert tracks</li>
-          </ul>
-
-          <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 14 }}>
-            <a href="/dashboard"><button className="primary">Back to Dashboard</button></a>
-            <a href="/start#pricing"><button>Pricing</button></a>
+    <main className="learningCatalog page">
+      <div className="container learningCatalogInner">
+        <section className="card learningHero">
+          <div>
+            <div className="dashboardEyebrow">CERTIFICATION PRACTICE</div>
+            <h1>Turn knowledge into exam readiness.</h1>
+            <p>Practice certification domains inside the same LevelUp progression system and use results to identify what to study next.</p>
           </div>
-
-          <p style={{ marginTop: 12, opacity: 0.75 }}>
-            <small>
-              Note: Certification names are trademarks of their respective owners. LevelUp Pro provides practice content only.
-            </small>
-          </p>
-        </div>
-
-        <div className="card" style={{ flex: "1 1 360px" }}>
-          <h3 style={{ marginTop: 0 }}>How to access</h3>
-          <ol style={{ margin: 0, paddingLeft: 18 }}>
-            <li>Go to <b>Dashboard</b></li>
-            <li>Click <b>Start Now</b></li>
-            <li>Select <b>Certifications</b></li>
-          </ol>
-          <p style={{ marginTop: 10, opacity: 0.8 }}>
-            <small>
-              This keeps the user journey consistent: Start Now → module window → earn XP.
-            </small>
-          </p>
-        </div>
-      </main>
-    </>
+          <a href="/dashboard" className="learningPrimaryLink">Start from Dashboard →</a>
+        </section>
+        <section className="learningTrackGrid">
+          {tracks.map((track) => (
+            <article className="card learningTrackCard" key={track.title}>
+              <span className="badge">{track.tag}</span>
+              <h2>{track.title}</h2>
+              <p>{track.body}</p>
+            </article>
+          ))}
+        </section>
+        <section className="card learningFlowCard">
+          <div><b>Practice</b><span>Work through certification-focused questions and scenarios.</span></div>
+          <div><b>Measure</b><span>Track mastery and performance as you answer.</span></div>
+          <div><b>Review</b><span>Use explanations and domain feedback to close gaps.</span></div>
+          <div><b>Repeat</b><span>Return to weaker areas until your performance is consistent.</span></div>
+        </section>
+        <p className="learningLegal">Certification names are trademarks of their respective owners. LevelUp Pro provides independent practice content.</p>
+      </div>
+    </main>
   );
 }
