@@ -208,7 +208,7 @@ function renderQuestionInput(args: {
     const choices = safeArray<string>(question.choices?.length ? question.choices : data.choices);
     const correctIndex = Number(question.correctIndex ?? data.correctIndex ?? -1);
     return (
-      <div style={{ marginTop: 14, display: "grid", gap: 10 }}>
+      <div className="quizInputGroup quizChoiceGroup" style={{ marginTop: 14, display: "grid", gap: 10 }}>
         {type === "incident" && data.scenario ? (
           <div className="card" style={{ padding: 12, background: "rgba(255,255,255,0.04)", whiteSpace: "pre-wrap" }}>
             <div style={{ fontSize: 12, fontWeight: 900, letterSpacing: 0.6, opacity: 0.8, marginBottom: 8 }}>INCIDENT DETAILS</div>
@@ -244,7 +244,7 @@ function renderQuestionInput(args: {
     const choices = ["True", "False"];
     const correctIndex = Number((data as any).correctIndex ?? question.correctIndex ?? 0);
     return (
-      <div style={{ marginTop: 14, display: "grid", gap: 10 }}>
+      <div className="quizInputGroup quizTrueFalseGroup" style={{ marginTop: 14, display: "grid", gap: 10 }}>
         {choices.map((choice, index) => {
           if (hiddenChoiceIndices.includes(index)) return null;
           const isSel = mcqSelected === index;
@@ -271,7 +271,7 @@ function renderQuestionInput(args: {
 
   if (type === "fill_blank") {
     return (
-      <div style={{ marginTop: 14 }}>
+      <div className="quizInputGroup quizTextAnswer" style={{ marginTop: 14 }}>
         <input
           value={fillValue}
           onChange={(e) => setFillValue(e.target.value)}
@@ -291,7 +291,7 @@ function renderQuestionInput(args: {
       ...commandHistory,
     ].filter(Boolean))).slice(0, 6);
     return (
-      <div style={{ marginTop: 14, display: "grid", gap: 10 }}>
+      <div className="quizInputGroup quizCliGroup" style={{ marginTop: 14, display: "grid", gap: 10 }}>
         {data.hint ? <div className="badge">Hint: {String(data.hint)}</div> : null}
         <div className="card" style={{ padding: 12, background: "rgba(4,8,18,0.78)", borderColor: "rgba(110,190,255,0.20)" }}>
           <div style={{ fontSize: 12, fontWeight: 900, letterSpacing: 0.6, opacity: 0.8, marginBottom: 8 }}>COMMAND CONSOLE</div>
@@ -337,7 +337,7 @@ function renderQuestionInput(args: {
   if (type === "log_analysis") {
     const logChoices = safeArray<string>((data as any).choices);
     return (
-      <div style={{ marginTop: 14, display: "grid", gap: 10 }}>
+      <div className="quizInputGroup quizLogGroup" style={{ marginTop: 14, display: "grid", gap: 10 }}>
         {data.logText ? (
           <div className="card" style={{ padding: 12, background: "rgba(255,255,255,0.04)", whiteSpace: "pre-wrap", fontFamily: "monospace", fontSize: 13 }}>
             <div style={{ fontSize: 12, fontWeight: 900, letterSpacing: 0.6, opacity: 0.8, marginBottom: 8 }}>LOG EXCERPT</div>
@@ -364,7 +364,7 @@ function renderQuestionInput(args: {
 
   if (type === "sequence_order") {
     return (
-      <div style={{ marginTop: 14, display: "grid", gap: 10 }}>
+      <div className="quizInputGroup quizSequenceGroup" style={{ marginTop: 14, display: "grid", gap: 10 }}>
         {data.instructions ? <div className="badge">{String(data.instructions)}</div> : null}
         {sequenceItems.map((item, index) => (
           <div key={`${item}_${index}`} className="card d2CompactSequenceRow" style={{ padding: 8, background: "rgba(255,255,255,0.04)", display: "flex", gap: 8, alignItems: "center" }}>
@@ -384,7 +384,7 @@ function renderQuestionInput(args: {
     const choices = safeArray<string>(data.choices);
     const correctIndices = uniqueSortedNumbers(data.correctIndices);
     return (
-      <div style={{ marginTop: 14, display: "grid", gap: 10 }}>
+      <div className="quizInputGroup quizMultiGroup" style={{ marginTop: 14, display: "grid", gap: 10 }}>
         <div className="badge">Select all that apply{correctIndices.length ? ` (${correctIndices.length})` : ""}</div>
         {choices.map((choice, index) => {
           const checked = multiSelected.includes(index);
@@ -431,7 +431,7 @@ function renderQuestionInput(args: {
       : pairs.map((pair) => pair.right);
 
     return (
-      <div style={{ marginTop: 14, display: "grid", gap: 12 }}>
+      <div className="quizInputGroup quizMatchingGroup" style={{ marginTop: 14, display: "grid", gap: 12 }}>
         {(data as any).instructions ? <div className="badge" style={{ whiteSpace: "normal", lineHeight: 1.4 }}>{String((data as any).instructions)}</div> : null}
         {leftItems.map((left, index) => {
           const selected = matchingSelections[index] || "";
