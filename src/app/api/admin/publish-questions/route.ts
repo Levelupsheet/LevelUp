@@ -3,7 +3,7 @@ import { requireAdminRequest } from "@/app/api/_lib/adminGuard";
 import { QuestionSetStatus } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { mapCandidateToDbQuestion } from "@/lib/contentEngine";
-import { validateQuestionQuality, promptSignature } from "@/lib/questionQuality";
+import { clusterQuestionsBySimilarity, validateQuestionQuality, promptSignature } from "@/lib/questionQuality";
 
 export async function POST(req: Request) {
   const admin = await requireAdminRequest();
@@ -20,6 +20,22 @@ export async function POST(req: Request) {
     const placementFilter: any = { lane: block.lane, isActive: true };
     if (block.lane === "TRAINING") placementFilter.startingPosition = block.startingPosition;
     if (block.lane === "CERTIFICATIONS") placementFilter.certExam = block.certExam;
+
+    const reviewedQuality = block.generatedQuestions.map((q: any) => ({ id: q.id, prompt: q.prompt, quality: validateQuestionQuality(q as any) }));
+    const blockedQuality = reviewedQuality.filter((row: any) => row.quality.issues.length > 0 || row.quality.qualityScore < 70);
+    if (blockedQuality.length) {
+      return NextResponse.json({
+        error: "Publishing blocked: approved questions still have quality issues.",
+        blockedQuestions: blockedQuality.map((row: any) => ({ id: row.id, prompt: row.prompt, qualityScore: row.quality.qualityScore, issues: row.quality.issues })),
+      }, { status: 400 });
+    }
+    const similarityClusters = clusterQuestionsBySimilarity(block.generatedQuestions as any[], 0.84).filter((cluster) => cluster.ids.length > 1);
+    if (similarityClusters.length) {
+      return NextResponse.json({
+        error: "Publishing blocked: closely similar approved prompts require review.",
+        similarityClusters,
+      }, { status: 400 });
+    }
 
     const incoming = block.generatedQuestions.map((q: any, index: number) => {
       const mapped = mapCandidateToDbQuestion({ prompt: q.prompt, type: q.type.toLowerCase() as any, difficulty: q.difficulty, explanation: q.explanation, tags: q.tags, data: (q.data as any) || {}, choices: Array.isArray(q.choices) ? (q.choices as string[]) : null, correctIndex: q.correctIndex }, index);
