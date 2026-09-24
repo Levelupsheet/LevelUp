@@ -3523,3 +3523,80 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
  .progressionSnapshot{gap:8px;}
  .progressionSignals>span{padding:6px 7px;}
 }
+
+
+/* ===== Batch 8: desktop quiz learning-first shell ===== */
+@media(min-width:901px){
+ .batch8DesktopQuizGrid{
+   grid-template-columns:minmax(150px,180px) minmax(0,1fr) minmax(150px,180px) !important;
+   gap:14px !important;
+ }
+ .batch8CombatRail{
+   min-width:0;
+   align-content:start;
+ }
+ .batch8CombatRail .d2ModelPanel,
+ .batch8CombatRail .modelPanel{
+   min-width:0;
+ }
+ .batch8CombatRail video,
+ .batch8CombatRail img{
+   max-width:100%;
+   object-fit:cover;
+ }
+ .batch8LearningStage{
+   padding:16px !important;
+   overflow-y:auto !important;
+   scrollbar-width:thin;
+   justify-content:flex-start !important;
+ }
+ .batch8LearningStage .desktopQuizPrompt{
+   max-width:1100px;
+   margin-top:12px !important;
+   font-size:clamp(20px,1.45vw,27px) !important;
+   line-height:1.22 !important;
+ }
+ .batch8PrimaryProgress{
+   margin-top:7px !important;
+   opacity:.88;
+ }
+ .batch8PrimaryProgress .badge:nth-child(2){display:none;}
+ .batch8SecondarySignals{
+   margin-top:6px !important;
+   padding:6px 8px !important;
+   opacity:.82;
+ }
+ .batch8SecondarySignals .badge{font-size:10px !important;padding:4px 7px !important;}
+ .batch8CenterPowerStrip{display:none !important;}
+ .batch8PlayerRail .stage7PowerStrip.underPlayer{
+   display:grid !important;
+   grid-template-columns:1fr 1fr;
+   gap:6px !important;
+ }
+ .batch8PlayerRail .stage7PowerStrip.underPlayer .d2Btn:last-child{grid-column:1/-1;}
+ .batch8PlayerRail .d2Btn.power{
+   min-height:38px;
+   padding:6px !important;
+   font-size:11px !important;
+ }
+ .batch8CombatRail .d2LifeOrb{transform-origin:top center;}
+ .batch8LearningStage .quizChoiceGroup,
+ .batch8LearningStage .quizTrueFalseGroup,
+ .batch8LearningStage .quizMultiGroup{
+   margin-top:10px;
+ }
+ .batch8LearningStage .quizHintRow{margin-top:8px !important;}
+ .batch8LearningStage .stage8ActionDock{margin-top:8px !important;}
+ .batch8LearningStage .adaptiveTeachingCard{
+   margin-top:2px;
+   border-color:rgba(110,190,255,.28) !important;
+ }
+}
+@media(min-width:901px) and (max-width:1180px){
+ .batch8DesktopQuizGrid{
+   grid-template-columns:135px minmax(0,1fr) 135px !important;
+   gap:10px !important;
+ }
+ .batch8LearningStage{padding:13px !important;}
+ .batch8LearningStage .desktopQuizPrompt{font-size:clamp(18px,1.7vw,23px) !important;}
+}
