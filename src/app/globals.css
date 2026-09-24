@@ -3431,3 +3431,18 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 @media(max-width:520px){ .adminContentWorkflow,.contentPipelineSteps,.adminQuestionMetrics{ grid-template-columns:1fr; } .adminQuestionMetrics>div:first-child{ grid-column:auto; } }
 
 .adaptiveCoachFeedback{ margin-top:9px; padding:9px 10px; border-left:3px solid rgba(110,190,255,.55); border-radius:8px; background:rgba(110,190,255,.07); color:rgba(235,245,255,.9); font-size:12px; line-height:1.45; }
+
+
+/* ===== Batch 7: adaptive learning clarity ===== */
+.adaptiveCoachFeedback{ margin-top:11px; padding:11px 13px; border-left-width:4px; font-size:14px; line-height:1.5; font-weight:650; }
+.adaptiveSummaryCard{ padding:14px; background:rgba(255,255,255,.04); }
+.adaptiveSummaryTitle{ font-weight:950; font-size:17px; margin-bottom:9px; }
+.adaptiveRecommendationList{ display:grid; gap:8px; }
+.adaptiveSessionMastery{ margin-top:12px; padding-top:10px; border-top:1px solid rgba(255,255,255,.09); display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+.adaptiveSessionMastery>small{ width:100%; color:var(--muted); }
+.adaptiveSessionMastery>span{ padding:6px 9px; border:1px solid rgba(110,190,255,.18); border-radius:999px; background:rgba(110,190,255,.06); text-transform:capitalize; font-size:12px; }
+.adaptiveReadinessNote{ margin-top:9px; color:var(--muted); font-size:12px; line-height:1.4; }
+@media(min-width:1100px){
+ .stage5MergedFeedbackCard{ padding:15px !important; }
+ .stage5MergedFeedbackCard>div:first-child{ font-size:17px; }
+}
