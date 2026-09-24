@@ -3261,3 +3261,33 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
  .mobileEnemyHud{ grid-template-columns:minmax(0,1fr) 72px !important; }
  .mobileEnemyPortrait,.mobileEnemyPortrait .card{ width:72px !important; }
 }
+
+
+/* ===== Batch 3: career progression, interviews, AI coach ===== */
+.coachPage,.interviewPage,.careerPathPage{ min-height:100dvh; padding:24px 14px 48px; }
+.coachPageInner,.careerPathInner,.interviewWorkspace{ width:min(1120px,100%); margin:0 auto; }
+.coachHero,.careerPathHero{ padding:22px; }
+.coachHero h1,.careerPathHero h1,.interviewMain h1{ margin:5px 0 6px; font-size:clamp(30px,4vw,46px); }
+.coachGrid{ display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:16px; }
+.coachGridPrimary{ grid-template-columns:1.15fr .85fr; }
+.coachPanel{ padding:18px; min-width:0; }
+.interviewWorkspace{ display:grid; grid-template-columns:minmax(0,1.65fr) minmax(280px,.65fr); gap:16px; align-items:start; }
+.interviewMain,.interviewLog{ padding:20px; }
+.interviewIntro{ color:var(--muted); line-height:1.55; margin:0 0 18px; }
+.interviewMain textarea{ width:100%; box-sizing:border-box; font-size:16px; }
+.interviewLog{ position:sticky; top:18px; max-height:70dvh; overflow:auto; }
+.careerPathHero p,.careerPathCard p,.careerPathNext p{ color:var(--muted); line-height:1.55; }
+.careerPathActions{ display:flex; gap:10px; flex-wrap:wrap; margin-top:18px; }
+.careerPathGrid{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; margin-top:16px; }
+.careerPathCard{ padding:20px; }
+.careerPathCard>span{ font-weight:900; color:#f2cc72; letter-spacing:.12em; }
+.careerPathCard h2{ margin:8px 0 6px; font-size:21px; }
+.careerPathNext{ display:grid; grid-template-columns:.8fr 1.2fr; gap:24px; align-items:center; padding:22px; margin-top:16px; }
+.careerPathNext h2{ margin:5px 0 0; }
+@media(max-width:760px){
+ .coachPage,.interviewPage,.careerPathPage{ padding:10px 8px 30px; }
+ .coachGrid,.coachGridPrimary,.interviewWorkspace,.careerPathGrid,.careerPathNext{ grid-template-columns:1fr; }
+ .coachHero,.coachPanel,.interviewMain,.interviewLog,.careerPathHero,.careerPathCard,.careerPathNext{ padding:16px; }
+ .interviewLog{ position:static; max-height:none; }
+ .careerPathActions>*{ width:100%; text-align:center; }
+}
