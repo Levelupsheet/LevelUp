@@ -30,9 +30,9 @@ export default function CertMCQPage() {
   return (
     <div className="page">
       <div className="container" style={{ maxWidth: 1280 }}>
-        <div className="row" style={{ justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 10, marginBottom: 12 }}>
+        <div className="learningSessionToolbar">
           <div className="muted" style={{ fontWeight: 700 }}>Certification Trial • {examLabel}</div>
-          <div className="row" style={{ gap: 8, flexWrap: "wrap" }}>
+          <div className="learningExamTabs">
             <button className="btn d2Roman" onClick={() => setExam("A_PLUS")} style={{ opacity: exam === "A_PLUS" ? 1 : 0.6 }}>A+</button>
             <button className="btn d2Roman" onClick={() => setExam("SECURITY_PLUS")} style={{ opacity: exam === "SECURITY_PLUS" ? 1 : 0.6 }}>Security+</button>
             <button className="btn d2Roman" onClick={() => setExam("AZ_900")} style={{ opacity: exam === "AZ_900" ? 1 : 0.6 }}>AZ-900</button>
