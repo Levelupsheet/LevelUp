@@ -3168,3 +3168,32 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
  .learningFlowCard{ grid-template-columns:1fr 1fr; }
 }
 @media(max-width:430px){ .learningFlowCard{ grid-template-columns:1fr; } }
+
+
+/* ===== Batch 2 completion: connected learning sessions ===== */
+.learningSessionPage{ padding:14px 12px 24px; }
+.learningSessionInner{ max-width:1440px !important; margin:0 auto; }
+.learningSessionToolbar{ display:flex; justify-content:space-between; align-items:center; gap:12px; margin:0 0 12px; padding:10px 12px; border:1px solid rgba(255,255,255,.10); border-radius:14px; background:rgba(9,14,23,.76); }
+.learningExamTabs{ display:flex; gap:7px; flex-wrap:wrap; }
+.practiceWorkspace{ min-height:100dvh; padding:24px 16px 44px; }
+.practiceWorkspaceInner{ max-width:1120px; margin:0 auto; display:grid; grid-template-columns:minmax(0,1.7fr) minmax(280px,.7fr); gap:16px; align-items:start; }
+.practiceMainCard,.practiceSnapshot{ padding:22px; }
+.practiceMainCard h1{ margin:5px 0 7px; font-size:clamp(28px,3.2vw,42px); }
+.practiceIntro{ color:var(--muted); line-height:1.5; margin:0 0 18px; }
+.practiceMainCard textarea,.practiceMainCard select{ width:100%; box-sizing:border-box; }
+.practiceSnapshot{ position:sticky; top:18px; }
+.practiceSnapshot h2{ margin-top:0; }
+@media(max-width:860px){
+ .learningSessionPage{ padding:0; }
+ .learningSessionInner{ width:100%; max-width:none !important; }
+ .learningSessionToolbar{ margin:8px; align-items:stretch; flex-direction:column; }
+ .learningExamTabs{ flex-wrap:nowrap; overflow-x:auto; padding-bottom:2px; scrollbar-width:none; }
+ .learningExamTabs::-webkit-scrollbar{ display:none; }
+ .learningExamTabs .btn{ flex:0 0 auto; }
+ .practiceWorkspace{ padding:12px 9px 30px; }
+ .practiceWorkspaceInner{ grid-template-columns:1fr; }
+ .practiceMainCard,.practiceSnapshot{ padding:16px; }
+ .practiceMainCard .row{ flex-direction:column; }
+ .practiceMainCard textarea{ font-size:16px; }
+ .practiceSnapshot{ position:static; }
+}
