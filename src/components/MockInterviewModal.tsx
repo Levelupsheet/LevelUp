@@ -139,10 +139,10 @@ export default function MockInterviewModal(props: { open: boolean; onClose: () =
         </div>
 
         {step !== "quiz" && (
-          <div className="luModalHeader" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div className="luModalHeader interviewBattleHeader">
             <div>
-              <b style={{ fontSize: 18 }}>Boss Battle Interview</b>
-              <div><small className="luHint">Certification-style combat UI for tech and HR interview practice.</small></div>
+              <div className="dashboardEyebrow">INTERVIEW BATTLES</div><b className="interviewBattleTitle">Career Readiness Arena</b>
+              <div><small className="luHint">Choose a track, clear the technical battle, then advance to the next interview stage.</small></div>
             </div>
             <button className="secondaryBtn" type="button" onClick={onClose}>✕</button>
           </div>
@@ -150,10 +150,10 @@ export default function MockInterviewModal(props: { open: boolean; onClose: () =
 
         <div className="luModalBody">
           {step === "setup" && (
-            <div className="grid2">
-              <div className="card" style={{ gridColumn: "1 / -1" }}>
-                <div className="cardTitle">Choose a track</div>
-                <div className="muted">Stage 1 unlocks Stage 2 for the selected track.</div>
+            <div className="interviewBattleSetup">
+              <div className="card interviewBattleSetupCard">
+                <div className="dashboardEyebrow">CHOOSE YOUR PATH</div><div className="cardTitle interviewBattleHeading">Select an interview track</div>
+                <div className="muted">Clear the first battle to unlock the advanced interview stage for that track.</div>
                 <div className="trackGrid" style={{ marginTop: 14 }}>
                   {(Object.entries(TRACK_META) as [Track, { title: string; subtitle: string }][]) .map(([id, meta]) => (
                     <button key={id} className={"trackBtn" + (track === id ? " active" : "")} onClick={() => setTrack(id)}>
@@ -176,11 +176,11 @@ export default function MockInterviewModal(props: { open: boolean; onClose: () =
                   </div>
                 </div>
                 <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 14 }}>
-                  <button className="btn primary" onClick={() => start(1)}>Start Boss Battle 1 →</button>
-                  <button className="btn" disabled={!passedStage1} onClick={() => start(2)} title={passedStage1 ? "" : "Pass Stage 1 to unlock"}>Start Boss Battle 2</button>
+                  <button className="btn primary" onClick={() => start(1)}>Start Tech Battle →</button>
+                  <button className="btn" disabled={!passedStage1} onClick={() => start(2)} title={passedStage1 ? "" : "Pass the Tech Battle to unlock"}>Start Advanced Battle</button>
                 </div>
                 <div style={{ marginTop: 10 }}>
-                  {passedStage1 ? <span className="badge">✓ Stage 2 unlocked for this track</span> : <span className="badge">Defeat the first boss battle to unlock the second stage.</span>}
+                  {passedStage1 ? <span className="badge">✓ Stage 2 unlocked for this track</span> : <span className="badge">Clear the Tech Battle to unlock the advanced interview stage.</span>}
                 </div>
               </div>
             </div>
@@ -203,14 +203,21 @@ export default function MockInterviewModal(props: { open: boolean; onClose: () =
           )}
 
           {step === "summary" && (
-            <div className="card" style={{ padding: 18 }}>
-              <div className="cardTitle">Boss battle summary</div>
-              <div className="muted" style={{ marginTop: 8 }}>
-                Outcome: <b>{lastSummary?.outcome || "complete"}</b> • Score <b>{Number(lastSummary?.correctCount || 0)}</b> / <b>{Number(lastSummary?.totalQuestions || 0)}</b> • XP +<b>{Number(lastSummary?.xpEarned || 0)}</b>
+            <div className="card interviewBattleSummary">
+              <div className="dashboardEyebrow">BATTLE COMPLETE</div>
+              <h2>{(lastSummary?.outcome === "victory" || lastSummary?.enemyHP === 0) ? "Stage cleared" : "Review and try again"}</h2>
+              <p className="muted">{(lastSummary?.outcome === "victory" || lastSummary?.enemyHP === 0) ? "Your progression has been updated. Keep moving while the material is fresh." : "Use the result to identify what to review, then return for another attempt."}</p>
+              <div className="interviewBattleStats">
+                <div><small>Result</small><strong>{String(lastSummary?.outcome || "complete").toUpperCase()}</strong></div>
+                <div><small>Score</small><strong>{Number(lastSummary?.correctCount || 0)} / {Number(lastSummary?.totalQuestions || 0)}</strong></div>
+                <div><small>XP earned</small><strong>+{Number(lastSummary?.xpEarned || 0)}</strong></div>
+                <div><small>Track</small><strong>{TRACK_META[track].title}</strong></div>
               </div>
-              <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 16 }}>
-                <button className="btn primary" onClick={() => setStep("setup")}>Back to setup</button>
-                <button className="btn" onClick={onClose}>Close</button>
+              <div className="interviewBattleSummaryActions">
+                {(lastSummary?.outcome === "victory" || lastSummary?.enemyHP === 0) && stage === 1 ? <button className="btn primary" onClick={() => start(2)}>Continue to advanced battle →</button> : null}
+                <button className="btn" onClick={() => setStep("setup")}>Choose another battle</button>
+                <a className="secondaryBtn" href="/coach">Open AI Coach</a>
+                <button className="btn" onClick={onClose}>Return to dashboard</button>
               </div>
             </div>
           )}
