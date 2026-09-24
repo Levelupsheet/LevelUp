@@ -2982,3 +2982,61 @@ button.gold, a.gold{
   .landing .heroH1{ font-size:clamp(31px,9.5vw,38px); }
   .landing .heroP{ font-size:15px; }
 }
+
+
+/* ===== P1 quiz experience redesign ===== */
+.d2QuizShell{ border-radius:20px; }
+.d2QuizQuestionCard{ background:linear-gradient(180deg,rgba(17,22,31,.97),rgba(8,11,17,.98)); border-color:rgba(255,255,255,.12); }
+.d2QuestionPrompt,.quizPrompt{ text-wrap:pretty; }
+.d2QuizQuestionCard .d2ChoiceBtn{ border-radius:12px; background:rgba(255,255,255,.045); border:1px solid rgba(255,255,255,.11); box-shadow:none; }
+.d2QuizQuestionCard .d2ChoiceBtn:hover{ background:rgba(255,255,255,.075); border-color:rgba(110,190,255,.30); }
+.d2QuizQuestionCard .d2ChoiceBtn.selected{ background:linear-gradient(90deg,rgba(255,126,58,.14),rgba(255,255,255,.05)); border-color:rgba(255,132,66,.78); box-shadow:0 0 0 1px rgba(255,132,66,.12); }
+.d2QuizQuestionCard .d2ActionRow .d2Btn{ border-radius:12px; }
+
+@media (min-width:861px){
+  .d2QuizShell{ max-width:1500px !important; }
+  .d2InterviewGrid.d2QuizGrid.stage8CompactGrid{ grid-template-columns:190px minmax(0,1fr) 210px !important; gap:14px !important; }
+  .d2QuizQuestionCard{ padding:16px !important; }
+  .d2QuestionPrompt{ font-size:clamp(18px,1.55vw,25px) !important; line-height:1.18 !important; margin:8px 0 4px; }
+  .d2QuizQuestionCard .d2ChoiceBtn{ padding:11px 13px !important; font-size:14px !important; min-height:42px; }
+  .quizSecondaryMeta{ margin-top:7px; }
+  .quizMomentumBar{ margin-top:7px !important; }
+  .quizPowerStrip{ padding:7px 8px; margin:6px 0 8px; }
+  .stage8ActionDock{ display:grid; grid-template-columns:minmax(0,1fr); gap:8px; }
+}
+
+@media (max-width:860px){
+  .d2QuizShell{ border-radius:0; border-left:0; border-right:0; }
+  .d2QuizShell .modalHead{ padding:10px 12px; }
+  .d2QuizBody{ padding:0 10px 18px !important; overflow:visible !important; }
+  .mobileQuizStack{ gap:10px; }
+  .mobileQuizTopMeta{ position:sticky; top:0; z-index:8; margin:0 -2px; padding:8px 2px; background:linear-gradient(180deg,rgba(7,10,16,.97),rgba(7,10,16,.88)); backdrop-filter:blur(10px); }
+  .mobileQuizBadges{ gap:5px; }
+  .mobileQuizBadges .badge{ padding:4px 7px; font-size:11px; }
+  .stage8CompactBar{ display:none; }
+  .quizPowerStrip.mobile{ display:none; }
+  .mobileEnemyCard{ gap:6px; }
+  .mobileEnemyCard .card{ min-height:0 !important; padding:6px !important; }
+  .mobileEnemyCard video,.mobileEnemyCard img{ max-height:120px !important; object-fit:contain; }
+  .mobileQuizQuestionCard{ padding:14px !important; border-radius:18px; }
+  .mobileQuizQuestionCard::after{ display:none; }
+  .mobileQuizQuestionCard .d2Rivet{ display:none; }
+  .mobileQuizQuestionCard .badge{ font-size:11px; padding:5px 8px; }
+  .mobileQuizPrompt,.quizPrompt{ margin:12px 0 10px; font-size:clamp(19px,5.4vw,24px); line-height:1.24; font-weight:850; letter-spacing:-.015em; }
+  .mobileQuizQuestionCard .d2RuneBar{ margin:8px 0 10px; }
+  .mobileQuizQuestionCard .d2ChoiceBtn{ padding:13px 14px !important; min-height:50px; font-size:16px !important; line-height:1.3; border-radius:13px; }
+  .mobileQuizQuestionCard .input{ min-height:52px; padding:12px 14px; font-size:16px; border-radius:13px; }
+  .mobileQuizQuestionCard .stage7PowerStrip{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:7px; padding:0; margin:12px 0 6px; background:transparent; border:0; }
+  .mobileQuizQuestionCard .stage7PowerStrip .d2Btn{ min-width:0; min-height:42px; padding:8px 5px; font-size:11px; white-space:normal; }
+  .mobileQuizActions{ display:grid !important; grid-template-columns:1fr 1fr !important; gap:8px; margin-top:10px !important; }
+  .mobileQuizActions .d2Btn,.mobileQuizActions .gold{ width:100%; min-height:48px; }
+  .stage5FeedbackCard{ border-radius:13px; }
+}
+
+@media (max-width:430px){
+  .d2QuizBody{ padding-left:8px !important; padding-right:8px !important; }
+  .mobileQuizProgress{ font-size:13px; }
+  .mobileQuizPrompt,.quizPrompt{ font-size:20px; }
+  .mobileQuizQuestionCard{ padding:12px !important; }
+  .mobileQuizQuestionCard .d2ChoiceBtn{ font-size:15px !important; padding:11px 12px !important; min-height:46px; }
+}
