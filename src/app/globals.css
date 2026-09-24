@@ -3328,3 +3328,26 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
  .interviewBattleSummaryActions{ display:grid; grid-template-columns:1fr; }
  .interviewBattleSummaryActions>*{ width:100%; text-align:center; justify-content:center; }
 }
+
+
+/* ===== Batch 4: gamification, PvP, rewards, leaderboard ===== */
+.pvpHubPage,.gameHubPage{ min-height:100dvh; padding:22px 14px 44px; }
+.pvpHubInner,.gameHubInner{ max-width:1180px !important; margin:0 auto; }
+.pvpHubHero,.gameHubHero{ padding:20px; border-color:rgba(93,168,255,.24); }
+.pvpSetupGrid{ display:grid; grid-template-columns:1.05fr .95fr; gap:16px; margin-top:16px; }
+.pvpChallengeGrid{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; margin-top:16px; }
+.pvpResultGrid{ display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:14px; }
+.rewardsHubPage{ max-width:1180px; margin:0 auto; padding:22px 14px 44px; }
+.rewardsHubHero{ margin-bottom:14px; padding:18px; border:1px solid rgba(255,255,255,.10); border-radius:16px; background:rgba(9,14,23,.72); }
+.rewardsTierGrid{ display:grid !important; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px !important; }
+.rewardsTierCard{ padding:16px; min-width:0; }
+.leaderboardRow{ padding:14px; display:grid; grid-template-columns:60px minmax(0,1fr) auto; gap:12px; align-items:center; text-decoration:none; }
+@media(max-width:860px){
+ .pvpHubPage,.gameHubPage,.rewardsHubPage{ padding:10px 8px 30px; }
+ .pvpSetupGrid,.pvpResultGrid{ grid-template-columns:1fr; }
+ .pvpChallengeGrid{ grid-template-columns:1fr; }
+ .rewardsTierGrid{ grid-template-columns:1fr 1fr !important; }
+ .leaderboardRow{ grid-template-columns:48px minmax(0,1fr); }
+ .leaderboardRow>div:last-child{ grid-column:2; text-align:left !important; }
+}
+@media(max-width:520px){ .rewardsTierGrid{ grid-template-columns:1fr !important; } }
