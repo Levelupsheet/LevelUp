@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { validateQuestionQuality } from "@/lib/questionQuality";
+import { clusterQuestionsBySimilarity, validateQuestionQuality } from "@/lib/questionQuality";
 import {
   TEST_NOW_POOL_KEY,
   getAllDefaultPools,
@@ -1016,7 +1016,9 @@ export default function AdminPage(){
     const passing = results.filter((r) => r.issues.length === 0).length;
     const needsReview = results.length - passing;
     const average = results.length ? Math.round(results.reduce((sum, r) => sum + r.qualityScore, 0) / results.length) : 0;
-    return { passing, needsReview, average };
+    const duplicateClusters = clusterQuestionsBySimilarity(questions, 0.84).filter((cluster) => cluster.ids.length > 1);
+    const duplicateIds = new Set(duplicateClusters.flatMap((cluster) => cluster.ids));
+    return { passing, needsReview, average, duplicateClusters, duplicateIds };
   }, [questions]);
 
   const [qDraft, setQDraft] = useState(`{
@@ -1555,6 +1557,7 @@ export default function AdminPage(){
             <div><small>Quality ready</small><b>{questionQualitySummary.passing}</b></div>
             <div><small>Needs review</small><b>{questionQualitySummary.needsReview}</b></div>
             <div><small>Avg. quality</small><b>{questions.length ? `${questionQualitySummary.average}/100` : "—"}</b></div>
+            <div><small>Similar prompts</small><b>{questionQualitySummary.duplicateIds.size}</b></div>
           </div>
 
           <div className="adminQuestionSetupGrid">
@@ -1673,6 +1676,7 @@ export default function AdminPage(){
               <div style={{ marginTop: 12, maxHeight: 560, overflow:"auto", display:"grid", gap: 10 }}>
                 {questions.map((q, idx) => {
                   const quality = validateQuestionQuality(q);
+                  const isSimilar = questionQualitySummary.duplicateIds.has(q.id);
                   return (
                   <div key={q.id} className={"card adminQuestionReviewCard " + (quality.issues.length ? "needsReview" : "qualityReady")}>
                     <div style={{ display:"flex", justifyContent:"space-between", gap: 10, flexWrap:"wrap", alignItems:"center" }}>
@@ -1687,8 +1691,10 @@ export default function AdminPage(){
                       <span className="badge">Correct: {q.correctIndex + 1}</span>
                       <span className="badge">Quality: {quality.qualityScore}/100</span>
                       <span className={"badge " + (quality.issues.length ? "adminQualityWarn" : "adminQualityReady")}>{quality.issues.length ? `${quality.issues.length} issue${quality.issues.length === 1 ? "" : "s"}` : "Ready"}</span>
+                      {isSimilar ? <span className="badge adminQualityWarn">Similar prompt</span> : null}
                     </div>
                     {quality.issues.length ? <div className="adminQualityIssues"><b>Review before publishing:</b> {quality.issues.join(" • ")}</div> : null}
+                    {isSimilar ? <div className="adminQualityIssues"><b>Similarity check:</b> This prompt closely overlaps another question in the selected set. Review both before publishing.</div> : null}
                     <div style={{ marginTop: 10, display:"grid", gap: 6 }}>
                       {asArray(q.choices).map((choice, choiceIndex) => (
                         <div key={choiceIndex} style={{ padding:"8px 10px", borderRadius:12, border:"1px solid rgba(255,255,255,0.08)", background: choiceIndex === q.correctIndex ? "rgba(74, 222, 128, 0.12)" : "rgba(255,255,255,0.04)" }}>
