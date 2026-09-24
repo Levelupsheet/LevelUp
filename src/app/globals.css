@@ -3393,3 +3393,15 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
  .combatRunStats{ grid-template-columns:repeat(3,minmax(0,1fr)); }
 }
 @media(max-width:430px){ .combatRunStats{ grid-template-columns:1fr; } }
+
+
+/* ===== Batch 4 final pass: progression consistency ===== */
+.dashboardBattleStatus{ margin-top:10px; display:flex; align-items:flex-start; gap:9px; padding:10px 11px; border:1px solid rgba(255,255,255,.09); border-radius:12px; background:rgba(255,255,255,.025); }
+.dashboardBattleStatusDot{ width:9px; height:9px; flex:0 0 9px; margin-top:5px; border-radius:999px; background:rgba(255,255,255,.25); }
+.dashboardBattleStatus.unlocked .dashboardBattleStatusDot{ background:rgba(120,220,160,.92); box-shadow:0 0 10px rgba(120,220,160,.5); }
+.dashboardBattleStatus b,.dashboardBattleStatus small{ display:block; }
+.dashboardBattleStatus b{ font-size:13px; }
+.dashboardBattleStatus small{ margin-top:3px; color:var(--muted); line-height:1.35; }
+.dashboardGameCard{ margin-top:14px; padding:12px; border-color:rgba(93,168,255,.22); background:linear-gradient(180deg,rgba(44,64,98,.25),rgba(18,28,46,.20)); }
+.dashboardGameCard.leaderboard{ border-color:rgba(255,215,100,.25); background:linear-gradient(180deg,rgba(28,54,84,.42),rgba(15,26,44,.38)); box-shadow:0 0 0 1px rgba(255,215,100,.06) inset; }
+@media(max-width:760px){ .dashboardBattleStatus{ padding:9px 10px; } .dashboardGameCard{ padding:11px; } }
