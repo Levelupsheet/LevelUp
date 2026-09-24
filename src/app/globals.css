@@ -3291,3 +3291,16 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
  .interviewLog{ position:static; max-height:none; }
  .careerPathActions>*{ width:100%; text-align:center; }
 }
+
+
+/* ===== Batch 3 deployment checkpoint: connected career loop ===== */
+.dashboardCoachCard{ margin-bottom:14px; border-color:rgba(100,220,255,.20); background:linear-gradient(180deg,rgba(66,112,160,.18),rgba(90,36,64,.14)); }
+.dashboardCoachGrid{ margin-top:12px; display:grid; grid-template-columns:1.15fr .85fr; gap:12px; }
+.dashboardCoachCta{ display:inline-flex; margin-top:14px; text-decoration:none; justify-content:center; }
+.dashboardNextAction{ transition:border-color .2s ease,transform .2s ease; }
+.dashboardNextAction:hover{ border-color:rgba(245,201,105,.42); }
+@media(max-width:760px){
+ .dashboardCoachGrid{ grid-template-columns:1fr; }
+ .dashboardCoachCta{ width:100%; }
+ .dashboardNextAction .dashboardNextButton{ width:100%; min-height:50px; }
+}
