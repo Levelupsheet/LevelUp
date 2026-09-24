@@ -3040,3 +3040,48 @@ button.gold, a.gold{
   .mobileQuizQuestionCard{ padding:12px !important; }
   .mobileQuizQuestionCard .d2ChoiceBtn{ font-size:15px !important; padding:11px 12px !important; min-height:46px; }
 }
+
+
+/* ===== Batch 1 shared quiz sizing: Test Now + Position Training ===== */
+@media (min-width:861px){
+  .d2QuizShell{ width:min(94vw,1440px) !important; max-width:1440px !important; height:min(820px,calc(100dvh - 72px)) !important; min-height:0 !important; max-height:calc(100dvh - 72px) !important; }
+  .d2QuizBody{ padding:10px 14px 14px !important; }
+  .d2InterviewGrid.d2QuizGrid.stage8CompactGrid{ grid-template-columns:170px minmax(0,1fr) 185px !important; gap:12px !important; }
+  .quizPlayerRail .d2ModelPanel,.quizEnemyRail .d2ModelPanel{ min-height:0; }
+  .quizPlayerRail .stage7PowerStrip.underPlayer{ grid-template-columns:1fr 1fr !important; }
+  .quizPlayerRail .stage7PowerStrip.underPlayer .d2Btn:last-of-type{ grid-column:1 / -1; }
+  .d2QuizQuestionCard{ justify-content:flex-start !important; overflow-y:auto; scrollbar-width:thin; }
+  .stageHeaderRow{ gap:8px; }
+  .desktopQuizPrompt{ font-size:clamp(19px,1.45vw,25px) !important; }
+  .d2QuizQuestionCard .d2RuneBar{ margin-top:7px; }
+  .d2QuizQuestionCard .stageProgressDots{ margin:5px 0; }
+  .quizSecondaryMeta{ margin-top:5px; }
+  .quizMomentumBar{ margin-top:5px !important; }
+  .quizPowerStrip{ display:none !important; }
+  .quizHintRow{ display:grid !important; grid-template-columns:repeat(3,minmax(0,1fr)); margin-top:10px !important; }
+  .quizHintRow .d2Btn{ width:100%; min-width:0; }
+  .stage8ActionDock{ grid-template-columns:1fr 1fr !important; }
+  .stage8ActionDock > *{ width:100%; }
+}
+
+@media (max-width:860px){
+  .d2QuizShell{ width:100% !important; max-width:100% !important; height:auto !important; min-height:100dvh !important; max-height:none !important; margin:0 !important; overflow:visible !important; }
+  .d2QuizShell .modalHead{ position:sticky; top:0; z-index:20; background:rgba(7,10,16,.96); backdrop-filter:blur(12px); }
+  .mobileQuizStack{ width:100%; max-width:680px; margin:0 auto; }
+  .mobileEnemyCard{ display:grid; grid-template-columns:minmax(0,1fr) 104px; align-items:center; padding:8px 10px !important; }
+  .mobileEnemyCard > div:first-child{ min-width:0; }
+  .mobileEnemyCard > div:nth-child(2){ margin-top:0 !important; }
+  .mobileEnemyCard video,.mobileEnemyCard img{ width:104px !important; height:76px !important; max-height:76px !important; border-radius:10px; }
+  .mobileQuizQuestionCard{ width:100%; box-sizing:border-box; }
+  .quizHintRow{ display:grid !important; grid-template-columns:repeat(3,minmax(0,1fr)); gap:7px !important; margin-top:10px !important; }
+  .quizHintRow .d2Btn{ width:100%; min-width:0; min-height:42px; padding:7px 5px; font-size:11px; white-space:normal; }
+  .mobilePlayerCard{ display:none !important; }
+  .mobileQuizActions{ position:sticky; bottom:0; z-index:10; padding:8px 0 max(8px,env(safe-area-inset-bottom)); background:linear-gradient(180deg,rgba(7,10,16,0),rgba(7,10,16,.96) 24%); }
+}
+
+@media (max-width:430px){
+  .mobileEnemyCard{ grid-template-columns:minmax(0,1fr) 86px; }
+  .mobileEnemyCard video,.mobileEnemyCard img{ width:86px !important; height:64px !important; }
+  .quizHintRow{ grid-template-columns:1fr 1fr !important; }
+  .quizHintRow .d2Btn:last-child{ grid-column:1 / -1; }
+}
