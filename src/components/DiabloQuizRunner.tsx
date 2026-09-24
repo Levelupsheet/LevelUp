@@ -1178,10 +1178,9 @@ const showExpandedExplanation = useMemo(() => {
 
                   <div className="stage5MetaStrip quizSecondaryMeta">
                     <span className="badge">Mastery {masteryPercent}%</span>
-                    <span className="badge">Question {Math.min(state.idx + 1, combatQuestions.length)} / {combatQuestions.length}</span>
+                    <span className="badge">Q {Math.min(state.idx + 1)} / {combatQuestions.length}</span>
                     <span className="badge">Streak {streak}</span>
-                    {bestStreak > 0 ? <span className="badge">Best {bestStreak}</span> : null}
-                    {partialPercent > 0 && state.locked ? <span className="badge">Partial credit {partialPercent}%</span> : null}
+                    {partialPercent > 0 && state.locked ? <span className="badge">Partial {partialPercent}%</span> : null}
                   </div>
 
                   <div className="stage8CompactBar quizMomentumBar" style={{ marginTop: 10 }}>
@@ -1189,8 +1188,7 @@ const showExpandedExplanation = useMemo(() => {
                       <div className="stage8CompactMini">
                         <span className="badge">🔥 Reward in {stage8Momentum.nextRewardIn}</span>
                         <span className="badge">{stage8Momentum.xpBoostActive ? `⚡ Boost ${stage8Momentum.xpBoostRemaining}` : "⚡ Boost readying"}</span>
-                        <span className="badge">Tier {effectiveQuestionTier}</span>
-                        <span className="badge">Stage {sessionStage}/{maxStages}</span>
+                        <span className="badge">Stage {sessionStage}/{maxStages} • Tier {effectiveQuestionTier}</span>
                         {microRewardFlash ? <span className="badge stage8MicroFlash">{microRewardFlash}</span> : null}
                       </div>
                       <button type="button" className="d2Btn compact" onClick={() => setShowSessionIntel((v) => !v)}>
@@ -1299,10 +1297,11 @@ const showExpandedExplanation = useMemo(() => {
                   )}
                 </>
               ) : (
-                <div className="card" style={{ padding: 16, background: "rgba(255,255,255,0.04)" }}>
-                  <div style={{ fontWeight: 950, fontSize: 20 }}>{outcome === "victory" ? "Victory" : outcome === "defeat" ? "Defeat" : "Run complete"}</div>
-                  <div className="muted" style={{ marginTop: 8 }}>Score {state.correctCount}/{combatQuestions.length} • XP +{displayedXp}</div>
-                  {hintXpSpent > 0 ? <div className="muted" style={{ marginTop: 6 }}>Hints used: {hintsUsedCount} • XP spent on hints: {hintXpSpent}</div> : null}
+                <div className={"card combatRunSummary " + (outcome === "victory" ? "victory" : outcome === "defeat" ? "defeat" : "complete")}>
+                  <div className="dashboardEyebrow">SESSION COMPLETE</div>
+                  <div className="combatRunOutcome">{outcome === "victory" ? "Victory" : outcome === "defeat" ? "Defeat" : "Run complete"}</div>
+                  <div className="combatRunStats"><span><small>Score</small><b>{state.correctCount}/{combatQuestions.length}</b></span><span><small>XP earned</small><b>+{displayedXp}</b></span><span><small>Best streak</small><b>{bestStreak}</b></span></div>
+                  {hintXpSpent > 0 ? <div className="muted combatRunHintCost">Hints used: {hintsUsedCount} • XP spent: {hintXpSpent}</div> : null}
                 </div>
               )}
             </div>
@@ -1323,7 +1322,7 @@ const showExpandedExplanation = useMemo(() => {
               </div>
             </div>
 
-            <div className="stage8CompactBar">
+            <div className="stage8CompactBar mobileSessionIntel">
               <div className="stage8CompactBarRow">
                 <div className="stage8CompactMini">
                   <span className="badge">🔥 {stage8Momentum.nextRewardIn} to reward</span>
@@ -1455,9 +1454,10 @@ const showExpandedExplanation = useMemo(() => {
                   )}
                 </>
               ) : (
-                <div className="card" style={{ padding: 16, background: "rgba(255,255,255,0.04)" }}>
-                  <div style={{ fontWeight: 950, fontSize: 20 }}>{outcome === "victory" ? "Victory" : outcome === "defeat" ? "Defeat" : "Run complete"}</div>
-                  <div className="muted" style={{ marginTop: 8 }}>Score {state.correctCount}/{combatQuestions.length} • XP +{displayedXp}</div>
+                <div className={"card combatRunSummary mobile " + (outcome === "victory" ? "victory" : outcome === "defeat" ? "defeat" : "complete")}>
+                  <div className="dashboardEyebrow">SESSION COMPLETE</div>
+                  <div className="combatRunOutcome">{outcome === "victory" ? "Victory" : outcome === "defeat" ? "Defeat" : "Run complete"}</div>
+                  <div className="combatRunStats"><span><small>Score</small><b>{state.correctCount}/{combatQuestions.length}</b></span><span><small>XP</small><b>+{displayedXp}</b></span><span><small>Best streak</small><b>{bestStreak}</b></span></div>
                 </div>
               )}
             </div>
