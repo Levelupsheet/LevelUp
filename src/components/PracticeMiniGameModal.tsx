@@ -24,6 +24,7 @@ export default function PracticeMiniGameModal(props: {
   const [finalScore, setFinalScore] = useState<{ correct: number; total: number; xp: number; timeLeft?: number; bestStreak?: number }>({ correct: 0, total: 0, xp: 0 });
   const [learningPath, setLearningPath] = useState<any | null>(null);
   const [sessionMastery, setSessionMastery] = useState<Record<string, number>>({});
+  const [previousLearningPath, setPreviousLearningPath] = useState<any | null>(null);
   const [bossReady, setBossReady] = useState(false);
   const [bossLoading, setBossLoading] = useState(false);
   const [bossConsumed, setBossConsumed] = useState(false);
@@ -38,6 +39,7 @@ export default function PracticeMiniGameModal(props: {
     setFinalScore({ correct: 0, total: 0, xp: 0 });
     setLearningPath(null);
     setSessionMastery({});
+    setPreviousLearningPath(null);
     setBossReady(false);
     setBossLoading(false);
     setBossConsumed(false);
@@ -132,6 +134,7 @@ export default function PracticeMiniGameModal(props: {
   function finishRun(summary: DiabloQuizRunSummary & { awardedXp?: number }) {
     setFinalScore({ correct: summary.correctCount, total: summary.totalQuestions, xp: summary.awardedXp ?? summary.xpEarned, timeLeft: summary.timeLeft, bestStreak: summary.bestStreak });
     setSessionMastery(summary.masteryByDomain || {});
+    setPreviousLearningPath(learningPath);
     setStep("summary");
     fetch("/api/learning/path", { cache: "no-store" as any })
       .then((res) => res.json().catch(() => null))
@@ -202,7 +205,14 @@ export default function PracticeMiniGameModal(props: {
             />
           )}
 
-          {step === "summary" && (
+          {step === "summary" && (() => {
+            const previousReadiness = Number(previousLearningPath?.readinessScore);
+            const currentReadiness = Number(learningPath?.readinessScore);
+            const readinessDelta = Number.isFinite(previousReadiness) && Number.isFinite(currentReadiness) ? currentReadiness - previousReadiness : 0;
+            const weakest = Array.isArray(learningPath?.weakestDomains) ? learningPath.weakestDomains[0] : null;
+            const mastery = Number(weakest?.mastery ?? 0);
+            const masteryState = mastery >= 85 ? "MASTERED" : mastery >= 70 ? "STRENGTHENED" : mastery >= 50 ? "IMPROVING" : "FOCUS AREA";
+            return (
             <div className="card" style={{ padding: 14 }}>
               <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}><div><div style={{ fontSize: 18, fontWeight: 950 }}>Run complete</div><small className="luHint">XP was synced to the user profile and DB.</small></div><span className="badge">+{finalScore.xp} XP</span></div>
               <div style={{ marginTop: 12, display: "grid", gap: 10 }}>
@@ -223,6 +233,7 @@ export default function PracticeMiniGameModal(props: {
               <div className="stage5SummaryGrid adaptiveSummaryGrid" style={{ marginTop: 12 }}>
                 <div className="card adaptiveSummaryCard">
                   <div className="adaptiveSummaryTitle">Adaptive learning focus</div>
+                  {weakest ? <div className={`adaptiveMasteryState state-${masteryState.toLowerCase().replaceAll(" ","-")}`}><b>{masteryState}</b><span>{String(weakest.domain || "Skill").replaceAll("_"," ")} • {Math.round(mastery)}%</span></div> : null}
                   {learningPath?.recommendations?.length ? (
                     <div className="adaptiveRecommendationList">
                       {learningPath.recommendations.slice(0, 3).map((item: string, idx: number) => (
@@ -239,6 +250,7 @@ export default function PracticeMiniGameModal(props: {
                   <div className="adaptiveSummaryTitle">Readiness snapshot</div>
                   <div className="stage5SummaryMetric">{typeof learningPath?.readinessScore === "number" ? `${learningPath.readinessScore}%` : "—"}</div>
                   <div className="muted">Momentum: {learningPath?.momentum || "BUILDING"}</div>
+                  {readinessDelta > 0 ? <div className="adaptiveProgressCongrats">↑ Readiness improved {readinessDelta} point{readinessDelta === 1 ? "" : "s"}. Keep going.</div> : null}
                   <div className="adaptiveReadinessNote">Readiness reflects your stored mastery across learning domains, not just this run's score.</div>
                 </div>
               </div>
@@ -247,7 +259,7 @@ export default function PracticeMiniGameModal(props: {
                 <button className="primaryBtn" type="button" onClick={onClose}>{bossReward ? "Finish" : "Done"}</button>
               </div>
             </div>
-          )}
+          )})}
         </div>
       </div>
     </div>
