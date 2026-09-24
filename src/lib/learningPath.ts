@@ -57,16 +57,19 @@ export async function buildPersonalizedLearningPath(userId: string) {
     ...typeWeakness.slice(0, 2).map((item) => `Mix in more ${titleCase(item.type)} questions to reduce format-specific weakness.`),
   ].slice(0, 5);
 
+  const primaryFocus = weakestDomains.find((item) => item.mastery < 85) || weakestDomains[0];
+  const focusState = primaryFocus ? masteryState(primaryFocus.mastery) : "FOCUS_AREA";
   const nextSessionPlan = {
-    warmupDomain: weakestDomains[0]?.domain || ctx.weakestDomain || "general",
+    warmupDomain: primaryFocus?.domain || ctx.weakestDomain || "general",
     focusSubdomain: subdomainWeakness[0]?.subdomain || "general",
     targetDifficulty: ctx.weakestTargetDifficulty,
-    suggestedMix: {
-      remediation: 3,
-      balanced: 3,
-      stretch: 2,
-      scenario: 2,
-    },
+    suggestedMix: focusState === "MASTERED"
+      ? { remediation: 1, balanced: 3, stretch: 3, scenario: 3 }
+      : focusState === "STRENGTHENED"
+        ? { remediation: 1, balanced: 3, stretch: 3, scenario: 3 }
+        : focusState === "IMPROVING"
+          ? { remediation: 2, balanced: 4, stretch: 2, scenario: 2 }
+          : { remediation: 4, balanced: 3, stretch: 1, scenario: 2 },
   };
 
   return {
@@ -78,6 +81,11 @@ export async function buildPersonalizedLearningPath(userId: string) {
     milestones,
     recommendations,
     nextSessionPlan,
+    learningLoop: {
+      focusDomain: primaryFocus?.domain || ctx.weakestDomain || "general",
+      state: focusState,
+      strategy: focusState === "MASTERED" ? "maintenance" : focusState === "STRENGTHENED" ? "verify" : focusState === "IMPROVING" ? "reinforce" : "remediate",
+    },
     readinessScore: Math.max(0, Math.min(100, Math.round(100 - avg(weakestDomains.map((d) => 100 - d.mastery))))),
   };
 }
