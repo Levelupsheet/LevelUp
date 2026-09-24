@@ -23,8 +23,8 @@ export default function RewardsPage() {
   const [ent, setEnt] = useState<Entitlements | null>(null);
   useEffect(() => { fetch('/api/subscription/entitlements', { cache: 'no-store' as any }).then(r => r.json()).then(d => setEnt(d?.entitlements || null)).catch(() => {}); }, []);
   return (
-    <main className="luPage">
-      <div className="luTopRow" style={{ marginBottom: 14 }}>
+    <main className="luPage rewardsHubPage">
+      <div className="luTopRow rewardsHubHero">
         <div>
           <h1 className="luH1" style={{ margin: 0 }}>Rewards</h1>
           <div className="muted" style={{ marginTop: 6 }}>What you can win from loot boxes.</div>
@@ -48,9 +48,9 @@ export default function RewardsPage() {
         </div>
       ) : null}
 
-      <div className="luGrid" style={{ display: "grid", gap: 12 }}>
+      <div className="luGrid rewardsTierGrid">
         {TIERS.map((t, idx) => (
-          <div key={t.name} className="luCard" style={{ padding: 14, opacity: !ent ? 1 : idx < 2 || ent.rewardsTrack !== 'core' ? 1 : 0.92 }}>
+          <div key={t.name} className="luCard rewardsTierCard" style={{ opacity: !ent ? 1 : idx < 2 || ent.rewardsTrack !== 'core' ? 1 : 0.92 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
               <div style={{ fontWeight: 800, fontSize: 16 }}>{t.name} Loot Box</div>
               <div className="luPill">Preview</div>
