@@ -356,8 +356,8 @@ export default function PvpPage() {
         </div>
 
         {activeChallenge ? (
-          <div className="card" style={{ padding: 18, marginTop: 16 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
+          <div className="card pvpDuelSummary">
+            <div className="pvpDuelSummaryHead">
               <div>
                 <h3 style={{ margin: 0 }}>Duel vs {currentOpponentName}</h3>
                 <div style={{ marginTop: 6, opacity: 0.78 }}>
@@ -368,7 +368,7 @@ export default function PvpPage() {
                 </div>
               </div>
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                {activeChallenge.resultLabel ? <span className="badge">{activeChallenge.resultLabel}</span> : null}
+                {activeChallenge.resultLabel ? <span className="badge pvpResultBadge">{activeChallenge.resultLabel}</span> : null}
                 {!activeChallenge.youSubmitted ? (
                   <button type="button" className="primaryBtn" onClick={() => { setDuelOpen(true); answerRef.current = {}; startedAtRef.current = Date.now(); }}>
                     Open combat duel
@@ -378,8 +378,8 @@ export default function PvpPage() {
             </div>
 
             <div className="pvpResultGrid">
-              <div className="featureCard" style={{ padding: 14 }}>
-                <h4 style={{ marginTop: 0 }}>Your result</h4>
+              <div className="featureCard pvpScoreCard">
+                <h4>Your result</h4>
                 {youSummary ? (
                   <div style={{ display: "grid", gap: 8 }}>
                     <div>Accuracy: <b>{Math.round((youSummary.accuracy || 0) * 100)}%</b></div>
@@ -392,8 +392,8 @@ export default function PvpPage() {
                   <small style={{ opacity: 0.78 }}>Your duel result will appear here after you finish the combat session.</small>
                 )}
               </div>
-              <div className="featureCard" style={{ padding: 14 }}>
-                <h4 style={{ marginTop: 0 }}>{currentOpponentName} result</h4>
+              <div className="featureCard pvpScoreCard">
+                <h4>{currentOpponentName} result</h4>
                 {opponentSummary ? (
                   <div style={{ display: "grid", gap: 8 }}>
                     <div>Accuracy: <b>{Math.round((opponentSummary.accuracy || 0) * 100)}%</b></div>
