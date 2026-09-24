@@ -241,9 +241,9 @@ export default function PvpPage() {
   const duelQuestions = useMemo(() => toDiabloQuestions(activeChallenge?.questions || []), [activeChallenge?.questions]);
 
   return (
-    <main className="page">
-      <div className="container" style={{ maxWidth: 1180, paddingTop: 24, paddingBottom: 32 }}>
-        <div className="card" style={{ padding: 18 }}>
+    <main className="page pvpHubPage">
+      <div className="container pvpHubInner">
+        <div className="card pvpHubHero">
           <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
             <div>
               <h1 style={{ margin: 0 }}>PvP Arena</h1>
@@ -270,7 +270,7 @@ export default function PvpPage() {
           </div>
         ) : null}
 
-        <div style={{ display: "grid", gridTemplateColumns: "1.05fr .95fr", gap: 16, marginTop: 16 }}>
+        <div className="pvpSetupGrid">
           <div className="card" style={{ padding: 18 }}>
             <h3 style={{ marginTop: 0 }}>Choose a rival</h3>
             <div style={{ display: "grid", gap: 10 }}>
@@ -317,7 +317,7 @@ export default function PvpPage() {
           </div>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16, marginTop: 16 }}>
+        <div className="pvpChallengeGrid">
           {[
             { title: "Incoming challenges", rows: incoming, incoming: true },
             { title: "Outgoing challenges", rows: outgoing, incoming: false },
@@ -377,7 +377,7 @@ export default function PvpPage() {
               </div>
             </div>
 
-            <div style={{ marginTop: 14, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+            <div className="pvpResultGrid">
               <div className="featureCard" style={{ padding: 14 }}>
                 <h4 style={{ marginTop: 0 }}>Your result</h4>
                 {youSummary ? (
