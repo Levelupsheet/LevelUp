@@ -166,7 +166,7 @@ export default function PracticeMiniGameModal(props: {
           {step === "quiz" && (
             <GameEngine
               lane={lane}
-              title={title}
+              title=""
               subtitle={subtitle}
               timed={kind === "test"}
               startingPosition={kind === "position" ? path : undefined}
