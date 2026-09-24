@@ -1352,9 +1352,13 @@ const showExpandedExplanation = useMemo(() => {
             </div>
 
             <div className="mobileCombatCard mobileEnemyCard">
-              <D2EnemyHealthBar value={stageEnemyHP} max={currentStageConfig.hp} name={currentStageEnemyName.toUpperCase().slice(0, 18)} />
-              <div style={{ marginTop: 10 }}>
-                <ModelPanel title={currentStageEnemyName.toUpperCase().slice(0, 18)} src={enemyVideo} loop={!isEnemyHitVideo} onEnded={isEnemyHitVideo ? () => setHitPulse(null) : undefined} height={180} damageText={damageFloat.enemy || null} damageTone="enemy" />
+              <div className="mobileEnemyHud">
+                <div className="mobileEnemyHealth">
+                  <D2EnemyHealthBar value={stageEnemyHP} max={currentStageConfig.hp} name={currentStageEnemyName.toUpperCase().slice(0, 18)} />
+                </div>
+                <div className="mobileEnemyPortrait">
+                  <ModelPanel title={currentStageEnemyName.toUpperCase().slice(0, 18)} src={enemyVideo} loop={!isEnemyHitVideo} onEnded={isEnemyHitVideo ? () => setHitPulse(null) : undefined} height={92} damageText={damageFloat.enemy || null} damageTone="enemy" />
+                </div>
               </div>
             </div>
 
