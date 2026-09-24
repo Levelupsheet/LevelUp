@@ -924,7 +924,7 @@ async function analyzeResumeStage12() {
 
           <h4 className="dashboardProgressHeading" style={{ margin: "0 0 8px 0" }}>Progress</h4>
 
-          <div className="card dashboardProgressCard" style={{ padding: 12 }}>
+          <div className="card dashboardProgressCard dashboardProgressGameCard" style={{ padding: 12 }}>
             <div style={{ display: "flex", justifyContent: "space-between", gap: 10 }}>
               <small>{levelTitleFromLevel(localLevel)} • Level {localLevel}</small>
               <small style={{ padding: "2px 10px", borderRadius: 999, fontWeight: 800, letterSpacing: 0.2, ...(tierBadgeStyle as any) }}>{tierLabel}</small>
@@ -933,8 +933,8 @@ async function analyzeResumeStage12() {
               <ProgressBar value={Number.isFinite(xpIntoLevel) ? xpIntoLevel : 0} max={levelMax} />
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8, opacity: 0.85 }}>
-              <small>Level progress: {Number.isFinite(xpIntoLevel) ? xpIntoLevel : 0} / {levelMax} XP</small>
-              <small>Tokens: {Number.isFinite(tokenBalance) ? tokenBalance : 0}</small>
+              <small>{Math.max(0, levelMax - (Number.isFinite(xpIntoLevel) ? xpIntoLevel : 0))} XP to Level {localLevel + 1}</small>
+              <small>{Number.isFinite(tokenBalance) ? tokenBalance : 0} tokens</small>
             </div>
           </div>
 
