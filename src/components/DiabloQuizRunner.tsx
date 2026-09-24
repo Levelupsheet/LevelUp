@@ -1176,7 +1176,7 @@ const showExpandedExplanation = useMemo(() => {
                   <DomainRuneBar domainLabel={domainLabel} mastery={currentMastery} tier={state.tier} />
                   <div className="stageProgressDots">{Array.from({ length: 3 }).map((_, idx) => <span key={idx} className={"stageDot" + (idx < stageAnswered ? " active" : "") + (idx === stageAnswered && !state.locked ? " current" : "") } />)}</div>
 
-                  <div className="stage5MetaStrip">
+                  <div className="stage5MetaStrip quizSecondaryMeta">
                     <span className="badge">Mastery {masteryPercent}%</span>
                     <span className="badge">Question {Math.min(state.idx + 1, combatQuestions.length)} / {combatQuestions.length}</span>
                     <span className="badge">Streak {streak}</span>
@@ -1184,7 +1184,7 @@ const showExpandedExplanation = useMemo(() => {
                     {partialPercent > 0 && state.locked ? <span className="badge">Partial credit {partialPercent}%</span> : null}
                   </div>
 
-                  <div className="stage8CompactBar" style={{ marginTop: 10 }}>
+                  <div className="stage8CompactBar quizMomentumBar" style={{ marginTop: 10 }}>
                     <div className="stage8CompactBarRow">
                       <div className="stage8CompactMini">
                         <span className="badge">🔥 Reward in {stage8Momentum.nextRewardIn}</span>
@@ -1208,7 +1208,7 @@ const showExpandedExplanation = useMemo(() => {
                     ) : null}
                   </div>
 
-                  <div className="stage7PowerStrip">
+                  <div className="stage7PowerStrip quizPowerStrip">
                     <button className={"d2Btn power" + (powerups.shieldActive ? " active" : "")} type="button" disabled={state.locked || powerups.shieldActive || (powerups.shieldUses + stage9Inventory.shield) <= 0} onClick={activateShield}>Shield {powerups.shieldActive ? "On" : (powerups.shieldUses + stage9Inventory.shield) > 0 ? `x${powerups.shieldUses + stage9Inventory.shield}` : "Locked"}</button>
                     <button className={"d2Btn power" + (powerups.furyActive ? " active" : "")} type="button" disabled={state.locked || powerups.furyActive || (powerups.furyUses + stage9Inventory.fury) <= 0} onClick={activateFury}>Fury {powerups.furyActive ? "On" : (powerups.furyUses + stage9Inventory.fury) > 0 ? `x${powerups.furyUses + stage9Inventory.fury}` : "Locked"}</button>
                 <button className="d2Btn power" type="button" disabled={state.locked || stage9Inventory.xpSurge <= 0} onClick={activateXpSurge}>Time Slow {stage9Inventory.xpSurge > 0 ? `x${stage9Inventory.xpSurge}` : "Locked"}</button>
@@ -1346,12 +1346,12 @@ const showExpandedExplanation = useMemo(() => {
               ) : null}
             </div>
 
-            <div className="stage7PowerStrip mobile">
+            <div className="stage7PowerStrip mobile quizPowerStrip">
               <button className={"d2Btn power" + (powerups.shieldActive ? " active" : "")} type="button" disabled={state.locked || powerups.shieldActive || (powerups.shieldUses + stage9Inventory.shield) <= 0} onClick={activateShield}>Shield {powerups.shieldActive ? "On" : (powerups.shieldUses + stage9Inventory.shield) > 0 ? `x${powerups.shieldUses + stage9Inventory.shield}` : "Locked"}</button>
               <button className={"d2Btn power" + (powerups.furyActive ? " active" : "")} type="button" disabled={state.locked || powerups.furyActive || (powerups.furyUses + stage9Inventory.fury) <= 0} onClick={activateFury}>Fury {powerups.furyActive ? "On" : (powerups.furyUses + stage9Inventory.fury) > 0 ? `x${powerups.furyUses + stage9Inventory.fury}` : "Locked"}</button>
             </div>
 
-            <div className="mobileCombatCard">
+            <div className="mobileCombatCard mobileEnemyCard">
               <D2EnemyHealthBar value={stageEnemyHP} max={currentStageConfig.hp} name={currentStageEnemyName.toUpperCase().slice(0, 18)} />
               <div style={{ marginTop: 10 }}>
                 <ModelPanel title={currentStageEnemyName.toUpperCase().slice(0, 18)} src={enemyVideo} loop={!isEnemyHitVideo} onEnded={isEnemyHitVideo ? () => setHitPulse(null) : undefined} height={180} damageText={damageFloat.enemy || null} damageTone="enemy" />
@@ -1366,7 +1366,7 @@ const showExpandedExplanation = useMemo(() => {
                     <span className="badge">{labelForType(questionType)}</span>
                     <span className="badge">Stage {sessionStage}/{maxStages}</span>
                   </div>
-                  <div className="mobileQuizPrompt">{question.prompt}</div>
+                  <div className="mobileQuizPrompt quizPrompt">{question.prompt}</div>
                   <DomainRuneBar domainLabel={domainLabel} mastery={currentMastery} tier={state.tier} />
                   {renderQuestionInput({
                     question,
