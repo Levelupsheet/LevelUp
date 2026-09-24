@@ -274,6 +274,9 @@ export function weightedAdaptiveQuestionPlan<T extends RuntimeQuestion>(args: {
   const rule = getBankRule(args.lane);
   const blueprint = args.blueprint?.length ? args.blueprint : buildSessionBlueprint(args.questionCount, args.learning.weakestTargetDifficulty);
   const sessionTypeCounts = new Map<string, number>(Object.entries(args.sessionState?.typeCounts || {}));
+  const recentTail = args.learning.recentHistory.slice(0, 4);
+  const recentWrongCount = recentTail.filter((row) => !row.correct).length;
+  const inferredRecovery = Boolean(args.sessionState?.inRecovery) || Number(args.sessionState?.wrongStreak || 0) >= 2 || recentWrongCount >= 2;
   const perDomainCount = new Map<string, number>();
   const selectedIds = new Set<string>();
   const selected: Array<T & { level?: number }> = [];
@@ -309,7 +312,10 @@ export function weightedAdaptiveQuestionPlan<T extends RuntimeQuestion>(args: {
       const weakBonus = step.weakFocus && domainKey === args.learning.weakestDomain ? 30 : 0;
       const scenarioBonus = step.mode === "scenario" && ["incident", "cli_command", "log_analysis"].includes(typeKey) ? 30 : 0;
       const reviewBonus = step.mode === "review" && ["multiple_choice", "fill_blank", "multi_select"].includes(typeKey) ? 20 : 0;
-      const recoveryBonus = (args.sessionState?.inRecovery || step.mode === "recovery") && ["multiple_choice", "fill_blank"].includes(typeKey) ? 35 : 0;
+      const recoveryMode = inferredRecovery || step.mode === "recovery";
+      const recoveryBonus = recoveryMode && ["multiple_choice", "fill_blank"].includes(typeKey) ? 42 : 0;
+      const recoveryDomainBonus = recoveryMode && sameWrongDomain ? 48 : 0;
+      const recoveryDifficultyBonus = recoveryMode && Number((q as any).level || 1) <= Math.max(1, args.learning.weakestTargetDifficulty) ? 28 : 0;
       const typePreferenceBonus = step.preferredTypes?.includes(typeKey) ? 18 : 0;
       const qualityBonus = Number((q as any).qualityScore || 70) * 0.08;
       const crowdingPenalty = (perDomainCount.get(domainKey) || 0) * 22;
@@ -324,6 +330,8 @@ export function weightedAdaptiveQuestionPlan<T extends RuntimeQuestion>(args: {
         scenarioBonus +
         reviewBonus +
         recoveryBonus +
+        recoveryDomainBonus +
+        recoveryDifficultyBonus +
         typePreferenceBonus +
         qualityBonus -
         crowdingPenalty +
