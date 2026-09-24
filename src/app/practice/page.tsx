@@ -57,9 +57,9 @@ export default function PracticePage() {
   }
 
   return (
-    <main className="row">
-      <div className="card" style={{ flex: "1 1 560px" }}>
-        <h2 style={{ marginTop: 0 }}>Practice (IT Support)</h2>
+    <main className="practiceWorkspace page"><div className="container practiceWorkspaceInner">
+      <section className="card practiceMainCard">
+        <div className="dashboardEyebrow">SKILL PRACTICE</div><h1>Practice IT Support</h1><p className="practiceIntro">Work through a real-world support prompt. Structure your answer around checks, tools, actions, and expected outcomes.</p>
 
         <div className="row">
           <div style={{ flex: "1 1 260px" }}>
