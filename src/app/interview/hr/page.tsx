@@ -85,8 +85,9 @@ export default function HRInterviewPage() {
       <div className="heroBlur" />
     <main className="interviewPage"><div className="interviewWorkspace">
       <section className="card interviewMain">
-        <h2 style={{ marginTop: 0 }}>HR Screen (1:1 Hiring Manager)</h2>
-        <p><small>This is the MVP text interview flow. Avatars/voice come later.</small></p>
+        <div className="dashboardEyebrow">INTERVIEW READINESS</div>
+        <h1>HR Battle</h1>
+        <p className="interviewIntro">Practice a structured hiring-manager screen. Use clear examples and the STAR method when it fits.</p>
 
         {!session ? (
           <button onClick={start} disabled={loading}>{loading ? "Starting..." : "Start HR Screen"}</button>
@@ -109,11 +110,12 @@ export default function HRInterviewPage() {
             </div>
           </>
         )}
-      </div>
+      </section>
 
-      <div className="card" style={{ flex: "1 1 360px" }}>
+      <aside className="card interviewLog">
         <h3 style={{ marginTop: 0 }}>Session log</h3>
         {log.length ? log.map((x, i) => <p key={i} style={{ margin: "6px 0" }}><small>{x}</small></p>) : <p><small>No session yet.</small></p>}
+      </aside>
       </div>
     </main>
     </>
