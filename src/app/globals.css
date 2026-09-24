@@ -3504,3 +3504,22 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 @media(max-width:900px){
   .gameHubHero,.pvpHubHero,.rewardsHubHero{padding:14px;}
 }
+
+
+/* ===== Batch 8: progression hierarchy ===== */
+.progressionSnapshot{display:grid;gap:10px;}
+.progressionSnapshotHead{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
+.progressionEyebrow{display:block;font-size:10px;font-weight:900;letter-spacing:.12em;color:var(--lu-game-muted);margin-bottom:3px;}
+.progressionLevel{font-size:14px;font-weight:700;}
+.progressionLevel b{color:var(--lu-game-gold);margin-left:4px;}
+.progressionTier{padding:3px 9px;border-radius:999px;font-weight:800;letter-spacing:.02em;white-space:nowrap;}
+.progressionXpRow{display:flex;justify-content:space-between;gap:8px;font-size:11px;color:var(--lu-game-muted);font-variant-numeric:tabular-nums;}
+.progressionXpRow b{color:inherit;}
+.progressionSignals{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;}
+.progressionSignals>span{display:grid;gap:1px;padding:7px 8px;border:1px solid var(--lu-game-border);border-radius:10px;background:var(--lu-game-surface-soft);min-width:0;}
+.progressionSignals small{font-size:9px;text-transform:uppercase;letter-spacing:.07em;color:var(--lu-game-muted);}
+.progressionSignals b{font-size:14px;font-variant-numeric:tabular-nums;}
+@media(max-width:900px){
+ .progressionSnapshot{gap:8px;}
+ .progressionSignals>span{padding:6px 7px;}
+}
