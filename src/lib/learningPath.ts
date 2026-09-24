@@ -1,7 +1,14 @@
 import { getAdaptiveLearningContext } from "@/lib/adaptiveEngine";
 
 function titleCase(value: string) {
-  return value.replace(/[_-]+/g, " ").replace(/\w/g, (m) => m.toUpperCase());
+  return value.replace(/[_-]+/g, " ").replace(/\b\w/g, (m) => m.toUpperCase());
+}
+
+function masteryState(mastery: number) {
+  if (mastery >= 85) return "MASTERED";
+  if (mastery >= 70) return "STRENGTHENED";
+  if (mastery >= 50) return "IMPROVING";
+  return "FOCUS_AREA";
 }
 
 function avg(values: number[]) {
@@ -40,7 +47,13 @@ export async function buildPersonalizedLearningPath(userId: string) {
   }));
 
   const recommendations = [
-    ...weakestDomains.map((item) => `Prioritize ${titleCase(item.domain)} until mastery reaches at least ${Math.min(75, Math.round(item.mastery + 10))}.`),
+    ...weakestDomains.map((item) => item.mastery >= 85
+      ? `${titleCase(item.domain)} is mastered. Maintain it with occasional mixed review.`
+      : item.mastery >= 70
+        ? `${titleCase(item.domain)} is strengthened. Use harder scenario questions to verify durable mastery.`
+        : item.mastery >= 50
+          ? `${titleCase(item.domain)} is improving. Continue targeted practice until mastery reaches at least ${Math.min(75, Math.round(item.mastery + 10))}.`
+          : `Prioritize ${titleCase(item.domain)} until mastery reaches at least ${Math.min(75, Math.round(item.mastery + 10))}.`),
     ...typeWeakness.slice(0, 2).map((item) => `Mix in more ${titleCase(item.type)} questions to reduce format-specific weakness.`),
   ].slice(0, 5);
 
@@ -59,6 +72,7 @@ export async function buildPersonalizedLearningPath(userId: string) {
   return {
     momentum,
     weakestDomains,
+    masteryStates: weakestDomains.map((item) => ({ ...item, state: masteryState(item.mastery) })),
     subdomainWeakness,
     typeWeakness,
     milestones,
