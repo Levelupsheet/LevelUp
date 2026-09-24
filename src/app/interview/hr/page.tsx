@@ -83,8 +83,8 @@ export default function HRInterviewPage() {
     <>
       <div className="bgPattern" />
       <div className="heroBlur" />
-    <main className="row">
-      <div className="card" style={{ flex: "1 1 660px" }}>
+    <main className="interviewPage"><div className="interviewWorkspace">
+      <section className="card interviewMain">
         <h2 style={{ marginTop: 0 }}>HR Screen (1:1 Hiring Manager)</h2>
         <p><small>This is the MVP text interview flow. Avatars/voice come later.</small></p>
 
@@ -105,7 +105,7 @@ export default function HRInterviewPage() {
                 {loading ? "Submitting..." : "Submit Answer"}
               </button>
               <button onClick={finish} disabled={loading}>Finish + Score</button>
-              <a href="/dashboard"><button>Back to Dashboard</button></a>
+              <a className="secondaryBtn" href="/dashboard">Back to Dashboard</a>
             </div>
           </>
         )}
