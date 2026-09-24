@@ -351,7 +351,16 @@ export default function AdminContentStudioPage() {
         body: JSON.stringify({ knowledgeBlockId: selectedBlockId }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data?.error || "Publish failed");
+      if (!res.ok) {
+        const blocked = Array.isArray(data?.blockedQuestions) ? data.blockedQuestions : [];
+        const similar = Array.isArray(data?.similarityClusters) ? data.similarityClusters : [];
+        const detail = blocked.length
+          ? ` ${blocked.length} question(s) need quality review: ${blocked.slice(0, 3).map((q: any) => `${q.qualityScore}/100 ${q.prompt}`).join(" | ")}`
+          : similar.length
+            ? ` ${similar.length} similar prompt cluster(s) must be reviewed before publishing.`
+            : "";
+        throw new Error(`${data?.error || "Publish failed"}${detail}`);
+      }
       setMessage(`Published ${data.publishedCount} question(s) to live QuestionSet ${data.setId}.`);
       await loadBlocks();
       await refreshReviewData(selectedBlockId);
