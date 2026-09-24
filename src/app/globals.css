@@ -3304,3 +3304,27 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
  .dashboardCoachCta{ width:100%; }
  .dashboardNextAction .dashboardNextButton{ width:100%; min-height:50px; }
 }
+
+
+/* ===== Batch 3 completion: interview battle progression ===== */
+.interviewBattleHeader{ display:flex; justify-content:space-between; align-items:center; gap:14px; }
+.interviewBattleTitle{ display:block; margin:3px 0; font-size:20px; }
+.interviewBattleSetup{ display:block; }
+.interviewBattleSetupCard{ padding:22px; }
+.interviewBattleHeading{ margin:5px 0 6px; font-size:clamp(24px,3vw,34px); }
+.interviewBattleSummary{ padding:24px; }
+.interviewBattleSummary h2{ margin:5px 0 6px; font-size:clamp(28px,4vw,42px); }
+.interviewBattleStats{ display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; margin-top:18px; }
+.interviewBattleStats>div{ padding:14px; border:1px solid rgba(255,255,255,.11); border-radius:14px; background:rgba(255,255,255,.035); }
+.interviewBattleStats small,.interviewBattleStats strong{ display:block; }
+.interviewBattleStats small{ color:var(--muted); margin-bottom:6px; }
+.interviewBattleStats strong{ font-size:18px; }
+.interviewBattleSummaryActions{ display:flex; gap:10px; flex-wrap:wrap; margin-top:18px; }
+.interviewBattleSummaryActions a{ text-decoration:none; }
+@media(max-width:700px){
+ .interviewBattleHeader{ align-items:flex-start; }
+ .interviewBattleSetupCard,.interviewBattleSummary{ padding:16px; }
+ .interviewBattleStats{ grid-template-columns:1fr 1fr; }
+ .interviewBattleSummaryActions{ display:grid; grid-template-columns:1fr; }
+ .interviewBattleSummaryActions>*{ width:100%; text-align:center; justify-content:center; }
+}
