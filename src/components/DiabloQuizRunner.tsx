@@ -1287,7 +1287,7 @@ const showExpandedExplanation = useMemo(() => {
 
                   {state.locked && (
                     <div style={{ marginTop: 12, display: "grid", gap: 10 }}>
-                      <div className="card stage5FeedbackCard stage5MergedFeedbackCard" style={{ padding: 12, background: (question as any)?.isGolden ? "rgba(255,215,64,0.08)" : "rgba(255,255,255,0.04)", borderColor: (question as any)?.isGolden ? "rgba(255,215,64,0.35)" : undefined }}>
+                      <div className="card stage5FeedbackCard stage5MergedFeedbackCard adaptiveTeachingCard" style={{ padding: 12, background: (question as any)?.isGolden ? "rgba(255,215,64,0.08)" : "rgba(255,255,255,0.04)", borderColor: (question as any)?.isGolden ? "rgba(255,215,64,0.35)" : undefined }}>
                         <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
                           <div style={{ fontWeight: 950 }}>{state.lastWasCorrect ? "✅ Correct" : partialPercent > 0 ? "🟨 Partial credit" : "❌ Not quite"}</div>
                           <div className="stage5ScorePill">{partialPercent}% accuracy</div>
