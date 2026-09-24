@@ -23,6 +23,7 @@ export default function PracticeMiniGameModal(props: {
   const [cert, setCert] = useState<CertTrack>("A_PLUS");
   const [finalScore, setFinalScore] = useState<{ correct: number; total: number; xp: number; timeLeft?: number; bestStreak?: number }>({ correct: 0, total: 0, xp: 0 });
   const [learningPath, setLearningPath] = useState<any | null>(null);
+  const [sessionMastery, setSessionMastery] = useState<Record<string, number>>({});
   const [bossReady, setBossReady] = useState(false);
   const [bossLoading, setBossLoading] = useState(false);
   const [bossConsumed, setBossConsumed] = useState(false);
@@ -36,6 +37,7 @@ export default function PracticeMiniGameModal(props: {
     setStep("setup");
     setFinalScore({ correct: 0, total: 0, xp: 0 });
     setLearningPath(null);
+    setSessionMastery({});
     setBossReady(false);
     setBossLoading(false);
     setBossConsumed(false);
@@ -129,6 +131,7 @@ export default function PracticeMiniGameModal(props: {
 
   function finishRun(summary: DiabloQuizRunSummary & { awardedXp?: number }) {
     setFinalScore({ correct: summary.correctCount, total: summary.totalQuestions, xp: summary.awardedXp ?? summary.xpEarned, timeLeft: summary.timeLeft, bestStreak: summary.bestStreak });
+    setSessionMastery(summary.masteryByDomain || {});
     setStep("summary");
     fetch("/api/learning/path", { cache: "no-store" as any })
       .then((res) => res.json().catch(() => null))
@@ -217,21 +220,26 @@ export default function PracticeMiniGameModal(props: {
                 ) : null}
                 {bossReward ? <div className="card" style={{ padding: 12, background: bossReward.won ? "rgba(46,204,113,0.08)" : "rgba(255,255,255,0.04)" }}><b>{bossReward.won ? "Boss cleared" : "Boss attempt completed"}</b>: +{bossReward.xp} XP<div className="muted" style={{ marginTop: 6 }}>This bonus fight has been consumed for this run.</div></div> : null}
               </div>
-              <div className="stage5SummaryGrid" style={{ marginTop: 12 }}>
-                <div className="card" style={{ padding: 12, background: "rgba(255,255,255,0.04)" }}>
-                  <div style={{ fontWeight: 900, marginBottom: 6 }}>Next learning focus</div>
+              <div className="stage5SummaryGrid adaptiveSummaryGrid" style={{ marginTop: 12 }}>
+                <div className="card adaptiveSummaryCard">
+                  <div className="adaptiveSummaryTitle">Adaptive learning focus</div>
                   {learningPath?.recommendations?.length ? (
-                    <div style={{ display: "grid", gap: 8 }}>
+                    <div className="adaptiveRecommendationList">
                       {learningPath.recommendations.slice(0, 3).map((item: string, idx: number) => (
                         <div key={idx} className="stage5SummaryNote">{item}</div>
                       ))}
                     </div>
                   ) : <div className="muted">Complete more sessions to build your adaptive path.</div>}
+                  {Object.keys(sessionMastery).length ? <div className="adaptiveSessionMastery">
+                    <small>This session</small>
+                    {Object.entries(sessionMastery).sort((a,b) => Number(a[1]) - Number(b[1])).slice(0,3).map(([domain, mastery]) => <span key={domain}><b>{domain.replaceAll("_"," ")}</b> {Math.round(Number(mastery))}%</span>)}
+                  </div> : null}
                 </div>
-                <div className="card" style={{ padding: 12, background: "rgba(255,255,255,0.04)" }}>
-                  <div style={{ fontWeight: 900, marginBottom: 6 }}>Readiness snapshot</div>
+                <div className="card adaptiveSummaryCard">
+                  <div className="adaptiveSummaryTitle">Readiness snapshot</div>
                   <div className="stage5SummaryMetric">{typeof learningPath?.readinessScore === "number" ? `${learningPath.readinessScore}%` : "—"}</div>
                   <div className="muted">Momentum: {learningPath?.momentum || "BUILDING"}</div>
+                  <div className="adaptiveReadinessNote">Readiness reflects your stored mastery across learning domains, not just this run's score.</div>
                 </div>
               </div>
               <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 14, flexWrap: "wrap" }}>
