@@ -1132,7 +1132,7 @@ const showExpandedExplanation = useMemo(() => {
         )}
       </div>
 
-      <div className="modalBody d2QuizBody" style={{ flex: 1, overflow: "hidden", paddingTop: 0 }}>
+      <div className="modalBody d2QuizBody" style={{ flex: 1, paddingTop: 0 }}>
         {stageBanner ? <div className="stageTransitionBanner">{stageBanner}</div> : null}
         {!isMobileLayout ? (
           <div className="d2InterviewGrid d2QuizGrid stage8CompactGrid" style={{ height: "100%", alignItems: "stretch", minWidth: 0, minHeight: 0, overflow: "hidden" }}>
