@@ -744,6 +744,17 @@ const showExpandedExplanation = useMemo(() => {
   return true;
 }, [explanationText, feedbackText]);
 
+const adaptiveCoachText = useMemo(() => {
+  if (!state.locked) return "";
+  if (state.lastWasCorrect) {
+    if (streak >= 5) return `Excellent run — ${streak} correct in a row. The adaptive engine can keep raising the challenge as your mastery grows.`;
+    if (streak >= 3) return `Strong work — ${streak} correct in a row. You\'re building reliable mastery in ${domainLabel}.`;
+    if (masteryPercent >= 80) return `Nice work. ${domainLabel} is becoming a strength; we\'ll keep mixing in harder questions while maintaining review.`;
+    return `Correct. Your ${domainLabel} mastery is moving in the right direction.`;
+  }
+  return `We\'ll reinforce ${domainLabel}. Review why this answer works; upcoming adaptive questions can give extra weight to weaker areas and recent misses.`;
+}, [state.locked, state.lastWasCorrect, streak, masteryPercent, domainLabel]);
+
   useEffect(() => {
     finishedOnceRef.current = false;
     setStreak(0);
@@ -1283,6 +1294,7 @@ const showExpandedExplanation = useMemo(() => {
                         </div>
                         <div className="muted" style={{ marginTop: 6, whiteSpace: "pre-wrap", lineHeight: 1.42 }}>
                           {feedbackText}
+                          {adaptiveCoachText ? <div className="adaptiveCoachFeedback">{adaptiveCoachText}</div> : null}
                         </div>
                         {showExpandedExplanation ? (
                           <div className="stage5MergedExplanation" style={{ marginTop: 8 }}>
@@ -1440,6 +1452,7 @@ const showExpandedExplanation = useMemo(() => {
                         </div>
                         <div className="muted" style={{ marginTop: 6, whiteSpace: "pre-wrap", lineHeight: 1.42 }}>
                           {feedbackText}
+                          {adaptiveCoachText ? <div className="adaptiveCoachFeedback">{adaptiveCoachText}</div> : null}
                         </div>
                         {showExpandedExplanation ? (
                           <div className="stage5MergedExplanation" style={{ marginTop: 8 }}>
