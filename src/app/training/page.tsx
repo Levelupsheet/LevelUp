@@ -1,51 +1,36 @@
 export default function TrainingCatalog() {
+  const tracks = [
+    { title: "Help Desk", tag: "FOUNDATION", body: "Ticket triage, troubleshooting, escalation, customer communication, identity, endpoints, and Microsoft 365 fundamentals." },
+    { title: "Desktop Support", tag: "INTERMEDIATE", body: "Windows endpoint triage, device remediation, software support, access issues, and practical desktop operations." },
+    { title: "Cloud Fundamentals", tag: "ADVANCING", body: "Cloud terminology, identity, security, Azure and Microsoft 365 concepts that prepare you for cloud-focused roles." },
+  ];
   return (
-    <>
-      <div className="bgPattern" />
-      <div className="heroBlur" />
-      <main className="row">
-        <div className="card" style={{ flex: "1 1 720px" }}>
-          <h2 style={{ marginTop: 0 }}>Training (catalog)</h2>
-          <p style={{ opacity: 0.9 }}>
-            This page lists training areas LevelUp Pro offers. To launch training questions, use the <b>Start Now</b> button from the dashboard.
-          </p>
-
-          <hr style={{ margin: "14px 0" }} />
-
-          <h3 style={{ marginTop: 0 }}>Current tracks</h3>
-          <ul>
-            <li><b>Help Desk</b>: tickets, troubleshooting basics, escalation</li>
-            <li><b>Desktop Support</b>: Windows endpoint triage, device fixes</li>
-            <li><b>Cloud Fundamentals</b>: intro concepts and terminology</li>
-          </ul>
-
-          <h3>Coming next</h3>
-          <ul>
-            <li>Azure / Microsoft 365 deeper modules</li>
-            <li>AWS identity/networking quick labs</li>
-            <li>Scenario-based “choose your path” training</li>
-          </ul>
-
-          <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 14 }}>
-            <a href="/dashboard"><button className="primary">Back to Dashboard</button></a>
-            <a href="/start#how"><button>How it works</button></a>
+    <main className="learningCatalog page">
+      <div className="container learningCatalogInner">
+        <section className="card learningHero">
+          <div>
+            <div className="dashboardEyebrow">POSITION TRAINING</div>
+            <h1>Build job-ready IT skills.</h1>
+            <p>Train through real-world scenarios, earn XP, build domain mastery, and advance along your career path.</p>
           </div>
-        </div>
-
-        <div className="card" style={{ flex: "1 1 360px" }}>
-          <h3 style={{ marginTop: 0 }}>How to access</h3>
-          <ol style={{ margin: 0, paddingLeft: 18 }}>
-            <li>Go to <b>Dashboard</b></li>
-            <li>Click <b>Start Now</b></li>
-            <li>Select <b>Position training</b></li>
-          </ol>
-          <p style={{ marginTop: 10, opacity: 0.8 }}>
-            <small>
-              This keeps users from jumping straight into modules without the leveling flow.
-            </small>
-          </p>
-        </div>
-      </main>
-    </>
+          <a href="/dashboard" className="learningPrimaryLink">Continue from Dashboard →</a>
+        </section>
+        <section className="learningTrackGrid">
+          {tracks.map((track) => (
+            <article className="card learningTrackCard" key={track.title}>
+              <span className="badge">{track.tag}</span>
+              <h2>{track.title}</h2>
+              <p>{track.body}</p>
+            </article>
+          ))}
+        </section>
+        <section className="card learningFlowCard">
+          <div><b>1. Choose your path</b><span>Your dashboard keeps training aligned to your current role.</span></div>
+          <div><b>2. Practice scenarios</b><span>Answer varied question types and use assistance when needed.</span></div>
+          <div><b>3. Build mastery</b><span>XP, streaks and domain mastery update as you progress.</span></div>
+          <div><b>4. Advance</b><span>Unlock interviews, battles and the next career milestones.</span></div>
+        </section>
+      </div>
+    </main>
   );
 }
