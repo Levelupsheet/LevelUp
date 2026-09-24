@@ -3411,7 +3411,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .adminQuestionBankHeader{ display:flex; align-items:flex-start; justify-content:space-between; gap:16px; flex-wrap:wrap; }
 .adminContentWorkflow,.contentPipelineSteps{ display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:8px; margin-top:16px; }
 .adminContentWorkflow>div,.contentPipelineSteps>span{ padding:9px 10px; border:1px solid rgba(110,190,255,.16); border-radius:10px; background:rgba(110,190,255,.055); font-size:12px; font-weight:800; text-align:center; }
-.adminQuestionMetrics{ display:grid; grid-template-columns:2fr repeat(4,minmax(110px,1fr)); gap:10px; margin-top:14px; }
+.adminQuestionMetrics{ display:grid; grid-template-columns:2fr repeat(5,minmax(100px,1fr)); gap:10px; margin-top:14px; }
 .adminQuestionMetrics>div{ min-width:0; padding:12px; border:1px solid rgba(255,255,255,.09); border-radius:12px; background:rgba(0,0,0,.12); }
 .adminQuestionMetrics small,.adminQuestionMetrics b{ display:block; }
 .adminQuestionMetrics b{ margin-top:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:16px; }
@@ -3429,3 +3429,5 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
  .adminQuestionSetupGrid,.adminQuestionReviewGrid{ grid-template-columns:1fr; }
 }
 @media(max-width:520px){ .adminContentWorkflow,.contentPipelineSteps,.adminQuestionMetrics{ grid-template-columns:1fr; } .adminQuestionMetrics>div:first-child{ grid-column:auto; } }
+
+.adaptiveCoachFeedback{ margin-top:9px; padding:9px 10px; border-left:3px solid rgba(110,190,255,.55); border-radius:8px; background:rgba(110,190,255,.07); color:rgba(235,245,255,.9); font-size:12px; line-height:1.45; }
