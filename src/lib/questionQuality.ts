@@ -77,6 +77,6 @@ export function validateQuestionQuality(input: { prompt?: string | null; type?: 
     if (!answers.length) issues.push("Log analysis missing accepted findings");
   }
 
-  const qualityScore = Math.max(0, 100 - issues.length * 18 - (prompt.length < 24 ? 8 : 0) + (explanation ? 4 : 0));
+  const qualityScore = Math.max(0, Math.min(100, 100 - issues.length * 18 - (prompt.length < 24 ? 8 : 0) + (explanation ? 4 : 0)));
   return { issues, qualityScore };
 }
