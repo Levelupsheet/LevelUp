@@ -298,10 +298,14 @@ export function weightedAdaptiveQuestionPlan<T extends RuntimeQuestion>(args: {
       const typeBalance = Math.max(0, 100 - sessionTypeCount * Math.max(12, 120 / Math.max(5, typeTarget)));
       const novelty = args.learning.recentQuestionIds.has(String(q.id)) ? 0 : 100;
       const recencyPenalty = args.learning.exposureQuestionIds24h.has(String(q.id)) ? 100 : 0;
+      const sameWrongDomain = args.learning.lastWrongDomain === domainKey;
+      const sameWrongSubdomain = args.learning.lastWrongSubdomain === String((q as any).subdomain).toLowerCase();
+      const sameWrongType = args.learning.lastWrongQuestionType === typeKey;
       const remediationBonus =
-        (args.learning.lastWrongDomain === domainKey ? 35 : 0) +
-        (args.learning.lastWrongSubdomain === String((q as any).subdomain).toLowerCase() ? 20 : 0) +
-        (args.learning.lastWrongQuestionType === typeKey ? 12 : 0);
+        (sameWrongDomain ? 55 : 0) +
+        (sameWrongSubdomain ? 38 : 0) +
+        (sameWrongType ? 14 : 0) +
+        (sameWrongDomain && !args.learning.recentQuestionIds.has(String(q.id)) ? 24 : 0);
       const weakBonus = step.weakFocus && domainKey === args.learning.weakestDomain ? 30 : 0;
       const scenarioBonus = step.mode === "scenario" && ["incident", "cli_command", "log_analysis"].includes(typeKey) ? 30 : 0;
       const reviewBonus = step.mode === "review" && ["multiple_choice", "fill_blank", "multi_select"].includes(typeKey) ? 20 : 0;
@@ -315,7 +319,7 @@ export function weightedAdaptiveQuestionPlan<T extends RuntimeQuestion>(args: {
         typeBalance * 0.14 +
         novelty * 0.12 -
         recencyPenalty * 0.12 +
-        remediationBonus * 0.08 +
+        remediationBonus * 0.16 +
         weakBonus +
         scenarioBonus +
         reviewBonus +
