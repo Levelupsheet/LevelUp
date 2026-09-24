@@ -91,10 +91,10 @@ export default function CoachPage() {
   return (
     <main className="page">
       <div className="container" style={{ maxWidth: 1080, paddingTop: 24, paddingBottom: 40 }}>
-        <div className="card" style={{ padding: 20 }}>
+        <div className="card coachHero">
           <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
             <div>
-              <h1 style={{ margin: 0 }}>AI Coach</h1>
+              <div className="dashboardEyebrow">CAREER INTELLIGENCE</div><h1>AI Coach</h1>
               <div style={{ marginTop: 6, opacity: 0.82 }}>
                 <small>Resume analysis, skill-gap mapping, and LevelUp learning-path recommendations.</small>
               </div>
@@ -103,8 +103,8 @@ export default function CoachPage() {
           </div>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1.15fr 0.95fr", gap: 16, marginTop: 16 }}>
-          <div className="card" style={{ padding: 18 }}>
+        <div className="coachGrid coachGridPrimary">
+          <div className="card coachPanel">
             <h3 style={{ marginTop: 0 }}>Career fit</h3>
             <div style={{ fontWeight: 900, fontSize: 24 }}>
               {loading ? "Loading..." : profile?.targetRole || "No analysis yet"}
@@ -142,7 +142,7 @@ export default function CoachPage() {
             ) : null}
           </div>
 
-          <div className="card" style={{ padding: 18 }}>
+          <div className="card coachPanel">
             <h3 style={{ marginTop: 0 }}>Focus areas</h3>
             <div style={{ display: "grid", gap: 8 }}>
               {focusAreas.map((row, idx) => (
@@ -157,8 +157,8 @@ export default function CoachPage() {
           </div>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginTop: 16 }}>
-          <div className="card" style={{ padding: 18 }}>
+        <div className="coachGrid">
+          <div className="card coachPanel">
             <h3 style={{ marginTop: 0 }}>Detected skills</h3>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
               {detectedSkills.map((skill) => (
@@ -170,7 +170,7 @@ export default function CoachPage() {
             </div>
           </div>
 
-          <div className="card" style={{ padding: 18 }}>
+          <div className="card coachPanel">
             <h3 style={{ marginTop: 0 }}>Coach next actions</h3>
             <div style={{ display: "grid", gap: 8 }}>
               {nextActions.map((row, idx) => (
