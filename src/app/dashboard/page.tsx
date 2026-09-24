@@ -924,17 +924,23 @@ async function analyzeResumeStage12() {
 
           <h4 className="dashboardProgressHeading" style={{ margin: "0 0 8px 0" }}>Progress</h4>
 
-          <div className="card dashboardProgressCard dashboardProgressGameCard" style={{ padding: 12 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", gap: 10 }}>
-              <small>{levelTitleFromLevel(localLevel)} • Level {localLevel}</small>
-              <small style={{ padding: "2px 10px", borderRadius: 999, fontWeight: 800, letterSpacing: 0.2, ...(tierBadgeStyle as any) }}>{tierLabel}</small>
+          <div className="card dashboardProgressCard dashboardProgressGameCard progressionSnapshot" style={{ padding: 12 }}>
+            <div className="progressionSnapshotHead">
+              <div>
+                <span className="progressionEyebrow">YOUR PROGRESSION</span>
+                <div className="progressionLevel">{levelTitleFromLevel(localLevel)} <b>Level {localLevel}</b></div>
+              </div>
+              <small className="progressionTier" style={{ ...(tierBadgeStyle as any) }}>{tierLabel}</small>
             </div>
-            <div style={{ marginTop: 10 }}>
-              <ProgressBar value={Number.isFinite(xpIntoLevel) ? xpIntoLevel : 0} max={levelMax} />
+            <div className="progressionXpRow">
+              <span><b>{Number.isFinite(xpIntoLevel) ? xpIntoLevel : 0}</b> / {levelMax} XP</span>
+              <span>{Math.max(0, levelMax - (Number.isFinite(xpIntoLevel) ? xpIntoLevel : 0))} to next level</span>
             </div>
-            <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8, opacity: 0.85 }}>
-              <small>{Math.max(0, levelMax - (Number.isFinite(xpIntoLevel) ? xpIntoLevel : 0))} XP to Level {localLevel + 1}</small>
-              <small>{Number.isFinite(tokenBalance) ? tokenBalance : 0} tokens</small>
+            <ProgressBar value={Number.isFinite(xpIntoLevel) ? xpIntoLevel : 0} max={levelMax} />
+            <div className="progressionSignals">
+              <span><small>Mastery</small><b>{Math.round(Number(overallMastery || 0))}%</b></span>
+              <span><small>Streak</small><b>{dailyStreak.streakDays}d</b></span>
+              <span><small>Tokens</small><b>{Number.isFinite(tokenBalance) ? tokenBalance : 0}</b></span>
             </div>
           </div>
 
