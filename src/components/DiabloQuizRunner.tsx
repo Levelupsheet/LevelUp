@@ -744,17 +744,6 @@ const showExpandedExplanation = useMemo(() => {
   return true;
 }, [explanationText, feedbackText]);
 
-const adaptiveCoachText = useMemo(() => {
-  if (!state.locked) return "";
-  if (state.lastWasCorrect) {
-    if (streak >= 5) return `Excellent run — ${streak} correct in a row. The adaptive engine can keep raising the challenge as your mastery grows.`;
-    if (streak >= 3) return `Strong work — ${streak} correct in a row. You\'re building reliable mastery in ${domainLabel}.`;
-    if (masteryPercent >= 80) return `Nice work. ${domainLabel} is becoming a strength; we\'ll keep mixing in harder questions while maintaining review.`;
-    return `Correct. Your ${domainLabel} mastery is moving in the right direction.`;
-  }
-  return `We\'ll reinforce ${domainLabel}. Review why this answer works; upcoming adaptive questions can give extra weight to weaker areas and recent misses.`;
-}, [state.locked, state.lastWasCorrect, streak, masteryPercent, domainLabel]);
-
   useEffect(() => {
     finishedOnceRef.current = false;
     setStreak(0);
@@ -894,6 +883,17 @@ const adaptiveCoachText = useMemo(() => {
   const partialScore = Number(answerInsight?.evaluation?.partialScore ?? answerInsight?.evaluation?.score ?? 0);
   const partialPercent = Math.max(0, Math.min(100, Math.round(partialScore * 100)));
   const masteryPercent = Math.max(0, Math.min(100, Math.round(currentMastery)));
+
+  const adaptiveCoachText = useMemo(() => {
+    if (!state.locked) return "";
+    if (state.lastWasCorrect) {
+      if (streak >= 5) return `Excellent run — ${streak} correct in a row. The adaptive engine can keep raising the challenge as your mastery grows.`;
+      if (streak >= 3) return `Strong work — ${streak} correct in a row. You\'re building reliable mastery in ${domainLabel}.`;
+      if (masteryPercent >= 80) return `Nice work. ${domainLabel} is becoming a strength; we\'ll keep mixing in harder questions while maintaining review.`;
+      return `Correct. Your ${domainLabel} mastery is moving in the right direction.`;
+    }
+    return `We\'ll reinforce ${domainLabel}. Review why this answer works; upcoming adaptive questions can give extra weight to weaker areas and recent misses.`;
+  }, [state.locked, state.lastWasCorrect, streak, masteryPercent, domainLabel]);
 
   function useHint(type: HintType) {
     if (!question || state.locked) return;
