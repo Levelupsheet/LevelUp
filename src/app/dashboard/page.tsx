@@ -938,15 +938,12 @@ async function analyzeResumeStage12() {
             </div>
           </div>
 
-          <div style={{ marginTop: 10 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <span style={{ width: 10, height: 10, borderRadius: 999, background: (((localLevel || 1) >= 5 || elig?.eligible) ? "rgba(120,220,160,0.92)" : "rgba(255,255,255,0.25)"), boxShadow: (((localLevel || 1) >= 5 || elig?.eligible) ? "0 0 10px rgba(120,220,160,0.55)" : "none") }} />
-              <small>Boss Battle Eligibility Unlocked!</small>
-            </div>
-            <div style={{ marginTop: 8, opacity: 0.82 }}><small>Adaptive mastery details are shown in the main panel.</small></div>
+          <div className={"dashboardBattleStatus " + (((localLevel || 1) >= 5 || elig?.eligible) ? "unlocked" : "locked")}>
+            <span className="dashboardBattleStatusDot" />
+            <div><b>{((localLevel || 1) >= 5 || elig?.eligible) ? "Boss Battle unlocked" : "Boss Battle locked"}</b><small>{((localLevel || 1) >= 5 || elig?.eligible) ? "You meet the current progression gate." : "Reach Level 5 or qualify through mastery to unlock."}</small></div>
           </div>
 
-          <div className="card powerHudCard" style={{ marginTop: 14, padding: 12, borderColor: "rgba(93,168,255,0.22)", background: "linear-gradient(180deg, rgba(44,64,98,0.28), rgba(18,28,46,0.20))" }}>
+          <div className="card powerHudCard dashboardGameCard">
             <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
               <div>
                 <div style={{ fontWeight: 900 }}>PowerUps</div>
@@ -964,7 +961,7 @@ async function analyzeResumeStage12() {
             </div>
           </div>
 
-          <div className="card leaderboardMiniCard" style={{ marginTop: 14, padding: 12, borderColor: "rgba(255,215,100,0.28)", background: "linear-gradient(180deg, rgba(28,54,84,0.46), rgba(15,26,44,0.40))", boxShadow: "0 0 0 1px rgba(255,215,100,0.08) inset" }}>
+          <div className="card leaderboardMiniCard dashboardGameCard leaderboard">
             <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
               <div>
                 <div style={{ fontWeight: 900, fontSize: 16 }}>Leaderboard • Top candidates</div>
