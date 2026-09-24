@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { validateQuestionQuality } from "@/lib/questionQuality";
 import {
   TEST_NOW_POOL_KEY,
   getAllDefaultPools,
@@ -1010,6 +1011,13 @@ export default function AdminPage(){
   const [newSetName, setNewSetName] = useState("Networking Set 1");
   const [questions, setQuestions] = useState<Question[]>([]);
   const [dirtyOrder, setDirtyOrder] = useState(false);
+  const questionQualitySummary = useMemo(() => {
+    const results = questions.map((q) => validateQuestionQuality(q));
+    const passing = results.filter((r) => r.issues.length === 0).length;
+    const needsReview = results.length - passing;
+    const average = results.length ? Math.round(results.reduce((sum, r) => sum + r.qualityScore, 0) / results.length) : 0;
+    return { passing, needsReview, average };
+  }, [questions]);
 
   const [qDraft, setQDraft] = useState(`{
   "prompt": "A user reports intermittent connectivity over Wi-Fi. Which step should you do FIRST?",
@@ -1522,11 +1530,12 @@ export default function AdminPage(){
       ) : null}
 
       {tab === "questions" ? (
-        <div className="card" style={{ marginTop: 14 }}>
-          <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap: 12, flexWrap:"wrap" }}>
+        <div className="card adminQuestionBank" style={{ marginTop: 14 }}>
+          <div className="adminQuestionBankHeader">
             <div>
-              <div style={{ fontWeight: 900, fontSize: 20 }}>DB Question Bank</div>
-              <small>Create sets, import final JSON question files, and assign live placements used by the quiz and training flows.</small>
+              <div className="dashboardEyebrow">CONTENT OPERATIONS</div>
+              <div style={{ fontWeight: 900, fontSize: 24 }}>DB Question Bank</div>
+              <small>Review, organize, validate, and publish original LevelUp Pro learning content.</small>
             </div>
             <div className="row" style={{ gap: 8, flexWrap:"wrap" }}>
               <button onClick={refreshSets}>Refresh sets</button>
@@ -1536,7 +1545,19 @@ export default function AdminPage(){
             </div>
           </div>
 
-          <div style={{ marginTop: 14, display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(320px, 1fr))", gap: 14 }}>
+          <div className="adminContentWorkflow">
+            {["1. Source concepts", "2. Generate original questions", "3. Quality review", "4. Assign learning lane", "5. Publish & monitor"].map((step) => <div key={step}>{step}</div>)}
+          </div>
+
+          <div className="adminQuestionMetrics">
+            <div><small>Selected set</small><b>{selectedSetObj?.name || "None selected"}</b></div>
+            <div><small>Questions</small><b>{questions.length}</b></div>
+            <div><small>Quality ready</small><b>{questionQualitySummary.passing}</b></div>
+            <div><small>Needs review</small><b>{questionQualitySummary.needsReview}</b></div>
+            <div><small>Avg. quality</small><b>{questions.length ? `${questionQualitySummary.average}/100` : "—"}</b></div>
+          </div>
+
+          <div className="adminQuestionSetupGrid">
             <div className="card" style={{ background:"rgba(255,255,255,0.03)" }}>
               <div style={{ fontWeight: 800, marginBottom: 10 }}>Question sets</div>
               <label style={{ display:"grid", gap: 6 }}>
@@ -1622,7 +1643,7 @@ export default function AdminPage(){
             </div>
           </div>
 
-          <div style={{ marginTop: 14, display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(320px, 1fr))", gap: 14 }}>
+          <div className="adminQuestionReviewGrid">
             <div className="card" style={{ background:"rgba(255,255,255,0.03)" }}>
               <div style={{ display:"flex", justifyContent:"space-between", gap: 10, flexWrap:"wrap", alignItems:"center" }}>
                 <div>
@@ -1650,8 +1671,10 @@ export default function AdminPage(){
                 </div>
               </div>
               <div style={{ marginTop: 12, maxHeight: 560, overflow:"auto", display:"grid", gap: 10 }}>
-                {questions.map((q, idx) => (
-                  <div key={q.id} className="card" style={{ background:"rgba(0,0,0,0.25)" }}>
+                {questions.map((q, idx) => {
+                  const quality = validateQuestionQuality(q);
+                  return (
+                  <div key={q.id} className={"card adminQuestionReviewCard " + (quality.issues.length ? "needsReview" : "qualityReady")}>
                     <div style={{ display:"flex", justifyContent:"space-between", gap: 10, flexWrap:"wrap", alignItems:"center" }}>
                       <div style={{ fontWeight: 800 }}>{idx + 1}. {q.prompt}</div>
                       <div className="row" style={{ gap: 8, flexWrap:"wrap" }}>
@@ -1662,7 +1685,10 @@ export default function AdminPage(){
                     <div className="row" style={{ marginTop: 8, flexWrap:"wrap" }}>
                       <span className="badge">Difficulty: {q.difficulty}</span>
                       <span className="badge">Correct: {q.correctIndex + 1}</span>
+                      <span className="badge">Quality: {quality.qualityScore}/100</span>
+                      <span className={"badge " + (quality.issues.length ? "adminQualityWarn" : "adminQualityReady")}>{quality.issues.length ? `${quality.issues.length} issue${quality.issues.length === 1 ? "" : "s"}` : "Ready"}</span>
                     </div>
+                    {quality.issues.length ? <div className="adminQualityIssues"><b>Review before publishing:</b> {quality.issues.join(" • ")}</div> : null}
                     <div style={{ marginTop: 10, display:"grid", gap: 6 }}>
                       {asArray(q.choices).map((choice, choiceIndex) => (
                         <div key={choiceIndex} style={{ padding:"8px 10px", borderRadius:12, border:"1px solid rgba(255,255,255,0.08)", background: choiceIndex === q.correctIndex ? "rgba(74, 222, 128, 0.12)" : "rgba(255,255,255,0.04)" }}>
@@ -1672,7 +1698,8 @@ export default function AdminPage(){
                     </div>
                     {q.explanation ? <div style={{ marginTop: 8 }}><small><b>Explanation:</b> {q.explanation}</small></div> : null}
                   </div>
-                ))}
+                  );
+                })}
                 {!questions.length ? <div className="card" style={{ background:"rgba(0,0,0,0.25)" }}><small>No questions in this set yet.</small></div> : null}
               </div>
             </div>
