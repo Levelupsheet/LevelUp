@@ -21,9 +21,9 @@ export default function LeaderboardPage() {
   const subtitle = tab === 'top' ? 'Top candidates' : tab === 'boss' ? 'Boss Wins' : `${data?.domain || 'AZURE'} Domain`;
 
   return (
-    <main className="page">
-      <div className="container" style={{ maxWidth: 1100, paddingTop: 24, paddingBottom: 32 }}>
-        <div className="card" style={{ padding: 18, borderColor: 'rgba(93,168,255,0.24)' }}>
+    <main className="page gameHubPage">
+      <div className="container gameHubInner">
+        <div className="card gameHubHero">
           <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -47,7 +47,7 @@ export default function LeaderboardPage() {
         <div className="card" style={{ marginTop: 16 }}>
           <div style={{ display: 'grid', gap: 12 }}>
             {rows.map((row, idx) => (
-              <a key={`${tab}_${row.userId}_${idx}`} href={`/profile/${encodeURIComponent(row.userId)}`} className="featureCard" style={{ padding: 14, display: 'grid', gridTemplateColumns: '60px minmax(0,1fr) auto', gap: 12, alignItems: 'center', textDecoration: 'none' }}>
+              <a key={`${tab}_${row.userId}_${idx}`} href={`/profile/${encodeURIComponent(row.userId)}`} className="featureCard leaderboardRow">
                 <div className="badge" style={{ width: 44, textAlign: 'center', fontSize: 18 }}>{idx + 1}</div>
                 <div style={{ minWidth: 0 }}>
                   <div style={{ fontWeight: 900, fontSize: 20, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row.displayName}</div>
