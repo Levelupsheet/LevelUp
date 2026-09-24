@@ -3465,3 +3465,42 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .adaptiveMasteryState.state-improving{ border-color:rgba(110,190,255,.28); background:rgba(110,190,255,.07); }
 .adaptiveMasteryState.state-strengthened,.adaptiveMasteryState.state-mastered{ border-color:rgba(110,220,150,.3); background:rgba(110,220,150,.075); }
 .adaptiveProgressCongrats{ margin-top:10px; padding:9px 10px; border:1px solid rgba(110,220,150,.24); border-radius:9px; background:rgba(110,220,150,.07); font-size:13px; font-weight:800; }
+
+
+/* ===== Batch 8: canonical game-hub design system ===== */
+:root{
+  --lu-game-border:rgba(255,255,255,.12);
+  --lu-game-surface:rgba(10,14,24,.78);
+  --lu-game-surface-soft:rgba(255,255,255,.045);
+  --lu-game-gold:rgba(255,214,102,.92);
+  --lu-game-muted:rgba(232,238,248,.72);
+}
+.gameHubHero,.pvpHubHero,.rewardsHubHero{
+  border:1px solid var(--lu-game-border);
+  background:linear-gradient(135deg,rgba(255,255,255,.065),rgba(255,255,255,.025));
+  box-shadow:0 18px 44px rgba(0,0,0,.2);
+}
+.gameHubHero h1,.pvpHubHero h1,.rewardsHubHero .luH1{
+  letter-spacing:-.025em;
+}
+.gameHubPage .featureCard,.pvpHubPage .featureCard,.rewardsHubPage .rewardsTierCard{
+  border:1px solid var(--lu-game-border);
+  background:var(--lu-game-surface-soft);
+  transition:transform .16s ease,border-color .16s ease,background .16s ease;
+}
+.gameHubPage .featureCard:hover,.pvpHubPage button.featureCard:hover,.rewardsHubPage .rewardsTierCard:hover{
+  transform:translateY(-1px);
+  border-color:rgba(255,214,102,.28);
+  background:rgba(255,255,255,.065);
+}
+.gameHubPage .badge,.pvpHubPage .badge,.rewardsHubPage .luPill{
+  border:1px solid rgba(255,214,102,.22);
+  background:rgba(255,214,102,.075);
+  font-weight:800;
+}
+.gameHubPage small,.pvpHubPage small,.rewardsHubPage .muted{
+  color:var(--lu-game-muted);
+}
+@media(max-width:900px){
+  .gameHubHero,.pvpHubHero,.rewardsHubHero{padding:14px;}
+}
