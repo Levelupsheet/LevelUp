@@ -1019,12 +1019,18 @@ async function analyzeResumeStage12() {
           <div className="card dashboardNextAction">
             <div className="dashboardNextCopy">
               <div className="dashboardEyebrow">RECOMMENDED NEXT</div>
-              <h2>Continue your {user?.startingPosition ? labelPos(user.startingPosition) : "career"} path</h2>
-              <p>Keep your momentum moving with the next training session. Your XP, mastery, and unlock progress update as you complete challenges.</p>
+              <h2>{hasTechReady ? "Your Tech Battle is ready" : hrBattleUnlocked && !hrPassed ? "Take your HR Battle" : `Continue your ${user?.startingPosition ? labelPos(user.startingPosition) : "career"} path`}</h2>
+              <p>{hasTechReady ? "You cleared the HR gate. Put your technical reasoning to the test and keep your career progression moving." : hrBattleUnlocked && !hrPassed ? "You have unlocked the interview track. Complete the HR Battle to move toward the technical interview." : "Keep your momentum moving with the next training session. Your XP, mastery, and unlock progress update as you complete challenges."}</p>
             </div>
-            <button className="gold dashboardNextButton" type="button" onClick={() => !hasFreeStartCooldown && setShowLaunchModal(true)} disabled={hasFreeStartCooldown}>
-              {hasFreeStartCooldown ? `Available in ${freeStartCooldownLabel}` : "Continue training →"}
-            </button>
+            {hasTechReady ? (
+              <button className="primary dashboardNextButton" type="button" onClick={() => setMockInterviewOpen(true)}>Start Tech Battle →</button>
+            ) : hrBattleUnlocked && !hrPassed ? (
+              <button className="gold dashboardNextButton" type="button" onClick={() => setMockInterviewOpen(true)}>Start HR Battle →</button>
+            ) : (
+              <button className="gold dashboardNextButton" type="button" onClick={() => !hasFreeStartCooldown && setShowLaunchModal(true)} disabled={hasFreeStartCooldown}>
+                {hasFreeStartCooldown ? `Available in ${freeStartCooldownLabel}` : "Continue training →"}
+              </button>
+            )}
           </div>
 
           <div className="card dashboardPlanCard" style={{ marginBottom: 14, borderColor: normalizedTier === "FREE" ? "rgba(255,196,107,0.25)" : "rgba(93,168,255,0.24)" }}>
@@ -1089,7 +1095,7 @@ async function analyzeResumeStage12() {
 
 
 
-<div className="card" style={{ marginBottom: 14, borderColor: "rgba(100,220,255,0.20)", background: "linear-gradient(180deg, rgba(66,112,160,0.18), rgba(90,36,64,0.14))" }}>
+<div className="card dashboardCoachCard">
   <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
     <div>
       <h3 style={{ margin: 0 }}>AI Coach</h3>
@@ -1097,7 +1103,7 @@ async function analyzeResumeStage12() {
     </div>
   </div>
 
-  <div style={{ marginTop: 12, display: "grid", gridTemplateColumns: "1.15fr 0.85fr", gap: 12 }}>
+  <div className="dashboardCoachGrid">
     <div className="featureCard">
       <div><small>AI summary</small></div>
       <div style={{ marginTop: 8, fontWeight: 800, fontSize: 20 }}>{stage12Status?.profile?.targetRole || "Career path pending"}</div>
@@ -1119,7 +1125,7 @@ async function analyzeResumeStage12() {
         ))}
         {!(stage12Status?.profile?.coaching?.nextActions || []).length ? <small style={{ opacity: 0.78 }}>No recommendations yet.</small> : null}
       </div>
-      <div style={{ marginTop: 10, opacity: 0.76 }}><small>{stage12Status?.analyzedAt ? `Last analyzed ${new Date(stage12Status.analyzedAt).toLocaleString()}` : "Original resume file is not retained long term."}</small></div>
+      <div style={{ marginTop: 10, opacity: 0.76 }}><small>{stage12Status?.analyzedAt ? `Last analyzed ${new Date(stage12Status.analyzedAt).toLocaleString()}` : "Original resume file is not retained long term."}</small></div>\n      <a className="secondaryBtn dashboardCoachCta" href="/coach">Open AI Coach →</a>
     </div>
   </div>
 </div>
