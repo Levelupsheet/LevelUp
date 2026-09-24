@@ -3405,3 +3405,27 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .dashboardGameCard{ margin-top:14px; padding:12px; border-color:rgba(93,168,255,.22); background:linear-gradient(180deg,rgba(44,64,98,.25),rgba(18,28,46,.20)); }
 .dashboardGameCard.leaderboard{ border-color:rgba(255,215,100,.25); background:linear-gradient(180deg,rgba(28,54,84,.42),rgba(15,26,44,.38)); box-shadow:0 0 0 1px rgba(255,215,100,.06) inset; }
 @media(max-width:760px){ .dashboardBattleStatus{ padding:9px 10px; } .dashboardGameCard{ padding:11px; } }
+
+
+/* ===== Batch 7: admin knowledge-bank workflow ===== */
+.adminQuestionBankHeader{ display:flex; align-items:flex-start; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+.adminContentWorkflow,.contentPipelineSteps{ display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:8px; margin-top:16px; }
+.adminContentWorkflow>div,.contentPipelineSteps>span{ padding:9px 10px; border:1px solid rgba(110,190,255,.16); border-radius:10px; background:rgba(110,190,255,.055); font-size:12px; font-weight:800; text-align:center; }
+.adminQuestionMetrics{ display:grid; grid-template-columns:2fr repeat(4,minmax(110px,1fr)); gap:10px; margin-top:14px; }
+.adminQuestionMetrics>div{ min-width:0; padding:12px; border:1px solid rgba(255,255,255,.09); border-radius:12px; background:rgba(0,0,0,.12); }
+.adminQuestionMetrics small,.adminQuestionMetrics b{ display:block; }
+.adminQuestionMetrics b{ margin-top:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:16px; }
+.adminQuestionSetupGrid,.adminQuestionReviewGrid{ margin-top:14px; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+.adminQuestionReviewCard{ background:rgba(0,0,0,.25); }
+.adminQuestionReviewCard.qualityReady{ border-color:rgba(110,220,150,.22); }
+.adminQuestionReviewCard.needsReview{ border-color:rgba(255,190,90,.24); }
+.adminQualityReady{ border-color:rgba(110,220,150,.3); background:rgba(110,220,150,.08); }
+.adminQualityWarn{ border-color:rgba(255,190,90,.32); background:rgba(255,190,90,.08); }
+.adminQualityIssues{ margin-top:9px; padding:9px 10px; border-radius:10px; background:rgba(255,190,90,.07); border:1px solid rgba(255,190,90,.16); color:var(--muted); font-size:12px; line-height:1.45; }
+@media(max-width:900px){
+ .adminContentWorkflow,.contentPipelineSteps{ grid-template-columns:1fr 1fr; }
+ .adminQuestionMetrics{ grid-template-columns:1fr 1fr; }
+ .adminQuestionMetrics>div:first-child{ grid-column:1/-1; }
+ .adminQuestionSetupGrid,.adminQuestionReviewGrid{ grid-template-columns:1fr; }
+}
+@media(max-width:520px){ .adminContentWorkflow,.contentPipelineSteps,.adminQuestionMetrics{ grid-template-columns:1fr; } .adminQuestionMetrics>div:first-child{ grid-column:auto; } }
