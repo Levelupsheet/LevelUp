@@ -1146,8 +1146,8 @@ const showExpandedExplanation = useMemo(() => {
       <div className="modalBody d2QuizBody" style={{ flex: 1, paddingTop: 0 }}>
         {stageBanner ? <div className="stageTransitionBanner">{stageBanner}</div> : null}
         {!isMobileLayout ? (
-          <div className="d2InterviewGrid d2QuizGrid stage8CompactGrid" style={{ height: "100%", alignItems: "stretch", minWidth: 0, minHeight: 0, overflow: "hidden" }}>
-            <div className="quizPlayerRail" style={{ display: "grid", gap: 10, alignContent: "start", minHeight: 0 }}>
+          <div className="d2InterviewGrid d2QuizGrid stage8CompactGrid batch8DesktopQuizGrid" style={{ height: "100%", alignItems: "stretch", minWidth: 0, minHeight: 0, overflow: "hidden" }}>
+            <div className="quizPlayerRail batch8CombatRail batch8PlayerRail" style={{ display: "grid", gap: 10, alignContent: "start", minHeight: 0 }}>
               <div className={hitPulse === "player" ? "d2Shake" : ""}>
                 <D2LifeOrb value={state.playerHP} name={playerName} />
               </div>
@@ -1159,7 +1159,7 @@ const showExpandedExplanation = useMemo(() => {
               </div>
             </div>
 
-            <div className={"d2QuestionCard d2QuizQuestionCard " + (hitPulse === "enemy" ? "d2HitFlash" : "") + ((question as any)?.isGolden ? " d2GoldenQuestionCard" : "") + (isGoldenBoss ? " d2GoldenBossCard" : "") } style={{ minHeight: 0, height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+            <div className={"d2QuestionCard d2QuizQuestionCard batch8LearningStage " + (hitPulse === "enemy" ? "d2HitFlash" : "") + ((question as any)?.isGolden ? " d2GoldenQuestionCard" : "") + (isGoldenBoss ? " d2GoldenBossCard" : "") } style={{ minHeight: 0, height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
               <span className="d2Rivet" style={{ left: 12, top: 12 }} />
               <span className="d2Rivet" style={{ right: 12, top: 12 }} />
               <span className="d2Rivet" style={{ left: 12, bottom: 12 }} />
@@ -1187,14 +1187,14 @@ const showExpandedExplanation = useMemo(() => {
                   <DomainRuneBar domainLabel={domainLabel} mastery={currentMastery} tier={state.tier} />
                   <div className="stageProgressDots">{Array.from({ length: 3 }).map((_, idx) => <span key={idx} className={"stageDot" + (idx < stageAnswered ? " active" : "") + (idx === stageAnswered && !state.locked ? " current" : "") } />)}</div>
 
-                  <div className="stage5MetaStrip quizSecondaryMeta">
+                  <div className="stage5MetaStrip quizSecondaryMeta batch8PrimaryProgress">
                     <span className="badge">Mastery {masteryPercent}%</span>
                     <span className="badge">Q {Math.min(state.idx + 1)} / {combatQuestions.length}</span>
                     <span className="badge">Streak {streak}</span>
                     {partialPercent > 0 && state.locked ? <span className="badge">Partial {partialPercent}%</span> : null}
                   </div>
 
-                  <div className="stage8CompactBar quizMomentumBar" style={{ marginTop: 10 }}>
+                  <div className="stage8CompactBar quizMomentumBar batch8SecondarySignals" style={{ marginTop: 10 }}>
                     <div className="stage8CompactBarRow">
                       <div className="stage8CompactMini">
                         <span className="badge">🔥 Reward in {stage8Momentum.nextRewardIn}</span>
@@ -1217,7 +1217,7 @@ const showExpandedExplanation = useMemo(() => {
                     ) : null}
                   </div>
 
-                  <div className="stage7PowerStrip quizPowerStrip">
+                  <div className="stage7PowerStrip quizPowerStrip batch8CenterPowerStrip">
                     <button className={"d2Btn power" + (powerups.shieldActive ? " active" : "")} type="button" disabled={state.locked || powerups.shieldActive || (powerups.shieldUses + stage9Inventory.shield) <= 0} onClick={activateShield}>Shield {powerups.shieldActive ? "On" : (powerups.shieldUses + stage9Inventory.shield) > 0 ? `x${powerups.shieldUses + stage9Inventory.shield}` : "Locked"}</button>
                     <button className={"d2Btn power" + (powerups.furyActive ? " active" : "")} type="button" disabled={state.locked || powerups.furyActive || (powerups.furyUses + stage9Inventory.fury) <= 0} onClick={activateFury}>Fury {powerups.furyActive ? "On" : (powerups.furyUses + stage9Inventory.fury) > 0 ? `x${powerups.furyUses + stage9Inventory.fury}` : "Locked"}</button>
                 <button className="d2Btn power" type="button" disabled={state.locked || stage9Inventory.xpSurge <= 0} onClick={activateXpSurge}>Time Slow {stage9Inventory.xpSurge > 0 ? `x${stage9Inventory.xpSurge}` : "Locked"}</button>
@@ -1318,7 +1318,7 @@ const showExpandedExplanation = useMemo(() => {
               )}
             </div>
 
-            <div className="quizEnemyRail" style={{ display: "grid", gap: 12 }}>
+            <div className="quizEnemyRail batch8CombatRail batch8EnemyRail" style={{ display: "grid", gap: 12 }}>
               <D2EnemyHealthBar value={stageEnemyHP} max={currentStageConfig.hp} name={currentStageEnemyName.toUpperCase().slice(0, 18)} />
               <ModelPanel title={currentStageEnemyName.toUpperCase().slice(0, 18)} src={enemyVideo} loop={!isEnemyHitVideo} onEnded={isEnemyHitVideo ? () => setHitPulse(null) : undefined} height="clamp(180px, 22vh, 280px)" damageText={damageFloat.enemy || null} damageTone="enemy" />
             </div>
