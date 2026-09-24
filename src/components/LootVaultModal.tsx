@@ -211,8 +211,8 @@ export default function LootVaultModal(props: {
 
   return (
     <div className="luModalOverlay">
-      <div className="luModal" role="dialog" aria-modal="true" aria-label="Loot Vault">
-        <div className="luModalHeader" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <div className="luModal lootVaultModal" role="dialog" aria-modal="true" aria-label="Loot Vault">
+        <div className="luModalHeader lootVaultHeader">
           <div>
             <b style={{ fontSize: 18 }}>🎁 Loot Vault</b>
             <div>
@@ -225,7 +225,7 @@ export default function LootVaultModal(props: {
         </div>
 
         <div className="luModalBody">
-          <div className="card" style={{ padding: 14, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14 }}>
+          <div className="card lootVaultSpinnerCard">
             <div style={{ display: "flex", alignItems: "center", gap: 12, minWidth: 0 }}>
               <div
                 className="card"
@@ -254,7 +254,7 @@ export default function LootVaultModal(props: {
             </label>
           </div>
 
-          <div style={{ display: "flex", gap: 10, marginTop: 12, flexWrap: "wrap" }}>
+          <div className="lootVaultActions">
             <button className="primary" type="button" disabled={!canOpenOne || loading} onClick={() => openBoxes(1)}>
               {spinning ? "Opening…" : "Open 1"}
             </button>
@@ -311,7 +311,7 @@ export default function LootVaultModal(props: {
                   {skip ? "(Instant reveal)" : "(Sequential)"}
                 </small>
               </div>
-              <div style={{ display: "grid", gap: 10, marginTop: 10 }}>
+              <div className="lootVaultResults">
                 {results.map((r, idx) => {
                   const isRevealed = skip || idx <= revealedIndex;
                   return (
