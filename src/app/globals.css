@@ -3456,3 +3456,12 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
  .quizSecondaryTelemetry .badge{ font-size:11px; padding:5px 8px; }
  .stage5MergedExplanation{ font-size:14px; line-height:1.5; }
 }
+
+
+/* ===== Batch 7: mastery transitions ===== */
+.adaptiveMasteryState{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin:0 0 10px; padding:9px 11px; border:1px solid rgba(255,255,255,.1); border-radius:10px; background:rgba(255,255,255,.035); text-transform:capitalize; }
+.adaptiveMasteryState b{ font-size:12px; letter-spacing:.06em; }
+.adaptiveMasteryState span{ color:var(--muted); font-size:12px; }
+.adaptiveMasteryState.state-improving{ border-color:rgba(110,190,255,.28); background:rgba(110,190,255,.07); }
+.adaptiveMasteryState.state-strengthened,.adaptiveMasteryState.state-mastered{ border-color:rgba(110,220,150,.3); background:rgba(110,220,150,.075); }
+.adaptiveProgressCongrats{ margin-top:10px; padding:9px 10px; border:1px solid rgba(110,220,150,.24); border-radius:9px; background:rgba(110,220,150,.07); font-size:13px; font-weight:800; }
