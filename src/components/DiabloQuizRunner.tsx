@@ -1136,7 +1136,7 @@ const showExpandedExplanation = useMemo(() => {
         {stageBanner ? <div className="stageTransitionBanner">{stageBanner}</div> : null}
         {!isMobileLayout ? (
           <div className="d2InterviewGrid d2QuizGrid stage8CompactGrid" style={{ height: "100%", alignItems: "stretch", minWidth: 0, minHeight: 0, overflow: "hidden" }}>
-            <div style={{ display: "grid", gap: 10, alignContent: "start", minHeight: 0 }}>
+            <div className="quizPlayerRail" style={{ display: "grid", gap: 10, alignContent: "start", minHeight: 0 }}>
               <div className={hitPulse === "player" ? "d2Shake" : ""}>
                 <D2LifeOrb value={state.playerHP} name={playerName} />
               </div>
@@ -1171,7 +1171,7 @@ const showExpandedExplanation = useMemo(() => {
                     </div>
                   </div>
 
-                  <div style={{ marginTop: 10, fontSize: "clamp(18px, 1.7vw, 32px)", lineHeight: 1.16, fontWeight: 900 }}>{question.prompt}</div>
+                  <div className="desktopQuizPrompt" style={{ marginTop: 10, fontSize: "clamp(18px, 1.7vw, 32px)", lineHeight: 1.16, fontWeight: 900 }}>{question.prompt}</div>
 
                   <DomainRuneBar domainLabel={domainLabel} mastery={currentMastery} tier={state.tier} />
                   <div className="stageProgressDots">{Array.from({ length: 3 }).map((_, idx) => <span key={idx} className={"stageDot" + (idx < stageAnswered ? " active" : "") + (idx === stageAnswered && !state.locked ? " current" : "") } />)}</div>
@@ -1239,7 +1239,7 @@ const showExpandedExplanation = useMemo(() => {
                   })}
 
                   {!state.locked ? (
-                    <div style={{ marginTop: 14, display: "flex", gap: 8, flexWrap: "wrap" }}>
+                    <div className="quizHintRow" style={{ marginTop: 14, display: "flex", gap: 8, flexWrap: "wrap" }}>
                       <button className="d2Btn" type="button" onClick={() => useHint("REMOVE_TWO")}>Remove 2 (−{getHintCost("REMOVE_TWO")})</button>
                       <button className="d2Btn" type="button" onClick={() => useHint("PARTIAL_EXPLANATION")}>Explain (−{getHintCost("PARTIAL_EXPLANATION")})</button>
                       <button className="d2Btn" type="button" onClick={() => useHint("DOMAIN_HINT")}>Domain (−{getHintCost("DOMAIN_HINT")})</button>
@@ -1307,7 +1307,7 @@ const showExpandedExplanation = useMemo(() => {
               )}
             </div>
 
-            <div style={{ display: "grid", gap: 12 }}>
+            <div className="quizEnemyRail" style={{ display: "grid", gap: 12 }}>
               <D2EnemyHealthBar value={stageEnemyHP} max={currentStageConfig.hp} name={currentStageEnemyName.toUpperCase().slice(0, 18)} />
               <ModelPanel title={currentStageEnemyName.toUpperCase().slice(0, 18)} src={enemyVideo} loop={!isEnemyHitVideo} onEnded={isEnemyHitVideo ? () => setHitPulse(null) : undefined} height="clamp(180px, 22vh, 280px)" damageText={damageFloat.enemy || null} damageTone="enemy" />
             </div>
@@ -1392,7 +1392,7 @@ const showExpandedExplanation = useMemo(() => {
                   })}
 
                   {!state.locked ? (
-                    <div style={{ marginTop: 14, display: "flex", gap: 8, flexWrap: "wrap" }}>
+                    <div className="quizHintRow" style={{ marginTop: 14, display: "flex", gap: 8, flexWrap: "wrap" }}>
                       <button className="d2Btn" type="button" onClick={() => useHint("REMOVE_TWO")}>Remove 2 (−{getHintCost("REMOVE_TWO")})</button>
                       <button className="d2Btn" type="button" onClick={() => useHint("PARTIAL_EXPLANATION")}>Explain (−{getHintCost("PARTIAL_EXPLANATION")})</button>
                       <button className="d2Btn" type="button" onClick={() => useHint("DOMAIN_HINT")}>Domain (−{getHintCost("DOMAIN_HINT")})</button>
