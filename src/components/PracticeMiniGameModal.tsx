@@ -259,7 +259,7 @@ export default function PracticeMiniGameModal(props: {
                 <button className="primaryBtn" type="button" onClick={onClose}>{bossReward ? "Finish" : "Done"}</button>
               </div>
             </div>
-          )})}
+          )})()}
         </div>
       </div>
     </div>
