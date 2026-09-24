@@ -82,6 +82,6 @@ export async function POST(req: Request) {
       await tx.generatedQuestion.updateMany({ where: { knowledgeBlockId: block.id, reviewStatus: { in: ["APPROVED", "EDITED"] } }, data: { publishedAt: new Date() } });
       await tx.knowledgeBlock.update({ where: { id: block.id }, data: { status: "APPROVED" } });
     });
-    return NextResponse.json({ ok: true, setId, appendedCount: incoming.length, replaceExisting });
+    return NextResponse.json({ ok: true, setId, publishedCount: incoming.length, appendedCount: incoming.length, replaceExisting });
   } catch (e: any) { return NextResponse.json({ error: e?.message || "Failed to publish questions" }, { status: 500 }); }
 }
