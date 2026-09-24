@@ -331,13 +331,13 @@ function definitionQuestions(block: NormalizedKnowledgeBlock, def: any): Candida
 function procedureQuestion(block: NormalizedKnowledgeBlock, procedure: any): CandidateQuestion | null {
   const steps = uniqueStrings(procedure?.steps || []);
   if (steps.length < 2) return null;
-  return { prompt: `Put the steps in the correct order for: ${String(procedure?.title || "this procedure")}`, type: "sequence_order", difficulty: Math.max(2, block.difficulty), explanation: procedure?.outcome ? String(procedure.outcome) : null, tags: questionTags(block, [String(procedure?.title || "procedure")]), data: { ...toBase(block, Math.max(2, block.difficulty)).data, items: shuffle(steps), correctOrder: steps }, ...goldenDefaults(block, Math.max(2, block.difficulty)) };
+  return { prompt: `Put the steps in the correct order for: ${String(procedure?.title || "this procedure")}`, type: "sequence_order", difficulty: Math.max(2, block.difficulty), explanation: procedure?.outcome ? `${String(procedure.outcome)} The order matters because each step establishes the conditions needed for the next troubleshooting or configuration action.` : `Follow the sequence from least disruptive verification to the later corrective steps. This preserves evidence and avoids unnecessary changes.`, tags: questionTags(block, [String(procedure?.title || "procedure")]), data: { ...toBase(block, Math.max(2, block.difficulty)).data, items: shuffle(steps), correctOrder: steps }, ...goldenDefaults(block, Math.max(2, block.difficulty)) };
 }
 function commandQuestion(block: NormalizedKnowledgeBlock, command: any): CandidateQuestion | null {
   const cmd = String(command?.command || "").trim();
   const purpose = String(command?.purpose || "").trim();
   if (!cmd || !purpose) return null;
-  return { prompt: `Enter the command to: ${purpose}`, type: "cli_command", difficulty: block.difficulty, explanation: `Expected command: ${cmd}`, tags: questionTags(block, uniqueStrings([command?.platform, ...(command?.tags || [])])), data: { ...toBase(block).data, expectedCommands: uniqueStrings([cmd, ...(command?.aliases || [])]), placeholder: "Type command here", caseSensitive: false }, ...goldenDefaults(block, block.difficulty) };
+  return { prompt: `Enter the command to: ${purpose}`, type: "cli_command", difficulty: block.difficulty, explanation: `${cmd} is the expected command because it is used to ${purpose.charAt(0).toLowerCase()}${purpose.slice(1)}. Remember the task the command performs, not only the command text.`, tags: questionTags(block, uniqueStrings([command?.platform, ...(command?.tags || [])])), data: { ...toBase(block).data, expectedCommands: uniqueStrings([cmd, ...(command?.aliases || [])]), placeholder: "Type command here", caseSensitive: false }, ...goldenDefaults(block, block.difficulty) };
 }
 function logAnalysisQuestion(block: NormalizedKnowledgeBlock, source: any): CandidateQuestion | null {
   const scenarioText = String(source?.scenario || source?.statement || source?.purpose || source?.question || "").trim();
@@ -360,7 +360,7 @@ function scenarioQuestion(block: NormalizedKnowledgeBlock, scenario: any): Candi
   if (distractors.length < 3) return null;
   const choices = shuffle([bestAction, ...distractors]);
   const correctIndex = choices.findIndex((choice) => choice === bestAction);
-  return { prompt: "What is the best next action?", type: "incident", difficulty: Math.max(2, block.difficulty), explanation: bestAction, tags: questionTags(block, uniqueStrings([scenario?.severity, ...(scenario?.tags || [])])), choices, correctIndex, data: { ...toBase(block, Math.max(2, block.difficulty)).data, scenario: scenarioText, choices, correctIndex }, ...goldenDefaults(block, Math.max(2, block.difficulty)) };
+  return { prompt: `A technician is handling this situation: ${scenarioText} What is the best next action?`, type: "incident", difficulty: Math.max(2, block.difficulty), explanation: `${bestAction} is the best next action for this scenario. It directly addresses the evidence given before moving to broader or more disruptive troubleshooting steps.`, tags: questionTags(block, uniqueStrings([scenario?.severity, ...(scenario?.tags || [])])), choices, correctIndex, data: { ...toBase(block, Math.max(2, block.difficulty)).data, scenario: scenarioText, choices, correctIndex }, ...goldenDefaults(block, Math.max(2, block.difficulty)) };
 }
 function multiSelectQuestion(block: NormalizedKnowledgeBlock): CandidateQuestion | null {
   const choices = uniqueStrings([...block.facts.map((fact) => normalizeFact(fact).subject || normalizeFact(fact).answer), ...block.definitions.map((def: any) => String(def?.term || "").trim())]).filter(Boolean).slice(0, 6);
