@@ -3446,3 +3446,13 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
  .stage5MergedFeedbackCard{ padding:15px !important; }
  .stage5MergedFeedbackCard>div:first-child{ font-size:17px; }
 }
+
+
+/* ===== Batch 7: desktop learning hierarchy ===== */
+@media(min-width:901px){
+ .adaptiveTeachingCard{ border-color:rgba(110,190,255,.24) !important; box-shadow:0 10px 28px rgba(0,0,0,.16); }
+ .adaptiveTeachingCard .adaptiveCoachFeedback{ font-size:15px; }
+ .quizSecondaryTelemetry{ opacity:.82; }
+ .quizSecondaryTelemetry .badge{ font-size:11px; padding:5px 8px; }
+ .stage5MergedExplanation{ font-size:14px; line-height:1.5; }
+}
