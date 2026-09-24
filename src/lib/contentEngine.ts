@@ -132,13 +132,24 @@ function normalizeFact(input: any) {
   };
 }
 
-function buildPromptFromFact(statement: string, hint?: string) {
+function buildPromptFromFact(statement: string, hint?: string, subject?: string, answer?: string) {
   if (hint) return hint;
   const portMatch = statement.match(/^(.*?)\s+uses\s+port\s+(\d+)$/i);
   if (portMatch) return `Which port does ${portMatch[1].trim()} use?`;
   const meansMatch = statement.match(/^(.*?)\s+(?:is|means|stands for)\s+(.*)$/i);
-  if (meansMatch) return `What best completes this statement: ${meansMatch[1].trim()} _____ ?`;
-  return `Which answer is correct based on this fact: ${statement}`;
+  if (meansMatch) return `Which description best matches ${meansMatch[1].trim()}?`;
+  if (subject && answer) return `Which option best describes ${subject}?`;
+  return `Which option best matches this concept: ${statement}`;
+}
+
+function buildTeachingExplanation(fact: ReturnType<typeof normalizeFact>) {
+  const statement = String(fact.statement || "").trim();
+  const answer = String(fact.answer || "").trim();
+  if (!statement) return answer ? `The correct answer is ${answer}.` : null;
+  if (answer && !normalizeChoiceText(statement).includes(normalizeChoiceText(answer))) {
+    return `${answer} is the best answer. ${statement}`;
+  }
+  return `${statement} This is the key concept to remember when you see a similar scenario or troubleshooting question.`;
 }
 
 function normalizeChoiceText(value: string) { return String(value || "").trim().toLowerCase(); }
@@ -265,7 +276,7 @@ function goldenDefaults(block: NormalizedKnowledgeBlock, difficulty = block.diff
 function multipleChoiceFromFact(block: NormalizedKnowledgeBlock, factInput: any): CandidateQuestion | null {
   const fact = normalizeFact(factInput);
   if (!fact.statement || !fact.answer) return null;
-  const prompt = buildPromptFromFact(fact.statement, fact.questionHint);
+  const prompt = buildPromptFromFact(fact.statement, fact.questionHint, fact.subject, fact.answer);
   const distractors = chooseDistractors(fact, block, 3);
   if (distractors.length < 3) return null;
   const choices = shuffle([fact.answer, ...distractors.slice(0, 3)]);
@@ -274,7 +285,7 @@ function multipleChoiceFromFact(block: NormalizedKnowledgeBlock, factInput: any)
     prompt,
     type: "multiple_choice",
     difficulty: block.difficulty,
-    explanation: fact.statement,
+    explanation: buildTeachingExplanation(fact),
     tags: questionTags(block, fact.tags),
     choices,
     correctIndex,
