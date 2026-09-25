@@ -944,15 +944,15 @@ async function analyzeResumeStage12() {
             </div>
           </div>
 
-          <div className={"dashboardBattleStatus " + (((localLevel || 1) >= 5 || elig?.eligible) ? "unlocked" : "locked")}>
+          <div className={"dashboardBattleStatus dashboardProgressionGate " + (((localLevel || 1) >= 5 || elig?.eligible) ? "unlocked" : "locked")}>
             <span className="dashboardBattleStatusDot" />
             <div><b>{((localLevel || 1) >= 5 || elig?.eligible) ? "Boss Battle unlocked" : "Boss Battle locked"}</b><small>{((localLevel || 1) >= 5 || elig?.eligible) ? "You meet the current progression gate." : "Reach Level 5 or qualify through mastery to unlock."}</small></div>
           </div>
 
-          <div className="card powerHudCard dashboardGameCard">
+          <div className="card powerHudCard dashboardGameCard dashboardUtilityCard">
             <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
               <div>
-                <div style={{ fontWeight: 900 }}>PowerUps</div>
+                <div className="dashboardUtilityEyebrow">COMBAT LOADOUT</div><div style={{ fontWeight: 900 }}>PowerUps</div>
                 <div style={{ opacity: 0.78 }}><small>Inventory + daily claims</small></div>
               </div>
               <button className="secondaryBtn" type="button" onClick={() => setPowerupsOpen(true)} style={{ minHeight: 30, padding: "5px 12px", fontSize: 12, borderColor: "rgba(110,190,255,0.35)", background: "linear-gradient(180deg, rgba(46,104,172,0.24), rgba(24,64,118,0.18))" }}>Open</button>
@@ -967,10 +967,10 @@ async function analyzeResumeStage12() {
             </div>
           </div>
 
-          <div className="card leaderboardMiniCard dashboardGameCard leaderboard">
+          <div className="card leaderboardMiniCard dashboardGameCard leaderboard dashboardUtilityCard">
             <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
               <div>
-                <div style={{ fontWeight: 900, fontSize: 16 }}>Leaderboard • Top candidates</div>
+                <div className="dashboardUtilityEyebrow">COMPETE</div><div style={{ fontWeight: 900, fontSize: 16 }}>Leaderboard • Top candidates</div>
               </div>
               <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                 <span className="badge" style={{ minHeight: 34, padding: "6px 12px", background: "rgba(255,214,102,0.12)", borderColor: "rgba(255,214,102,0.28)" }}>Top</span>
