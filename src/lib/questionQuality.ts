@@ -48,6 +48,8 @@ export function validateQuestionQuality(input: { prompt?: string | null; type?: 
 
   if (!prompt || prompt.length < 12) issues.push("Prompt is too short");
   if (!explanation) issues.push("Explanation missing");
+  if (/which answer is correct based on this fact|which option best matches this concept/i.test(prompt)) issues.push("Generic fact-recall wording should be rewritten");
+  if (/^fill in the blank:/i.test(prompt)) issues.push("Fill-blank should be a natural sentence, not a definition prompt");
 
   if (type === "multiple_choice" || type === "incident") {
     if (choices.length < 4) issues.push("Needs at least 4 choices");
@@ -55,6 +57,13 @@ export function validateQuestionQuality(input: { prompt?: string | null; type?: 
     if (uniqueChoices.size !== choices.length) issues.push("Duplicate answer choices detected");
     const correctIndex = Number(input.correctIndex ?? data.correctIndex ?? -1);
     if (correctIndex < 0 || correctIndex >= choices.length) issues.push("Correct index is invalid");
+  }
+
+  if (type === "fill_blank") {
+    const answers = safeArray<string>(data.answers).map((v) => String(v).trim()).filter(Boolean);
+    if (!/_{3,}/.test(prompt)) issues.push("Fill-blank prompt needs a visible blank inside the sentence");
+    if (!answers.length) issues.push("Fill-blank needs at least one accepted answer");
+    if (answers.some((answer) => answer.length > 80)) issues.push("Fill-blank answer is too long; use a focused term or value");
   }
 
   if (type === "multi_select") {
