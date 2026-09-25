@@ -273,10 +273,29 @@ function goldenDefaults(block: NormalizedKnowledgeBlock, difficulty = block.diff
   return { testNowEligible, goldenEligible: isGoldenEligible, goldenWeight: difficulty >= 3 ? 3 : difficulty >= 2 ? 2 : 1, goldenBonusXp: difficulty >= 3 ? 75 : 50 };
 }
 
+function cognitiveLevel(difficulty: number) {
+  if (difficulty <= 1) return "recall";
+  if (difficulty === 2) return "understand";
+  if (difficulty === 3) return "apply";
+  if (difficulty === 4) return "troubleshoot";
+  return "analyze";
+}
+function promptForDifficulty(block: NormalizedKnowledgeBlock, fact: ReturnType<typeof normalizeFact>) {
+  const base = buildPromptFromFact(fact.statement, fact.questionHint, fact.subject, fact.answer);
+  const subject = fact.subject || "this technology";
+  if (block.difficulty <= 2) return base;
+  if (block.difficulty === 3) return `An administrator needs to use ${subject} correctly in a production environment. Which option best matches the requirement?`;
+  if (block.difficulty === 4) return `A technician is troubleshooting an issue involving ${subject}. Which option should be verified or applied first based on the documented behavior?`;
+  return `During a production incident involving ${subject}, the team must choose the option that satisfies the requirement without introducing an unnecessary change. Which option is the best choice?`;
+}
+function questionMeta(block: NormalizedKnowledgeBlock, difficulty = block.difficulty) {
+  return { cognitiveLevel: cognitiveLevel(difficulty), sourceBlockId: block.sourceBlockId };
+}
+
 function multipleChoiceFromFact(block: NormalizedKnowledgeBlock, factInput: any): CandidateQuestion | null {
   const fact = normalizeFact(factInput);
   if (!fact.statement || !fact.answer) return null;
-  const prompt = buildPromptFromFact(fact.statement, fact.questionHint, fact.subject, fact.answer);
+  const prompt = promptForDifficulty(block, fact);
   const distractors = chooseDistractors(fact, block, 3);
   if (distractors.length < 3) return null;
   const choices = shuffle([fact.answer, ...distractors.slice(0, 3)]);
@@ -289,7 +308,7 @@ function multipleChoiceFromFact(block: NormalizedKnowledgeBlock, factInput: any)
     tags: questionTags(block, fact.tags),
     choices,
     correctIndex,
-    data: { ...toBase(block).data, choices, correctIndex, answer: fact.answer, sourceStatement: fact.statement },
+    data: { ...toBase(block).data, ...questionMeta(block), choices, correctIndex, answer: fact.answer, sourceStatement: fact.statement },
     ...goldenDefaults(block, block.difficulty),
   };
 }
@@ -306,7 +325,7 @@ function fillBlankFromFact(block: NormalizedKnowledgeBlock, factInput: any): Can
     difficulty: Math.min(3, block.difficulty),
     explanation: buildTeachingExplanation(fact),
     tags: questionTags(block, [...fact.tags, "recall"]),
-    data: { ...toBase(block, Math.min(3, block.difficulty)).data, answers: uniqueStrings([answer, ...fact.synonyms]), placeholder: "Type the missing term or value", caseSensitive: false, sourceStatement: fact.statement },
+    data: { ...toBase(block, Math.min(3, block.difficulty)).data, ...questionMeta(block, Math.min(3, block.difficulty)), answers: uniqueStrings([answer, ...fact.synonyms]), placeholder: "Type the missing term or value", caseSensitive: false, sourceStatement: fact.statement },
     ...goldenDefaults(block, Math.min(3, block.difficulty))
   };
 }
@@ -321,7 +340,7 @@ function trueFalseFromFact(block: NormalizedKnowledgeBlock, factInput: any): Can
     tags: questionTags(block, [...fact.tags, "true_false"]),
     choices: ["True", "False"],
     correctIndex: 0,
-    data: { ...toBase(block).data, statement: fact.statement, choices: ["True", "False"], correctIndex: 0, correctAnswer: true },
+    data: { ...toBase(block).data, ...questionMeta(block), statement: fact.statement, choices: ["True", "False"], correctIndex: 0, correctAnswer: true },
     ...goldenDefaults(block, block.difficulty),
   };
 }
@@ -335,19 +354,19 @@ function definitionQuestions(block: NormalizedKnowledgeBlock, def: any): Candida
   const choices = shuffle([term, ...distractors]);
   const correctIndex = choices.findIndex((choice) => choice === term);
   return [
-    { prompt: `Which term matches this definition: ${definition}`, type: "multiple_choice", difficulty: block.difficulty, explanation: `${term}: ${definition}`, tags: questionTags(block, [term]), choices, correctIndex, data: { ...toBase(block).data, choices, correctIndex }, ...goldenDefaults(block, block.difficulty) },
+    { prompt: `Which term matches this definition: ${definition}`, type: "multiple_choice", difficulty: block.difficulty, explanation: `${term}: ${definition}`, tags: questionTags(block, [term]), choices, correctIndex, data: { ...toBase(block).data, ...questionMeta(block), choices, correctIndex, sourceDefinition: definition }, ...goldenDefaults(block, block.difficulty) },
   ];
 }
 function procedureQuestion(block: NormalizedKnowledgeBlock, procedure: any): CandidateQuestion | null {
   const steps = uniqueStrings(procedure?.steps || []);
   if (steps.length < 2) return null;
-  return { prompt: `Put the steps in the correct order for: ${String(procedure?.title || "this procedure")}`, type: "sequence_order", difficulty: Math.max(2, block.difficulty), explanation: procedure?.outcome ? `${String(procedure.outcome)} The order matters because each step establishes the conditions needed for the next troubleshooting or configuration action.` : `Follow the sequence from least disruptive verification to the later corrective steps. This preserves evidence and avoids unnecessary changes.`, tags: questionTags(block, [String(procedure?.title || "procedure")]), data: { ...toBase(block, Math.max(2, block.difficulty)).data, items: shuffle(steps), correctOrder: steps }, ...goldenDefaults(block, Math.max(2, block.difficulty)) };
+  return { prompt: `Put the steps in the correct order for: ${String(procedure?.title || "this procedure")}`, type: "sequence_order", difficulty: Math.max(2, block.difficulty), explanation: procedure?.outcome ? `${String(procedure.outcome)} The order matters because each step establishes the conditions needed for the next troubleshooting or configuration action.` : `Follow the sequence from least disruptive verification to the later corrective steps. This preserves evidence and avoids unnecessary changes.`, tags: questionTags(block, [String(procedure?.title || "procedure")]), data: { ...toBase(block, Math.max(2, block.difficulty)).data, ...questionMeta(block, Math.max(2, block.difficulty)), items: shuffle(steps), correctOrder: steps }, ...goldenDefaults(block, Math.max(2, block.difficulty)) };
 }
 function commandQuestion(block: NormalizedKnowledgeBlock, command: any): CandidateQuestion | null {
   const cmd = String(command?.command || "").trim();
   const purpose = String(command?.purpose || "").trim();
   if (!cmd || !purpose) return null;
-  return { prompt: `Enter the command to: ${purpose}`, type: "cli_command", difficulty: block.difficulty, explanation: `${cmd} is the expected command because it is used to ${purpose.charAt(0).toLowerCase()}${purpose.slice(1)}. Remember the task the command performs, not only the command text.`, tags: questionTags(block, uniqueStrings([command?.platform, ...(command?.tags || [])])), data: { ...toBase(block).data, expectedCommands: uniqueStrings([cmd, ...(command?.aliases || [])]), placeholder: "Type command here", caseSensitive: false }, ...goldenDefaults(block, block.difficulty) };
+  return { prompt: `Enter the command to: ${purpose}`, type: "cli_command", difficulty: block.difficulty, explanation: `${cmd} is the expected command because it is used to ${purpose.charAt(0).toLowerCase()}${purpose.slice(1)}. Remember the task the command performs, not only the command text.`, tags: questionTags(block, uniqueStrings([command?.platform, ...(command?.tags || [])])), data: { ...toBase(block).data, ...questionMeta(block), expectedCommands: uniqueStrings([cmd, ...(command?.aliases || [])]), placeholder: "Type command here", caseSensitive: false }, ...goldenDefaults(block, block.difficulty) };
 }
 function logAnalysisQuestion(block: NormalizedKnowledgeBlock, source: any): CandidateQuestion | null {
   const scenarioText = String(source?.scenario || source?.statement || source?.purpose || source?.question || "").trim();
@@ -360,7 +379,7 @@ function logAnalysisQuestion(block: NormalizedKnowledgeBlock, source: any): Cand
         ? logTextFromCommand(source)
         : [`[09:15:22] ALERT ${block.title}`, scenarioText || "System generated troubleshooting event.", bestAction ? `Observed clue: ${bestAction}` : "Observed clue: review the failure message."].join("\n");
   if (!logText || !bestAction) return null;
-  return { prompt: String(source?.question || "Review the log excerpt and identify the most likely issue or finding."), type: "log_analysis", difficulty: Math.max(2, block.difficulty), explanation: bestAction, tags: questionTags(block, ["log_analysis"]), data: { ...toBase(block, Math.max(2, block.difficulty)).data, logText, answers: uniqueStrings([bestAction, ...(source?.aliases || [])]), expectedFindings: uniqueStrings([bestAction]), placeholder: "Describe the issue shown in the log", caseSensitive: false }, ...goldenDefaults(block, Math.max(2, block.difficulty)) };
+  return { prompt: String(source?.question || "Review the log excerpt and identify the most likely issue or finding."), type: "log_analysis", difficulty: Math.max(2, block.difficulty), explanation: bestAction, tags: questionTags(block, ["log_analysis"]), data: { ...toBase(block, Math.max(2, block.difficulty)).data, ...questionMeta(block, Math.max(2, block.difficulty)), logText, answers: uniqueStrings([bestAction, ...(source?.aliases || [])]), expectedFindings: uniqueStrings([bestAction]), placeholder: "Describe the issue shown in the log", caseSensitive: false }, ...goldenDefaults(block, Math.max(2, block.difficulty)) };
 }
 function scenarioQuestion(block: NormalizedKnowledgeBlock, scenario: any): CandidateQuestion | null {
   const scenarioText = String(scenario?.scenario || "").trim();
@@ -370,7 +389,7 @@ function scenarioQuestion(block: NormalizedKnowledgeBlock, scenario: any): Candi
   if (distractors.length < 3) return null;
   const choices = shuffle([bestAction, ...distractors]);
   const correctIndex = choices.findIndex((choice) => choice === bestAction);
-  return { prompt: `A technician is handling this situation: ${scenarioText} What is the best next action?`, type: "incident", difficulty: Math.max(2, block.difficulty), explanation: `${bestAction} is the best next action for this scenario. It directly addresses the evidence given before moving to broader or more disruptive troubleshooting steps.`, tags: questionTags(block, uniqueStrings([scenario?.severity, ...(scenario?.tags || [])])), choices, correctIndex, data: { ...toBase(block, Math.max(2, block.difficulty)).data, scenario: scenarioText, choices, correctIndex }, ...goldenDefaults(block, Math.max(2, block.difficulty)) };
+  return { prompt: `A technician is handling this situation: ${scenarioText} What is the best next action?`, type: "incident", difficulty: Math.max(2, block.difficulty), explanation: `${bestAction} is the best next action for this scenario. It directly addresses the evidence given before moving to broader or more disruptive troubleshooting steps.`, tags: questionTags(block, uniqueStrings([scenario?.severity, ...(scenario?.tags || [])])), choices, correctIndex, data: { ...toBase(block, Math.max(2, block.difficulty)).data, ...questionMeta(block, Math.max(2, block.difficulty)), scenario: scenarioText, choices, correctIndex }, ...goldenDefaults(block, Math.max(2, block.difficulty)) };
 }
 function multiSelectQuestion(block: NormalizedKnowledgeBlock): CandidateQuestion | null {
   const choices = uniqueStrings([...block.facts.map((fact) => normalizeFact(fact).subject || normalizeFact(fact).answer), ...block.definitions.map((def: any) => String(def?.term || "").trim())]).filter(Boolean).slice(0, 6);
