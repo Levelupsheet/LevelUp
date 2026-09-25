@@ -10,7 +10,7 @@ export async function POST(req: Request) {
   try {
     const sessionUser = await getSessionUser();
     const userId = sessionUser?.id ?? null;
-    if (!userId) return Response.json({ ok: false, error: "userId required" }, { status: 400 });
+    if (!userId) return Response.json({ ok: false, error: "Sign in required" }, { status: 401 });
     const body = await req.json().catch(() => ({}));
     const itemId = String(body?.itemId || "").trim();
     if (!itemId) return Response.json({ ok: false, error: "itemId required" }, { status: 400 });
