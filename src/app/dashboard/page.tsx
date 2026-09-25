@@ -1128,7 +1128,8 @@ async function analyzeResumeStage12() {
         ))}
         {!(stage12Status?.profile?.coaching?.nextActions || []).length ? <small style={{ opacity: 0.78 }}>No recommendations yet.</small> : null}
       </div>
-      <div style={{ marginTop: 10, opacity: 0.76 }}><small>{stage12Status?.analyzedAt ? `Last analyzed ${new Date(stage12Status.analyzedAt).toLocaleString()}` : "Original resume file is not retained long term."}</small></div>\n      <a className="secondaryBtn dashboardCoachCta" href="/coach">Open AI Coach →</a>
+      <div style={{ marginTop: 10, opacity: 0.76 }}><small>{stage12Status?.analyzedAt ? `Last analyzed ${new Date(stage12Status.analyzedAt).toLocaleString()}` : "Original resume file is not retained long term."}</small></div>
+      <a className="secondaryBtn dashboardCoachCta" href="/coach">Open AI Coach →</a>
     </div>
   </div>
 </div>
