@@ -111,10 +111,7 @@ export async function GET(req: Request) {
       offers,
     });
   } catch (err: any) {
-    const message = err?.message ?? "Internal error";
-    return Response.json(
-      { ok: false, error: "Failed to load user summary", detail: message },
-      { status: 500 }
-    );
+    console.error("User summary load failed", err);
+    return Response.json({ ok: false, error: "Failed to load user summary" }, { status: 500 });
   }
 }
