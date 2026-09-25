@@ -100,6 +100,8 @@ model User {
   wallet          Wallet?
   inventory       InventoryItem[]
   gameSessions    GameSession[]
+  economyState    UserEconomyState?
+  rewardClaims    RewardClaim[]
 
 }
 
@@ -600,4 +602,28 @@ model QuestionCalibration {
   updatedAt         DateTime @default(now())
 
   @@index([updatedAt(sort: Desc)])
+}
+
+
+model UserEconomyState {
+  userId        String   @id
+  streakDays    Int      @default(0)
+  lastClaimDate String?
+  lastSeenDate  String?
+  updatedAt     DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model RewardClaim {
+  id        String   @id @default(cuid())
+  userId    String
+  claimKey  String   @unique
+  kind      String
+  meta      Json?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
 }
