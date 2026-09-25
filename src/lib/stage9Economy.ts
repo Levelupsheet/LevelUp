@@ -199,8 +199,13 @@ export async function useStage9Item(userId: string, itemId: string) {
     orderBy: { createdAt: "asc" },
   });
   if (!existing) return { ok: false as const, error: "Item not available" };
-  const updated = await prisma.inventoryItem.update({ where: { id: existing.id }, data: { quantity: { decrement: 1 } } });
-  return { ok: true as const, remaining: Math.max(0, Number(updated.quantity || 0)) };
+  const result = await prisma.inventoryItem.updateMany({
+    where: { id: existing.id, userId: key, quantity: { gt: 0 } },
+    data: { quantity: { decrement: 1 } },
+  });
+  if (result.count !== 1) return { ok: false as const, error: "Item not available" };
+  const updated = await prisma.inventoryItem.findUnique({ where: { id: existing.id } });
+  return { ok: true as const, remaining: Math.max(0, Number(updated?.quantity || 0)) };
 }
 
 export async function awardSessionRewards(userId: string, input: { correctCount?: number; totalQuestions?: number; outcome?: string | null; encounterType?: string | null; bestStreak?: number; }) {
