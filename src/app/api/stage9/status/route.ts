@@ -1,10 +1,11 @@
 
-import { getRequestUserId } from "@/app/api/_lib/authUser";
+import { getSessionUser } from "@/lib/auth/session";
 import { getStage9Status } from "@/lib/stage9Economy";
 
-export async function GET(req: Request) {
+export async function GET() {
   try {
-    const userId = await getRequestUserId(req);
+    const sessionUser = await getSessionUser();
+    const userId = sessionUser?.id ?? null;
     if (!userId) return Response.json({ ok: false, error: "userId required" }, { status: 400 });
     const status = await getStage9Status(userId);
     return Response.json({ ok: true, ...status });
