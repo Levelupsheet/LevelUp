@@ -3662,3 +3662,24 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
  .gameHubSectionLabel{display:block;margin-top:16px;}
  .gameHubSectionLabel small{display:block;text-align:left;margin-top:4px;}
 }
+
+
+/* ===== Batch 8: competition + progression surfaces ===== */
+.leaderboardStandingsCard{margin-top:0 !important;padding:14px;}
+.leaderboardRow{position:relative;overflow:hidden;}
+.leaderboardRank1{border-color:rgba(255,214,102,.34) !important;background:linear-gradient(90deg,rgba(255,214,102,.08),var(--lu-game-surface-soft)) !important;}
+.leaderboardRank2{border-color:rgba(185,205,225,.25) !important;}
+.leaderboardRank3{border-color:rgba(205,145,90,.24) !important;}
+.dashboardProgressionGate{margin-top:10px;}
+.dashboardProgressionGate.unlocked{box-shadow:0 0 0 1px rgba(110,220,150,.06) inset;}
+.dashboardUtilityCard{position:relative;overflow:hidden;}
+.dashboardUtilityEyebrow{
+ font-size:9px;font-weight:950;letter-spacing:.12em;color:var(--lu-game-gold);
+ margin-bottom:3px;
+}
+.powerHudCard.dashboardUtilityCard{border-color:rgba(110,190,255,.22);}
+.leaderboardMiniCard.dashboardUtilityCard{border-color:rgba(255,214,102,.24);}
+@media(max-width:700px){
+ .leaderboardStandingsCard{padding:10px;}
+ .leaderboardRow{gap:9px !important;}
+}
