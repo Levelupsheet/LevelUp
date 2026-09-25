@@ -10,6 +10,7 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
     const ids = Array.isArray(body?.knowledgeBlockIds) ? body.knowledgeBlockIds.filter(Boolean) : [];
+    const autoApprove = body?.autoApprove !== false;
     if (!ids.length) return NextResponse.json({ error: "knowledgeBlockIds required" }, { status: 400 });
 
     const blocks = await prisma.knowledgeBlock.findMany({ where: { id: { in: ids } } });
@@ -57,7 +58,7 @@ export async function POST(req: Request) {
             difficulty: q.difficulty,
             tags: q.tags,
             sortOrder: i,
-            reviewStatus: "PENDING",
+            reviewStatus: autoApprove ? "APPROVED" : "PENDING",
           },
         });
       }
@@ -67,7 +68,7 @@ export async function POST(req: Request) {
       touched.push(blockRecord.id);
     }
 
-    return NextResponse.json({ ok: true, generatedCount, rejectedCount, knowledgeBlockIds: touched });
+    return NextResponse.json({ ok: true, generatedCount, rejectedCount, autoApproved: autoApprove ? generatedCount : 0, knowledgeBlockIds: touched });
   } catch (e: any) {
     return NextResponse.json({ error: e?.message || "Failed to generate questions" }, { status: 500 });
   }
