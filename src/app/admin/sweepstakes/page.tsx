@@ -36,6 +36,7 @@ export default function AdminSweepstakesPage() {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [selectedId, setSelectedId] = useState('');
   const [status, setStatus] = useState('');
+  const [claims, setClaims] = useState<any[]>([]);
   const selected = useMemo(() => campaigns.find((c) => c.id === selectedId) || campaigns[0] || null, [campaigns, selectedId]);
   const [form, setForm] = useState<any>({ title:'', prizePoolLabel:'', prizeValueUsd:0, tokenCost:0, allowTokenEntry:true, allowGoldenQuestion:false, prizeUrl:'', prizeImageUrl:'', rulesText:'', rulesUrl:'', startsAt:'', endsAt:'', isLive:true, status:'ACTIVE' });
 
@@ -72,7 +73,13 @@ export default function AdminSweepstakesPage() {
     });
   }
 
-  useEffect(() => { loadCampaigns(); }, []);
+  async function loadClaims() {
+    const res = await fetch('/api/admin/sweepstakes/claims', { cache:'no-store' });
+    const data = await res.json().catch(()=>({}));
+    if (data?.ok) setClaims(Array.isArray(data.claims) ? data.claims : []);
+  }
+
+  useEffect(() => { loadCampaigns(); loadClaims(); }, []);
   useEffect(() => { if (selected) hydrate(selected); }, [selectedId]);
 
   async function saveCampaign(e: React.FormEvent) {
@@ -153,6 +160,19 @@ export default function AdminSweepstakesPage() {
                   </button>
                 ))}
               </div>
+            </div>
+          </div>
+
+          <div className="featureCard" style={{ marginTop:16, borderColor:'rgba(255,215,90,.28)' }}>
+            <div style={{display:'flex',justifyContent:'space-between',gap:10,alignItems:'center'}}><div><b>Prize fulfillment claims</b><div className="muted">Secure winner contact and shipping submissions for LevelUp Pro support.</div></div><button className="secondaryBtn" onClick={loadClaims}>Refresh claims</button></div>
+            <div style={{display:'grid',gap:10,marginTop:12}}>
+              {claims.length ? claims.map((claim:any)=><div key={claim.id} style={{padding:12,border:'1px solid rgba(255,255,255,.08)',borderRadius:12,background:'rgba(255,255,255,.025)'}}>
+                <div style={{display:'flex',justifyContent:'space-between',gap:10,flexWrap:'wrap'}}><b>{claim.campaignTitle}</b><span className="badge">{claim.status}</span></div>
+                <div style={{marginTop:8}}><b>{claim.fullName}</b> • {claim.email}{claim.phone ? ` • ${claim.phone}` : ''}</div>
+                <div className="muted" style={{marginTop:5}}>{[claim.shippingAddress1,claim.shippingAddress2,claim.city,claim.region,claim.postalCode,claim.country].filter(Boolean).join(', ') || 'No shipping address submitted'}</div>
+                {claim.notes ? <div className="muted" style={{marginTop:5}}>Notes: {claim.notes}</div> : null}
+                <div className="muted" style={{marginTop:5,fontSize:12}}>Submitted {new Date(claim.submittedAt).toLocaleString()}</div>
+              </div>) : <div className="muted">No prize claims submitted yet.</div>}
             </div>
           </div>
 
