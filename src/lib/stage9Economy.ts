@@ -129,14 +129,16 @@ export async function claimDailyBonus(userId: string) {
   const today = dayKey();
   const touched = await touchUserActivity(key);
   const awarded = getDailyBonusAmount(touched.streakDays);
-  return prisma.$transaction(async (tx) => {
-    const claimKey = `daily-bonus:${key}:${today}`;
-    const state = await tx.userEconomyState.findUnique({ where: { userId: key } });
-    if (state?.lastClaimDate === today) {
-      const wallet = await tx.wallet.findUnique({ where: { userId: key } });
-      return { ok: true as const, alreadyClaimed: true, awarded: 0, streakDays: state.streakDays, dailyBonusTokens: getDailyBonusAmount(state.streakDays), walletTokens: wallet?.tokenBalance || 0 };
-    }
-    try {
+  const claimKey = `daily-bonus:${key}:${today}`;
+
+  try {
+    return await prisma.$transaction(async (tx) => {
+      const state = await tx.userEconomyState.findUnique({ where: { userId: key } });
+      if (state?.lastClaimDate === today) {
+        const wallet = await tx.wallet.findUnique({ where: { userId: key } });
+        return { ok: true as const, alreadyClaimed: true, awarded: 0, streakDays: state.streakDays, dailyBonusTokens: getDailyBonusAmount(state.streakDays), walletTokens: wallet?.tokenBalance || 0 };
+      }
+
       await tx.rewardClaim.create({
         data: {
           userId: key,
@@ -145,26 +147,31 @@ export async function claimDailyBonus(userId: string) {
           meta: { date: today, awarded, streakDays: touched.streakDays },
         },
       });
-    } catch (error: any) {
-      if (error?.code !== "P2002") throw error;
-      const wallet = await tx.wallet.findUnique({ where: { userId: key } });
-      return { ok: true as const, alreadyClaimed: true, awarded: 0, streakDays: state?.streakDays || touched.streakDays, dailyBonusTokens: getDailyBonusAmount(state?.streakDays || touched.streakDays), walletTokens: wallet?.tokenBalance || 0 };
-    }
-    await tx.userEconomyState.upsert({
-      where: { userId: key },
-      update: { lastClaimDate: today },
-      create: { userId: key, streakDays: Math.max(1, touched.streakDays), lastSeenDate: today, lastClaimDate: today },
+
+      await tx.userEconomyState.upsert({
+        where: { userId: key },
+        update: { lastClaimDate: today },
+        create: { userId: key, streakDays: Math.max(1, touched.streakDays), lastSeenDate: today, lastClaimDate: today },
+      });
+      const wallet = await tx.wallet.upsert({
+        where: { userId: key },
+        update: { tokenBalance: { increment: awarded } },
+        create: { userId: key, tokenBalance: awarded },
+      });
+      try {
+        await tx.notification.create({ data: { userId: key, type: "STAGE9_DAILY_BONUS", title: "Daily streak bonus claimed", body: `You claimed +${awarded} tokens for keeping your streak alive.` } as any });
+      } catch {}
+      return { ok: true as const, alreadyClaimed: false, awarded, streakDays: touched.streakDays, walletTokens: wallet.tokenBalance };
     });
-    const wallet = await tx.wallet.upsert({
-      where: { userId: key },
-      update: { tokenBalance: { increment: awarded } },
-      create: { userId: key, tokenBalance: awarded },
-    });
-    try {
-      await tx.notification.create({ data: { userId: key, type: "STAGE9_DAILY_BONUS", title: "Daily streak bonus claimed", body: `You claimed +${awarded} tokens for keeping your streak alive.` } as any });
-    } catch {}
-    return { ok: true as const, alreadyClaimed: false, awarded, streakDays: touched.streakDays, walletTokens: wallet.tokenBalance };
-  });
+  } catch (error: any) {
+    if (error?.code !== "P2002") throw error;
+    const [state, wallet] = await Promise.all([
+      prisma.userEconomyState.findUnique({ where: { userId: key } }),
+      prisma.wallet.findUnique({ where: { userId: key } }),
+    ]);
+    const streakDays = state?.streakDays || touched.streakDays;
+    return { ok: true as const, alreadyClaimed: true, awarded: 0, streakDays, dailyBonusTokens: getDailyBonusAmount(streakDays), walletTokens: wallet?.tokenBalance || 0 };
+  }
 }
 
 export async function purchaseStage9Item(userId: string, itemId: string) {
