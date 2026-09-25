@@ -3763,3 +3763,14 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
  .rewardEconomyFlow{justify-content:flex-start;}
 }
 @media(max-width:430px){.rewardEconomySnapshot{grid-template-columns:1fr;}}
+
+
+/* ===== Batch 9 final: admin economy visibility ===== */
+.adminEconomyGrid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-top:12px;}
+.adminEconomyGrid>div{padding:12px;border:1px solid var(--lu-game-border);border-radius:12px;background:rgba(255,255,255,.025);}
+.adminEconomyGrid small,.adminEconomyGrid b,.adminEconomyGrid span{display:block;}
+.adminEconomyGrid small{font-size:9px;font-weight:950;letter-spacing:.1em;color:var(--lu-game-gold);}
+.adminEconomyGrid b{margin-top:5px;font-size:18px;}
+.adminEconomyGrid span{margin-top:3px;font-size:11px;color:var(--lu-game-muted);}
+@media(max-width:900px){.adminEconomyGrid{grid-template-columns:repeat(2,minmax(0,1fr));}}
+@media(max-width:520px){.adminEconomyGrid{grid-template-columns:1fr;}}
