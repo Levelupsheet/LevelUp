@@ -2,9 +2,9 @@ import { z } from "zod";
 import { prisma } from "../../_lib/prisma";
 import { gradeAnswer, qualifiesForHR, rankLabelIT, readinessFromXP } from "../../_lib/scoring";
 import { applyUserXpIncrement } from "@/lib/xpCaps";
+import { getSessionUser } from "@/lib/auth/session";
 
 const Body = z.object({
-  userId: z.string().min(1),
   track: z.enum(["IT_SUPPORT"]),
   tier: z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4)]),
   domain: z.string().min(2),
@@ -15,18 +15,12 @@ const Body = z.object({
 export async function POST(req: Request) {
   try {
     const body = Body.parse(await req.json());
+    const sessionUser = await getSessionUser();
+    const userId = String(sessionUser?.id || "").trim();
+    if (!userId) return Response.json({ error: "Sign in required" }, { status: 401 });
 
-    // Ensure user exists (demo-friendly).
-    const user = await prisma.user.upsert({
-      where: { id: body.userId },
-      update: {},
-      create: {
-        id: body.userId,
-        email: `${body.userId}@local.leveluppro`,
-        displayName: body.userId,
-        authProvider: "LOCAL",
-      },
-    });
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user) return Response.json({ error: "Authenticated user not found" }, { status: 404 });
 
     const score = gradeAnswer({ tier: body.tier, answerText: body.answer });
 
