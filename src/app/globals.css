@@ -3744,3 +3744,22 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 @media(max-width:700px){
   .gameHubState{min-height:44px;padding:9px 10px;}
 }
+
+
+/* ===== Batch 9: live reward economy ===== */
+.rewardEconomySnapshot{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:0 0 12px;}
+.rewardEconomySnapshot>div{padding:13px 14px;border:1px solid var(--lu-game-border);border-radius:14px;background:var(--lu-game-surface);}
+.rewardEconomySnapshot small,.rewardEconomySnapshot strong,.rewardEconomySnapshot span{display:block;}
+.rewardEconomySnapshot small{font-size:10px;font-weight:950;letter-spacing:.12em;color:var(--lu-game-gold);}
+.rewardEconomySnapshot strong{margin-top:5px;font-size:22px;}
+.rewardEconomySnapshot span{margin-top:3px;font-size:12px;color:var(--lu-game-muted);}
+.rewardEconomySnapshot a{color:inherit;font-weight:800;text-decoration:none;}
+.rewardEconomyFlow{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;margin:0 0 14px;padding:10px;border:1px solid rgba(255,255,255,.08);border-radius:14px;background:rgba(255,255,255,.025);}
+.rewardEconomyFlow span{padding:7px 9px;border-radius:10px;background:rgba(255,255,255,.04);font-size:12px;font-weight:750;}
+.rewardEconomyFlow b{color:var(--lu-game-gold);margin-right:4px;}
+.rewardEconomyFlow i{color:var(--lu-game-muted);font-style:normal;}
+@media(max-width:760px){
+ .rewardEconomySnapshot{grid-template-columns:1fr 1fr;}
+ .rewardEconomyFlow{justify-content:flex-start;}
+}
+@media(max-width:430px){.rewardEconomySnapshot{grid-template-columns:1fr;}}
