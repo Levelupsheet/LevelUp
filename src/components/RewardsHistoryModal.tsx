@@ -53,7 +53,7 @@ export default function RewardsHistoryModal(props: {
 
   return createPortal(
     <div className="luModalOverlay">
-      <div className="luModal" role="dialog" aria-modal="true" aria-label="Rewards">
+      <div className="luModal" role="dialog" aria-modal="true" aria-label="Rewards" style={{ maxWidth: 900, maxHeight: "92vh", display: "flex", flexDirection: "column", overflow: "hidden" }}>
         <div className="luModalHeader" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div>
             <b style={{ fontSize: 18 }}>🎁 Rewards</b>
@@ -62,7 +62,7 @@ export default function RewardsHistoryModal(props: {
           <button className="luIconBtn" onClick={onClose} aria-label="Close">✕</button>
         </div>
 
-        <div className="luModalBody" style={{ display: "grid", gap: 12 }}>
+        <div className="luModalBody" style={{ display: "grid", gap: 12, overflowY: "auto", overscrollBehavior: "contain" }}>
           {loading && <div style={{ opacity: 0.75 }}>Loading…</div>}
           {err && <div style={{ color: "#ffb4b4" }}>{err}</div>}
 
@@ -80,12 +80,13 @@ export default function RewardsHistoryModal(props: {
               </div>
 
               <div className="luCard" style={{ padding: 12 }}>
-                <div style={{ fontWeight: 700, marginBottom: 8 }}>Recent Loot</div>
+                <div style={{ fontWeight: 800, marginBottom: 4 }}>Reward history</div>
+                <div style={{ opacity: 0.7, fontSize: 13, marginBottom: 10 }}>Newest rewards first. Each box shows exactly what was awarded.</div>
                 {(!data.boxes || data.boxes.length === 0) ? (
                   <div style={{ opacity: 0.75 }}>No opened loot yet.</div>
                 ) : (
                   <div style={{ display: "grid", gap: 10 }}>
-                    {(data.boxes as LootBox[]).map((b) => (
+                    {(data.boxes as LootBox[]).slice(0, 20).map((b) => (
                       <div key={b.id} className="luInset" style={{ padding: 12 }}>
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
                           <div style={{ fontWeight: 700 }}>{b.type.toLowerCase()} box</div>
