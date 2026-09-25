@@ -93,6 +93,16 @@ function prettyType(t: string){
   return t;
 }
 
+function isGoldenNotification(n: { type?: string; title?: string; body?: string }) {
+  const haystack = `${n?.type || ""} ${n?.title || ""} ${n?.body || ""}`.toLowerCase();
+  return haystack.includes("sweepstakes winner")
+    || haystack.includes("winner selected")
+    || haystack.includes("golden sweepstakes")
+    || haystack.includes("golddraw")
+    || haystack.includes("pass_interview_stage")
+    || haystack.includes("boss battle cleared");
+}
+
 
 function itemIcon(itemType?: string | null, itemRef?: string | null) {
   const key = String(itemRef || itemType || "").toLowerCase();
@@ -1214,7 +1224,7 @@ async function analyzeResumeStage12() {
             <div className="luModalBody">
               <div style={{ display: "grid", gap: 10 }}>
                 {combinedNotes.length ? combinedNotes.map((n: any) => (
-                  <div key={n.id} className={"card " + (n.type === "TECH_INTERVIEW_READY" ? "notifHighlight" : "")} role="button" tabIndex={0}
+                  <div key={n.id} className={"card " + (isGoldenNotification(n) ? "notifGoldenWinner" : n.type === "TECH_INTERVIEW_READY" ? "notifHighlight" : "")} role="button" tabIndex={0}
                     onClick={() => markNotificationReadAndRemove(n)}
                     onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") markNotificationReadAndRemove(n); }}
                     style={{ cursor: "pointer" }} title="Click to mark as read">
