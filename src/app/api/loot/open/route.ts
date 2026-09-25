@@ -118,10 +118,11 @@ export async function POST(req: Request) {
       for (const box of pending) {
         const drops = await generateDropsForType(box.type as LootBoxType);
 
-        await tx.lootBox.update({
-          where: { id: box.id },
+        const reserved = await tx.lootBox.updateMany({
+          where: { id: box.id, userId, status: "PENDING" },
           data: { status: "OPENED", openedAt: new Date() },
         });
+        if (reserved.count !== 1) continue;
 
         await tx.lootDrop.createMany({
           data: drops.map((d) => ({
