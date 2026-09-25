@@ -130,10 +130,25 @@ export async function claimDailyBonus(userId: string) {
   const touched = await touchUserActivity(key);
   const awarded = getDailyBonusAmount(touched.streakDays);
   return prisma.$transaction(async (tx) => {
+    const claimKey = `daily-bonus:${key}:${today}`;
     const state = await tx.userEconomyState.findUnique({ where: { userId: key } });
     if (state?.lastClaimDate === today) {
       const wallet = await tx.wallet.findUnique({ where: { userId: key } });
       return { ok: true as const, alreadyClaimed: true, awarded: 0, streakDays: state.streakDays, dailyBonusTokens: getDailyBonusAmount(state.streakDays), walletTokens: wallet?.tokenBalance || 0 };
+    }
+    try {
+      await tx.rewardClaim.create({
+        data: {
+          userId: key,
+          claimKey,
+          kind: "STAGE9_DAILY_BONUS",
+          meta: { date: today, awarded, streakDays: touched.streakDays },
+        },
+      });
+    } catch (error: any) {
+      if (error?.code !== "P2002") throw error;
+      const wallet = await tx.wallet.findUnique({ where: { userId: key } });
+      return { ok: true as const, alreadyClaimed: true, awarded: 0, streakDays: state?.streakDays || touched.streakDays, dailyBonusTokens: getDailyBonusAmount(state?.streakDays || touched.streakDays), walletTokens: wallet?.tokenBalance || 0 };
     }
     await tx.userEconomyState.upsert({
       where: { userId: key },
