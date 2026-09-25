@@ -31,6 +31,25 @@ export type Stage9Status = {
 };
 
 
+const STORE: Stage9StoreItem[] = [
+  { id: "shield_charge", name: "Shield Charge", cost: 30, description: "Adds one extra shield use to your inventory.", itemType: "POWERUP", quantity: 1, badge: "Defense" },
+  { id: "fury_charge", name: "Fury Charge", cost: 45, description: "Adds one fury burst for tougher sessions.", itemType: "POWERUP", quantity: 1, badge: "Damage" },
+  { id: "hint_discount", name: "Hint Discount", cost: 35, description: "Banks one reduced-cost hint for a future run.", itemType: "BOOST", quantity: 1, badge: "Support" },
+  { id: "extra_life", name: "Boss Extra Life", cost: 80, description: "Stores one extra life for boss battle runs.", itemType: "BOSS", quantity: 1, badge: "Boss" },
+  { id: "xp_surge", name: "XP Surge", cost: 60, description: "Stores one 15 minute XP surge consumable.", itemType: "BOOST", quantity: 1, badge: "XP" },
+];
+
+function dayKey(date = new Date()) {
+  return date.toISOString().slice(0, 10);
+}
+
+function yesterdayKey(date = new Date()) {
+  const d = new Date(date);
+  d.setDate(d.getDate() - 1);
+  return dayKey(d);
+}
+
+
 export function getStoreCatalog() {
   return STORE;
 }
