@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "../../_lib/prisma";
 import { ensureUser } from "../../_lib/ensureUser";
 import { readLootVaultRows } from "@/lib/lootVault";
+import { getSessionUser } from "@/lib/auth/session";
 
 type LootBoxType = "BRONZE" | "SILVER" | "GOLD" | "PLATINUM" | "DIAMOND";
 
@@ -91,11 +92,11 @@ async function generateDropsForType(type: LootBoxType): Promise<DropSpec[]> {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const userId = String(body?.userId ?? "");
+    const sessionUser = await getSessionUser();
+    const userId = String(sessionUser?.id || "").trim();
     const countReq = body?.count;
-    if (!userId) return NextResponse.json({ error: "Missing userId" }, { status: 400 });
+    if (!userId) return NextResponse.json({ error: "Sign in required" }, { status: 401 });
 
-    // Ensure user exists (demo/local mode)
     await ensureUser(userId);
 
     // If Prisma client is stale (missing models), fail gracefully with a clear message.
