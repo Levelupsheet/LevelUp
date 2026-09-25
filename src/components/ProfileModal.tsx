@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
-import { createUser, getActiveUser, getUsers, setActiveUserId } from "@/lib/userStore";
+import { getActiveUser } from "@/lib/userStore";
 import RewardsHistoryModal from "@/components/RewardsHistoryModal";
 import { levelFromXp } from "@/lib/progression";
 
@@ -13,9 +13,9 @@ export default function ProfileModal(props: {
 }) {
   const { open, onClose, userLabel } = props;
 
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [tick, setTick] = useState(0);
+  const [tick] = useState(0);
+  const [summary, setSummary] = useState<any>(null);
+  const [learning, setLearning] = useState<any>(null);
   const [rewardsOpen, setRewardsOpen] = useState(false);
   const [sweepStats, setSweepStats] = useState<any>(null);
   const active = useMemo(() => getActiveUser(), [open, tick]);
@@ -55,8 +55,21 @@ export default function ProfileModal(props: {
       .catch(() => setSweepStats(null));
   }, [open, userId, tick]);
 
+  useEffect(() => {
+    if (!open) return;
+    Promise.all([
+      fetch("/api/users/summary", { cache: "no-store" as any }).then((r) => r.ok ? r.json() : null),
+      fetch("/api/learning/profile", { cache: "no-store" as any }).then((r) => r.ok ? r.json() : null),
+    ]).then(([userSummary, learningProfile]) => {
+      setSummary(userSummary?.ok ? userSummary : null);
+      setLearning(learningProfile?.ok ? learningProfile?.profile : null);
+    }).catch(() => {
+      setSummary(null);
+      setLearning(null);
+    });
+  }, [open]);
+
   if (!open || !mountNode) return null;
-  const users = getUsers();
 
   return createPortal(
     <div
@@ -68,7 +81,7 @@ export default function ProfileModal(props: {
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="luModal" style={{ maxWidth: 860 }}>
+      <div className="luModal" style={{ maxWidth: 860, maxHeight: "92vh", display: "flex", flexDirection: "column", overflow: "hidden" }}>
         <div className="luModalHeader">
           <div>
             <div className="luModalTitle">Profile</div>
@@ -79,7 +92,7 @@ export default function ProfileModal(props: {
           </button>
         </div>
 
-        <div className="luModalBody">
+        <div className="luModalBody" style={{ overflowY: "auto", overscrollBehavior: "contain" }}>
           <div className="grid2">
             <div className="card" style={{ gridColumn: "1 / -1" }}>
               <h3 style={{ marginTop: 0 }}>Account</h3>
@@ -98,22 +111,11 @@ export default function ProfileModal(props: {
                   </div>
                 </div>
 
-                <div style={{ flex: 1, minWidth: 260 }}>
-                  <div className="muted" style={{ fontSize: 12, marginBottom: 6 }}>Switch user</div>
-                  <select
-                    className="luInput"
-                    value={active.id}
-                    onChange={(e) => {
-                      setActiveUserId(e.target.value);
-                      setTick((t) => t + 1);
-                    }}
-                  >
-                    {users.map((u) => (
-                      <option key={u.id} value={u.id}>
-                        {u.displayName} ({u.xp} XP)
-                      </option>
-                    ))}
-                  </select>
+                <div style={{ flex: 1, minWidth: 260, display: "flex", justifyContent: "flex-end", alignItems: "center" }}>
+                  <button className="btn" type="button" onClick={async () => {
+                    await fetch("/api/auth/logout", { method: "POST" }).catch(() => null);
+                    window.location.href = "/start";
+                  }}>Sign out</button>
                 </div>
               </div>
 
@@ -132,49 +134,25 @@ export default function ProfileModal(props: {
                   <div style={{ fontSize: 24, fontWeight: 900 }}>{Number(sweepStats?.weeklyCount || 0)} / {Number(sweepStats?.weeklyLimit || 5)}</div>
                 </div>
               </div>
-              <div className="muted" style={{ fontSize: 12, marginBottom: 8 }}>Create a new local account</div>
-              <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-                <input
-                  className="luInput"
-                  placeholder="Display name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  style={{ minWidth: 220 }}
-                />
-                <input
-                  className="luInput"
-                  placeholder="Email (optional)"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  style={{ minWidth: 260 }}
-                />
-                <button
-                  className="btn primary"
-                  onClick={() => {
-                    const dn = name.trim();
-                    if (!dn) return;
-                    createUser({ displayName: dn, email: email.trim() || undefined });
-                    setName("");
-                    setEmail("");
-                    setTick((t) => t + 1);
-                  }}
-                >
-                  Create
-                </button>
+              <div className="divider" />
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 10 }}>
+                <div className="luInset" style={{ padding: 12 }}><div className="muted" style={{ fontSize: 12 }}>Overall mastery</div><div style={{ fontSize: 22, fontWeight: 900 }}>{Number(learning?.overallMastery || 0).toFixed(0)}%</div></div>
+                <div className="luInset" style={{ padding: 12 }}><div className="muted" style={{ fontSize: 12 }}>Plan</div><div style={{ fontSize: 22, fontWeight: 900 }}>{String(summary?.subscriptionTier || "FREE")}</div></div>
+                <div className="luInset" style={{ padding: 12 }}><div className="muted" style={{ fontSize: 12 }}>Tokens</div><div style={{ fontSize: 22, fontWeight: 900 }}>{Number(summary?.tokenBalance ?? sweepStats?.tokenBalance ?? 0)}</div></div>
               </div>
-              {/* tick is used to refresh derived values via re-render */}
               <div style={{ display: "none" }}>{tick}</div>
             </div>
 
             <div className="card">
-              <h3 style={{ marginTop: 0 }}>Student</h3>
-              <p className="muted" style={{ marginTop: 6 }}>
-                Rank up by completing lessons, tests, and boss battles.
-              </p>
+              <h3 style={{ marginTop: 0 }}>Mastery insights</h3>
+              <p className="muted" style={{ marginTop: 6 }}>Your strongest areas and the domains that deserve the next training session.</p>
               <div className="divider" />
-              <p className="muted" style={{ margin: 0 }}>
-                Active sweepstakes joined: <b>{Array.isArray(sweepStats?.activeEnteredCampaignIds) ? sweepStats.activeEnteredCampaignIds.length : 0}</b>
-              </p>
+              {(learning?.masteryByDomain || []).slice().sort((a: any, b: any) => Number(b.mastery) - Number(a.mastery)).map((row: any) => (
+                <div key={row.domain} style={{ display: "flex", justifyContent: "space-between", gap: 12, marginTop: 8 }}>
+                  <span>{String(row.domain).replace(/_/g, " ")}</span><b>{Number(row.mastery || 0).toFixed(0)}%</b>
+                </div>
+              ))}
+              {!learning?.masteryByDomain?.length ? <p className="muted">Complete training questions to build your mastery profile.</p> : null}
             </div>
             <div className="card">
               <h3 style={{ marginTop: 0 }}>Quick links</h3>
