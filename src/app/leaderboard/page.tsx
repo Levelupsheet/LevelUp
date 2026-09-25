@@ -44,10 +44,10 @@ export default function LeaderboardPage() {
           </div>
         </div>
 
-        <div className="card" style={{ marginTop: 16 }}>
+        <div className="gameHubSectionLabel"><span>{tab === "top" ? "WEEKLY XP" : tab === "boss" ? "BOSS HUNTERS" : "DOMAIN MASTERY"}</span><small>{tab === "top" ? "XP earned from completed sessions." : tab === "boss" ? "Players ranked by completed boss victories." : `${data?.domain || "AZURE"} mastery standings.`}</small></div>\n        <div className="card leaderboardStandingsCard">
           <div style={{ display: 'grid', gap: 12 }}>
             {rows.map((row, idx) => (
-              <a key={`${tab}_${row.userId}_${idx}`} href={`/profile/${encodeURIComponent(row.userId)}`} className="featureCard leaderboardRow">
+              <a key={`${tab}_${row.userId}_${idx}`} href={`/profile/${encodeURIComponent(row.userId)}`} className={`featureCard leaderboardRow leaderboardRank${idx + 1 <= 3 ? idx + 1 : "Other"}`}>
                 <div className="badge" style={{ width: 44, textAlign: 'center', fontSize: 18 }}>{idx + 1}</div>
                 <div style={{ minWidth: 0 }}>
                   <div style={{ fontWeight: 900, fontSize: 20, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{row.displayName}</div>
