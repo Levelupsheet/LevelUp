@@ -36,6 +36,25 @@ export async function applySubscriptionContribution(
   const amountPaidCents = Math.max(0, Math.floor(Number(input.amountPaidCents || 0)));
   const percentBps = Math.max(0, Math.floor(Number(input.percentBps || SUBSCRIPTION_POOL_CONTRIBUTION_BPS)));
   const contributionCents = Math.floor((amountPaidCents * percentBps) / 10000);
+  const eventId = String(input.eventId || "").trim();
+
+  if (eventId) {
+    const reserved = await tx.$executeRaw`
+      INSERT INTO "PaymentWebhookEvent" ("id", "provider", "eventId", "createdAt")
+      VALUES (${crypto.randomUUID()}, 'STRIPE', ${eventId}, CURRENT_TIMESTAMP)
+      ON CONFLICT ("provider", "eventId") DO NOTHING
+    `;
+    if (Number(reserved) !== 1) {
+      return {
+        amountPaidCents,
+        percentBps,
+        contributionCents: 0,
+        poolType: "WEEKLY_GOLDEN_POOL" as const,
+        newPoolAmount: null,
+        duplicate: true,
+      };
+    }
+  }
 
   await ensurePrizePools(tx);
   const weeklyPool = await tx.prizePool.upsert({
@@ -65,6 +84,7 @@ export async function applySubscriptionContribution(
     contributionCents,
     poolType: "WEEKLY_GOLDEN_POOL" as const,
     newPoolAmount: Number(weeklyPool.currentAmount || 0),
+    duplicate: false,
   };
 }
 
