@@ -51,6 +51,7 @@ export async function POST(req: Request) {
       planId: done.planId || paypalPlanIdForTier(tier),
     });
   } catch (err: any) {
-    return NextResponse.json({ ok: false, error: err?.message || 'Failed to activate PayPal subscription.' }, { status: 500 });
+    console.error('Failed to activate PayPal subscription failed', err);
+    return NextResponse.json({ ok: false, error: 'Failed to activate PayPal subscription.' }, { status: 500 });
   }
 }
