@@ -2,6 +2,14 @@ import { prisma } from "./prisma";
 import { getSessionUser, type SessionUser } from "@/lib/auth/session";
 
 export async function getRequestUserId(req: Request, fieldNames: string[] = ["userId", "uid"]) {
+  // Authenticated identity always wins. This prevents a signed-in client from
+  // overriding its account by submitting another user's id in the URL/body.
+  const sessionUser = await getSessionUser();
+  if (sessionUser?.id) return sessionUser.id;
+
+  // Legacy/local prototype callers may still provide an explicit id when no
+  // authenticated session exists. Production economy routes should require a
+  // session directly instead of relying on this fallback.
   try {
     const url = new URL(req.url);
     for (const field of fieldNames) {
@@ -18,8 +26,7 @@ export async function getRequestUserId(req: Request, fieldNames: string[] = ["us
     }
   } catch {}
 
-  const sessionUser = await getSessionUser();
-  return sessionUser?.id ?? null;
+  return null;
 }
 
 export async function upsertGoogleUser(sessionUser: SessionUser) {
