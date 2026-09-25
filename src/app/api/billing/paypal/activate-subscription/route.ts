@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSessionUser } from '@/lib/auth/session';
 import { upsertGoogleUser } from '@/app/api/_lib/authUser';
-import { finalizePayPalSubscription, savePendingSubscription, type PaidTier, paypalPlanIdForTier } from '@/lib/paypal';
+import { finalizePayPalSubscription, getPendingSubscription, type PaidTier, paypalPlanIdForTier } from '@/lib/paypal';
 import { prisma } from '@/lib/prisma';
 
 export async function POST(req: Request) {
@@ -23,17 +23,10 @@ export async function POST(req: Request) {
 
     const user = await upsertGoogleUser(sessionUser);
     const tier = rawPlan as PaidTier;
-    savePendingSubscription({
-      subscriptionId,
-      userId: user.id,
-      email: user.email,
-      tier,
-      planId: paypalPlanIdForTier(tier),
-      status: 'APPROVAL_PENDING',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      customId: user.id,
-    });
+    const pending = getPendingSubscription(subscriptionId);
+    if (pending && String(pending.userId) !== String(user.id)) {
+      return NextResponse.json({ ok: false, error: 'Subscription does not belong to the current user.' }, { status: 403 });
+    }
 
     const done: any = await finalizePayPalSubscription(subscriptionId, user.id);
 
