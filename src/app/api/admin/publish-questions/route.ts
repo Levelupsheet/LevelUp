@@ -51,7 +51,7 @@ export async function POST(req: Request) {
       };
     });
 
-    await prisma.$transaction(async (tx: any) => {
+    const publishResult = await prisma.$transaction(async (tx: any) => {
       await tx.questionSet.upsert({ where: { id: setId }, update: { name: block.setName, domain: block.domain, status: QuestionSetStatus.PUBLISHED }, create: { id: setId, name: block.setName, domain: block.domain, status: QuestionSetStatus.PUBLISHED } });
       if (replaceExisting) await tx.questionSetPlacement.updateMany({ where: placementFilter, data: { isActive: false } });
       const existingPlacement = await tx.questionSetPlacement.findFirst({ where: { setId, lane: block.lane, startingPosition: block.lane === "TRAINING" ? block.startingPosition : null, certExam: block.lane === "CERTIFICATIONS" ? block.certExam : null } });
@@ -81,7 +81,21 @@ export async function POST(req: Request) {
 
       await tx.generatedQuestion.updateMany({ where: { knowledgeBlockId: block.id, reviewStatus: { in: ["APPROVED", "EDITED"] } }, data: { publishedAt: new Date() } });
       await tx.knowledgeBlock.update({ where: { id: block.id }, data: { status: "APPROVED" } });
+      const activeQuestionCount = await tx.mCQQuestion.count({ where: { setId } });
+      return {
+        insertedCount: replaceExisting ? incoming.length : toInsert.length,
+        skippedDuplicateCount: replaceExisting ? 0 : Math.max(0, incoming.length - toInsert.length),
+        activeQuestionCount,
+      };
     });
-    return NextResponse.json({ ok: true, setId, publishedCount: incoming.length, appendedCount: incoming.length, replaceExisting });
+    return NextResponse.json({
+      ok: true,
+      setId,
+      publishedCount: publishResult.insertedCount,
+      appendedCount: publishResult.insertedCount,
+      skippedDuplicateCount: publishResult.skippedDuplicateCount,
+      activeQuestionCount: publishResult.activeQuestionCount,
+      replaceExisting,
+    });
   } catch (e: any) { return NextResponse.json({ error: e?.message || "Failed to publish questions" }, { status: 500 }); }
 }
