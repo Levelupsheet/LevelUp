@@ -151,6 +151,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ opened });
   } catch (e: any) {
-    return NextResponse.json({ error: e?.message ?? "Error" }, { status: 500 });
+    console.error("Loot open failed", e);
+    return NextResponse.json({ error: "Failed to open loot." }, { status: 500 });
   }
 }
