@@ -3,6 +3,7 @@ import { mkdir, writeFile, unlink } from "fs/promises";
 import path from "path";
 import { prisma } from "@/lib/prisma";
 import { deriveStage12Profile, saveStage12Profile } from "@/lib/stage12";
+import { getSessionUser } from "@/lib/auth/session";
 
 export const runtime = "nodejs";
 
@@ -211,20 +212,16 @@ function sanitizeParsedJson(parsedJson: any) {
 export async function POST(req: Request) {
   try {
     const contentType = req.headers.get("content-type") || "";
-    let userId = "";
+    const sessionUser = await getSessionUser();
+    const userId = String(sessionUser?.id || "").trim();
+    if (!userId) return NextResponse.json({ error: "Sign in required" }, { status: 401 });
     let file: File | null = null;
 
     if (contentType.includes("multipart/form-data")) {
       const form = await req.formData();
-      userId = String(form.get("userId") || "").trim();
       file = (form.get("file") as File | null) || null;
     } else {
-      const body = await req.json().catch(() => ({}));
-      userId = String(body?.userId || "").trim();
-    }
-
-    if (!userId) {
-      return NextResponse.json({ error: "Missing userId" }, { status: 400 });
+      await req.json().catch(() => ({}));
     }
 
     let resumeRecord: any = null;
@@ -319,7 +316,6 @@ export async function POST(req: Request) {
     return NextResponse.json(
       {
         error: "Failed to analyze resume",
-        detail: String(err?.message || err),
       },
       { status: 500 }
     );
