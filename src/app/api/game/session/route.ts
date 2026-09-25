@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { ensureUser } from "@/app/api/_lib/ensureUser";
+import { getSessionUser } from "@/lib/auth/session";
 import { inferDomainFromQuestion } from "@/lib/learningProfile";
 import { applyUserXpIncrement } from "@/lib/xpCaps";
 import { awardSessionRewards } from "@/lib/stage9Economy";
@@ -12,7 +13,8 @@ function asNum(v: unknown, fallback = 0) {
 export async function POST(req: Request) {
   try {
     const body = await req.json().catch(() => ({} as any));
-    const userId = String(body.userId || "").trim();
+    const sessionUser = await getSessionUser();
+    const userId = String(sessionUser?.id || "").trim();
     const xpEarned = Math.max(0, Math.floor(asNum(body.xpEarned, 0)));
     const masteryByDomain = body?.masteryByDomain && typeof body.masteryByDomain === "object" ? body.masteryByDomain : {};
     const questionDomains = Array.isArray(body?.questionDomains) ? body.questionDomains : [];
@@ -22,7 +24,7 @@ export async function POST(req: Request) {
     const encounterType = String(body?.encounterType || "standard").trim();
     const bestStreak = Math.max(0, Math.floor(asNum(body?.bestStreak, 0)));
 
-    if (!userId) return Response.json({ ok: false, error: "userId required" }, { status: 400 });
+    if (!userId) return Response.json({ ok: false, error: "Sign in required" }, { status: 401 });
     const existing = await prisma.user.findUnique({ where: { id: userId }, select: { id: true } });
     if (!existing) await ensureUser(userId);
 
