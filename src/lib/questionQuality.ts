@@ -48,12 +48,17 @@ export function validateQuestionQuality(input: { prompt?: string | null; type?: 
 
   if (!prompt || prompt.length < 12) issues.push("Prompt is too short");
   if (!explanation) issues.push("Explanation missing");
+  if (explanation && /^the correct answer is\b/i.test(explanation)) issues.push("Explanation should teach why the answer is correct");
+  if (/\b(all of the above|none of the above)\b/i.test(choices.join(" "))) issues.push("Avoid all/none-of-the-above distractors");
+  if (choices.length && choices.some((choice) => String(choice).trim().length < 1)) issues.push("Empty answer choice detected");
   if (/which answer is correct based on this fact|which option best matches this concept/i.test(prompt)) issues.push("Generic fact-recall wording should be rewritten");
   if (/^fill in the blank:/i.test(prompt)) issues.push("Fill-blank should be a natural sentence, not a definition prompt");
 
   if (type === "multiple_choice" || type === "incident") {
     if (choices.length < 4) issues.push("Needs at least 4 choices");
     const uniqueChoices = new Set(choices.map((v) => normalizeText(v)));
+    const lengths = choices.map((v) => String(v).trim().length).filter(Boolean);
+    if (lengths.length >= 4 && Math.max(...lengths) > Math.max(18, Math.min(...lengths) * 4)) issues.push("One answer choice is disproportionately long and may reveal the answer");
     if (uniqueChoices.size !== choices.length) issues.push("Duplicate answer choices detected");
     const correctIndex = Number(input.correctIndex ?? data.correctIndex ?? -1);
     if (correctIndex < 0 || correctIndex >= choices.length) issues.push("Correct index is invalid");
