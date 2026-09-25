@@ -106,6 +106,9 @@ export async function POST(req: Request) {
     await import("@/lib/stage9Economy").then(({ touchUserActivity }) => touchUserActivity(userId)).catch(() => null);
     return Response.json({ ok: true, user: result.user, stage9: result.stage9 });
   } catch (err: any) {
+    if (err?.code === "P2002") {
+      return Response.json({ ok: true, duplicate: true, stage9: { awarded: 0 } });
+    }
     return Response.json({ ok: false, error: "Failed to save game session", detail: String(err?.message ?? err) }, { status: 500 });
   }
 }
