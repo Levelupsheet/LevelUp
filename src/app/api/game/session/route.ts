@@ -3,7 +3,6 @@ import { ensureUser } from "@/app/api/_lib/ensureUser";
 import { getSessionUser } from "@/lib/auth/session";
 import { inferDomainFromQuestion } from "@/lib/learningProfile";
 import { applyUserXpIncrement } from "@/lib/xpCaps";
-import { awardSessionRewards } from "@/lib/stage9Economy";
 
 function asNum(v: unknown, fallback = 0) {
   const n = Number(v);
@@ -34,7 +33,7 @@ export async function POST(req: Request) {
     const priorClaim = await prisma.rewardClaim.findUnique({ where: { claimKey } });
     if (priorClaim) return Response.json({ ok: true, duplicate: true, stage9: { awarded: 0 } });
 
-    const updated = await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx) => {
       await tx.rewardClaim.create({ data: { userId, claimKey, kind: "GAME_SESSION", meta: { xpEarned, correctCount, totalQuestions, outcome, encounterType, bestStreak } } });
       const user = await applyUserXpIncrement(tx, userId, xpEarned);
 
@@ -73,11 +72,36 @@ export async function POST(req: Request) {
         });
       }
 
-      return user;
+      let awarded = correctCount * 2;
+      if (totalQuestions > 0 && correctCount === totalQuestions) awarded += 10;
+      if (outcome.toLowerCase() === "victory" || outcome.toLowerCase() === "complete") awarded += 8;
+      if (encounterType.toLowerCase() === "boss") awarded += 12;
+      if (bestStreak >= 5) awarded += 6;
+      awarded = Math.max(0, Math.floor(awarded));
+
+      const wallet = await tx.wallet.upsert({
+        where: { userId },
+        update: { tokenBalance: { increment: awarded } },
+        create: { userId, tokenBalance: awarded },
+      });
+      try {
+        await tx.notification.create({
+          data: {
+            userId,
+            type: "LOOT_BOX_EARNED" as any,
+            title: `Session reward: +${awarded} tokens`,
+            body: encounterType.toLowerCase() === "boss"
+              ? `Boss run complete • ${correctCount}/${totalQuestions} correct • Wallet now ${wallet.tokenBalance}`
+              : `Session complete • ${correctCount}/${totalQuestions} correct • Wallet now ${wallet.tokenBalance}`,
+          } as any,
+        });
+      } catch {}
+
+      return { user, stage9: { ok: true as const, awarded, walletTokens: wallet.tokenBalance } };
     });
 
-    const stage9 = await awardSessionRewards(userId, { correctCount, totalQuestions, outcome, encounterType, bestStreak }).catch(() => null);
-    return Response.json({ ok: true, user: updated, stage9 });
+    await import("@/lib/stage9Economy").then(({ touchUserActivity }) => touchUserActivity(userId)).catch(() => null);
+    return Response.json({ ok: true, user: result.user, stage9: result.stage9 });
   } catch (err: any) {
     return Response.json({ ok: false, error: "Failed to save game session", detail: String(err?.message ?? err) }, { status: 500 });
   }
