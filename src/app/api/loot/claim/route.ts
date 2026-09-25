@@ -41,8 +41,16 @@ export async function POST(req: Request) {
 
       let tokensToAdd = 0;
       let xpToAdd = 0;
+      const claimedBoxIds: string[] = [];
 
       for (const box of claimable) {
+        const reserved = await tx.lootBox.updateMany({
+          where: { id: box.id, userId, status: "OPENED" },
+          data: { status: "CLAIMED", claimedAt: new Date() },
+        });
+        if (reserved.count !== 1) continue;
+        claimedBoxIds.push(box.id);
+
         for (const d of box.drops) {
           if (d.rewardType === "TOKENS") {
             tokensToAdd += d.quantity;
@@ -79,18 +87,13 @@ export async function POST(req: Request) {
         await applyUserXpIncrement(tx, userId, xpToAdd);
       }
 
-      await tx.lootBox.updateMany({
-        where: { id: { in: claimable.map((b) => b.id) }, userId },
-        data: { status: "CLAIMED", claimedAt: new Date() },
-      });
-
       // Clear LOOT notifications after claiming (server-side)
       await tx.notification.updateMany({
         where: { userId, type: "LOOT_BOX_EARNED", readAt: null },
         data: { readAt: new Date() },
       });
 
-      return { claimed: claimable.length, tokenBalance: updatedWallet.tokenBalance, tokensAdded: tokensToAdd, xpAdded: xpToAdd };
+      return { claimed: claimedBoxIds.length, tokenBalance: updatedWallet.tokenBalance, tokensAdded: tokensToAdd, xpAdded: xpToAdd };
     });
 
     return NextResponse.json(result);
