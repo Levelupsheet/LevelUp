@@ -10,6 +10,7 @@ export async function POST(req: Request) {
     const result = await applyWebhookEvent(event);
     return NextResponse.json({ ok: true, result });
   } catch (err: any) {
-    return NextResponse.json({ ok: false, error: err?.message || 'Failed to process PayPal webhook.' }, { status: 500 });
+    console.error('PayPal webhook processing failed', err);
+    return NextResponse.json({ ok: false, error: 'Failed to process PayPal webhook.' }, { status: 500 });
   }
 }
