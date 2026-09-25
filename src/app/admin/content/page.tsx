@@ -303,11 +303,11 @@ export default function AdminContentStudioPage() {
       const res = await fetch("/api/admin/generate-questions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ knowledgeBlockIds: [selectedBlockId] }),
+        body: JSON.stringify({ knowledgeBlockIds: [selectedBlockId], autoApprove: true }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || "Generation failed");
-      setMessage(`Generated ${data.generatedCount} quality-ready question(s)${data.rejectedCount ? ` • filtered out ${data.rejectedCount} weak question(s)` : ""}. Review, approve, then publish.`);
+      setMessage(`Generated and auto-approved ${data.generatedCount} quality-ready question(s)${data.rejectedCount ? ` • filtered out ${data.rejectedCount} weak question(s)` : ""}. Review only what you want to change, then publish the batch.`);
       await loadBlocks();
       await refreshReviewData(selectedBlockId);
       setTab("review");
@@ -463,16 +463,16 @@ export default function AdminContentStudioPage() {
           <div>
             <div className="dashboardEyebrow">KNOWLEDGE BANK PIPELINE</div>
             <div style={{ fontWeight: 900, fontSize: 28 }}>Admin Content Studio</div>
-            <div style={{ opacity: 0.85, marginTop: 6 }}>Turn verified concepts and learning objectives into original LevelUp Pro questions, review them, then publish approved content into the live learning lanes.</div>
+            <div style={{ opacity: 0.85, marginTop: 6 }}>Import verified knowledge JSON and let LevelUp Pro generate, quality-check, and prepare questions automatically. Review is optional; publish the ready batch when you are satisfied.</div>
           </div>
           <div className="content-actions">
             <button onClick={() => (window.location.href = "/admin")}>Back to admin</button>
             <button onClick={() => setTab("import")} className={tab === "import" ? "primaryBtn" : "secondaryBtn" as any}>Import</button>
-            <button onClick={() => setTab("review")} className={tab === "review" ? "primaryBtn" : "secondaryBtn" as any}>Review & Publish</button>
+            <button onClick={() => setTab("review")} className={tab === "review" ? "primaryBtn" : "secondaryBtn" as any}>Generated Questions</button>
           </div>
         </div>
         <div className="contentPipelineSteps">
-          {["1. Concepts", "2. Generate", "3. Review", "4. Publish", "5. Monitor"].map((step) => <span key={step}>{step}</span>)}
+          {["1. Import knowledge", "2. Auto-generate", "3. Optional review", "4. Publish batch", "5. Monitor"].map((step) => <span key={step}>{step}</span>)}
         </div>
         {message ? <div style={{ marginTop: 12, padding: 12, borderRadius: 10, background: "rgba(99,102,241,0.12)", border: "1px solid rgba(99,102,241,0.28)" }}>{message}</div> : null}
       </div>
@@ -542,9 +542,9 @@ export default function AdminContentStudioPage() {
             <div className="card" style={{ padding: 16 }}>
               <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
                 <div>
-                  <div style={{ fontWeight: 800, fontSize: 20 }}>3. Review & approve</div>
+                  <div style={{ fontWeight: 800, fontSize: 20 }}>Generated questions</div>
                   <div style={{ opacity: 0.8, marginTop: 4 }}>{selectedBlock ? `${selectedBlock.title} • ${questions.length} quality-ready question(s)` : "Select a content block to generate questions"}</div>
-                  <div style={{ opacity: 0.68, marginTop: 4, fontSize: 13 }}>Read the prompt and answer normally. Use Advanced only when you need to inspect the underlying question data.</div>
+                  <div style={{ opacity: 0.68, marginTop: 4, fontSize: 13 }}>Questions that pass the automatic quality gate are ready to publish. You only need to edit or reject exceptions; Advanced is for troubleshooting.</div>
                 </div>
                 <div className="content-actions">
                   <button onClick={generateForSelected} disabled={!selectedBlockId || loading || syncing}>Regenerate</button>
