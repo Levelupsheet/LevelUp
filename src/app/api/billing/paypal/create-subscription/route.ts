@@ -14,6 +14,7 @@ export async function POST(req: Request) {
     const created = await createPayPalSubscription({ tier: rawPlan as PaidTier, userId: user.id, email: user.email, returnBase: appBaseUrl(req) });
     return NextResponse.json({ ok: true, subscriptionId: created.subscriptionId, approveUrl: created.approveUrl });
   } catch (err: any) {
-    return NextResponse.json({ ok: false, error: err?.message || 'Failed to create PayPal subscription.' }, { status: 500 });
+    console.error('Failed to create PayPal subscription failed', err);
+    return NextResponse.json({ ok: false, error: 'Failed to create PayPal subscription.' }, { status: 500 });
   }
 }
