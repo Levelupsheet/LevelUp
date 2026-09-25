@@ -3,6 +3,7 @@ import { prisma } from "../../_lib/prisma";
 import { ensureUser } from "../../_lib/ensureUser";
 import { levelFromXp } from "@/lib/progression";
 import { syncUserXpUpward } from "@/lib/xpCaps";
+import { getSessionUser } from "@/lib/auth/session";
 
 // Creates pending loot boxes (typically on level-up) and a notification.
 // Server-side verification: grants ONLY when XP crosses a level threshold.
@@ -11,14 +12,15 @@ import { syncUserXpUpward } from "@/lib/xpCaps";
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const userId = String(body?.userId ?? "");
+    const sessionUser = await getSessionUser();
+    const userId = String(sessionUser?.id || "").trim();
     const source = body?.source ? String(body.source) : "level_up";
 
     // Caller can pass xpAfter (preferred). If missing, we won't mint.
     const xpAfterRaw = body?.xpAfter;
     const xpAfter = xpAfterRaw == null ? null : Number(xpAfterRaw);
 
-    if (!userId) return NextResponse.json({ error: "Missing userId" }, { status: 400 });
+    if (!userId) return NextResponse.json({ error: "Sign in required" }, { status: 401 });
 
     await ensureUser(userId);
 
@@ -101,6 +103,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json(result);
   } catch (e: any) {
-    return NextResponse.json({ error: e?.message ?? "Error" }, { status: 500 });
+    console.error("Loot earn failed", e);
+    return NextResponse.json({ error: "Failed to earn loot." }, { status: 500 });
   }
 }
