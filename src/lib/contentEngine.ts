@@ -282,11 +282,12 @@ function cognitiveLevel(difficulty: number) {
 }
 function promptForDifficulty(block: NormalizedKnowledgeBlock, fact: ReturnType<typeof normalizeFact>) {
   const base = buildPromptFromFact(fact.statement, fact.questionHint, fact.subject, fact.answer);
-  const subject = fact.subject || "this technology";
+  const subject = fact.subject || block.title || "the technology";
+  const requirement = fact.statement.replace(/[.?!]+$/, "");
   if (block.difficulty <= 2) return base;
-  if (block.difficulty === 3) return `An administrator needs to use ${subject} correctly in a production environment. Which option best matches the requirement?`;
-  if (block.difficulty === 4) return `A technician is troubleshooting an issue involving ${subject}. Which option should be verified or applied first based on the documented behavior?`;
-  return `During a production incident involving ${subject}, the team must choose the option that satisfies the requirement without introducing an unnecessary change. Which option is the best choice?`;
+  if (block.difficulty === 3) return `An administrator is working with ${subject}. The requirement is: ${requirement}. Which option should the administrator use?`;
+  if (block.difficulty === 4) return `A technician is troubleshooting ${subject}. Evidence shows: ${requirement}. Which option is the best next step to verify or correct the issue?`;
+  return `During a production incident involving ${subject}, the team confirms the following constraint: ${requirement}. Which option best satisfies the requirement while avoiding an unnecessary change?`;
 }
 function questionMeta(block: NormalizedKnowledgeBlock, difficulty = block.difficulty) {
   return { cognitiveLevel: cognitiveLevel(difficulty), sourceBlockId: block.sourceBlockId };
@@ -392,12 +393,10 @@ function scenarioQuestion(block: NormalizedKnowledgeBlock, scenario: any): Candi
   return { prompt: `A technician is handling this situation: ${scenarioText} What is the best next action?`, type: "incident", difficulty: Math.max(2, block.difficulty), explanation: `${bestAction} is the best next action for this scenario. It directly addresses the evidence given before moving to broader or more disruptive troubleshooting steps.`, tags: questionTags(block, uniqueStrings([scenario?.severity, ...(scenario?.tags || [])])), choices, correctIndex, data: { ...toBase(block, Math.max(2, block.difficulty)).data, ...questionMeta(block, Math.max(2, block.difficulty)), scenario: scenarioText, choices, correctIndex }, ...goldenDefaults(block, Math.max(2, block.difficulty)) };
 }
 function multiSelectQuestion(block: NormalizedKnowledgeBlock): CandidateQuestion | null {
-  const choices = uniqueStrings([...block.facts.map((fact) => normalizeFact(fact).subject || normalizeFact(fact).answer), ...block.definitions.map((def: any) => String(def?.term || "").trim())]).filter(Boolean).slice(0, 6);
-  if (choices.length < 4) return null;
-  const preferred = choices.filter((choice) => /secure|https|ssh|ldaps|mfa|security|iam|defender|dns|dhcp/i.test(choice));
-  const correct = preferred.length ? preferred.slice(0, Math.min(3, preferred.length)) : choices.slice(0, 2);
-  const correctIndices = choices.map((choice, index) => (correct.includes(choice) ? index : -1)).filter((index) => index >= 0);
-  return { prompt: "Select all answers that are most strongly associated with secure access, identity, or core service troubleshooting in this block.", type: "multi_select", difficulty: Math.max(2, block.difficulty), explanation: "This multi-select is generated from the most relevant technical terms in the knowledge block.", tags: questionTags(block, ["generated", "multi_select"]), data: { ...toBase(block, Math.max(2, block.difficulty)).data, choices, correctIndices, minSelections: Math.min(correctIndices.length, 1), maxSelections: correctIndices.length }, ...goldenDefaults(block, Math.max(2, block.difficulty)) };
+  // Multi-select questions require explicit source truth. Inferring correctness from
+  // keywords (for example "secure" or "IAM") can silently create wrong answer keys.
+  // Generate these only when the knowledge block supplies a curated matching/multi-select source.
+  return null;
 }
 function matchingQuestion(block: NormalizedKnowledgeBlock, source: any): CandidateQuestion | null {
   const pairs = uniqueStrings((Array.isArray(source?.pairs) ? source.pairs : []).map((pair: any) => `${String(pair?.left || "").trim()}|||${String(pair?.right || "").trim()}`))
