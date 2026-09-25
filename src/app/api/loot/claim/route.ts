@@ -98,6 +98,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json(result);
   } catch (e: any) {
-    return NextResponse.json({ error: e?.message ?? "Error" }, { status: 500 });
+    console.error("Loot claim failed", e);
+    return NextResponse.json({ error: "Failed to claim loot." }, { status: 500 });
   }
 }
