@@ -1,5 +1,5 @@
 
-import { getRequestUserId } from "@/app/api/_lib/authUser";
+import { getSessionUser } from "@/lib/auth/session";
 import { getStoreCatalog, purchaseStage9Item } from "@/lib/stage9Economy";
 
 export async function GET() {
@@ -8,7 +8,8 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
-    const userId = await getRequestUserId(req);
+    const sessionUser = await getSessionUser();
+    const userId = sessionUser?.id ?? null;
     if (!userId) return Response.json({ ok: false, error: "userId required" }, { status: 400 });
     const body = await req.json().catch(() => ({}));
     const itemId = String(body?.itemId || "").trim();
