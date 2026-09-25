@@ -3404,7 +3404,10 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .dashboardBattleStatus small{ margin-top:3px; color:var(--muted); line-height:1.35; }
 .dashboardGameCard{ margin-top:14px; padding:12px; border-color:rgba(93,168,255,.22); background:linear-gradient(180deg,rgba(44,64,98,.25),rgba(18,28,46,.20)); }
 .dashboardGameCard.leaderboard{ border-color:rgba(255,215,100,.25); background:linear-gradient(180deg,rgba(28,54,84,.42),rgba(15,26,44,.38)); box-shadow:0 0 0 1px rgba(255,215,100,.06) inset; }
-@media(max-width:760px){\n .dashboardBattleStatus{ padding:9px 10px; }\n .dashboardGameCard{ padding:11px; }\n}
+@media(max-width:760px){
+ .dashboardBattleStatus{ padding:9px 10px; }
+ .dashboardGameCard{ padding:11px; }
+}
 
 
 /* ===== Batch 7: admin knowledge-bank workflow ===== */
