@@ -26,6 +26,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ ok: true, orderId: created.orderId, approveUrl: created.approveUrl });
   } catch (err: any) {
-    return NextResponse.json({ ok: false, error: err?.message || 'Failed to create PayPal order.' }, { status: 500 });
+    console.error('Failed to create PayPal order failed', err);
+    return NextResponse.json({ ok: false, error: 'Failed to create PayPal order.' }, { status: 500 });
   }
 }
