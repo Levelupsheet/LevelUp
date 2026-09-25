@@ -51,7 +51,11 @@ export async function POST(req: Request) {
       };
     });
 
-    const publishResult = await prisma.$transaction(async (tx: any) => {
+    const publishResult: {
+      insertedCount: number;
+      skippedDuplicateCount: number;
+      activeQuestionCount: number;
+    } = await prisma.$transaction(async (tx: any) => {
       await tx.questionSet.upsert({ where: { id: setId }, update: { name: block.setName, domain: block.domain, status: QuestionSetStatus.PUBLISHED }, create: { id: setId, name: block.setName, domain: block.domain, status: QuestionSetStatus.PUBLISHED } });
       if (replaceExisting) await tx.questionSetPlacement.updateMany({ where: placementFilter, data: { isActive: false } });
       const existingPlacement = await tx.questionSetPlacement.findFirst({ where: { setId, lane: block.lane, startingPosition: block.lane === "TRAINING" ? block.startingPosition : null, certExam: block.lane === "CERTIFICATIONS" ? block.certExam : null } });
