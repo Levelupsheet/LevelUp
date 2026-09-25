@@ -333,15 +333,22 @@ function fillBlankFromFact(block: NormalizedKnowledgeBlock, factInput: any): Can
 function trueFalseFromFact(block: NormalizedKnowledgeBlock, factInput: any): CandidateQuestion | null {
   const fact = normalizeFact(factInput);
   if (!fact.statement) return null;
+  // Do not generate an always-True item from a source fact. A useful true/false
+  // question needs an explicitly authored claim and truth value.
+  const explicit = typeof factInput === "object" ? factInput : null;
+  if (!explicit || typeof explicit.correctAnswer !== "boolean") return null;
+  const claim = String(explicit.claim || explicit.statement || "").trim();
+  if (!claim) return null;
+  const correct = Boolean(explicit.correctAnswer);
   return {
-    prompt: `True or false: ${fact.statement}`,
+    prompt: `True or false: ${claim}`,
     type: "true_false" as any,
     difficulty: block.difficulty,
-    explanation: fact.answer ? `Correct fact: ${fact.statement}` : fact.statement,
+    explanation: String(explicit.explanation || fact.statement),
     tags: questionTags(block, [...fact.tags, "true_false"]),
     choices: ["True", "False"],
-    correctIndex: 0,
-    data: { ...toBase(block).data, ...questionMeta(block), statement: fact.statement, choices: ["True", "False"], correctIndex: 0, correctAnswer: true },
+    correctIndex: correct ? 0 : 1,
+    data: { ...toBase(block).data, ...questionMeta(block), statement: claim, choices: ["True", "False"], correctIndex: correct ? 0 : 1, correctAnswer: correct, sourceStatement: fact.statement },
     ...goldenDefaults(block, block.difficulty),
   };
 }
