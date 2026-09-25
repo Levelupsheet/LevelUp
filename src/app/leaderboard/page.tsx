@@ -59,7 +59,7 @@ export default function LeaderboardPage() {
                 </div>
               </a>
             ))}
-            {!rows.length ? <div style={{ opacity: 0.8 }}><small>No leaderboard data yet.</small></div> : null}
+            {!rows.length ? <div className="gameHubState gameHubStateEmpty"><small>No leaderboard data yet.</small></div> : null}
           </div>
         </div>
       </div>
