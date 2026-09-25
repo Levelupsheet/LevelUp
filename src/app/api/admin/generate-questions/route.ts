@@ -35,7 +35,10 @@ export async function POST(req: Request) {
         source: blockRecord.source,
       });
       const rawCandidates = generateQuestionsFromBlock(normalized);
-      const candidates = rawCandidates.filter((q) => validateQuestionQuality(q).qualityScore >= 80);
+      const candidates = rawCandidates.filter((q) => {
+        const quality = validateQuestionQuality(q);
+        return quality.qualityScore >= 80 && quality.issues.length === 0;
+      });
 
       rejectedCount += rawCandidates.length - candidates.length;
 
