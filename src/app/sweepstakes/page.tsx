@@ -275,6 +275,9 @@ export default function SweepstakesPage() {
   const [pendingCampaignId, setPendingCampaignId] = useState<string | null>(null);
   const [authChecked, setAuthChecked] = useState(false);
   const [authed, setAuthed] = useState(false);
+  const [claimingWin, setClaimingWin] = useState<any>(null);
+  const [claimForm, setClaimForm] = useState<any>({ fullName:'', email:'', phone:'', shippingAddress1:'', shippingAddress2:'', city:'', region:'', postalCode:'', country:'United States', notes:'' });
+  const [claimStatus, setClaimStatus] = useState('');
 
   async function load() {
     const authRes = await fetch('/api/auth/me', { cache: 'no-store' as any }).catch(() => null as any);
@@ -362,8 +365,22 @@ export default function SweepstakesPage() {
               {active[0] ? <Countdown endsAt={active[0]?.endsAt} compact /> : null}
             </div>
 
+            {Array.isArray(data?.user?.wins) && data.user.wins.length ? (
+              <div className="featureCard" style={{ marginTop:18, borderColor:'rgba(255,215,90,.55)', background:'linear-gradient(135deg,rgba(105,70,7,.32),rgba(255,190,35,.10),rgba(30,22,8,.36))' }}>
+                <h3 style={{ margin:'0 0 6px', color:'#ffe58a' }}>🏆 Your sweepstakes wins</h3>
+                <div className="muted">Congratulations! Claim real-world prizes here so LevelUp Pro support can complete fulfillment.</div>
+                <div style={{ display:'grid', gap:10, marginTop:12 }}>
+                  {data.user.wins.map((win:any) => <div key={win.campaignId} style={{ display:'flex',justifyContent:'space-between',gap:12,alignItems:'center',flexWrap:'wrap',padding:12,border:'1px solid rgba(255,215,90,.3)',borderRadius:14,background:'rgba(255,255,255,.035)' }}>
+                    <div><b style={{color:'#ffe58a'}}>{win.title}</b><div className="muted">{win.prizePoolLabel || 'Sweepstakes prize'}{win.drawnAt ? ` • Won ${new Date(win.drawnAt).toLocaleDateString()}` : ''}</div></div>
+                    {win.claimStatus ? <span className="badge">✓ Claim {String(win.claimStatus).toLowerCase()}</span> : <button className="gold" onClick={()=>{setClaimingWin(win);setClaimStatus('');}}>Claim prize →</button>}
+                  </div>)}
+                </div>
+              </div>
+            ) : null}
+
             <div style={{ marginTop: 22 }}>
-              <h3 style={{ marginBottom: 12, fontSize: 24 }}>Active drawings</h3>
+              <h3 style={{ marginBottom: 4, fontSize: 24 }}>Open drawings</h3>
+              <div className="muted" style={{ marginBottom: 12 }}>Enter drawings that are currently accepting entries. Closed and completed campaigns are listed separately below.</div>
               <div className="grid3">
                 {active.length ? active.map((c) => (
                   <button key={c.id} id={`campaign-${c.id}`} type="button" className="featureCard" style={{ textAlign:'left', position:'relative', overflow:'hidden', scrollMarginTop: 120 }} onClick={() => { setSelected(c); try { const params = new URLSearchParams(window.location.search); params.set('campaign', String(c.id)); window.history.replaceState({}, '', `/sweepstakes?${params.toString()}`); } catch {} }}>
@@ -403,6 +420,25 @@ export default function SweepstakesPage() {
         </div>
       </div>
       <SweepstakesModal campaign={selected} user={data?.user} onClose={() => { setSelected(null); try { const params = new URLSearchParams(window.location.search); params.delete('campaign'); const next = params.toString(); window.history.replaceState({}, '', next ? `/sweepstakes?${next}` : '/sweepstakes'); } catch {} }} onEntered={() => { setSelected(null); load(); }} />
+          {claimingWin ? <div style={{position:'fixed',inset:0,zIndex:1300,background:'rgba(2,6,16,.9)',display:'grid',placeItems:'center',padding:20}} onClick={()=>setClaimingWin(null)}>
+            <form className="glass" style={{width:'min(720px,96vw)',maxHeight:'90vh',overflow:'auto',padding:20}} onClick={(e)=>e.stopPropagation()} onSubmit={async(e)=>{e.preventDefault();setClaimStatus('Submitting…');const res=await fetch('/api/sweepstakes/claim',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({...claimForm,campaignId:claimingWin.campaignId})});const json=await res.json().catch(()=>({}));if(res.ok&&json?.ok){setClaimStatus('Claim submitted securely to LevelUp Pro support.');await load();setTimeout(()=>setClaimingWin(null),900);}else setClaimStatus(json?.error||'Could not submit claim.');}}>
+              <div style={{display:'flex',justifyContent:'space-between',gap:10}}><div><div className="muted">Prize fulfillment</div><h2 style={{margin:'4px 0'}}>Claim {claimingWin.title}</h2></div><button type="button" className="secondaryBtn" onClick={()=>setClaimingWin(null)}>Close</button></div>
+              <p className="muted">Provide only the contact and delivery information needed for prize fulfillment. This information is visible to authorized LevelUp Pro administrators.</p>
+              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
+                <label>Full name<input required value={claimForm.fullName} onChange={e=>setClaimForm((s:any)=>({...s,fullName:e.target.value}))}/></label>
+                <label>Email<input required type="email" value={claimForm.email} onChange={e=>setClaimForm((s:any)=>({...s,email:e.target.value}))}/></label>
+                <label>Phone<input value={claimForm.phone} onChange={e=>setClaimForm((s:any)=>({...s,phone:e.target.value}))}/></label>
+                <label>Country<input value={claimForm.country} onChange={e=>setClaimForm((s:any)=>({...s,country:e.target.value}))}/></label>
+              </div>
+              <label style={{display:'block',marginTop:10}}>Address<input value={claimForm.shippingAddress1} onChange={e=>setClaimForm((s:any)=>({...s,shippingAddress1:e.target.value}))}/></label>
+              <label style={{display:'block',marginTop:10}}>Address line 2<input value={claimForm.shippingAddress2} onChange={e=>setClaimForm((s:any)=>({...s,shippingAddress2:e.target.value}))}/></label>
+              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:10,marginTop:10}}>
+                <label>City<input value={claimForm.city} onChange={e=>setClaimForm((s:any)=>({...s,city:e.target.value}))}/></label><label>State / region<input value={claimForm.region} onChange={e=>setClaimForm((s:any)=>({...s,region:e.target.value}))}/></label><label>Postal code<input value={claimForm.postalCode} onChange={e=>setClaimForm((s:any)=>({...s,postalCode:e.target.value}))}/></label>
+              </div>
+              <label style={{display:'block',marginTop:10}}>Fulfillment notes (optional)<textarea rows={3} value={claimForm.notes} onChange={e=>setClaimForm((s:any)=>({...s,notes:e.target.value}))}/></label>
+              <div style={{display:'flex',gap:10,alignItems:'center',marginTop:14}}><button className="gold" type="submit">Submit prize claim</button><span className="muted">{claimStatus}</span></div>
+            </form>
+          </div> : null}
     </main>
   );
 }
