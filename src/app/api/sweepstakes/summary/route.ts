@@ -29,11 +29,12 @@ export async function GET(req: Request) {
     let userSummary = null;
     if (userId) {
       const weekStart = startOfWeekUtc(now);
-      const [weeklyCount, sourceBreakdown, campaignRows, wallet] = await Promise.all([
+      const [weeklyCount, sourceBreakdown, campaignRows, wallet, claimRows] = await Promise.all([
         countWeeklyEntries(prisma, userId, weekStart),
         prisma.$queryRawUnsafe(`SELECT "source", COALESCE(SUM("quantity"),0) AS "quantity" FROM "RaffleEntry" WHERE "userId" = $1 AND "weekStart" = $2 GROUP BY "source"`, userId, weekStart).catch(() => []),
         prisma.$queryRawUnsafe(`SELECT "campaignId", COALESCE(SUM("quantity"),0) AS "quantity" FROM "RaffleEntry" WHERE "userId" = $1 GROUP BY "campaignId"`, userId).catch(() => []),
         prisma.wallet.findUnique({ where: { userId } }).catch(() => null),
+        prisma.$queryRawUnsafe(`SELECT "campaignId","status","submittedAt" FROM "SweepstakesPrizeClaim" WHERE "userId" = $1`, userId).catch(() => []),
       ]);
       const entriesByCampaign = Array.isArray(campaignRows)
         ? Object.fromEntries(campaignRows.map((row: any) => [String(row.campaignId), Number(row.quantity || 0)]))
@@ -51,6 +52,10 @@ export async function GET(req: Request) {
         weeklyLimit: RAFFLE_WEEKLY_ENTRY_LIMIT,
         tokenBalance: Number(wallet?.tokenBalance || 0),
         sources: Array.isArray(sourceBreakdown) ? sourceBreakdown.map((row: any) => ({ source: row.source, quantity: Number(row.quantity || 0) })) : [],
+        wins: campaigns.filter((campaign: any) => String(campaign?.winnerUserId || "") === String(userId)).map((campaign: any) => {
+          const claim = Array.isArray(claimRows) ? claimRows.find((row: any) => String(row.campaignId) === String(campaign.id)) : null;
+          return { campaignId: String(campaign.id), title: campaign.title, prizePoolLabel: campaign.prizePoolLabel, prizeValueUsd: campaign.prizeValueUsd, drawnAt: campaign.drawnAt, claimStatus: claim?.status || null, claimSubmittedAt: claim?.submittedAt || null };
+        }),
       };
     }
 
@@ -63,6 +68,7 @@ export async function GET(req: Request) {
       now,
     });
   } catch (error: any) {
-    return Response.json({ ok: false, error: 'Failed to load sweepstakes summary', detail: String(error?.message || error) }, { status: 500 });
+    console.error('Sweepstakes summary load failed', error);
+    return Response.json({ ok: false, error: 'Failed to load sweepstakes summary' }, { status: 500 });
   }
 }
