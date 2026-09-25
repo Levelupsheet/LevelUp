@@ -15,6 +15,7 @@ export async function POST(req: Request) {
     const body = await req.json().catch(() => ({} as any));
     const sessionUser = await getSessionUser();
     const userId = String(sessionUser?.id || "").trim();
+    const rewardClaimKey = String(body?.rewardClaimKey || body?.sessionId || "").trim();
     const xpEarned = Math.max(0, Math.floor(asNum(body.xpEarned, 0)));
     const masteryByDomain = body?.masteryByDomain && typeof body.masteryByDomain === "object" ? body.masteryByDomain : {};
     const questionDomains = Array.isArray(body?.questionDomains) ? body.questionDomains : [];
@@ -25,10 +26,16 @@ export async function POST(req: Request) {
     const bestStreak = Math.max(0, Math.floor(asNum(body?.bestStreak, 0)));
 
     if (!userId) return Response.json({ ok: false, error: "Sign in required" }, { status: 401 });
+    if (!rewardClaimKey) return Response.json({ ok: false, error: "rewardClaimKey required" }, { status: 400 });
     const existing = await prisma.user.findUnique({ where: { id: userId }, select: { id: true } });
     if (!existing) await ensureUser(userId);
 
+    const claimKey = `game-session:${userId}:${rewardClaimKey}`;
+    const priorClaim = await prisma.rewardClaim.findUnique({ where: { claimKey } });
+    if (priorClaim) return Response.json({ ok: true, duplicate: true, stage9: { awarded: 0 } });
+
     const updated = await prisma.$transaction(async (tx) => {
+      await tx.rewardClaim.create({ data: { userId, claimKey, kind: "GAME_SESSION", meta: { xpEarned, correctCount, totalQuestions, outcome, encounterType, bestStreak } } });
       const user = await applyUserXpIncrement(tx, userId, xpEarned);
 
       const domainMap = new Map<string, { mastery: number; questions: number; level: number }>();
