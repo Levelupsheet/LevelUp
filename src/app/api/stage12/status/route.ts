@@ -2,12 +2,13 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { deriveStage12Profile, getStage12Profile, saveStage12Profile } from "@/lib/stage12";
+import { getSessionUser } from "@/lib/auth/session";
 
 export async function GET(req: Request) {
   try {
-    const { searchParams } = new URL(req.url);
-    const userId = String(searchParams.get("userId") || "").trim();
-    if (!userId) return NextResponse.json({ error: "userId required" }, { status: 400 });
+    const sessionUser = await getSessionUser();
+    const userId = String(sessionUser?.id || "").trim();
+    if (!userId) return NextResponse.json({ error: "Sign in required" }, { status: 401 });
 
     const cached = getStage12Profile(userId);
     const latestResume = await prisma.resumeFile.findFirst({
@@ -56,6 +57,7 @@ export async function GET(req: Request) {
       profile,
     });
   } catch (err: any) {
-    return NextResponse.json({ error: "Failed to load Stage 12 status", detail: String(err?.message || err) }, { status: 500 });
+    console.error("Stage 12 status load failed", err);
+    return NextResponse.json({ error: "Failed to load Stage 12 status" }, { status: 500 });
   }
 }
