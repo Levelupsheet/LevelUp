@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import DiabloQuizRunner from "@/components/DiabloQuizRunner";
 import ProgressBar from "@/components/ProgressBar";
 import { getActiveUser, setTrackProgress, type TrackId } from "@/lib/userStore";
@@ -84,6 +84,21 @@ export default function MockInterviewModal(props: { open: boolean; onClose: () =
   const [stage, setStage] = useState<Stage>(1);
   const [step, setStep] = useState<"setup" | "quiz" | "summary">("setup");
   const [lastSummary, setLastSummary] = useState<any>(null);
+  const [rewardResult, setRewardResult] = useState<any>(null);
+  const [cooldownUntil, setCooldownUntil] = useState(0);
+  const [now, setNow] = useState(() => Date.now());
+  const cooldownKey = `lu_interview_cooldown_${track}`;
+  const cooldownActive = cooldownUntil > now;
+
+  useEffect(() => {
+    try { setCooldownUntil(Number(localStorage.getItem(cooldownKey) || 0)); } catch { setCooldownUntil(0); }
+  }, [cooldownKey, step]);
+
+  useEffect(() => {
+    if (!open || !cooldownActive) return;
+    const id = window.setInterval(() => setNow(Date.now()), 30000);
+    return () => window.clearInterval(id);
+  }, [open, cooldownActive]);
 
   const activeUser = getActiveUser();
   const trackPct = activeUser.trackProgress?.[track as TrackId] ?? 0;
@@ -105,13 +120,32 @@ export default function MockInterviewModal(props: { open: boolean; onClose: () =
 
   function start(nextStage: Stage) {
     setStage(nextStage);
+    if (cooldownActive) return;
     setLastSummary(null);
+    setRewardResult(null);
     setStep("quiz");
   }
 
   function finishSummary(summary: any) {
     setLastSummary(summary);
     const passed = summary?.outcome === "victory" || summary?.enemyHP === 0;
+    if (passed) {
+      const rewardClaimKey = `interview:${track}:stage-${stage}:${Date.now()}`;
+      fetch("/api/game/session", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          rewardClaimKey,
+          xpEarned: Number(summary?.xpEarned || 0),
+          masteryByDomain: summary?.masteryByDomain || {},
+          correctCount: Number(summary?.correctCount || 0),
+          totalQuestions: Number(summary?.totalQuestions || 0),
+          outcome: "victory",
+          encounterType: "boss",
+          bestStreak: Number(summary?.bestStreak || 0),
+        }),
+      }).then((res) => res.json()).then((json) => { if (json?.ok) setRewardResult(json?.stage9 || null); }).catch(() => null);
+    }
     if (stage === 1 && passed) {
       try { localStorage.setItem(`lu_mock_passed_s1_${track}`, "1"); } catch {}
       setTrackProgress(track as TrackId, Math.max(trackPct, 50));
@@ -120,6 +154,13 @@ export default function MockInterviewModal(props: { open: boolean; onClose: () =
     if (stage === 2 && passed) {
       setTrackProgress(track as TrackId, 100);
       addActivity(activeUser.id, { type: "PASS_INTERVIEW_STAGE2", title: "Advanced boss battle cleared", body: track });
+      const until = Date.now() + 12 * 60 * 60 * 1000;
+      try {
+        localStorage.setItem(cooldownKey, String(until));
+        localStorage.removeItem(`lu_mock_passed_s1_${track}`);
+      } catch {}
+      setCooldownUntil(until);
+      setNow(Date.now());
     }
     setStep("summary");
   }
@@ -176,11 +217,11 @@ export default function MockInterviewModal(props: { open: boolean; onClose: () =
                   </div>
                 </div>
                 <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 14 }}>
-                  <button className="btn primary" onClick={() => start(1)}>Start Tech Battle →</button>
-                  <button className="btn" disabled={!passedStage1} onClick={() => start(2)} title={passedStage1 ? "" : "Pass the Tech Battle to unlock"}>Start Advanced Battle</button>
+                  <button className="btn primary" disabled={cooldownActive} onClick={() => start(1)}>{cooldownActive ? "Battle cooling down" : "Start Now →"}</button>
+                  <button className="btn" disabled={!passedStage1 || cooldownActive} onClick={() => start(2)} title={cooldownActive ? "Complete other training while this battle resets." : passedStage1 ? "" : "Pass the first battle to unlock"}>Start Advanced Battle</button>
                 </div>
                 <div style={{ marginTop: 10 }}>
-                  {passedStage1 ? <span className="badge">✓ Stage 2 unlocked for this track</span> : <span className="badge">Clear the Tech Battle to unlock the advanced interview stage.</span>}
+                  {cooldownActive ? <span className="badge">✓ Track cleared. Next attempt available in about {Math.max(1, Math.ceil((cooldownUntil - now) / 3600000))}h — explore Training or Certifications while it resets.</span> : passedStage1 ? <span className="badge">✓ Advanced battle unlocked for this track</span> : <span className="badge">Clear the first battle to unlock the advanced interview stage.</span>}
                 </div>
               </div>
             </div>
@@ -205,8 +246,9 @@ export default function MockInterviewModal(props: { open: boolean; onClose: () =
           {step === "summary" && (
             <div className="card interviewBattleSummary">
               <div className="dashboardEyebrow">BATTLE COMPLETE</div>
-              <h2>{(lastSummary?.outcome === "victory" || lastSummary?.enemyHP === 0) ? "Stage cleared" : "Review and try again"}</h2>
-              <p className="muted">{(lastSummary?.outcome === "victory" || lastSummary?.enemyHP === 0) ? "Your progression has been updated. Keep moving while the material is fresh." : "Use the result to identify what to review, then return for another attempt."}</p>
+              <h2>{(lastSummary?.outcome === "victory" || lastSummary?.enemyHP === 0) ? (stage === 2 ? "Congratulations — track cleared!" : "Great work — stage cleared!") : "Review and try again"}</h2>
+              <p className="muted">{(lastSummary?.outcome === "victory" || lastSummary?.enemyHP === 0) ? (stage === 2 ? "You completed both interview battles. Your progress and completion reward have been saved. This track now has a 12-hour cooldown; use that time to strengthen another training area." : "You passed the first battle and unlocked the advanced challenge. Your progress and completion reward have been saved.") : "Use the result to identify what to review, then return for another attempt."}</p>
+              {rewardResult ? <div className="badge" style={{ marginBottom: 12 }}>🎉 Reward earned: +{Number(rewardResult.awarded || 0)} tokens • wallet {Number(rewardResult.walletTokens || 0)}</div> : null}
               <div className="interviewBattleStats">
                 <div><small>Result</small><strong>{String(lastSummary?.outcome || "complete").toUpperCase()}</strong></div>
                 <div><small>Score</small><strong>{Number(lastSummary?.correctCount || 0)} / {Number(lastSummary?.totalQuestions || 0)}</strong></div>
@@ -215,7 +257,8 @@ export default function MockInterviewModal(props: { open: boolean; onClose: () =
               </div>
               <div className="interviewBattleSummaryActions">
                 {(lastSummary?.outcome === "victory" || lastSummary?.enemyHP === 0) && stage === 1 ? <button className="btn primary" onClick={() => start(2)}>Continue to advanced battle →</button> : null}
-                <button className="btn" onClick={() => setStep("setup")}>Choose another battle</button>
+                <button className="btn" onClick={() => setStep("setup")}>{stage === 2 && (lastSummary?.outcome === "victory" || lastSummary?.enemyHP === 0) ? "Back to battle menu" : "Choose another battle"}</button>
+                {stage === 2 && (lastSummary?.outcome === "victory" || lastSummary?.enemyHP === 0) ? <a className="btn" href="/training">Explore other training →</a> : null}
                 <a className="secondaryBtn" href="/coach">Open AI Coach</a>
                 <button className="btn" onClick={onClose}>Return to dashboard</button>
               </div>
