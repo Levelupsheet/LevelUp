@@ -48,9 +48,9 @@ export default function RewardsPage() {
         </div>
       ) : null}
 
-      <div className="luGrid rewardsTierGrid">
+      <div className="gameHubSectionLabel rewardsSectionLabel"><span>REWARD PATH</span><small>Progress from standard drops toward rarer reward opportunities.</small></div>\n      <div className="luGrid rewardsTierGrid">
         {TIERS.map((t, idx) => (
-          <div key={t.name} className="luCard rewardsTierCard" style={{ opacity: !ent ? 1 : idx < 2 || ent.rewardsTrack !== 'core' ? 1 : 0.92 }}>
+          <div key={t.name} className={`luCard rewardsTierCard rewardPathCard rewardPathTier${idx + 1}`} style={{ opacity: !ent ? 1 : idx < 2 || ent.rewardsTrack !== 'core' ? 1 : 0.92 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
               <div style={{ fontWeight: 800, fontSize: 16 }}>{t.name} Loot Box</div>
               <div className="luPill">Preview</div>
