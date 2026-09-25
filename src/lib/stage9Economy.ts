@@ -167,12 +167,15 @@ export async function claimDailyBonus(userId: string) {
 export async function purchaseStage9Item(userId: string, itemId: string) {
   const item = STORE.find((x) => x.id === itemId);
   if (!item) return { ok: false as const, error: "Item not found" };
-  const wallet = await prisma.wallet.upsert({ where: { userId }, update: {}, create: { userId, tokenBalance: 0 } });
-  if ((wallet.tokenBalance || 0) < item.cost) {
-    return { ok: false as const, error: "Not enough tokens", walletTokens: wallet.tokenBalance };
-  }
+  await prisma.wallet.upsert({ where: { userId }, update: {}, create: { userId, tokenBalance: 0 } });
   const next = await prisma.$transaction(async (tx) => {
-    const updatedWallet = await tx.wallet.update({ where: { userId }, data: { tokenBalance: { decrement: item.cost } } });
+    const debited = await tx.wallet.updateMany({
+      where: { userId, tokenBalance: { gte: item.cost } },
+      data: { tokenBalance: { decrement: item.cost } },
+    });
+    if (debited.count !== 1) throw new Error("Not enough tokens");
+    const updatedWallet = await tx.wallet.findUnique({ where: { userId } });
+    if (!updatedWallet) throw new Error("Wallet not found");
     const existing = await tx.inventoryItem.findFirst({ where: { userId, itemType: item.itemType, itemRef: item.id } });
     if (existing) {
       await tx.inventoryItem.update({ where: { id: existing.id }, data: { quantity: { increment: item.quantity } } });
