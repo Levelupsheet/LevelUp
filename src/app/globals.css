@@ -3600,3 +3600,37 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
  .batch8LearningStage{padding:13px !important;}
  .batch8LearningStage .desktopQuizPrompt{font-size:clamp(18px,1.7vw,23px) !important;}
 }
+
+
+/* ===== Batch 8: desktop quiz viewport polish ===== */
+@media(min-width:901px){
+ .batch8LearningStage{
+   scrollbar-width:none !important;
+   overscroll-behavior:contain;
+ }
+ .batch8LearningStage::-webkit-scrollbar{
+   width:0 !important;
+   height:0 !important;
+   display:none;
+ }
+ .batch8LearningStage .stageHeaderRow{gap:10px;}
+ .batch8LearningStage .stageLabelPill{margin-top:5px;}
+ .batch8LearningStage .desktopQuizPrompt{margin-bottom:2px;}
+ .batch8LearningStage .quizSecondaryMeta{gap:6px;}
+ .batch8LearningStage .stage8CompactBarRow{gap:8px;}
+ .batch8LearningStage .stage8ActionDock .d2Btn{
+   min-height:42px;
+ }
+ .batch8LearningStage .adaptiveTeachingCard{
+   padding:14px !important;
+ }
+ .batch8LearningStage .adaptiveCoachFeedback{
+   margin-top:8px;
+   padding:9px 11px;
+   border-radius:9px;
+   background:rgba(110,190,255,.065);
+ }
+ .batch8EnemyRail,.batch8PlayerRail{
+   overflow:hidden;
+ }
+}
