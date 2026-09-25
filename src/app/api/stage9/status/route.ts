@@ -6,7 +6,7 @@ export async function GET() {
   try {
     const sessionUser = await getSessionUser();
     const userId = sessionUser?.id ?? null;
-    if (!userId) return Response.json({ ok: false, error: "userId required" }, { status: 400 });
+    if (!userId) return Response.json({ ok: false, error: "Sign in required" }, { status: 401 });
     const status = await getStage9Status(userId);
     return Response.json({ ok: true, ...status });
   } catch (err: any) {
