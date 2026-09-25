@@ -34,9 +34,11 @@ export async function POST(req: Request) {
       if (purchasableQuantity <= 0) throw new Error('Weekly entry limit reached');
 
       const totalCost = tokenCost * purchasableQuantity;
-      const wallet = (await tx.wallet.findUnique({ where: { userId } }).catch(() => null)) || { tokenBalance: 0 };
-      const balance = Number(wallet?.tokenBalance || 0);
-      if (balance < totalCost) throw new Error('Not enough tokens');
+      const debit = await tx.wallet.updateMany({
+        where: { userId, tokenBalance: { gte: totalCost } },
+        data: { tokenBalance: { decrement: totalCost } },
+      });
+      if (debit.count !== 1) throw new Error('Not enough tokens');
 
       const award = await awardRaffleEntries(tx as any, {
         userId,
@@ -51,12 +53,13 @@ export async function POST(req: Request) {
 
       const chargedTokens = tokenCost * Number(award.awarded || 0);
       if (chargedTokens <= 0) throw new Error('Weekly entry limit reached');
-
-      await tx.wallet.upsert({
-        where: { userId },
-        update: { tokenBalance: { decrement: chargedTokens } },
-        create: { userId, tokenBalance: 0 },
-      });
+      const refundTokens = Math.max(0, totalCost - chargedTokens);
+      if (refundTokens > 0) {
+        await tx.wallet.update({
+          where: { userId },
+          data: { tokenBalance: { increment: refundTokens } },
+        });
+      }
 
       return { award, chargedTokens };
     })) as { award: any; chargedTokens: number };
