@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+type EconomyStatus = { walletTokens: number; streakDays: number; claimableToday: boolean; dailyBonusTokens: number; inventory: Array<{ itemType: string; itemRef: string | null; quantity: number }>; };
+
 type Entitlements = {
   tier: string;
   rewardsTrack: string;
@@ -21,7 +23,17 @@ const TIERS = [
 
 export default function RewardsPage() {
   const [ent, setEnt] = useState<Entitlements | null>(null);
-  useEffect(() => { fetch('/api/subscription/entitlements', { cache: 'no-store' as any }).then(r => r.json()).then(d => setEnt(d?.entitlements || null)).catch(() => {}); }, []);
+  const [economy, setEconomy] = useState<EconomyStatus | null>(null);
+  useEffect(() => {
+    Promise.all([
+      fetch('/api/subscription/entitlements', { cache: 'no-store' as any }).then(r => r.json()),
+      fetch('/api/stage9/status', { cache: 'no-store' as any }).then(r => r.json()),
+    ]).then(([entData, economyData]) => {
+      setEnt(entData?.entitlements || null);
+      setEconomy(economyData?.ok ? economyData : null);
+    }).catch(() => {});
+  }, []);
+  const inventoryCount = economy?.inventory?.reduce((sum, item) => sum + Number(item.quantity || 0), 0) || 0;
   return (
     <main className="luPage rewardsHubPage">
       <div className="luTopRow rewardsHubHero">
@@ -31,6 +43,17 @@ export default function RewardsPage() {
           {ent ? <div className="muted" style={{ marginTop: 6 }}>Active track: <b>{ent.rewardsTrack}</b> • Loot luck {ent.lootLuck.toFixed(2)}x • XP boost {ent.xpMultiplier.toFixed(2)}x</div> : null}
         </div>
         <Link href="/dashboard" className="btn">← Back to dashboard</Link>
+      </div>
+
+      <div className="rewardEconomySnapshot">
+        <div><small>WALLET</small><strong>{economy ? economy.walletTokens : "—"}</strong><span>tokens available</span></div>
+        <div><small>STREAK</small><strong>{economy ? `${economy.streakDays}d` : "—"}</strong><span>{economy?.claimableToday ? `+${economy.dailyBonusTokens} ready today` : "daily bonus claimed"}</span></div>
+        <div><small>INVENTORY</small><strong>{economy ? inventoryCount : "—"}</strong><span>banked items</span></div>
+        <div><small>SWEEPSTAKES</small><strong>Live</strong><span><Link href="/sweepstakes">View drawings →</Link></span></div>
+      </div>
+
+      <div className="rewardEconomyFlow" aria-label="Reward economy flow">
+        <span><b>1</b> Learn & compete</span><i>→</i><span><b>2</b> Earn XP + tokens</span><i>→</i><span><b>3</b> Open loot</span><i>→</i><span><b>4</b> Spend or enter</span>
       </div>
 
       {ent ? (
