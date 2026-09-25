@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { resolveClientUserId } from "@/lib/activeUser";
 
 type Snapshot = { xp: number; readiness: number; rankLabel: string; qualifiedForHR: boolean };
 
@@ -21,7 +20,7 @@ export default function PracticePage() {
     try {
       const res = await fetch("/api/practice/answer", {
         method: "POST", headers: { "content-type": "application/json" },
-        body: JSON.stringify({ userId: resolveClientUserId(), track: "IT_SUPPORT", tier, domain, prompt: question, answer }),
+        body: JSON.stringify({ track: "IT_SUPPORT", tier, domain, prompt: question, answer }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error ?? "Request failed");
