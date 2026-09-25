@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { requireAdminRequest } from "@/app/api/_lib/adminGuard";
 import { prisma } from "@/lib/prisma";
 import { generateQuestionsFromBlock, normalizeKnowledgeBlock } from "@/lib/contentEngine";
+import { validateQuestionQuality } from "@/lib/questionQuality";
 
 export async function POST(req: Request) {
   const admin = await requireAdminRequest();
@@ -15,6 +16,7 @@ export async function POST(req: Request) {
     if (!blocks.length) return NextResponse.json({ error: "No matching knowledge blocks found" }, { status: 404 });
 
     let generatedCount = 0;
+    let rejectedCount = 0;
     const touched: string[] = [];
 
     for (const blockRecord of blocks) {
@@ -32,7 +34,10 @@ export async function POST(req: Request) {
         tags: blockRecord.tags,
         source: blockRecord.source,
       });
-      const candidates = generateQuestionsFromBlock(normalized);
+      const rawCandidates = generateQuestionsFromBlock(normalized);
+      const candidates = rawCandidates.filter((q) => validateQuestionQuality(q).qualityScore >= 80);
+
+      rejectedCount += rawCandidates.length - candidates.length;
 
       await prisma.generatedQuestion.deleteMany({ where: { knowledgeBlockId: blockRecord.id } });
       for (let i = 0; i < candidates.length; i += 1) {
@@ -59,7 +64,7 @@ export async function POST(req: Request) {
       touched.push(blockRecord.id);
     }
 
-    return NextResponse.json({ ok: true, generatedCount, knowledgeBlockIds: touched });
+    return NextResponse.json({ ok: true, generatedCount, rejectedCount, knowledgeBlockIds: touched });
   } catch (e: any) {
     return NextResponse.json({ error: e?.message || "Failed to generate questions" }, { status: 500 });
   }
