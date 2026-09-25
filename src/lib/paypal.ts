@@ -386,7 +386,13 @@ export async function finalizePayPalSubscription(subscriptionId: string, userId?
 
 export async function verifyWebhookSignature(req: Request, bodyText: string) {
   const webhookId = process.env.PAYPAL_WEBHOOK_ID;
-  if (!webhookId) return true;
+  if (!webhookId) {
+    if (process.env.NODE_ENV === 'production') {
+      console.error('PAYPAL_WEBHOOK_ID is required in production.');
+      return false;
+    }
+    return true;
+  }
   const transmissionId = req.headers.get('paypal-transmission-id');
   const transmissionTime = req.headers.get('paypal-transmission-time');
   const certUrl = req.headers.get('paypal-cert-url');
