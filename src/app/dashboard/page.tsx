@@ -158,6 +158,9 @@ export default function Dashboard() {
   const [offers, setOffers] = useState<Offer[]>([]);
   const [loading, setLoading] = useState(false);
   const [hrPassed, setHrPassed] = useState<boolean>(false);
+  const [hrLatest, setHrLatest] = useState<any | null>(null);
+  const [techPassed, setTechPassed] = useState<boolean>(false);
+  const [techLatest, setTechLatest] = useState<any | null>(null);
   const [lootOpen, setLootOpen] = useState(false);
   const [learningRows, setLearningRows] = useState<LearningRow[]>([]);
   const [overallMastery, setOverallMastery] = useState<number>(0);
@@ -340,7 +343,12 @@ useEffect(() => {
       const hrText = await hrRes.text();
       let hrData: any = null;
       try { hrData = hrText ? JSON.parse(hrText) : null; } catch { hrData = null; }
-      if (hrRes.ok) setHrPassed(Boolean(hrData?.passed));
+      if (hrRes.ok) { setHrPassed(Boolean(hrData?.passed)); setHrLatest(hrData?.latest || null); }
+      try {
+        const techRes = await fetch(`/api/interviews/tech/status?userId=${encodeURIComponent(activeUserId)}`, { cache: "no-store" as any });
+        const techData = await techRes.json().catch(() => null);
+        if (techRes.ok) { setTechPassed(Boolean(techData?.passed)); setTechLatest(techData?.latest || null); }
+      } catch {}
 
       try {
         const lpRes = await fetch('/api/learning/profile', { cache: 'no-store' as any });
@@ -595,7 +603,7 @@ async function analyzeResumeStage12() {
       ? { color: "#9ad2ff", textShadow: "0 0 12px rgba(74,126,255,0.24)" }
       : { color: "#ffca7a", textShadow: "0 0 10px rgba(255,153,0,0.18)" };
   const compactInventory = (stage9Status?.inventory || []).filter((row) => Number(row.quantity || 0) > 0).slice(0, 6);
-  const activeSweepCampaigns = (sweepSummary?.campaigns || []).filter((c: any) => (c?.status === "ACTIVE" || c?.isLive) && Number(sweepSummary?.user?.entriesByCampaign?.[String(c.id)] || 0) > 0);
+  const activeSweepCampaigns = (sweepSummary?.campaigns || []).filter((c: any) => c?.status === "ACTIVE" && c?.isLive !== false && (!c?.endsAt || new Date(c.endsAt).getTime() > Date.now()));
 
   const recommendedRoles = useMemo(() => {
     if ((localLevel || 1) < 7) return [] as CareerMatchRow[];
@@ -905,7 +913,7 @@ async function analyzeResumeStage12() {
           <div className="dashboardBattleShortcuts" style={{ marginTop: 10, display: "grid", gap: 10 }}>
             {hrBattleUnlocked ? (
               <button className="gold" style={{ width: "100%" }} onClick={() => setMockInterviewOpen(true)}>
-                Start HR Battle →
+                {hrPassed ? "Start HR Battle →" : "Start HR Battle →"}
               </button>
             ) : (
               <button className="gold" style={{ width: "100%", opacity: 0.65, cursor: "not-allowed" }} disabled title="HR battle unlocks automatically when you qualify.">
@@ -956,7 +964,7 @@ async function analyzeResumeStage12() {
 
           <div className={"dashboardBattleStatus dashboardProgressionGate " + (((localLevel || 1) >= 5 || elig?.eligible) ? "unlocked" : "locked")}>
             <span className="dashboardBattleStatusDot" />
-            <div><b>{((localLevel || 1) >= 5 || elig?.eligible) ? "Boss Battle unlocked" : "Boss Battle locked"}</b><small>{((localLevel || 1) >= 5 || elig?.eligible) ? "You meet the current progression gate." : "Reach Level 5 or qualify through mastery to unlock."}</small></div>
+            <div><b>{techPassed ? "Boss Battle complete" : ((localLevel || 1) >= 5 || elig?.eligible) ? "Boss Battle unlocked" : "Boss Battle locked"}</b><small>{techPassed ? `Technical battle cleared${techLatest?.scoreAvg != null ? ` • Score ${Number(techLatest.scoreAvg).toFixed(1)}` : ""}. Keep training while your skills are fresh.` : ((localLevel || 1) >= 5 || elig?.eligible) ? "You meet the current progression gate." : "Reach Level 5 or qualify through mastery to unlock."}</small></div>
           </div>
 
           <div className="card powerHudCard dashboardGameCard dashboardUtilityCard">
@@ -980,17 +988,17 @@ async function analyzeResumeStage12() {
           <div className="card leaderboardMiniCard dashboardGameCard leaderboard dashboardUtilityCard">
             <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
               <div>
-                <div className="dashboardUtilityEyebrow">COMPETE</div><div style={{ fontWeight: 900, fontSize: 16 }}>Leaderboard • Top candidates</div>
+                <div className="dashboardUtilityEyebrow">WEEKLY COMPETITION</div><div style={{ fontWeight: 900, fontSize: 16 }}>Top candidates</div><small style={{opacity:.72}}>XP earned from completed sessions in the last 7 days.</small>
               </div>
               <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                <span className="badge" style={{ minHeight: 34, padding: "6px 12px", background: "rgba(255,214,102,0.12)", borderColor: "rgba(255,214,102,0.28)" }}>Top</span>
+                <span className="badge" style={{ minHeight: 34, padding: "6px 12px", background: "rgba(255,214,102,0.12)", borderColor: "rgba(255,214,102,0.28)" }}>Weekly XP</span>
                 <a className="secondaryBtn" href="/leaderboard" style={{ textDecoration: "none", padding: "8px 14px", minHeight: 38 }}>Open</a>
               </div>
             </div>
             <div style={{ marginTop: 12, display: "grid", gap: 10 }}>
               {(stage10Leaderboards?.weekly || []).slice(0, 2).map((row, idx) => (
-                <a key={`sb_lb_${row.userId}`} href={`/profile/${encodeURIComponent(row.userId)}`} className="leaderboardMiniRow" style={{ ...(leaderboardTone(idx) as any), textDecoration: "none", color: "inherit", display: "grid", gridTemplateColumns: "44px minmax(0,1fr) auto", gap: 12, alignItems: "center", padding: 12, borderRadius: 22, border: "1px solid rgba(255,255,255,0.10)" }}>
-                  <div className="badge leaderboardMiniRank" style={{ width: 36, height: 36, display: "inline-flex", alignItems: "center", justifyContent: "center" }}>{idx + 1}</div>
+                <a key={`sb_lb_${row.userId}`} href={`/profile/${encodeURIComponent(row.userId)}`} className="leaderboardMiniRow" style={{ ...(leaderboardTone(idx) as any), textDecoration: "none", color: "inherit", display: "grid", gridTemplateColumns: "36px minmax(0,1fr) auto", gap: 9, alignItems: "center", padding: 10, borderRadius: 14, border: "1px solid rgba(255,255,255,0.10)" }}>
+                  <div className="badge leaderboardMiniRank" style={{ width: 30, height: 30, display: "inline-flex", alignItems: "center", justifyContent: "center" }}>{idx + 1}</div>
                   <div style={{ minWidth: 0 }}>
                     <div style={{ fontWeight: 900, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{row.displayName}</div>
                     <div style={{ opacity: 0.78, marginTop: 4 }}><small>{row.rank || levelTitleFromLevel(Number(row.level || 1))} • Lvl {row.level || 1}</small></div>
@@ -1148,8 +1156,8 @@ async function analyzeResumeStage12() {
   <div className="card sweepGoldCard" style={{ marginTop: 14, borderColor: 'rgba(255,215,90,.28)', boxShadow: '0 0 0 1px rgba(255,215,90,.08) inset' }}>
     <div style={{ display:'flex', justifyContent:'space-between', gap:12, alignItems:'center', flexWrap:'wrap' }}>
       <div>
-        <h3 style={{ margin: 0, color: "#f8d36a" }}>Active sweepstakes</h3>
-        <div><small>Campaigns you are currently entered in. Click a drawing card to open that campaign.</small></div>
+        <h3 style={{ margin: 0, color: "#f8d36a" }}>Live sweepstakes</h3>
+        <div><small>Currently open drawings. Your entry count is shown on each campaign.</small></div>
       </div>
     </div>
     <div style={{ marginTop: 12, display:'grid', gap:12 }}>
