@@ -2,14 +2,16 @@ import { NextResponse } from "next/server";
 import { prisma } from "../../_lib/prisma";
 import { ensureUser } from "../../_lib/ensureUser";
 import { applyUserXpIncrement } from "@/lib/xpCaps";
+import { getSessionUser } from "@/lib/auth/session";
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const userId = String(body?.userId ?? "");
+    const sessionUser = await getSessionUser();
+    const userId = String(sessionUser?.id || "").trim();
     const lootBoxIds = Array.isArray(body?.lootBoxIds) ? (body.lootBoxIds as string[]) : [];
 
-    if (!userId) return NextResponse.json({ error: "Missing userId" }, { status: 400 });
+    if (!userId) return NextResponse.json({ error: "Sign in required" }, { status: 401 });
 
     await ensureUser(userId);
 
