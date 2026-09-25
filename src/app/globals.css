@@ -3634,3 +3634,31 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
    overflow:hidden;
  }
 }
+
+
+/* ===== Batch 8: game-loop hierarchy ===== */
+.gameHubSectionLabel{
+ display:flex;justify-content:space-between;align-items:end;gap:12px;
+ margin:20px 2px 9px;padding:0 2px;
+}
+.gameHubSectionLabel span{
+ font-size:11px;font-weight:950;letter-spacing:.14em;color:var(--lu-game-gold);
+}
+.gameHubSectionLabel small{color:var(--lu-game-muted);text-align:right;}
+.gameHubOutcomeCard{
+ border-color:rgba(255,214,102,.2) !important;
+ box-shadow:0 16px 36px rgba(0,0,0,.18);
+}
+.rewardPathCard{position:relative;overflow:hidden;}
+.rewardPathCard::before{
+ content:"";position:absolute;inset:0 auto 0 0;width:3px;
+ background:rgba(255,214,102,.22);
+}
+.rewardPathTier2::before{background:rgba(110,190,255,.38);}
+.rewardPathTier3::before{background:rgba(185,125,255,.42);}
+.rewardPathTier4::before{background:rgba(255,214,102,.62);}
+.rewardsSectionLabel{margin-top:18px;}
+@media(max-width:700px){
+ .gameHubSectionLabel{display:block;margin-top:16px;}
+ .gameHubSectionLabel small{display:block;text-align:left;margin-top:4px;}
+}
