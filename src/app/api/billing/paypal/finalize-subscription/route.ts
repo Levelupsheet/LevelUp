@@ -21,6 +21,7 @@ export async function POST(req: Request) {
     }
     return NextResponse.json({ ok: true, subscriptionTier: done.tier, status: done.status, subscriptionId });
   } catch (err: any) {
-    return NextResponse.json({ ok: false, error: err?.message || 'Failed to finalize PayPal subscription.' }, { status: 500 });
+    console.error('Failed to finalize PayPal subscription failed', err);
+    return NextResponse.json({ ok: false, error: 'Failed to finalize PayPal subscription.' }, { status: 500 });
   }
 }
