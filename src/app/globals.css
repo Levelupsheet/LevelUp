@@ -3341,7 +3341,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .rewardsHubHero{ margin-bottom:14px; padding:18px; border:1px solid rgba(255,255,255,.10); border-radius:16px; background:rgba(9,14,23,.72); }
 .rewardsTierGrid{ display:grid !important; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px !important; }
 .rewardsTierCard{ padding:16px; min-width:0; }
-.leaderboardRow{ padding:14px; display:grid; grid-template-columns:60px minmax(0,1fr) auto; gap:12px; align-items:center; text-decoration:none; }
+.leaderboardRow{ padding:14px; display:grid; grid-template-columns:60px minmax(0,1fr) auto; gap:12px; align-items:center; text-decoration:none; position:relative; overflow:hidden; }
 @media(max-width:860px){
  .pvpHubPage,.gameHubPage,.rewardsHubPage{ padding:10px 8px 30px; }
  .pvpSetupGrid,.pvpResultGrid{ grid-template-columns:1fr; }
