@@ -33,7 +33,10 @@ export async function POST(req: Request) {
     const priorClaim = await prisma.rewardClaim.findUnique({ where: { claimKey } });
     if (priorClaim) return Response.json({ ok: true, duplicate: true, stage9: { awarded: 0 } });
 
-    const result = await prisma.$transaction(async (tx) => {
+    const result: {
+      user: Awaited<ReturnType<typeof applyUserXpIncrement>>;
+      stage9: { ok: true; awarded: number; walletTokens: number };
+    } = await prisma.$transaction(async (tx) => {
       await tx.rewardClaim.create({ data: { userId, claimKey, kind: "GAME_SESSION", meta: { xpEarned, correctCount, totalQuestions, outcome, encounterType, bestStreak } } });
       const user = await applyUserXpIncrement(tx, userId, xpEarned);
 
