@@ -3683,3 +3683,19 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
  .leaderboardStandingsCard{padding:10px;}
  .leaderboardRow{gap:9px !important;}
 }
+
+
+/* ===== Batch 8: canonical interactive surfaces ===== */
+.gameHubPage .featureCard,.pvpHubPage .featureCard,.rewardsHubPage .rewardsTierCard,
+.dashboardUtilityCard,.progressionSnapshot{
+  border-radius:14px;
+}
+.gameHubPage .secondaryBtn,.pvpHubPage .secondaryBtn,.rewardsHubPage .btn,
+.dashboardUtilityCard .secondaryBtn{
+  min-height:38px;
+  border-radius:12px;
+}
+.gameHubPage .badge,.pvpHubPage .badge,.rewardsHubPage .luPill,
+.progressionSignals>span{
+  font-variant-numeric:tabular-nums;
+}
