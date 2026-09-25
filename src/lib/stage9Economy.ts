@@ -60,12 +60,12 @@ export async function readLedger(userId: string): Promise<Stage9Ledger> {
   return row ? { userId: key, streakDays: row.streakDays, lastClaimDate: row.lastClaimDate, lastSeenDate: row.lastSeenDate } : { userId: key, streakDays: 0, lastClaimDate: null, lastSeenDate: null };
 }
 
-export async function touchUserActivity(userId: string, now = new Date()) {
+export async function touchUserActivity(userId: string, now = new Date()): Promise<Stage9Ledger> {
   const key = String(userId || "").trim();
   if (!key) return { userId: key, streakDays: 0, lastClaimDate: null, lastSeenDate: null };
   const today = dayKey(now);
   const yesterday = yesterdayKey(now);
-  return prisma.$transaction(async (tx) => {
+  return prisma.$transaction(async (tx): Promise<Stage9Ledger> => {
     const current = await tx.userEconomyState.findUnique({ where: { userId: key } });
     let streakDays = Math.max(0, Number(current?.streakDays || 0));
     if (!current?.lastSeenDate) streakDays = Math.max(1, streakDays || 1);
