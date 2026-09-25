@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
+import { requireAdminRequest } from "@/app/api/_lib/adminGuard";
 import { readLootVaultRows, writeLootVaultRows } from "@/lib/lootVault";
 
 export async function GET() {
+  const admin = await requireAdminRequest();
+  if (!admin.ok) return admin.response;
   try {
     const rows = await readLootVaultRows();
     return NextResponse.json({ ok: true, rows });
@@ -11,6 +14,8 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
+  const admin = await requireAdminRequest();
+  if (!admin.ok) return admin.response;
   try {
     const body = await req.json().catch(() => ({} as any));
     const rows = Array.isArray(body?.rows) ? body.rows : [];
