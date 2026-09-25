@@ -313,7 +313,7 @@ export default function PvpPage() {
               </ol>
             </div>
             <div style={{ marginTop: 12, opacity: 0.78 }}><small>Active user: {activeUser.displayName || userId}</small></div>
-            {loading ? <div style={{ marginTop: 12, opacity: 0.78 }}><small>Refreshing duel board...</small></div> : null}
+            {loading ? <div className="gameHubState gameHubStateLoading"><small>Refreshing duel board...</small></div> : null}
           </div>
         </div>
 
@@ -349,7 +349,7 @@ export default function PvpPage() {
                     </div>
                   );
                 })}
-                {!section.rows.length ? <small style={{ opacity: 0.78 }}>No duels here yet.</small> : null}
+                {!section.rows.length ? <div className="gameHubState gameHubStateEmpty"><small>No duels here yet.</small></div> : null}
               </div>
             </div>
           ))}
