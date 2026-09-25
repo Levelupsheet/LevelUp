@@ -261,7 +261,7 @@ export async function drawSweepstakesWinner(tx: typeof prisma, campaignId: strin
     const user = await tx.user.findUnique({ where: { id: winner.userId }, select: { displayName: true, email: true } });
     const displayName = String(user?.displayName || user?.email || 'there');
     const title = `Sweepstakes winner selected: ${campaign.title}`;
-    const body = `Congrats ${displayName}! You were selected as the winner for ${campaign.prizePoolLabel || campaign.title}. Please check with the admin team for prize fulfillment details.`;
+    const body = `Congrats ${displayName}! You were selected as the winner for ${campaign.prizePoolLabel || campaign.title}. Open the Sweepstakes page to claim your prize and submit fulfillment details.`;
     const existing = await tx.notification.findFirst({
       where: { userId: winner.userId, type: 'LOOT_BOX_EARNED', title, readAt: null },
       orderBy: { createdAt: 'desc' },
