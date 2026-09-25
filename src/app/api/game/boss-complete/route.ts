@@ -3,6 +3,7 @@ import { ensureUser } from "@/app/api/_lib/ensureUser";
 import { BOSS_BONUS_XP, GOLDEN_BOSS_RAFFLE_REWARD } from "@/lib/bossBattle";
 import { awardRaffleEntries } from "@/lib/raffle";
 import type { LearningAnswerEvent } from "@/lib/learningProfile";
+import { getSessionUser } from "@/lib/auth/session";
 
 type BossCompleteBody = {
   encounterId?: string;
@@ -21,10 +22,10 @@ export async function POST(req: Request) {
   try {
     const body = (await req.json().catch(() => ({}))) as BossCompleteBody;
     const encounterId = String(body.encounterId || "").trim();
-    const userId = String(body.userId || "").trim();
-    if (!encounterId || !userId) {
-      return Response.json({ ok: false, error: "encounterId and userId required" }, { status: 400 });
-    }
+    const sessionUser = await getSessionUser();
+    const userId = String(sessionUser?.id || "").trim();
+    if (!userId) return Response.json({ ok: false, error: "Sign in required" }, { status: 401 });
+    if (!encounterId) return Response.json({ ok: false, error: "encounterId required" }, { status: 400 });
 
     const existing = await prisma.user.findUnique({ where: { id: userId }, select: { id: true } });
     if (!existing) await ensureUser(userId);
@@ -89,6 +90,7 @@ export async function POST(req: Request) {
 
     return Response.json(Object.assign({ ok: true }, result as any));
   } catch (err: any) {
-    return Response.json({ ok: false, error: "Failed to complete boss battle", detail: String(err?.message ?? err) }, { status: 500 });
+    console.error("Boss battle completion failed", err);
+    return Response.json({ ok: false, error: "Failed to complete boss battle" }, { status: 500 });
   }
 }
