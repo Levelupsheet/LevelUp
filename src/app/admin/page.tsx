@@ -69,6 +69,36 @@ function normalizeQuestionRow(q: any): Question {
 }
 
 
+
+function EconomyHealthAdmin(){
+  const [data, setData] = useState<any>(null);
+  const [err, setErr] = useState("");
+  async function load(){
+    setErr("");
+    const res = await fetch("/api/admin/economy/summary", { cache: "no-store" as any });
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok || !json?.ok) { setErr(json?.error || "Failed to load economy health"); return; }
+    setData(json);
+  }
+  useEffect(() => { load(); }, []);
+  return (
+    <div className="card adminEconomyHealth" style={{ marginTop: 14 }}>
+      <div style={{display:"flex",justifyContent:"space-between",gap:12,alignItems:"center",flexWrap:"wrap"}}>
+        <div><div style={{fontWeight:900,fontSize:20}}>Economy health</div><small>Live operational snapshot. Values are read-only here.</small></div>
+        <button onClick={load}>Refresh</button>
+      </div>
+      {err ? <div className="gameHubState gameHubStateEmpty" style={{marginTop:12}}><small>{err}</small></div> : null}
+      {data ? <div className="adminEconomyGrid">
+        <div><small>TOKENS IN CIRCULATION</small><b>{data.tokensInCirculation}</b><span>{data.wallets} wallets</span></div>
+        <div><small>INVENTORY</small><b>{data.inventoryUnits}</b><span>{data.inventoryRows} inventory rows</span></div>
+        <div><small>LOOT PIPELINE</small><b>{data.loot.pending} pending</b><span>{data.loot.opened} opened • {data.loot.claimed} claimed</span></div>
+        <div><small>SWEEPSTAKES</small><b>{data.sweepstakes.activeCampaigns} live</b><span>{data.sweepstakes.totalCampaigns} campaigns</span></div>
+        <div><small>LOOT VAULT</small><b>{data.vault.activeRewards} active</b><span>{data.vault.totalRewards} configured</span></div>
+      </div> : <div className="gameHubState gameHubStateLoading" style={{marginTop:12}}><small>Loading economy health...</small></div>}
+    </div>
+  );
+}
+
 function LootVaultAdmin(){
   const [rows, setRows] = useState<LootVaultRow[]>([]);
   const [loading, setLoading] = useState(false);
@@ -1382,7 +1412,7 @@ export default function AdminPage(){
         <div className="row" style={{ alignItems:"center", gap: 10, flexWrap:"wrap", justifyContent:"flex-end" }}>
           <button onClick={() => setTab("questions")} className={tab==="questions" ? "primary" : ""}>DB Question Bank</button>
           <button onClick={() => setTab("career")} className={tab==="career" ? "primary" : ""}>Career Matches</button>
-          <button onClick={() => setTab("loot")} className={tab==="loot" ? "primary" : ""}>Loot Vault</button>
+          <button onClick={() => setTab("loot")} className={tab==="loot" ? "primary" : ""}>Economy & Loot</button>
           <button onClick={() => setTab("sweepstakes")} className={tab==="sweepstakes" ? "primary" : ""}>Sweepstakes</button>
           <button onClick={() => setTab("local")} className={tab==="local" ? "primary" : ""}>Local (Prototype)</button>
           <button onClick={() => setTab("users")} className={tab==="users" ? "primary" : ""}>DB Users</button>
@@ -1402,7 +1432,7 @@ export default function AdminPage(){
       ) : null}
 
       {tab === "loot" ? (
-        <LootVaultAdmin />
+        <><EconomyHealthAdmin /><LootVaultAdmin /></>
       ) : null}
 
       {tab === "sweepstakes" ? (
