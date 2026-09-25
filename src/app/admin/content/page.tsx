@@ -682,7 +682,13 @@ function GeneratedQuestionCard({ question, saving, onSave }: { question: Generat
   return (
     <div className="card" style={{ padding: 14, background: "rgba(255,255,255,0.03)" }}>
       <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
-        <div style={{ fontWeight: 800 }}>{question.type.replaceAll("_", " ")}</div>
+        <div>
+          <div style={{ fontWeight: 800 }}>{question.type.replaceAll("_", " ")}</div>
+          <div style={{ display:"flex", gap:6, flexWrap:"wrap", marginTop:6 }}>
+            <span className="badge">{String((question.data as any)?.cognitiveLevel || "review").replaceAll("_"," ")}</span>
+            {(question.data as any)?.sourceStatement ? <span style={{fontSize:12,opacity:.7}}>Grounded in source concept</span> : null}
+          </div>
+        </div>
         <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
           <span className="badge">diff {question.difficulty}</span>
           <select value={reviewStatus} onChange={(e) => setReviewStatus(e.target.value)}>
@@ -701,7 +707,7 @@ function GeneratedQuestionCard({ question, saving, onSave }: { question: Generat
         </label>
         {question.type === "MULTIPLE_CHOICE" || question.type === "INCIDENT" ? (
           <label style={{ display: "grid", gap: 6 }}>
-            <small>Choices (one per line)</small>
+            <small>Answer choices — verify the correct answer and distractors before approval</small>
             <textarea value={choicesText} onChange={(e) => setChoicesText(e.target.value)} style={fieldStyle} />
           </label>
         ) : null}
@@ -712,7 +718,7 @@ function GeneratedQuestionCard({ question, saving, onSave }: { question: Generat
           <textarea value={dataText} onChange={(e) => setDataText(e.target.value)} style={{ ...fieldStyle, minHeight: 160, fontFamily: "monospace", fontSize: 12 }} />
         </label> : null}
         <label style={{ display: "grid", gap: 6 }}>
-          <small>Explanation</small>
+          <small>Teaching explanation — explain why the answer is correct</small>
           <textarea value={explanation} onChange={(e) => setExplanation(e.target.value)} style={fieldStyle} />
         </label>
         <label style={{ display: "grid", gap: 6 }}>
