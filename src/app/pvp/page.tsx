@@ -270,7 +270,7 @@ export default function PvpPage() {
           </div>
         ) : null}
 
-        <div className="pvpSetupGrid">
+        <div className="gameHubSectionLabel"><span>ENTER THE ARENA</span><small>Choose an opponent and launch a fair seeded challenge.</small></div>\n        <div className="pvpSetupGrid">
           <div className="card" style={{ padding: 18 }}>
             <h3 style={{ marginTop: 0 }}>Choose a rival</h3>
             <div style={{ display: "grid", gap: 10 }}>
@@ -317,7 +317,7 @@ export default function PvpPage() {
           </div>
         </div>
 
-        <div className="pvpChallengeGrid">
+        <div className="gameHubSectionLabel"><span>DUEL BOARD</span><small>Track incoming, outgoing, and completed challenges.</small></div>\n        <div className="pvpChallengeGrid">
           {[
             { title: "Incoming challenges", rows: incoming, incoming: true },
             { title: "Outgoing challenges", rows: outgoing, incoming: false },
@@ -356,7 +356,7 @@ export default function PvpPage() {
         </div>
 
         {activeChallenge ? (
-          <div className="card pvpDuelSummary">
+          <div className="card pvpDuelSummary gameHubOutcomeCard">
             <div className="pvpDuelSummaryHead">
               <div>
                 <h3 style={{ margin: 0 }}>Duel vs {currentOpponentName}</h3>
