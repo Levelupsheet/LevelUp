@@ -43,6 +43,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ ok: true, subscriptionTier: pending.tier, captureId: captureId || null });
   } catch (err: any) {
-    return NextResponse.json({ ok: false, error: err?.message || 'Failed to capture PayPal order.' }, { status: 500 });
+    console.error('Failed to capture PayPal order failed', err);
+    return NextResponse.json({ ok: false, error: 'Failed to capture PayPal order.' }, { status: 500 });
   }
 }
