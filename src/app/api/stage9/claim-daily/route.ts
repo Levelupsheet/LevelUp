@@ -10,6 +10,7 @@ export async function POST(req: Request) {
     const result = await claimDailyBonus(userId);
     return Response.json(result);
   } catch (err: any) {
-    return Response.json({ ok: false, error: err?.message || "Failed to claim daily bonus" }, { status: 500 });
+    console.error("Daily bonus claim failed", err);
+    return Response.json({ ok: false, error: "Failed to claim daily bonus" }, { status: 500 });
   }
 }
