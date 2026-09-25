@@ -296,8 +296,19 @@ function multipleChoiceFromFact(block: NormalizedKnowledgeBlock, factInput: any)
 function fillBlankFromFact(block: NormalizedKnowledgeBlock, factInput: any): CandidateQuestion | null {
   const fact = normalizeFact(factInput);
   if (!fact.statement || !fact.answer) return null;
-  const masked = fact.statement.includes(String(fact.answer)) ? fact.statement.replace(String(fact.answer), "____") : `${fact.statement} ____`;
-  return { prompt: fact.questionHint || masked, type: "fill_blank", difficulty: block.difficulty, explanation: fact.statement, tags: questionTags(block, fact.tags), data: { ...toBase(block).data, answers: uniqueStrings([fact.answer, ...fact.synonyms]), placeholder: "Type your answer", caseSensitive: false }, ...goldenDefaults(block, block.difficulty) };
+  const answer = String(fact.answer).trim();
+  const index = fact.statement.toLowerCase().indexOf(answer.toLowerCase());
+  if (index < 0) return null;
+  const prompt = fact.statement.slice(0, index) + "_____" + fact.statement.slice(index + answer.length);
+  return {
+    prompt,
+    type: "fill_blank",
+    difficulty: Math.min(3, block.difficulty),
+    explanation: buildTeachingExplanation(fact),
+    tags: questionTags(block, [...fact.tags, "recall"]),
+    data: { ...toBase(block, Math.min(3, block.difficulty)).data, answers: uniqueStrings([answer, ...fact.synonyms]), placeholder: "Type the missing term or value", caseSensitive: false, sourceStatement: fact.statement },
+    ...goldenDefaults(block, Math.min(3, block.difficulty))
+  };
 }
 function trueFalseFromFact(block: NormalizedKnowledgeBlock, factInput: any): CandidateQuestion | null {
   const fact = normalizeFact(factInput);
@@ -320,12 +331,11 @@ function definitionQuestions(block: NormalizedKnowledgeBlock, def: any): Candida
   if (!term || !definition) return [];
   const aliases = uniqueStrings(def?.aliases || []);
   const distractors = uniqueStrings([...(def?.distractors || []), ...plausibleTechnicalDistractors(term, definition, block)]).filter((v) => normalizeChoiceText(v) !== normalizeChoiceText(term)).slice(0, 3);
-  if (distractors.length < 3) return [{ prompt: `Fill in the blank: ${definition}`, type: "fill_blank", difficulty: block.difficulty, explanation: `${term}: ${definition}`, tags: questionTags(block, [term]), data: { ...toBase(block).data, answers: uniqueStrings([term, ...aliases]), placeholder: "Type the term", caseSensitive: false }, ...goldenDefaults(block, block.difficulty) }];
+  if (distractors.length < 3) return [];
   const choices = shuffle([term, ...distractors]);
   const correctIndex = choices.findIndex((choice) => choice === term);
   return [
     { prompt: `Which term matches this definition: ${definition}`, type: "multiple_choice", difficulty: block.difficulty, explanation: `${term}: ${definition}`, tags: questionTags(block, [term]), choices, correctIndex, data: { ...toBase(block).data, choices, correctIndex }, ...goldenDefaults(block, block.difficulty) },
-    { prompt: `Fill in the blank: ${definition}`, type: "fill_blank", difficulty: block.difficulty, explanation: `${term}: ${definition}`, tags: questionTags(block, [term]), data: { ...toBase(block).data, answers: uniqueStrings([term, ...aliases]), placeholder: "Type the term", caseSensitive: false }, ...goldenDefaults(block, block.difficulty) },
   ];
 }
 function procedureQuestion(block: NormalizedKnowledgeBlock, procedure: any): CandidateQuestion | null {
