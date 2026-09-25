@@ -307,7 +307,7 @@ export default function AdminContentStudioPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || "Generation failed");
-      setMessage(`Generated ${data.generatedCount} question(s). Review before publishing.`);
+      setMessage(`Generated ${data.generatedCount} quality-ready question(s)${data.rejectedCount ? ` • filtered out ${data.rejectedCount} weak question(s)` : ""}. Review, approve, then publish.`);
       await loadBlocks();
       await refreshReviewData(selectedBlockId);
       setTab("review");
@@ -542,8 +542,9 @@ export default function AdminContentStudioPage() {
             <div className="card" style={{ padding: 16 }}>
               <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
                 <div>
-                  <div style={{ fontWeight: 800, fontSize: 20 }}>Review generated questions</div>
-                  <div style={{ opacity: 0.8, marginTop: 4 }}>{selectedBlock ? `${selectedBlock.title} • ${questions.length} generated question(s)` : "Select a block to review"}</div>
+                  <div style={{ fontWeight: 800, fontSize: 20 }}>3. Review & approve</div>
+                  <div style={{ opacity: 0.8, marginTop: 4 }}>{selectedBlock ? `${selectedBlock.title} • ${questions.length} quality-ready question(s)` : "Select a content block to generate questions"}</div>
+                  <div style={{ opacity: 0.68, marginTop: 4, fontSize: 13 }}>Read the prompt and answer normally. Use Advanced only when you need to inspect the underlying question data.</div>
                 </div>
                 <div className="content-actions">
                   <button onClick={generateForSelected} disabled={!selectedBlockId || loading || syncing}>Regenerate</button>
@@ -655,6 +656,7 @@ function GeneratedQuestionCard({ question, saving, onSave }: { question: Generat
   const [dataText, setDataText] = useState(JSON.stringify(question.data || {}, null, 2));
   const [choicesText, setChoicesText] = useState(Array.isArray(question.choices) ? question.choices.join("\n") : "");
   const [editorNotes, setEditorNotes] = useState(question.editorNotes || "");
+  const [advanced, setAdvanced] = useState(false);
 
   useEffect(() => {
     setPrompt(question.prompt);
@@ -703,10 +705,12 @@ function GeneratedQuestionCard({ question, saving, onSave }: { question: Generat
             <textarea value={choicesText} onChange={(e) => setChoicesText(e.target.value)} style={fieldStyle} />
           </label>
         ) : null}
-        <label style={{ display: "grid", gap: 6 }}>
+        {question.type === "FILL_BLANK" ? <label style={{ display:"grid", gap:6 }}><small>Accepted answer(s)</small><input value={(() => { try { const d=JSON.parse(dataText); return Array.isArray(d.answers) ? d.answers.join(" | ") : ""; } catch { return ""; } })()} readOnly style={{...fieldStyle,minHeight:42}} /></label> : null}
+        <button type="button" className="mini-btn" onClick={() => setAdvanced((v) => !v)}>{advanced ? "Hide advanced data" : "Advanced question data"}</button>
+        {advanced ? <label style={{ display: "grid", gap: 6 }}>
           <small>Data JSON</small>
           <textarea value={dataText} onChange={(e) => setDataText(e.target.value)} style={{ ...fieldStyle, minHeight: 160, fontFamily: "monospace", fontSize: 12 }} />
-        </label>
+        </label> : null}
         <label style={{ display: "grid", gap: 6 }}>
           <small>Explanation</small>
           <textarea value={explanation} onChange={(e) => setExplanation(e.target.value)} style={fieldStyle} />
