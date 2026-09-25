@@ -1,6 +1,4 @@
 
-import fs from "fs";
-import path from "path";
 import { prisma } from "@/lib/prisma";
 
 export type Stage9Ledger = {
@@ -32,71 +30,36 @@ export type Stage9Status = {
   store: Stage9StoreItem[];
 };
 
-const FILE = path.join(process.cwd(), "data", "stage9-economy.json");
-
-const STORE: Stage9StoreItem[] = [
-  { id: "shield_charge", name: "Shield Charge", cost: 30, description: "Adds one extra shield use to your inventory.", itemType: "POWERUP", quantity: 1, badge: "Defense" },
-  { id: "fury_charge", name: "Fury Charge", cost: 45, description: "Adds one fury burst for tougher sessions.", itemType: "POWERUP", quantity: 1, badge: "Damage" },
-  { id: "hint_discount", name: "Hint Discount", cost: 35, description: "Banks one reduced-cost hint for a future run.", itemType: "BOOST", quantity: 1, badge: "Support" },
-  { id: "extra_life", name: "Boss Extra Life", cost: 80, description: "Stores one extra life for boss battle runs.", itemType: "BOSS", quantity: 1, badge: "Boss" },
-  { id: "xp_surge", name: "XP Surge", cost: 60, description: "Stores one 15 minute XP surge consumable.", itemType: "BOOST", quantity: 1, badge: "XP" },
-];
-
-function ensureDir() {
-  try { fs.mkdirSync(path.dirname(FILE), { recursive: true }); } catch {}
-}
-
-function dayKey(date = new Date()) {
-  return date.toISOString().slice(0, 10);
-}
-
-function yesterdayKey(date = new Date()) {
-  const d = new Date(date);
-  d.setDate(d.getDate() - 1);
-  return dayKey(d);
-}
-
-function readMap(): Record<string, Stage9Ledger> {
-  try {
-    const raw = fs.readFileSync(FILE, "utf8");
-    const parsed = JSON.parse(raw);
-    return parsed && typeof parsed === "object" ? parsed : {};
-  } catch {
-    return {};
-  }
-}
-
-function writeMap(map: Record<string, Stage9Ledger>) {
-  ensureDir();
-  fs.writeFileSync(FILE, JSON.stringify(map, null, 2));
-}
 
 export function getStoreCatalog() {
   return STORE;
 }
 
-export function readLedger(userId: string): Stage9Ledger {
+export async function readLedger(userId: string): Promise<Stage9Ledger> {
   const key = String(userId || "").trim();
-  const map = readMap();
-  return map[key] || { userId: key, streakDays: 0, lastClaimDate: null, lastSeenDate: null };
+  const row = await prisma.userEconomyState.findUnique({ where: { userId: key } });
+  return row ? { userId: key, streakDays: row.streakDays, lastClaimDate: row.lastClaimDate, lastSeenDate: row.lastSeenDate } : { userId: key, streakDays: 0, lastClaimDate: null, lastSeenDate: null };
 }
 
-export function touchUserActivity(userId: string, now = new Date()) {
+export async function touchUserActivity(userId: string, now = new Date()) {
   const key = String(userId || "").trim();
-  if (!key) return readLedger(key);
+  if (!key) return { userId: key, streakDays: 0, lastClaimDate: null, lastSeenDate: null };
   const today = dayKey(now);
   const yesterday = yesterdayKey(now);
-  const map = readMap();
-  const current = map[key] || { userId: key, streakDays: 0, lastClaimDate: null, lastSeenDate: null };
-  let streakDays = Math.max(0, Number(current.streakDays || 0));
-  if (!current.lastSeenDate) streakDays = Math.max(1, streakDays || 1);
-  else if (current.lastSeenDate === today) streakDays = Math.max(1, streakDays || 1);
-  else if (current.lastSeenDate === yesterday) streakDays = Math.max(1, streakDays + 1);
-  else streakDays = 1;
-  const next = { ...current, streakDays, lastSeenDate: today };
-  map[key] = next;
-  writeMap(map);
-  return next;
+  return prisma.$transaction(async (tx) => {
+    const current = await tx.userEconomyState.findUnique({ where: { userId: key } });
+    let streakDays = Math.max(0, Number(current?.streakDays || 0));
+    if (!current?.lastSeenDate) streakDays = Math.max(1, streakDays || 1);
+    else if (current.lastSeenDate === today) streakDays = Math.max(1, streakDays || 1);
+    else if (current.lastSeenDate === yesterday) streakDays = Math.max(1, streakDays + 1);
+    else streakDays = 1;
+    const next = await tx.userEconomyState.upsert({
+      where: { userId: key },
+      update: { streakDays, lastSeenDate: today },
+      create: { userId: key, streakDays, lastSeenDate: today },
+    });
+    return { userId: key, streakDays: next.streakDays, lastClaimDate: next.lastClaimDate, lastSeenDate: next.lastSeenDate };
+  });
 }
 
 export function getMomentumLabel(streakDays: number) {
@@ -118,7 +81,7 @@ export function getEngagementHook(streakDays: number, walletTokens: number) {
 }
 
 export async function getStage9Status(userId: string): Promise<Stage9Status> {
-  const ledger = touchUserActivity(userId);
+  const ledger = await touchUserActivity(userId);
   const wallet = await prisma.wallet.upsert({ where: { userId }, update: {}, create: { userId, tokenBalance: 0 } });
   const inventoryRows = await prisma.inventoryItem.findMany({ where: { userId }, orderBy: { createdAt: "desc" } });
   const inventoryMap = new Map<string, { itemType: string; itemRef: string | null; quantity: number }>();
@@ -145,23 +108,29 @@ export async function getStage9Status(userId: string): Promise<Stage9Status> {
 export async function claimDailyBonus(userId: string) {
   const key = String(userId || "").trim();
   const today = dayKey();
-  const touched = touchUserActivity(key);
-  if (touched.lastClaimDate === today) {
-    return { ok: true as const, alreadyClaimed: true, awarded: 0, streakDays: touched.streakDays, dailyBonusTokens: getDailyBonusAmount(touched.streakDays) };
-  }
+  const touched = await touchUserActivity(key);
   const awarded = getDailyBonusAmount(touched.streakDays);
-  const map = readMap();
-  map[key] = { ...touched, lastClaimDate: today };
-  writeMap(map);
-  const wallet = await prisma.wallet.upsert({
-    where: { userId: key },
-    update: { tokenBalance: { increment: awarded } },
-    create: { userId: key, tokenBalance: awarded },
+  return prisma.$transaction(async (tx) => {
+    const state = await tx.userEconomyState.findUnique({ where: { userId: key } });
+    if (state?.lastClaimDate === today) {
+      const wallet = await tx.wallet.findUnique({ where: { userId: key } });
+      return { ok: true as const, alreadyClaimed: true, awarded: 0, streakDays: state.streakDays, dailyBonusTokens: getDailyBonusAmount(state.streakDays), walletTokens: wallet?.tokenBalance || 0 };
+    }
+    await tx.userEconomyState.upsert({
+      where: { userId: key },
+      update: { lastClaimDate: today },
+      create: { userId: key, streakDays: Math.max(1, touched.streakDays), lastSeenDate: today, lastClaimDate: today },
+    });
+    const wallet = await tx.wallet.upsert({
+      where: { userId: key },
+      update: { tokenBalance: { increment: awarded } },
+      create: { userId: key, tokenBalance: awarded },
+    });
+    try {
+      await tx.notification.create({ data: { userId: key, type: "STAGE9_DAILY_BONUS", title: "Daily streak bonus claimed", body: `You claimed +${awarded} tokens for keeping your streak alive.` } as any });
+    } catch {}
+    return { ok: true as const, alreadyClaimed: false, awarded, streakDays: touched.streakDays, walletTokens: wallet.tokenBalance };
   });
-  try {
-    await prisma.notification.create({ data: { userId: key, type: "STAGE9_DAILY_BONUS", title: "Daily streak bonus claimed", body: `You claimed +${awarded} tokens for keeping your streak alive.` } as any });
-  } catch {}
-  return { ok: true as const, alreadyClaimed: false, awarded, streakDays: touched.streakDays, walletTokens: wallet.tokenBalance };
 }
 
 export async function purchaseStage9Item(userId: string, itemId: string) {
@@ -216,7 +185,7 @@ export async function awardSessionRewards(userId: string, input: { correctCount?
   const bestStreak = Math.max(0, Number(input.bestStreak || 0));
   const outcome = String(input.outcome || "").toLowerCase();
   const encounterType = String(input.encounterType || "standard").toLowerCase();
-  touchUserActivity(key);
+  await touchUserActivity(key);
 
   let awarded = correctCount * 2;
   if (totalQuestions > 0 && correctCount === totalQuestions) awarded += 10;
