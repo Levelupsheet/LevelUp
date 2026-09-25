@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { ensureUser } from "@/app/api/_lib/ensureUser";
-import { getRequestUserId } from "@/app/api/_lib/authUser";
+import { getSessionUser } from "@/lib/auth/session";
 import { evaluateQuestionAnswer, normalizeDifficultyLevel, shuffleQuestionPayload } from "@/lib/questionTransforms";
 import { normalizeQuestionType } from "@/lib/questionTypes";
 import { buildQuestionBankSelection } from "@/lib/questionBank";
@@ -160,8 +160,9 @@ async function buildNewSession(userId: string, questionCount = 10) {
 
 export async function GET(req: Request) {
   try {
-    const userId = String((await getRequestUserId(req)) || "").trim();
-    if (!userId) return NextResponse.json({ error: "userId required" }, { status: 400 });
+    const sessionUser = await getSessionUser();
+    const userId = String(sessionUser?.id || "").trim();
+    if (!userId) return NextResponse.json({ error: "Sign in required" }, { status: 401 });
     const session = await findActiveSession(userId);
     if (!session) return NextResponse.json({ ok: true, session: null, questions: [] });
     return NextResponse.json(serializeSession(session));
@@ -173,9 +174,10 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   try {
     const body = await req.json().catch(() => ({} as any));
-    const userId = String(body?.userId || (await getRequestUserId(req)) || "").trim();
+    const sessionUser = await getSessionUser();
+    const userId = String(sessionUser?.id || "").trim();
     const questionCount = Math.max(1, Math.min(25, Number(body?.questionCount || 10) || 10));
-    if (!userId) return NextResponse.json({ error: "userId required" }, { status: 400 });
+    if (!userId) return NextResponse.json({ error: "Sign in required" }, { status: 401 });
     await ensureUser(userId);
     const existing = await findActiveSession(userId);
     if (existing) return NextResponse.json(serializeSession(existing));
@@ -191,6 +193,10 @@ export async function PATCH(req: Request) {
     const body = await req.json().catch(() => ({} as any));
     const sessionId = String(body?.sessionId || "").trim();
     if (!sessionId) return NextResponse.json({ error: "sessionId required" }, { status: 400 });
+    const sessionUser = await getSessionUser();
+    if (!sessionUser?.id) return NextResponse.json({ error: "Sign in required" }, { status: 401 });
+    const ownedSession = await prisma.gameSession.findFirst({ where: { id: sessionId, userId: sessionUser.id }, select: { id: true } });
+    if (!ownedSession) return NextResponse.json({ error: "Session not found" }, { status: 404 });
     const currentIndex = Number(body?.currentIndex);
     const state = body?.state && typeof body.state === "object" ? body.state : undefined;
     const status = typeof body?.status === "string" ? String(body.status).toUpperCase() : undefined;
