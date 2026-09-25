@@ -3712,3 +3712,32 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .dashboardUtilityCard small{
   line-height:1.4;
 }
+
+
+/* ===== Batch 8 final: canonical game states ===== */
+.gameHubState{
+  display:flex;
+  align-items:center;
+  min-height:48px;
+  margin-top:10px;
+  padding:10px 12px;
+  border:1px dashed var(--lu-game-border);
+  border-radius:12px;
+  background:rgba(255,255,255,.025);
+  color:var(--lu-game-muted);
+}
+.gameHubStateLoading{background:rgba(110,190,255,.045);border-color:rgba(110,190,255,.18);}
+.gameHubStateEmpty{background:rgba(255,255,255,.02);}
+.dashboardProgressionGate.locked{opacity:.78;}
+.dashboardProgressionGate.locked .dashboardBattleStatusDot{background:rgba(255,255,255,.22);}
+.dashboardProgressionGate.unlocked{border-color:rgba(110,220,150,.2);}
+.gameHubPage button:disabled,.pvpHubPage button:disabled,.rewardsHubPage button:disabled,
+.dashboardUtilityCard button:disabled{
+  opacity:.5;
+  cursor:not-allowed;
+  transform:none !important;
+  filter:none !important;
+}
+@media(max-width:700px){
+  .gameHubState{min-height:44px;padding:9px 10px;}
+}
