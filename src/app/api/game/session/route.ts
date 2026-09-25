@@ -109,6 +109,7 @@ export async function POST(req: Request) {
     if (err?.code === "P2002") {
       return Response.json({ ok: true, duplicate: true, stage9: { awarded: 0 } });
     }
-    return Response.json({ ok: false, error: "Failed to save game session", detail: String(err?.message ?? err) }, { status: 500 });
+    console.error("Game session save failed", err);
+    return Response.json({ ok: false, error: "Failed to save game session" }, { status: 500 });
   }
 }
