@@ -1162,3 +1162,42 @@
 .d2OrbFrame .d2AssetBloodOrb { inset:12%; z-index:2; }
 .d2OrbFrame .d2OrbShine,
 .d2OrbFrame .d2OrbFlash { z-index:4; }
+
+
+/* Desktop alignment correction: the uploaded engraved asset is the only outer frame.
+   Remove the legacy CSS shell outline and make both combat rails top-align. */
+@media (min-width:861px) {
+  .d2QuizShell.modalShell {
+    outline:0 !important;
+    border-radius:0 !important;
+  }
+  .d2QuizShell.modalShell::before,
+  .d2QuizShell.modalShell::after {
+    border:0 !important;
+    outline:0 !important;
+    box-shadow:none !important;
+  }
+
+  .d2QuizShell .batch8DesktopQuizGrid {
+    align-items:start !important;
+  }
+  .d2QuizShell .batch8PlayerRail,
+  .d2QuizShell .batch8EnemyRail {
+    align-self:start !important;
+    align-content:start !important;
+    height:max-content !important;
+    min-height:0 !important;
+    max-height:max-content !important;
+  }
+  .d2QuizShell .batch8EnemyRail {
+    display:flex !important;
+    flex-direction:column !important;
+    justify-content:flex-start !important;
+    gap:8px !important;
+    overflow:visible !important;
+  }
+  .d2QuizShell .batch8EnemyRail > .d2EnemyCard,
+  .d2QuizShell .batch8EnemyRail > .card {
+    flex:0 0 auto !important;
+  }
+}
