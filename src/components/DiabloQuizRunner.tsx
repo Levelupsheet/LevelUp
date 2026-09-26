@@ -1296,7 +1296,7 @@ const showExpandedExplanation = useMemo(() => {
                   <div className="d2ActionRow stage8ActionDock" style={{ marginTop: 8, alignItems: "center" }}>
                     {!state.locked ? (
                       <>
-                        <button className="d2Btn" onClick={() => triggerPrimaryAction()} disabled={!canSubmitCurrentQuestion()}>SUBMIT</button>
+                        <button className="d2Btn grimdarkPrimaryAction" onClick={() => triggerPrimaryAction()} disabled={!canSubmitCurrentQuestion()}>SUBMIT</button>
                         <button
                           className="d2Btn"
                           onClick={() => {
@@ -1318,7 +1318,7 @@ const showExpandedExplanation = useMemo(() => {
                         </button>
                       </>
                     ) : (
-                      <button className={(question as any)?.isGolden ? "gold" : "d2Btn"} onClick={() => handleNext()}>NEXT</button>
+                      <button className={(question as any)?.isGolden ? "gold grimdarkPrimaryAction" : "d2Btn grimdarkPrimaryAction"} onClick={() => handleNext()}>NEXT</button>
                     )}
                   </div>
 
