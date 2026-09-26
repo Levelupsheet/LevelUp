@@ -1,0 +1,207 @@
+/* Mobile Diablo quiz parity — reference-aligned skin.  Desktop remains unchanged. */
+@media (max-width: 860px) {
+  .d2QuizShell {
+    width: 100vw !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    border-radius: 0 !important;
+    border: 1px solid #6b350d !important;
+    background:
+      radial-gradient(circle at 50% -10%, rgba(159,61,7,.15), transparent 28%),
+      linear-gradient(180deg,#080706,#020303 42%,#050302) !important;
+    box-shadow: inset 0 0 0 2px #020202, inset 0 0 28px #000 !important;
+  }
+  .d2QuizShell .modalHead {
+    min-height: 68px !important;
+    padding: 8px 76px 8px 8px !important;
+    border-bottom: 2px solid #6d360e !important;
+    background:
+      linear-gradient(90deg,transparent,rgba(122,49,7,.16),transparent),
+      #050505 !important;
+  }
+  .d2QuizShell .modalTitle {
+    width: min(72vw, 430px) !important;
+    min-height: 46px !important;
+    padding: 8px 34px !important;
+    color: #f3d49a !important;
+    font-family: Georgia,"Times New Roman",serif !important;
+    font-size: clamp(15px,4.8vw,21px) !important;
+    font-weight: 900 !important;
+    letter-spacing: .075em !important;
+    background:
+      radial-gradient(ellipse at 50% 0,rgba(244,99,11,.26),transparent 50%),
+      linear-gradient(180deg,#28150a,#0b0907 55%,#030303) !important;
+    border-top: 1px solid #b9661c !important;
+    border-bottom: 1px solid #7a390d !important;
+    clip-path: polygon(8% 0,42% 0,46% 12%,50% 0,54% 12%,58% 0,92% 0,100% 50%,92% 100%,58% 100%,54% 88%,50% 100%,46% 88%,42% 100%,8% 100%,0 50%) !important;
+    text-shadow: 0 2px #000,0 0 10px rgba(255,116,21,.35) !important;
+  }
+  .d2QuizShell .modalHead .d2ExitBtn {
+    right: 7px !important;
+    min-width: 64px !important;
+    min-height: 38px !important;
+    font-family: Georgia,"Times New Roman",serif !important;
+    font-size: 12px !important;
+    letter-spacing: .06em !important;
+    border: 1px solid #f06d1a !important;
+    background: linear-gradient(180deg,#c53316,#650b05 50%,#a7180b) !important;
+    clip-path: polygon(9px 0,calc(100% - 9px) 0,100% 50%,calc(100% - 9px) 100%,9px 100%,0 50%) !important;
+    box-shadow: inset 0 0 13px rgba(255,153,52,.35),0 0 9px rgba(222,58,5,.25) !important;
+  }
+  .d2QuizBody {
+    padding: 6px !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain;
+    background:
+      radial-gradient(circle at 50% 0,rgba(101,42,8,.10),transparent 35%),
+      #030404 !important;
+  }
+  .mobileQuizStack { display:flex !important; flex-direction:column !important; gap:7px !important; }
+
+  /* Question counter becomes the reference-style stage/progress strip. */
+  .mobileQuizTopMeta {
+    order: 1;
+    min-height: 46px;
+    padding: 7px 9px !important;
+    border: 1px solid #704014 !important;
+    border-radius: 1px !important;
+    background: linear-gradient(180deg,#17120e,#080807) !important;
+    box-shadow: inset 0 0 0 1px #020202,inset 0 0 13px rgba(151,59,7,.12) !important;
+  }
+  .mobileQuizProgress {
+    color:#f0d39d !important;
+    font:900 14px/1 Georgia,"Times New Roman",serif !important;
+    letter-spacing:.035em;
+  }
+  .mobileQuizBadges { gap:5px !important; }
+  .mobileQuizBadges .badge {
+    border-color:#5b361b !important;
+    background:#0b0c0c !important;
+    color:#d9c6a8 !important;
+    font-size:10px !important;
+  }
+
+  /* Put the actual learning chamber immediately after progress. */
+  .mobileQuizQuestionCard {
+    order: 2;
+    padding: 10px !important;
+    border: 2px solid #70400f !important;
+    border-radius: 1px !important;
+    background:
+      radial-gradient(ellipse at 50% -12%,rgba(108,42,6,.10),transparent 40%),
+      linear-gradient(180deg,#0a0d0f,#030506) !important;
+    box-shadow: inset 0 0 0 2px #020202,inset 0 0 0 3px rgba(191,92,17,.10),inset 0 0 22px #000 !important;
+  }
+  .mobileQuizQuestionCard > div:first-of-type .badge {
+    color:#e8c487 !important;
+    border-color:#6b3d17 !important;
+    background:linear-gradient(180deg,#21150c,#0a0908) !important;
+  }
+  .mobileQuizPrompt {
+    margin: 10px 2px 8px !important;
+    color:#f4f0e7 !important;
+    font-family:Georgia,"Times New Roman",serif !important;
+    font-size:clamp(20px,6vw,28px) !important;
+    font-weight:900 !important;
+    line-height:1.08 !important;
+    text-shadow:0 2px #000 !important;
+  }
+  .mobileQuizQuestionCard .quizInputGroup { margin-top:10px !important; gap:7px !important; }
+  .mobileQuizQuestionCard .d2ChoiceBtn {
+    min-height:52px !important;
+    padding:8px 10px 8px 48px !important;
+    text-align:left !important;
+    color:#eee7db !important;
+    font-family:Georgia,"Times New Roman",serif !important;
+    font-size:15px !important;
+    line-height:1.18 !important;
+    border:1px solid #543016 !important;
+    border-radius:1px !important;
+    background:linear-gradient(180deg,#111517,#07090a) !important;
+    box-shadow:inset 0 1px rgba(255,255,255,.025),inset 0 -2px #020202 !important;
+  }
+  .mobileQuizQuestionCard .d2ChoiceBtn::before {
+    width:31px !important; height:31px !important; left:8px !important;
+    border-color:#a95a18 !important;
+    background:linear-gradient(145deg,#321b0b,#080706) !important;
+    box-shadow:inset 0 0 8px rgba(255,124,23,.18),0 0 0 2px #050403 !important;
+  }
+  .mobileQuizQuestionCard .d2ChoiceBtn.selected,
+  .mobileQuizQuestionCard .d2ChoiceBtn[aria-pressed="true"] {
+    color:#fff6e8 !important;
+    border-color:#ff8a27 !important;
+    background:linear-gradient(180deg,#702b0c,#311006) !important;
+    box-shadow:inset 0 0 18px rgba(255,103,16,.34),0 0 0 1px #8b3008,0 0 11px rgba(255,86,8,.28) !important;
+  }
+  .mobileQuizQuestionCard .quizHintRow { display:grid !important; grid-template-columns:repeat(3,minmax(0,1fr)); gap:5px !important; }
+  .mobileQuizQuestionCard .quizHintRow .d2Btn,
+  .mobileQuizQuestionCard .mobileQuizActions .d2Btn {
+    min-height:42px !important;
+    padding:7px 6px !important;
+    border:1px solid #5b3920 !important;
+    border-radius:1px !important;
+    color:#eadbc1 !important;
+    font-family:Georgia,"Times New Roman",serif !important;
+    font-size:11px !important;
+    font-weight:900 !important;
+    background:linear-gradient(180deg,#191614,#080808) !important;
+    clip-path:polygon(6% 0,94% 0,100% 50%,94% 100%,6% 100%,0 50%) !important;
+  }
+  .mobileQuizActions { display:grid !important; grid-template-columns:repeat(2,minmax(0,1fr)); gap:6px !important; }
+  .mobileQuizActions .d2Btn:first-child,
+  .mobileQuizActions > .d2Btn:only-child {
+    color:#fff2da !important;
+    border-color:#e35b17 !important;
+    background:linear-gradient(180deg,#e63b15,#831006 48%,#b91c09) !important;
+    box-shadow:inset 0 1px rgba(255,207,128,.4),inset 0 -4px rgba(70,5,2,.5),0 0 10px rgba(219,49,7,.25) !important;
+  }
+  .mobileQuizQuestionCard .stage5MergedFeedbackCard {
+    border:1px solid #1b9b4e !important;
+    border-radius:1px !important;
+    background:radial-gradient(ellipse at 50% 0,rgba(17,126,68,.18),transparent 65%),linear-gradient(180deg,#063522,#03150f) !important;
+    box-shadow:inset 0 0 20px rgba(0,0,0,.55),0 0 0 1px #06150d !important;
+  }
+  .mobileQuizQuestionCard .stage5ScorePill {
+    border-color:#37964f !important;
+    color:#bdf39e !important;
+    background:#092414 !important;
+  }
+
+  /* Enemy HUD follows the question, like the desktop right rail but compact. */
+  .mobileEnemyCard {
+    order: 3;
+    padding:7px !important;
+    border:2px solid #69370f !important;
+    border-radius:1px !important;
+    background:linear-gradient(180deg,#0a0c0e,#030405) !important;
+    box-shadow:inset 0 0 0 2px #020202,inset 0 0 17px #000 !important;
+  }
+  .mobileEnemyHud { display:grid !important; grid-template-columns:minmax(0,1fr) 112px !important; gap:7px !important; align-items:center !important; }
+  .mobileEnemyPortrait { border:1px solid #653a18 !important; border-radius:1px !important; overflow:hidden !important; }
+  .mobileEnemyPortrait .card { min-height:0 !important; padding:3px !important; border-radius:0 !important; }
+  .mobileEnemyPortrait video { height:78px !important; border-radius:0 !important; }
+
+  /* Secondary systems are retained but visually demoted below combat. */
+  .mobileSessionIntel { order:4; margin:0 !important; border:1px solid #4d321d !important; background:#080909 !important; }
+  .stage7PowerStrip.mobile { order:5; gap:6px !important; }
+  .stage7PowerStrip.mobile .d2Btn { min-height:38px !important; border-color:#5a371c !important; background:linear-gradient(180deg,#161310,#080808) !important; }
+
+  /* Player panel remains available without crowding the question above the fold. */
+  .mobileQuizStack > .mobileCombatCard:not(.mobileEnemyCard) {
+    order:6;
+    border:2px solid #69370f !important;
+    border-radius:1px !important;
+    background:linear-gradient(180deg,#090b0d,#030405) !important;
+    box-shadow:inset 0 0 0 2px #020202,inset 0 0 18px #000 !important;
+  }
+
+  .d2QuizShell .badge { border-radius:2px !important; }
+}
+@media (max-width: 430px) {
+  .d2QuizShell .modalHead { min-height:62px !important; padding-right:70px !important; }
+  .d2QuizShell .modalTitle { width:68vw !important; padding-inline:24px !important; font-size:14px !important; }
+  .mobileQuizPrompt { font-size:21px !important; }
+  .mobileQuizQuestionCard .d2ChoiceBtn { min-height:50px !important; font-size:14px !important; }
+  .mobileEnemyHud { grid-template-columns:minmax(0,1fr) 96px !important; }
+  .mobileQuizQuestionCard .quizHintRow .d2Btn { font-size:10px !important; }
+}
