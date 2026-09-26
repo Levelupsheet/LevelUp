@@ -1247,3 +1247,14 @@
     background-size:100% 100% !important;
   }
 }
+
+
+/* Regression fix: the forged unit-frame PNG has an opaque center.
+   Keep the live blood orb above that center while leaving the metal rim visible. */
+.d2OrbFrame .d2UnitFrameAsset{ z-index:2 !important; }
+.d2OrbFrame .d2AssetBloodOrb{
+  inset:17% !important;
+  z-index:5 !important;
+}
+.d2OrbFrame .d2OrbShine,
+.d2OrbFrame .d2OrbFlash{ z-index:6 !important; }
