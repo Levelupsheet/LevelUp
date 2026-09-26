@@ -152,10 +152,12 @@ export default function PracticeMiniGameModal(props: {
           <video className="luVideoEl" autoPlay loop muted playsInline preload="metadata"><source src="/video/blackhole-loop.mp4" type="video/mp4" /></video>
           <div className="luVideoVignette" />
         </div>
-        <div className={"luModalHeader practiceGameOuterHeader" + ((step === "quiz" || step === "boss") ? " gameActive" : "")} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <div className="practiceGameOuterTitle"><b style={{ fontSize: 18 }}>{title}</b><div><small className="luHint">{subtitle}</small></div></div>
-          <button className="secondaryBtn" type="button" onClick={onClose}>✕</button>
-        </div>
+        {step !== "quiz" && step !== "boss" ? (
+          <div className="luModalHeader practiceGameOuterHeader" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div className="practiceGameOuterTitle"><b style={{ fontSize: 18 }}>{title}</b><div><small className="luHint">{subtitle}</small></div></div>
+            <button className="secondaryBtn" type="button" onClick={onClose}>✕</button>
+          </div>
+        ) : null}
 
         <div className="luModalBody">
           {step === "setup" && (
@@ -176,7 +178,7 @@ export default function PracticeMiniGameModal(props: {
               startingPosition={kind === "position" ? path : undefined}
               certExam={kind === "cert" ? cert : undefined}
               bankDomain={kind === "test" && testBank !== "GENERAL" ? testBank : undefined}
-              exitLabel="Close"
+              exitLabel="EXIT"
               onExit={onClose}
               metaLeft={kind === "position" ? `Path: ${path.replaceAll("_", " ")}` : kind === "cert" ? `Exam: ${cert.replaceAll("_", " ")}` : `Bank: ${testBank === "GENERAL" ? "Mixed" : testBank}` }
               questionCount={kind === "test" ? 15 : 12}
