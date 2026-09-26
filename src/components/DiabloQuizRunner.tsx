@@ -1355,7 +1355,7 @@ const showExpandedExplanation = useMemo(() => {
               )}
             </div>
 
-            <div className="quizEnemyRail batch8CombatRail batch8EnemyRail" style={{ display: "grid", gap: 12, alignContent: "start", minHeight: 0 }}>
+            <div className="quizEnemyRail batch8CombatRail batch8EnemyRail" style={{ display: "grid", gap: 12, alignContent: "start", alignSelf: "start", height: "fit-content", minHeight: 0 }}>
               <D2EnemyHealthBar value={stageEnemyHP} max={currentStageConfig.hp} name={currentStageEnemyName.toUpperCase().slice(0, 18)} />
               <ModelPanel compact title="" src={enemyVideo} loop={!isEnemyHitVideo} onEnded={isEnemyHitVideo ? () => setHitPulse(null) : undefined} height="clamp(180px, 22vh, 280px)" damageText={damageFloat.enemy || null} damageTone="enemy" />
             </div>
