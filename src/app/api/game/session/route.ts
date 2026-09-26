@@ -3,6 +3,7 @@ import { ensureUser } from "@/app/api/_lib/ensureUser";
 import { getSessionUser } from "@/lib/auth/session";
 import { inferDomainFromQuestion } from "@/lib/learningProfile";
 import { applyUserXpIncrement } from "@/lib/xpCaps";
+import { levelFromXp } from "@/lib/progression";
 
 function asNum(v: unknown, fallback = 0) {
   const n = Number(v);
@@ -36,9 +37,34 @@ export async function POST(req: Request) {
     const result: {
       user: Awaited<ReturnType<typeof applyUserXpIncrement>>;
       stage9: { ok: true; awarded: number; walletTokens: number };
+      levelRewards?: { previousLevel: number; newLevel: number; lootBoxesAwarded: number };
     } = await prisma.$transaction(async (tx) => {
       await tx.rewardClaim.create({ data: { userId, claimKey, kind: "GAME_SESSION", meta: { xpEarned, correctCount, totalQuestions, outcome, encounterType, bestStreak } } });
+      const beforeXpUser = await tx.user.findUnique({ where: { id: userId }, select: { xp: true } });
+      const previousLevel = levelFromXp(Number(beforeXpUser?.xp || 0));
       const user = await applyUserXpIncrement(tx, userId, xpEarned);
+      const newLevel = levelFromXp(Number((user as any)?.xp || 0));
+      const levelsGained = Math.max(0, newLevel - previousLevel);
+      if (levelsGained > 0) {
+        await tx.lootBox.createMany({
+          data: Array.from({ length: levelsGained }, (_, index) => ({
+            userId,
+            type: "BRONZE" as any,
+            status: "PENDING" as any,
+            source: `LEVEL_UP:${previousLevel + index + 1}`,
+          })),
+        });
+        try {
+          await tx.notification.create({
+            data: {
+              userId,
+              type: "LOOT_BOX_EARNED" as any,
+              title: levelsGained === 1 ? "Level up loot chest earned" : `${levelsGained} level up loot chests earned`,
+              body: `Level ${newLevel} reached • ${levelsGained} Bronze loot chest${levelsGained === 1 ? "" : "s"} added to your rewards.`,
+            } as any,
+          });
+        } catch {}
+      }
 
       const domainMap = new Map<string, { mastery: number; questions: number; level: number }>();
       for (const [key, val] of Object.entries(masteryByDomain || {})) {
@@ -100,11 +126,11 @@ export async function POST(req: Request) {
         });
       } catch {}
 
-      return { user, stage9: { ok: true as const, awarded, walletTokens: wallet.tokenBalance } };
+      return { user, stage9: { ok: true as const, awarded, walletTokens: wallet.tokenBalance }, levelRewards: { previousLevel, newLevel, lootBoxesAwarded: levelsGained } };
     });
 
     await import("@/lib/stage9Economy").then(({ touchUserActivity }) => touchUserActivity(userId)).catch(() => null);
-    return Response.json({ ok: true, user: result.user, stage9: result.stage9 });
+    return Response.json({ ok: true, user: result.user, stage9: result.stage9, levelRewards: result.levelRewards });
   } catch (err: any) {
     if (err?.code === "P2002") {
       return Response.json({ ok: true, duplicate: true, stage9: { awarded: 0 } });
