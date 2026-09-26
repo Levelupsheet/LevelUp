@@ -668,3 +668,100 @@
 }
 .luRolePlayerImage::-webkit-media-controls,
 .dashboardSelectedPlayer video::-webkit-media-controls { display:none !important; }
+
+
+/* Mobile polish: starting-position modal + compact combat HUD. Desktop intentionally unchanged. */
+@media (max-width: 860px) {
+  .luModalOverlay {
+    align-items:flex-start !important;
+    overflow-y:auto !important;
+    -webkit-overflow-scrolling:touch;
+    padding:max(12px, env(safe-area-inset-top)) 10px calc(88px + env(safe-area-inset-bottom)) !important;
+  }
+  .luModalOverlay > .luModal {
+    width:min(100%, 680px) !important;
+    max-height:none !important;
+    margin:0 auto !important;
+    overflow:visible !important;
+  }
+  .luModalOverlay > .luModal > .luModalHeader {
+    position:relative !important;
+    min-height:82px !important;
+    padding:14px 104px 12px 14px !important;
+    align-items:flex-start !important;
+  }
+  .luModalOverlay > .luModal > .luModalHeader > div:first-child {
+    min-width:0 !important;
+  }
+  .luModalOverlay > .luModal > .luModalHeader b {
+    display:block;
+    font-size:20px !important;
+    line-height:1.12 !important;
+  }
+  .luModalOverlay > .luModal > .luModalHeader .luHint {
+    display:block;
+    margin-top:6px;
+    font-size:13px !important;
+    line-height:1.35 !important;
+  }
+  .luModalOverlay > .luModal .positionModalExit {
+    position:absolute !important;
+    top:14px !important;
+    right:12px !important;
+    min-width:78px !important;
+    width:78px !important;
+    height:40px !important;
+    padding:0 12px !important;
+  }
+  .luModalOverlay > .luModal > .luModalBody { padding:10px 12px !important; }
+  .luModalOverlay > .luModal .luGrid3 { gap:10px !important; }
+  .luModalOverlay > .luModal .luRoleCard { padding:10px !important; min-height:0 !important; }
+  .luModalOverlay > .luModal .luRolePlayerImage {
+    height:clamp(118px,30vw,160px) !important;
+    margin-bottom:7px !important;
+  }
+  .luModalOverlay > .luModal .luRoleTitle { margin-top:2px !important; }
+  .luModalOverlay > .luModal .luRoleDesc { line-height:1.25 !important; }
+  .luModalOverlay > .luModal > .luModalFooter {
+    position:sticky;
+    bottom:0;
+    z-index:3;
+    padding:10px 12px calc(10px + env(safe-area-inset-bottom)) !important;
+    background:rgba(9,12,18,.97);
+    border-top:1px solid rgba(100,112,132,.25);
+  }
+
+  .mobileEnemyCard {
+    min-height:0 !important;
+    padding:8px !important;
+  }
+  .mobileEnemyHud {
+    grid-template-columns:minmax(0,1fr) 112px !important;
+    gap:10px !important;
+    align-items:center !important;
+  }
+  .mobileEnemyHealth { align-self:center !important; }
+  .mobileEnemyPortrait,
+  .mobileEnemyCard video {
+    align-self:center !important;
+  }
+  .mobileQuizTopMeta { min-height:40px !important; }
+  .mobileQuizQuestionCard { padding:8px !important; }
+}
+@media (max-width: 430px) {
+  .luModalOverlay > .luModal > .luModalHeader {
+    min-height:86px !important;
+    padding:12px 94px 10px 12px !important;
+  }
+  .luModalOverlay > .luModal > .luModalHeader b { font-size:19px !important; }
+  .luModalOverlay > .luModal .positionModalExit {
+    top:12px !important;
+    right:10px !important;
+    width:72px !important;
+    min-width:72px !important;
+    height:38px !important;
+    font-size:12px !important;
+  }
+  .luModalOverlay > .luModal .luRolePlayerImage { height:120px !important; }
+  .mobileEnemyHud { grid-template-columns:minmax(0,1fr) 104px !important; }
+}
