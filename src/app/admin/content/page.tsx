@@ -135,6 +135,7 @@ export default function AdminContentStudioPage() {
   const [questions, setQuestions] = useState<GeneratedQuestion[]>([]);
   const [liveQuestions, setLiveQuestions] = useState<LiveQuestion[]>([]);
   const [bankSummary, setBankSummary] = useState<Array<{ id: string; name: string; domain: string; questionCount: number }>>([]);
+  const [publishBankId, setPublishBankId] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
@@ -169,8 +170,9 @@ export default function AdminContentStudioPage() {
     const res = await fetch("/api/admin/knowledge-blocks", { cache: "no-store" });
     const data = await res.json();
     if (!res.ok) throw new Error(data?.error || "Failed to load knowledge blocks");
-    setBlocks(data.blocks || []);
-    if (!selectedBlockId && data.blocks?.[0]?.id) setSelectedBlockId(data.blocks[0].id);
+    const pendingBlocks = (data.blocks || []).filter((block: KnowledgeBlock) => String(block.status || "").toUpperCase() !== "APPROVED");
+    setBlocks(pendingBlocks);
+    if (!pendingBlocks.some((block: KnowledgeBlock) => block.id === selectedBlockId)) setSelectedBlockId(pendingBlocks[0]?.id || "");
   }
 
   async function loadBankSummary() {
@@ -268,6 +270,7 @@ export default function AdminContentStudioPage() {
 
   useEffect(() => {
     if (!authChecked) return;
+    setPublishBankId("");
     loadQuestions(selectedBlockId).catch((e) => setMessage(e.message));
     loadGoldenTracking(selectedBlockId).catch((e) => setMessage(e.message));
   }, [selectedBlockId, authChecked]);
@@ -425,7 +428,7 @@ export default function AdminContentStudioPage() {
       const res = await fetch("/api/admin/publish-questions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ knowledgeBlockId: selectedBlockId }),
+        body: JSON.stringify({ knowledgeBlockId: selectedBlockId, targetSetId: publishBankId || null }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -438,7 +441,7 @@ export default function AdminContentStudioPage() {
             : "";
         throw new Error(`${data?.error || "Publish failed"}${detail}`);
       }
-      setMessage(`Published ${data.publishedCount} question(s) to live QuestionSet ${data.setId}.`);
+      setMessage(`Published ${data.publishedCount} question(s) to ${data.setName || "live bank"} (${data.setId})${data.skippedDuplicateCount ? ` • skipped ${data.skippedDuplicateCount} duplicate(s)` : ""}.`);
       await loadBlocks();
       await refreshReviewData(selectedBlockId);
       setReviewPanel("live");
@@ -642,6 +645,19 @@ export default function AdminContentStudioPage() {
                   <button onClick={publishSelected} className="primaryBtn" disabled={!selectedBlockId || loading || syncing}>Publish approved questions</button>
                 </div>
               </div>
+
+              {selectedBlock ? (
+                <div className="card" style={{ padding: 14, marginTop: 14, background: "rgba(59,130,246,0.06)", border: "1px solid rgba(59,130,246,0.22)" }}>
+                  <div style={{ fontWeight: 800, fontSize: 16 }}>Publish destination bank</div>
+                  <div style={{ opacity: 0.72, marginTop: 4, fontSize: 13 }}>Choose the DB bank that should receive these generated questions. Existing questions are preserved and duplicates are skipped automatically.</div>
+                  <select value={publishBankId} onChange={(e) => setPublishBankId(e.target.value)} style={{ ...fieldStyle, minHeight: 44, height: 44, marginTop: 10 }}>
+                    <option value="">Create/use this block&apos;s bank: {selectedBlock.setName}</option>
+                    {bankSummary.map((bank) => (
+                      <option key={bank.id} value={bank.id}>{bank.name} • {bank.domain} • {bank.questionCount} questions</option>
+                    ))}
+                  </select>
+                </div>
+              ) : null}
 
               {selectedBlock ? (
                 <div className="card" style={{ padding: 14, marginTop: 14, background: "rgba(255,215,0,0.06)", border: "1px solid rgba(255,215,0,0.24)" }}>
