@@ -866,7 +866,7 @@ async function analyzeResumeStage12() {
                   title="Help Desk Wizard"
                   desc="Entry-level IT support: tickets, troubleshooting, user support."
                   icon="🧑‍💻"
-                  videoSrc="/video/player-idle.mp4"
+                  videoSrc="/video/helpdesk-wizard-idle.mp4"
                   selected={pendingPos === "HELPDESK_SUPPORT"}
                   onClick={() => setPendingPos("HELPDESK_SUPPORT")}
                 />
@@ -961,8 +961,17 @@ async function analyzeResumeStage12() {
               setPositionChangeMode(true);
               setShowPositionModal(true);
             }}>
-              <video src="/video/player-idle.mp4" autoPlay loop muted playsInline disablePictureInPicture controlsList="nodownload noremoteplayback" aria-label="Help Desk Wizard player" />
+              <video src="/video/helpdesk-wizard-idle.mp4" autoPlay loop muted playsInline disablePictureInPicture controlsList="nodownload noremoteplayback" aria-label="Help Desk Wizard player" />
               <div><small>SELECTED PLAYER</small><b>Help Desk Wizard</b></div>
+            </button>
+          ) : user?.startingPosition === "DESKTOP_TECHNICIAN" ? (
+            <button className="dashboardSelectedPlayer dashboardSelectedPlayerButton" type="button" aria-label="Change selected player: Desktop Barbarian" onClick={() => {
+              setPendingPos(user.startingPosition);
+              setPositionChangeMode(true);
+              setShowPositionModal(true);
+            }}>
+              <video src="/video/desktop-barbarian-idle.mp4" autoPlay loop muted playsInline disablePictureInPicture controlsList="nodownload noremoteplayback" aria-label="Desktop Barbarian player" />
+              <div><small>SELECTED PLAYER</small><b>Desktop Barbarian</b></div>
             </button>
           ) : null}
 
