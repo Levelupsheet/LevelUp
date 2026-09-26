@@ -5581,3 +5581,83 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
   .d2QuizShell .modalTitle{width:min(68vw,330px) !important;padding-inline:28px !important;font-size:clamp(13px,4.2vw,17px) !important;}
   .d2QuizShell .modalHead .d2ExitBtn{right:6px !important;min-width:62px !important;font-size:12px !important;}
 }
+
+
+/* ===== Grimdark Forged dashboard — checkpoint 1: foundation =====
+   Establish the same forged-metal / ember hierarchy as the quiz without
+   changing dashboard behavior or mobile information order. */
+.dashboardGrimdarkApp{
+  --gd-ember:#c86b24;
+  --gd-gold:#d9a45b;
+  --gd-edge:#4c3424;
+  --gd-iron:#151412;
+}
+.dashboardGrimdarkShell{
+  position:relative;
+  overflow:hidden;
+  border:1px solid #493426 !important;
+  border-radius:3px !important;
+  background:
+    radial-gradient(90% 70% at 50% -10%,rgba(128,61,20,.13),transparent 58%),
+    linear-gradient(180deg,#11100f 0%,#080808 58%,#060606 100%) !important;
+  box-shadow:inset 0 0 0 2px #050505,inset 0 0 0 3px rgba(124,77,42,.2),0 18px 48px rgba(0,0,0,.55) !important;
+}
+.dashboardGrimdarkSidebar{
+  border-right:1px solid #4c3424 !important;
+  border-radius:0 !important;
+  background:linear-gradient(180deg,rgba(18,17,15,.98),rgba(7,7,7,.99)) !important;
+  box-shadow:inset -1px 0 rgba(0,0,0,.9),inset -12px 0 28px rgba(0,0,0,.25) !important;
+}
+.dashboardGrimdarkMain{
+  min-width:0;
+  background:
+    radial-gradient(70% 40% at 50% 0,rgba(116,54,20,.07),transparent 70%),
+    transparent;
+}
+.dashboardGrimdarkHero{
+  position:relative;
+  overflow:hidden;
+  border:1px solid #4b3020 !important;
+  border-radius:2px !important;
+  background:linear-gradient(180deg,rgba(24,20,16,.97),rgba(10,9,8,.98)) !important;
+  box-shadow:inset 0 0 0 2px #080706,inset 0 -18px 35px rgba(0,0,0,.34) !important;
+}
+.dashboardGrimdarkHero::before{
+  content:"";
+  position:absolute;
+  left:7%; right:7%; top:0;
+  height:1px;
+  background:linear-gradient(90deg,transparent,#9b5727,#d19046,#9b5727,transparent);
+  opacity:.75;
+  pointer-events:none;
+}
+.dashboardGrimdarkPanel{
+  border:1px solid #4b3020 !important;
+  border-radius:2px !important;
+  background:linear-gradient(180deg,rgba(24,22,19,.96),rgba(10,10,9,.98)) !important;
+  box-shadow:inset 0 0 0 2px #070706,inset 0 0 28px rgba(0,0,0,.42) !important;
+}
+.dashboardGrimdarkPanel .dashboardEyebrow{
+  color:#d7a05b !important;
+  letter-spacing:.12em;
+}
+.dashboardGrimdarkPanel h2{
+  font-family:Cinzel,Georgia,serif;
+  color:#f0dfbf;
+  text-shadow:0 2px 2px #000;
+}
+@media(max-width:860px){
+  .dashboardGrimdarkShell{
+    border-width:1px !important;
+    box-shadow:inset 0 0 0 1px rgba(124,77,42,.18) !important;
+  }
+  .dashboardGrimdarkSidebar{
+    border-right:0 !important;
+    border-bottom:1px solid #4c3424 !important;
+    box-shadow:none !important;
+  }
+  .dashboardGrimdarkHero,
+  .dashboardGrimdarkPanel{
+    border-radius:2px !important;
+  }
+}
