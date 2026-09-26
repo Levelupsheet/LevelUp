@@ -1137,7 +1137,7 @@ const showExpandedExplanation = useMemo(() => {
   return (
     <div
       className="modalShell d2QuizShell"
-      style={{ position: "relative", width: "min(96vw, 1600px)", maxWidth: media?.width || 1480, height: "min(900px, calc(100dvh - 96px))", maxHeight: "min(900px, calc(100dvh - 96px))", minHeight: "min(900px, calc(100dvh - 96px))", margin: "0 auto", display: "flex", flexDirection: "column", overflow: "hidden" }}
+      style={{ position: "relative", width: "min(98vw, 1600px)", maxWidth: media?.width || 1600, height: "calc(100dvh - 12px)", maxHeight: "calc(100dvh - 12px)", minHeight: 0, margin: "0 auto", display: "flex", flexDirection: "column", overflow: "hidden" }}
     >
       <div className="modalHead">
         <div>
