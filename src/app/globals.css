@@ -5111,3 +5111,68 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     overflow:hidden !important;
   }
 }
+
+
+/* ===== Quiz HUD checkpoint 14: centered skull-title plaque ===== */
+@media(min-width:901px){
+  .d2QuizShell .modalHead{
+    position:relative !important;
+    justify-content:center !important;
+    overflow:visible !important;
+  }
+  .d2QuizShell .modalHead>div:first-child{
+    position:absolute !important;
+    left:50% !important;
+    top:50% !important;
+    transform:translate(-50%,-50%) !important;
+    width:min(560px,52vw) !important;
+    min-width:0 !important;
+    padding:7px 92px !important;
+    text-align:center !important;
+    pointer-events:none;
+    background:
+      radial-gradient(circle at 50% -20%,rgba(255,109,18,.28),transparent 42%),
+      linear-gradient(180deg,#24130b 0%,#0d0a08 48%,#050505 100%) !important;
+    border:1px solid #8b4b19 !important;
+    clip-path:polygon(8% 0,42% 0,46% 12%,50% 0,54% 12%,58% 0,92% 0,100% 50%,92% 100%,58% 100%,54% 88%,50% 100%,46% 88%,42% 100%,8% 100%,0 50%);
+    box-shadow:inset 0 0 0 2px #050302,inset 0 0 16px rgba(207,78,7,.22),0 0 12px rgba(202,70,6,.15) !important;
+  }
+  .d2QuizShell .modalHead>div:first-child::before{
+    content:"☠";
+    position:absolute;
+    left:50%;
+    top:-20px;
+    transform:translateX(-50%);
+    width:42px;
+    height:31px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#c47a2c;
+    font-size:25px;
+    line-height:1;
+    text-shadow:0 2px #000,0 0 8px rgba(255,95,9,.55);
+    background:radial-gradient(circle,#201007 0%,#080604 67%,transparent 70%);
+  }
+  .d2QuizShell .modalTitle{
+    width:100%;
+    text-align:center !important;
+    font-size:clamp(16px,1.25vw,21px) !important;
+    color:#f4d79d !important;
+    text-transform:uppercase;
+    letter-spacing:.065em !important;
+    white-space:nowrap;
+    text-shadow:0 2px 1px #000,0 0 8px rgba(255,119,23,.28) !important;
+  }
+  .d2QuizShell .modalHead>.btn,
+  .d2QuizShell .modalHead>a.btn{
+    position:absolute !important;
+    right:7px !important;
+    top:50% !important;
+    transform:translateY(-50%) !important;
+    z-index:2;
+  }
+}
+@media(max-width:900px){
+  .d2QuizShell .modalHead{justify-content:space-between}
+}
