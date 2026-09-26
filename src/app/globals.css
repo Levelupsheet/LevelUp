@@ -5176,3 +5176,88 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 @media(max-width:900px){
   .d2QuizShell .modalHead{justify-content:space-between}
 }
+
+
+/* ===== Quiz HUD checkpoint 15: real centered title + right-edge containment ===== */
+@media(min-width:901px){
+  .d2QuizShell .modalHead{
+    min-height:70px !important;
+    padding:8px 72px !important;
+    box-sizing:border-box !important;
+  }
+
+  /* Override checkpoint 14 selector: the first child is not reliably the title wrapper. */
+  .d2QuizShell .modalHead>div:first-child{
+    position:static !important;
+    transform:none !important;
+    width:auto !important;
+    padding:0 !important;
+    background:none !important;
+    border:0 !important;
+    clip-path:none !important;
+    box-shadow:none !important;
+  }
+  .d2QuizShell .modalHead>div:first-child::before{content:none !important;}
+
+  /* Put the actual modal title in the centered Diablo plaque. */
+  .d2QuizShell .modalTitle{
+    position:absolute !important;
+    left:50% !important;
+    top:50% !important;
+    transform:translate(-50%,-50%) !important;
+    z-index:1 !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    width:min(570px,50vw) !important;
+    min-height:44px !important;
+    padding:7px 86px !important;
+    box-sizing:border-box !important;
+    text-align:center !important;
+    color:#f4d79d !important;
+    font-family:Georgia,"Times New Roman",serif !important;
+    font-size:clamp(17px,1.35vw,22px) !important;
+    font-weight:800 !important;
+    line-height:1 !important;
+    text-transform:uppercase !important;
+    letter-spacing:.065em !important;
+    white-space:nowrap !important;
+    background:
+      radial-gradient(circle at 50% -25%,rgba(255,105,12,.30),transparent 40%),
+      linear-gradient(180deg,#26140b 0%,#0d0907 52%,#050505 100%) !important;
+    border:1px solid #8b4b19 !important;
+    clip-path:polygon(8% 0,42% 0,46% 12%,50% 0,54% 12%,58% 0,92% 0,100% 50%,92% 100%,58% 100%,54% 88%,50% 100%,46% 88%,42% 100%,8% 100%,0 50%) !important;
+    box-shadow:inset 0 0 0 2px #050302,inset 0 0 16px rgba(207,78,7,.22),0 0 12px rgba(202,70,6,.18) !important;
+    text-shadow:0 2px 1px #000,0 0 8px rgba(255,119,23,.28) !important;
+    pointer-events:none !important;
+  }
+  .d2QuizShell .modalTitle::before{
+    content:"☠";
+    position:absolute;
+    left:50%;
+    top:-22px;
+    transform:translateX(-50%);
+    width:44px;
+    height:31px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#c47a2c;
+    font-family:Georgia,"Times New Roman",serif;
+    font-size:25px;
+    line-height:1;
+    text-shadow:0 2px #000,0 0 8px rgba(255,95,9,.55);
+    background:radial-gradient(circle,#201007 0%,#080604 67%,transparent 70%);
+  }
+
+  /* Keep the complete framed HUD inside the modal viewport. */
+  .d2QuizShell,
+  .d2QuizShell .modalBody,
+  .d2QuizShell .d2HudViewport{
+    max-width:100% !important;
+    box-sizing:border-box !important;
+  }
+  .d2QuizShell .modalBody{
+    overflow:hidden !important;
+  }
+}
