@@ -944,9 +944,9 @@ async function analyzeResumeStage12() {
       <div className="bgPattern" />
       <div className="heroBlur" />
 
-      <div className="appContainer">
-      <div className="shell">
-        <aside className="sidebar dashboardSidebar">
+      <div className="appContainer dashboardGrimdarkApp">
+      <div className="shell dashboardGrimdarkShell">
+        <aside className="sidebar dashboardSidebar dashboardGrimdarkSidebar">
           <div className="dashboardSidebarMobileTitle">Progress & shortcuts</div>
           <div className="dashboardSidebarBrand" style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
             <div className="sidebarLogoBox"><img src="/levelup-pro-icon.png" alt="LevelUp Pro" className="sidebarLogoImg" /></div>
@@ -1084,8 +1084,8 @@ async function analyzeResumeStage12() {
 
         </aside>
 
-        <section className="maincol dashboardMain">
-          <div className="topbar dashboardHero">
+        <section className="maincol dashboardMain dashboardGrimdarkMain">
+          <div className="topbar dashboardHero dashboardGrimdarkHero">
             <div style={{ flex: 1, minWidth: 260 }}>
               <div style={{ fontSize: 18, opacity: 0.82, textAlign: "center" }}>Welcome back</div>
               <div style={{ marginTop: 4, fontWeight: 900, fontSize: 34, lineHeight: 1.02, textAlign: "center", letterSpacing: 0.2, textShadow: "0 0 18px rgba(255,255,255,0.14), 0 0 28px rgba(96,188,255,0.10)" }}>
@@ -1109,7 +1109,7 @@ async function analyzeResumeStage12() {
             </div>
           </div>
 
-          <div className="card dashboardNextAction">
+          <div className="card dashboardNextAction dashboardGrimdarkPanel">
             <div className="dashboardNextCopy">
               <div className="dashboardEyebrow">RECOMMENDED NEXT</div>
               <h2>{hasTechReady ? "Your Tech Battle is ready" : hrBattleUnlocked && !hrPassed ? "Take your HR Battle" : `Continue your ${user?.startingPosition ? labelPos(user.startingPosition) : "career"} path`}</h2>
