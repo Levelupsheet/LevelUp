@@ -368,7 +368,11 @@ function definitionQuestions(block: NormalizedKnowledgeBlock, def: any): Candida
   const definition = String(def?.definition || "").trim();
   if (!term || !definition) return [];
   const aliases = uniqueStrings(def?.aliases || []);
-  const distractors = uniqueStrings([...(def?.distractors || []), ...plausibleTechnicalDistractors(term, definition, block)]).filter((v) => normalizeChoiceText(v) !== normalizeChoiceText(term)).slice(0, 3);
+  // Prefer verified terms from neighboring definitions as realistic wrong answers.
+  // They are valid concepts in this knowledge block, but do not match this definition.
+  const siblingTerms = uniqueStrings(block.definitions.map((item: any) => item?.term))
+    .filter((value) => normalizeChoiceText(value) !== normalizeChoiceText(term));
+  const distractors = uniqueStrings([...(def?.distractors || []), ...siblingTerms, ...plausibleTechnicalDistractors(term, definition, block)]).filter((v) => normalizeChoiceText(v) !== normalizeChoiceText(term)).slice(0, 3);
   if (distractors.length < 3) return [];
   const choices = shuffle([term, ...distractors]);
   const correctIndex = choices.findIndex((choice) => choice === term);
