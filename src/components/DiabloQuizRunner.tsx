@@ -1184,7 +1184,16 @@ const showExpandedExplanation = useMemo(() => {
                       <div className="stageLabelPill">Stage {sessionStage} • {metaLeft || "Combat Quiz"}</div>
                     </div>
                     <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap", justifyContent: "flex-end" }}>
-                      {timed ? <span className="badge" style={{ fontVariantNumeric: "tabular-nums" }}>⏱ {Math.max(0, state.timeLeft)}s</span> : null}
+                      {timed ? (
+                        <span
+                          className={`quizCountdownTimer ${state.timeLeft <= 5 ? "critical" : state.timeLeft <= 10 ? "warning" : "safe"}`}
+                          aria-label={`${Math.max(0, state.timeLeft)} seconds remaining`}
+                        >
+                          <span className="quizCountdownIcon">⏱</span>
+                          <span className="quizCountdownValue">{Math.max(0, state.timeLeft)}</span>
+                          <span className="quizCountdownUnit">SEC</span>
+                        </span>
+                      ) : null}
                       <span className="badge">{labelForType(questionType)}</span>
                       {metaRight ? <span className="badge">{metaRight}</span> : null}
                     </div>
