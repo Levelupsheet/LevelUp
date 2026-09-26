@@ -845,3 +845,135 @@
     box-shadow:inset 0 0 0 1px rgba(255,145,55,.025),0 11px 26px rgba(0,0,0,.16) !important;
   }
 }
+
+
+/* Mobile enemy HUD refinement: cleaner forged frame, compact HP plate, centered portrait. */
+@media (max-width: 860px) {
+  .mobileEnemyCardTop {
+    padding:8px 9px !important;
+    border:2px solid #6f3b13 !important;
+    background:linear-gradient(180deg,#0c0d0e 0%,#050606 100%) !important;
+    box-shadow:
+      inset 0 0 0 1px #1b0c04,
+      inset 0 0 0 3px #020202,
+      inset 0 0 18px rgba(0,0,0,.9) !important;
+  }
+  .mobileEnemyCardTop .mobileEnemyHud {
+    grid-template-columns:minmax(0,1fr) 104px !important;
+    gap:12px !important;
+    align-items:center !important;
+  }
+  .mobileEnemyCardTop .mobileEnemyHealth {
+    min-width:0 !important;
+    align-self:center !important;
+    overflow:visible !important;
+  }
+  .mobileEnemyCardTop .d2EnemyCard {
+    min-height:0 !important;
+    padding:9px 10px 10px !important;
+    border:1px solid #3f2a1c !important;
+    border-radius:18px !important;
+    background:
+      radial-gradient(ellipse at 50% 0,rgba(123,48,27,.13),transparent 58%),
+      linear-gradient(180deg,#171719,#090a0b) !important;
+    box-shadow:
+      inset 0 0 0 2px rgba(0,0,0,.72),
+      inset 0 0 16px rgba(0,0,0,.58),
+      0 0 0 1px rgba(125,72,37,.16) !important;
+  }
+  .mobileEnemyCardTop .d2EnemyTop {
+    display:grid !important;
+    grid-template-columns:minmax(0,1fr) auto !important;
+    align-items:center !important;
+    gap:8px !important;
+    min-height:42px !important;
+    margin:0 2px 6px !important;
+  }
+  .mobileEnemyCardTop .d2EnemyName {
+    min-width:0 !important;
+    font-size:clamp(18px,5.2vw,25px) !important;
+    line-height:.98 !important;
+    letter-spacing:.02em !important;
+    white-space:normal !important;
+    overflow-wrap:normal !important;
+    text-wrap:balance;
+    text-shadow:0 1px #000,0 0 8px rgba(255,151,79,.08) !important;
+  }
+  .mobileEnemyCardTop .d2EnemyNums {
+    width:58px !important;
+    max-width:58px !important;
+    font-size:12px !important;
+    line-height:1.15 !important;
+    text-align:right !important;
+    white-space:normal !important;
+    opacity:.86 !important;
+  }
+  .mobileEnemyCardTop .d2EnemyBarFrame {
+    height:26px !important;
+    min-height:26px !important;
+    margin:0 5px !important;
+    border:1px solid #4a2517 !important;
+    border-radius:14px !important;
+    background:#030303 !important;
+    box-shadow:
+      inset 0 0 0 2px #090909,
+      0 1px 0 rgba(255,145,74,.08),
+      0 0 10px rgba(117,16,13,.14) !important;
+  }
+  .mobileEnemyCardTop .d2EnemyBarInner {
+    inset:4px 8px !important;
+    border-radius:10px !important;
+    overflow:hidden !important;
+  }
+  .mobileEnemyCardTop .d2EnemySkull {
+    transform:scale(.72) !important;
+    opacity:.42 !important;
+  }
+
+  .mobileEnemyCardTop .mobileEnemyPortrait {
+    width:104px !important;
+    height:104px !important;
+    align-self:center !important;
+    justify-self:center !important;
+    display:grid !important;
+    place-items:center !important;
+    padding:5px !important;
+    border:1px solid #754018 !important;
+    background:linear-gradient(180deg,#17191b,#08090a) !important;
+    box-shadow:inset 0 0 0 2px #050505,inset 0 0 12px #000,0 0 9px rgba(211,91,19,.08) !important;
+  }
+  .mobileEnemyCardTop .mobileEnemyPortrait .card {
+    width:100% !important;
+    height:100% !important;
+    min-height:0 !important;
+    padding:0 !important;
+    display:grid !important;
+    place-items:center !important;
+    border:0 !important;
+    background:transparent !important;
+    box-shadow:none !important;
+  }
+  .mobileEnemyCardTop .mobileEnemyPortrait video {
+    width:100% !important;
+    height:100% !important;
+    min-height:0 !important;
+    object-fit:cover !important;
+    object-position:center center !important;
+    border-radius:9px !important;
+  }
+}
+@media (max-width: 430px) {
+  .mobileEnemyCardTop .mobileEnemyHud {
+    grid-template-columns:minmax(0,1fr) 96px !important;
+    gap:9px !important;
+  }
+  .mobileEnemyCardTop .mobileEnemyPortrait {
+    width:96px !important;
+    height:96px !important;
+    padding:4px !important;
+  }
+  .mobileEnemyCardTop .d2EnemyCard { padding:8px 8px 9px !important; }
+  .mobileEnemyCardTop .d2EnemyName { font-size:clamp(17px,5.4vw,23px) !important; }
+  .mobileEnemyCardTop .d2EnemyNums { width:52px !important; max-width:52px !important; font-size:11px !important; }
+  .mobileEnemyCardTop .d2EnemyBarFrame { height:24px !important; margin-inline:3px !important; }
+}
