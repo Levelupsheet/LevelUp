@@ -12,11 +12,17 @@ export async function POST(req: Request) {
     const body = await req.json();
     const knowledgeBlockId = String(body?.knowledgeBlockId || "").trim();
     const replaceExisting = body?.replaceExisting === true;
+    const requestedSetId = String(body?.targetSetId || "").trim();
     if (!knowledgeBlockId) return NextResponse.json({ error: "knowledgeBlockId is required" }, { status: 400 });
     const block = await (prisma as any).knowledgeBlock.findUnique({ where: { id: knowledgeBlockId }, include: { generatedQuestions: { where: { reviewStatus: { in: ["APPROVED", "EDITED"] } }, orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }] } } });
     if (!block) return NextResponse.json({ error: "Knowledge block not found" }, { status: 404 });
     if (!block.generatedQuestions.length) return NextResponse.json({ error: "No approved generated questions to publish" }, { status: 400 });
-    const setId = `kb-${block.sourceBlockId}`;
+    const defaultSetId = `kb-${block.sourceBlockId}`;
+    const targetSet = requestedSetId ? await prisma.questionSet.findUnique({ where: { id: requestedSetId } }) : null;
+    if (requestedSetId && !targetSet) return NextResponse.json({ error: "Selected destination bank was not found" }, { status: 404 });
+    const setId = targetSet?.id || defaultSetId;
+    const setName = targetSet?.name || block.setName;
+    const setDomain = targetSet?.domain || block.domain;
     const placementFilter: any = { lane: block.lane, isActive: true };
     if (block.lane === "TRAINING") placementFilter.startingPosition = block.startingPosition;
     if (block.lane === "CERTIFICATIONS") placementFilter.certExam = block.certExam;
@@ -58,7 +64,7 @@ export async function POST(req: Request) {
       skippedDuplicateCount: number;
       activeQuestionCount: number;
     } = await prisma.$transaction(async (tx: any) => {
-      await tx.questionSet.upsert({ where: { id: setId }, update: { name: block.setName, domain: block.domain, status: QuestionSetStatus.PUBLISHED }, create: { id: setId, name: block.setName, domain: block.domain, status: QuestionSetStatus.PUBLISHED } });
+      await tx.questionSet.upsert({ where: { id: setId }, update: { status: QuestionSetStatus.PUBLISHED }, create: { id: setId, name: setName, domain: setDomain, status: QuestionSetStatus.PUBLISHED } });
       if (replaceExisting) await tx.questionSetPlacement.updateMany({ where: placementFilter, data: { isActive: false } });
       const existingPlacement = await tx.questionSetPlacement.findFirst({ where: { setId, lane: block.lane, startingPosition: block.lane === "TRAINING" ? block.startingPosition : null, certExam: block.lane === "CERTIFICATIONS" ? block.certExam : null } });
       if (!existingPlacement) {
@@ -97,6 +103,7 @@ export async function POST(req: Request) {
     return NextResponse.json({
       ok: true,
       setId,
+      setName,
       publishedCount: publishResult.insertedCount,
       appendedCount: publishResult.insertedCount,
       skippedDuplicateCount: publishResult.skippedDuplicateCount + duplicateGeneratedIds.size,
