@@ -420,6 +420,43 @@ export default function AdminContentStudioPage() {
     }
   }
 
+  async function generateAndPublishSelected() {
+    if (!selectedBlockId) return;
+    setLoading(true);
+    setMessage("");
+    try {
+      const generatedRes = await fetch("/api/admin/generate-questions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ knowledgeBlockIds: [selectedBlockId], autoApprove: true }),
+      });
+      const generated = await generatedRes.json();
+      if (!generatedRes.ok) throw new Error(generated?.error || "Generation failed");
+
+      const publishRes = await fetch("/api/admin/publish-questions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ knowledgeBlockId: selectedBlockId, targetSetId: publishBankId || null }),
+      });
+      const published = await publishRes.json();
+      if (!publishRes.ok) throw new Error(published?.error || "Publish failed");
+
+      setMessage(
+        `Auto-generated ${generated.generatedCount} quality-ready question(s) and added ${published.publishedCount} new question(s) to ${published.setName || "the selected DB bank"}${published.skippedDuplicateCount ? ` • skipped ${published.skippedDuplicateCount} duplicate/similar question(s)` : ""}${generated.rejectedCount ? ` • filtered ${generated.rejectedCount} weak question(s)` : ""}.`
+      );
+      await Promise.all([loadBlocks(), loadBankSummary()]);
+      setSelectedBlockId("");
+      setQuestions([]);
+      setGoldenTracking(null);
+      setLiveQuestions([]);
+      setReviewPanel("generated");
+    } catch (e: any) {
+      setMessage(e?.message || "Automatic generation and publish failed");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   async function publishSelected() {
     if (!selectedBlockId) return;
     setLoading(true);
@@ -656,6 +693,12 @@ export default function AdminContentStudioPage() {
                       <option key={bank.id} value={bank.id}>{bank.name} • {bank.domain} • {bank.questionCount} questions</option>
                     ))}
                   </select>
+                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 10, alignItems: "center" }}>
+                    <button className="primaryBtn" onClick={generateAndPublishSelected} disabled={loading || syncing}>
+                      {loading ? "Working..." : "Generate + add to selected bank"}
+                    </button>
+                    <span style={{ opacity: 0.68, fontSize: 12 }}>One click: generate → quality gate → remove duplicates → publish → remove completed block from this queue.</span>
+                  </div>
                 </div>
               ) : null}
 
