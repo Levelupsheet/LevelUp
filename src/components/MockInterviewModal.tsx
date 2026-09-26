@@ -168,9 +168,9 @@ export default function MockInterviewModal(props: { open: boolean; onClose: () =
   if (!open) return null;
 
   return (
-    <div className="luModalOverlay" role="dialog" aria-modal="true" aria-label="Boss Battle Interview" onMouseDown={onClose}>
+    <div className={"luModalOverlay interviewBattleOverlay interviewBattleOverlay--" + step} role="dialog" aria-modal="true" aria-label="Boss Battle Interview" onMouseDown={onClose}>
       <div
-        className="luModal"
+        className={"luModal interviewBattleModal interviewBattleModal--" + step}
         onMouseDown={(e) => e.stopPropagation()}
         style={{ width: step === "quiz" ? "min(96vw, 1800px)" : "min(92vw, 1100px)", maxWidth: step === "quiz" ? 1800 : 1100, position: "relative", overflow: "hidden" }}
       >
@@ -185,7 +185,7 @@ export default function MockInterviewModal(props: { open: boolean; onClose: () =
               <div className="dashboardEyebrow">INTERVIEW BATTLES</div><b className="interviewBattleTitle">Career Readiness Arena</b>
               <div><small className="luHint">Choose a track, clear the technical battle, then advance to the next interview stage.</small></div>
             </div>
-            <button className="secondaryBtn" type="button" onClick={onClose}>✕</button>
+            <button className="secondaryBtn interviewBattleClose" type="button" onClick={onClose} aria-label="Close interview battles">✕</button>
           </div>
         )}
 
@@ -244,10 +244,10 @@ export default function MockInterviewModal(props: { open: boolean; onClose: () =
           )}
 
           {step === "summary" && (
-            <div className="card interviewBattleSummary">
+            <div className={"card interviewBattleSummary " + ((lastSummary?.outcome === "victory" || lastSummary?.enemyHP === 0) ? "isVictory" : "isReview")}>
               <div className="dashboardEyebrow">BATTLE COMPLETE</div>
-              <h2>{(lastSummary?.outcome === "victory" || lastSummary?.enemyHP === 0) ? (stage === 2 ? "Congratulations — track cleared!" : "Great work — stage cleared!") : "Review and try again"}</h2>
-              <p className="muted">{(lastSummary?.outcome === "victory" || lastSummary?.enemyHP === 0) ? (stage === 2 ? "You completed both interview battles. Your progress and completion reward have been saved. This track now has a 12-hour cooldown; use that time to strengthen another training area." : "You passed the first battle and unlocked the advanced challenge. Your progress and completion reward have been saved.") : "Use the result to identify what to review, then return for another attempt."}</p>
+              <h2 className="interviewBattleSummaryTitle">{(lastSummary?.outcome === "victory" || lastSummary?.enemyHP === 0) ? (stage === 2 ? "Congratulations — track cleared!" : "Great work — stage cleared!") : "Review and try again"}</h2>
+              <p className="muted interviewBattleSummaryCopy">{(lastSummary?.outcome === "victory" || lastSummary?.enemyHP === 0) ? (stage === 2 ? "You completed both interview battles. Your progress and completion reward have been saved. This track now has a 12-hour cooldown; use that time to strengthen another training area." : "You passed the first battle and unlocked the advanced challenge. Your progress and completion reward have been saved.") : "Use the result to identify what to review, then return for another attempt."}</p>
               {rewardResult ? <div className="badge" style={{ marginBottom: 12 }}>🎉 Reward earned: +{Number(rewardResult.awarded || 0)} tokens • wallet {Number(rewardResult.walletTokens || 0)}</div> : null}
               <div className="interviewBattleStats">
                 <div><small>Result</small><strong>{String(lastSummary?.outcome || "complete").toUpperCase()}</strong></div>
