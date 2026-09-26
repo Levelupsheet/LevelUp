@@ -1018,3 +1018,46 @@
     min-height:0 !important; max-height:150px !important; object-fit:cover !important; object-position:center center !important; border-radius:8px !important;
   }
 }
+
+
+/* Desktop final sizing pass: smaller timer and no artificial enemy-rail void. */
+@media (min-width: 861px) {
+  .d2QuizShell .quizCountdownTimer {
+    min-width:92px !important;
+    width:auto !important;
+    height:34px !important;
+    min-height:34px !important;
+    padding:2px 13px !important;
+    gap:5px !important;
+    clip-path:polygon(8% 0,92% 0,100% 50%,92% 100%,8% 100%,0 50%) !important;
+  }
+  .d2QuizShell .quizCountdownTimer .quizCountdownIcon { font-size:13px !important; }
+  .d2QuizShell .quizCountdownTimer .quizCountdownValue { font-size:20px !important; line-height:1 !important; }
+  .d2QuizShell .quizCountdownTimer .quizCountdownUnit { font-size:9px !important; }
+  .d2QuizShell .quizCountdownTimer.critical[aria-label="0 seconds remaining"] {
+    min-width:112px !important; height:34px !important; min-height:34px !important; padding-inline:12px !important;
+  }
+  .d2QuizShell .quizCountdownTimer.critical[aria-label="0 seconds remaining"] .quizCountdownValue { font-size:12px !important; }
+
+  .d2QuizShell .batch8EnemyRail {
+    align-self:start !important;
+    height:max-content !important;
+    min-height:0 !important;
+    max-height:none !important;
+    padding:0 !important;
+    border:0 !important;
+    background:transparent !important;
+    box-shadow:none !important;
+  }
+  .d2QuizShell .batch8EnemyRail > .card {
+    min-height:0 !important;
+    height:max-content !important;
+    padding:5px !important;
+  }
+  .d2QuizShell .batch8EnemyRail > .card video {
+    height:clamp(108px,9.5vw,145px) !important;
+    max-height:145px !important;
+    aspect-ratio:auto !important;
+    object-fit:cover !important;
+  }
+}
