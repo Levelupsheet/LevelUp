@@ -39,8 +39,7 @@ export default function D2LifeOrb(props: {
         style={{ width: size, height: size }}
         aria-label="Player health orb"
       >
-        {/* Decorative wing/metal */}
-        <div className="d2OrbWing" aria-hidden />
+        <img className="d2UnitFrameAsset" src="/ui/unit-frame.png" alt="" draggable={false} aria-hidden />
 
         <div className="d2AssetBloodOrb" aria-hidden>
           <img src="/ui/blood-orb.webp" alt="" draggable={false} />
