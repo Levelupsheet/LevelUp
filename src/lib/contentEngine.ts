@@ -179,8 +179,19 @@ function plausibleTechnicalDistractors(answer: string, statement: string, block:
 }
 function chooseDistractors(fact: ReturnType<typeof normalizeFact>, block: NormalizedKnowledgeBlock, count = 3) {
   const answer = String(fact.answer || "").trim();
+  // Verified answers to neighboring facts are excellent distractors when they are
+  // the same kind of value. They are real technical terms, not invented nonsense.
+  const siblingAnswers = uniqueStrings(block.facts.map((item: any) => normalizeFact(item).answer))
+    .filter((value) => normalizeChoiceText(value) !== normalizeChoiceText(answer))
+    .filter((value) => {
+      if (looksLikePortFact(fact)) return /^\d+$/.test(String(value).trim());
+      const answerIsNumber = /^\d+$/.test(answer);
+      const valueIsNumber = /^\d+$/.test(String(value).trim());
+      return answerIsNumber === valueIsNumber;
+    });
   const pools = [
     uniqueStrings(fact.distractors),
+    siblingAnswers,
     plausibleTechnicalDistractors(answer, fact.statement, block),
     uniqueStrings(block.distractors).filter((value) => {
       const lower = normalizeChoiceText(value);
