@@ -1145,3 +1145,20 @@
     box-shadow:inset 0 0 0 1px #090807,inset 0 0 24px rgba(0,0,0,.55) !important;
   }
 }
+
+
+/* Forged unit-frame asset around the live player health orb. */
+.d2OrbFrame { position:relative; }
+.d2UnitFrameAsset {
+  position:absolute;
+  inset:-5%;
+  width:110%;
+  height:110%;
+  object-fit:contain;
+  z-index:5;
+  pointer-events:none;
+  filter:drop-shadow(0 4px 7px rgba(0,0,0,.82));
+}
+.d2OrbFrame .d2AssetBloodOrb { inset:12%; z-index:2; }
+.d2OrbFrame .d2OrbShine,
+.d2OrbFrame .d2OrbFlash { z-index:4; }
