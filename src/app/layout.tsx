@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import "./globals.css";
+import "./quiz-mobile-parity.css";
 
 export const metadata: Metadata = {
   title: "LevelUp Pro",
