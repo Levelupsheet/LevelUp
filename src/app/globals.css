@@ -4790,3 +4790,63 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
  .batch8LearningStage .desktopQuizPrompt{font-size:16px !important;}
  .batch8LearningStage .adaptiveTeachingCard{max-height:88px !important;}
 }
+
+
+/* ===== Quiz HUD checkpoint 9: content-height board, no empty lower arena ===== */
+@media(min-width:901px){
+ .d2QuizShell{
+   height:auto !important;
+   min-height:0 !important;
+   max-height:calc(100dvh - 18px) !important;
+   margin:6px auto !important;
+   overflow:hidden !important;
+ }
+ .d2QuizShell .modalHead{
+   flex:0 0 30px !important;
+   height:30px !important;
+   min-height:30px !important;
+   padding:1px 7px !important;
+ }
+ .d2QuizShell .modalHead>div:first-child{
+   padding-top:1px !important;
+   padding-bottom:1px !important;
+ }
+ .d2QuizBody{
+   flex:0 1 auto !important;
+   height:auto !important;
+   min-height:0 !important;
+   max-height:calc(100dvh - 48px) !important;
+   overflow:hidden !important;
+   padding:3px 5px 5px !important;
+ }
+ .batch8DesktopQuizGrid{
+   height:auto !important;
+   min-height:0 !important;
+   max-height:calc(100dvh - 54px) !important;
+   align-items:stretch !important;
+   overflow:hidden !important;
+ }
+ .batch8CombatRail,
+ .batch8LearningStage{
+   height:auto !important;
+   min-height:0 !important;
+   max-height:100% !important;
+ }
+ .batch8LearningStage{
+   align-self:start !important;
+ }
+ .batch8CombatRail{
+   align-self:stretch !important;
+ }
+ .batch8LearningStage .adaptiveTeachingCard{
+   max-height:104px !important;
+ }
+}
+@media(min-width:901px) and (max-height:820px){
+ .d2QuizShell{
+   max-height:calc(100dvh - 10px) !important;
+   margin:3px auto !important;
+ }
+ .d2QuizBody{max-height:calc(100dvh - 40px) !important;}
+ .batch8DesktopQuizGrid{max-height:calc(100dvh - 46px) !important;}
+}
