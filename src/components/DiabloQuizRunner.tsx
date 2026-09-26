@@ -1200,8 +1200,8 @@ const showExpandedExplanation = useMemo(() => {
                           aria-label={`${Math.max(0, state.timeLeft)} seconds remaining`}
                         >
                           <span className="quizCountdownIcon">⏱</span>
-                          <span className="quizCountdownValue">{Math.max(0, state.timeLeft)}</span>
-                          <span className="quizCountdownUnit">SEC</span>
+                          <span className="quizCountdownValue">{state.timeLeft <= 0 ? "TIME'S UP" : Math.max(0, state.timeLeft)}</span>
+                          {state.timeLeft > 0 ? <span className="quizCountdownUnit">SEC</span> : null}
                         </span>
                       ) : null}
                       <span className="badge">{labelForType(questionType)}</span>
@@ -1211,7 +1211,10 @@ const showExpandedExplanation = useMemo(() => {
 
                   <div className="desktopQuizPrompt" style={{ marginTop: 10, fontSize: "clamp(18px, 1.7vw, 32px)", lineHeight: 1.16, fontWeight: 900 }}>{question.prompt}</div>
 
-                  <DomainRuneBar domainLabel={domainLabel} mastery={currentMastery} tier={state.tier} />
+                  <div className="quizDomainMasteryLine">
+                    <span>DOMAIN MASTERY: {domainLabel}</span>
+                    <span>Lv{state.tier} • {masteryPercent}%</span>
+                  </div>
                   <div className="quizQuestionTrack" aria-label={`Question ${Math.min(state.idx + 1, combatQuestions.length)} of ${combatQuestions.length}`}>
                     {combatQuestions.map((_, idx) => {
                       const result = questionResults[idx];
@@ -1417,7 +1420,10 @@ const showExpandedExplanation = useMemo(() => {
                     <span className="badge">Stage {sessionStage}/{maxStages}</span>
                   </div>
                   <div className="mobileQuizPrompt quizPrompt">{question.prompt}</div>
-                  <DomainRuneBar domainLabel={domainLabel} mastery={currentMastery} tier={state.tier} />
+                  <div className="quizDomainMasteryLine">
+                    <span>DOMAIN MASTERY: {domainLabel}</span>
+                    <span>Lv{state.tier} • {masteryPercent}%</span>
+                  </div>
                   {renderQuestionInput({
                     question,
                     state,
