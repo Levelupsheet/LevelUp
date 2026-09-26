@@ -82,11 +82,12 @@ async function findActiveSession(userId: string) {
   });
 }
 
-async function buildNewSession(userId: string, questionCount = 10) {
+async function buildNewSession(userId: string, questionCount = 10, bankDomain?: string | null) {
   const bank = await buildQuestionBankSelection({
     lane: "TEST_NOW",
     questionCount,
     shouldShuffle: true,
+    bankDomain,
     userId,
     sessionState: { wrongStreak: 0, inRecovery: false, typeCounts: {} },
   });
@@ -177,11 +178,12 @@ export async function POST(req: Request) {
     const sessionUser = await getSessionUser();
     const userId = String(sessionUser?.id || "").trim();
     const questionCount = Math.max(1, Math.min(25, Number(body?.questionCount || 10) || 10));
+    const bankDomain = String(body?.bankDomain || "").trim().toUpperCase() || null;
     if (!userId) return NextResponse.json({ error: "Sign in required" }, { status: 401 });
     await ensureUser(userId);
     const existing = await findActiveSession(userId);
     if (existing) return NextResponse.json(serializeSession(existing));
-    const session = await buildNewSession(userId, questionCount);
+    const session = await buildNewSession(userId, questionCount, bankDomain);
     return NextResponse.json(serializeSession(session));
   } catch (e: any) {
     return NextResponse.json({ error: e?.message || "Failed to create Test Now session" }, { status: 500 });
