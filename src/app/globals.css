@@ -5261,3 +5261,142 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     overflow:hidden !important;
   }
 }
+
+
+/* ===== Quiz HUD checkpoint 16: Diablo reference hierarchy ===== */
+@media(min-width:901px){
+  /* During an active run the title belongs to the game frame, not the outer modal chrome. */
+  .practiceGameOuterHeader.gameActive{
+    min-height:52px !important;
+    justify-content:flex-end !important;
+    background:linear-gradient(180deg,rgba(5,5,5,.96),rgba(3,3,3,.9)) !important;
+  }
+  .practiceGameOuterHeader.gameActive .practiceGameOuterTitle{display:none !important;}
+
+  /* Central forged title plate. */
+  .d2QuizShell .modalHead{
+    height:64px !important;
+    min-height:64px !important;
+    padding:8px 74px !important;
+    background:
+      linear-gradient(90deg,transparent 4%,rgba(77,31,7,.13) 30%,rgba(120,47,8,.12) 50%,rgba(77,31,7,.13) 70%,transparent 96%),
+      linear-gradient(180deg,#080807,#030303) !important;
+    border-bottom:1px solid #65310e !important;
+  }
+  .d2QuizShell .modalTitle{
+    width:min(640px,54vw) !important;
+    min-height:48px !important;
+    padding:8px 92px !important;
+    color:#f2d39b !important;
+    font-size:clamp(18px,1.5vw,24px) !important;
+    letter-spacing:.075em !important;
+    background:
+      linear-gradient(90deg,transparent 0%,rgba(97,39,8,.28) 9%,transparent 15%,transparent 85%,rgba(97,39,8,.28) 91%,transparent 100%),
+      radial-gradient(ellipse at 50% 0%,rgba(230,91,11,.22),transparent 47%),
+      linear-gradient(180deg,#21130c,#0b0a08 52%,#050505) !important;
+    border-top:1px solid #a75a19 !important;
+    border-bottom:1px solid #71360f !important;
+    border-left:0 !important;
+    border-right:0 !important;
+    clip-path:polygon(8% 0,42% 0,45% 13%,48% 13%,50% 0,52% 13%,55% 13%,58% 0,92% 0,100% 50%,92% 100%,58% 100%,55% 87%,52% 87%,50% 100%,48% 87%,45% 87%,42% 100%,8% 100%,0 50%) !important;
+  }
+  .d2QuizShell .modalTitle::before{
+    top:-19px !important;
+    font-size:22px !important;
+    color:#d17a25 !important;
+  }
+
+  /* Question chamber: closer to the dark stone / iron reference. */
+  .batch8LearningStage{
+    border:2px solid #6e390e !important;
+    background:
+      radial-gradient(ellipse at 50% -10%,rgba(93,38,8,.08),transparent 38%),
+      linear-gradient(180deg,#080b0d,#030506) !important;
+    box-shadow:
+      inset 0 0 0 2px #020303,
+      inset 0 0 0 3px rgba(202,104,24,.12),
+      inset 0 0 24px rgba(0,0,0,.9) !important;
+  }
+  .batch8LearningStage .desktopQuizPrompt{
+    font-family:Georgia,"Times New Roman",serif !important;
+    font-size:clamp(19px,1.55vw,27px) !important;
+    color:#f1ede3 !important;
+    line-height:1.08 !important;
+  }
+
+  /* Framed answer slabs with brighter ember selection. */
+  .batch8LearningStage .d2ChoiceBtn{
+    min-height:38px !important;
+    padding:6px 12px 6px 52px !important;
+    border:1px solid #553016 !important;
+    background:linear-gradient(180deg,#101416,#07090a) !important;
+    box-shadow:inset 0 1px rgba(255,255,255,.025),inset 0 -2px #020202 !important;
+  }
+  .batch8LearningStage .d2ChoiceBtn:hover{
+    border-color:#a65a1c !important;
+    box-shadow:inset 0 0 15px rgba(137,53,7,.15),0 0 7px rgba(215,92,12,.13) !important;
+  }
+  .batch8LearningStage .d2ChoiceBtn.selected,
+  .batch8LearningStage .d2ChoiceBtn[aria-pressed="true"]{
+    border-color:#ff8a27 !important;
+    background:linear-gradient(180deg,#6c2a0d,#301006) !important;
+    box-shadow:
+      inset 0 0 18px rgba(255,103,16,.30),
+      0 0 0 1px #7f2c09,
+      0 0 11px rgba(255,86,8,.25) !important;
+  }
+  .batch8LearningStage .d2ChoiceBtn::before{
+    width:30px !important;
+    height:30px !important;
+    left:9px !important;
+    border-color:#a85a18 !important;
+    background:linear-gradient(145deg,#2c180b,#080706) !important;
+    box-shadow:inset 0 0 8px rgba(255,124,23,.18),0 0 0 2px #050403 !important;
+  }
+
+  /* Hint/action bars become a single forged control strip. */
+  .batch8LearningStage .quizHintRow,
+  .batch8LearningStage .stage8ActionDock{
+    gap:6px !important;
+  }
+  .batch8LearningStage .quizHintRow .d2Btn,
+  .batch8LearningStage .stage8ActionDock .d2Btn{
+    min-height:36px !important;
+    border:1px solid #4f321d !important;
+    background:linear-gradient(180deg,#171513,#090909) !important;
+    color:#eadbc1 !important;
+    font-family:Georgia,"Times New Roman",serif !important;
+    font-weight:800 !important;
+    letter-spacing:.04em !important;
+    clip-path:polygon(5% 0,95% 0,100% 50%,95% 100%,5% 100%,0 50%) !important;
+  }
+  .batch8LearningStage .stage8ActionDock .d2Btn:first-child{
+    border-color:#d94d13 !important;
+    background:linear-gradient(180deg,#e43b15,#8c1107 48%,#b91d0a) !important;
+    color:#fff0d2 !important;
+    box-shadow:inset 0 1px rgba(255,203,117,.42),inset 0 -4px rgba(72,5,2,.5),0 0 10px rgba(218,43,8,.22) !important;
+  }
+
+  /* Side rails: heavier framed-panel appearance from the target art. */
+  .batch8CombatRail{
+    border:2px solid #69370f !important;
+    outline:1px solid #160b05 !important;
+    background:
+      linear-gradient(90deg,rgba(111,45,8,.08),transparent 20%,transparent 80%,rgba(111,45,8,.08)),
+      linear-gradient(180deg,#090b0d,#030405) !important;
+    box-shadow:inset 0 0 0 2px #020202,inset 0 0 20px #000 !important;
+  }
+  .batch8CombatRail .card{
+    border-color:#583116 !important;
+    background:linear-gradient(180deg,#101214,#060708) !important;
+  }
+
+  /* Correct-answer panel gets the emerald Diablo reward-panel treatment. */
+  .batch8LearningStage .adaptiveTeachingCard{
+    border:1px solid #198b48 !important;
+    background:
+      radial-gradient(ellipse at 50% 0%,rgba(14,112,62,.18),transparent 62%),
+      linear-gradient(180deg,#05301f,#03140f) !important;
+    box-shadow:inset 0 0 20px rgba(0,0,0,.55),0 0 0 1px #06150d !important;
+  }
+}
