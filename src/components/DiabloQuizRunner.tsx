@@ -917,7 +917,15 @@ const showExpandedExplanation = useMemo(() => {
       return;
     }
     if (type === "PARTIAL_EXPLANATION") {
-      setHintMessage(`${partialExplanation(question.explanation)} (−${cost} XP)`);
+      const hintData = (question.data || {}) as any;
+      const protectedAnswers = [
+        ...(Array.isArray(question.choices) && typeof question.correctIndex === "number" && question.correctIndex >= 0 ? [question.choices[question.correctIndex]] : []),
+        ...safeArray<string>(hintData.answers),
+        ...safeArray<string>(hintData.expectedCommands),
+        ...safeArray<string>(hintData.expectedFindings),
+        String(hintData.correctAnswer ?? "").trim(),
+      ].filter(Boolean);
+      setHintMessage(`${partialExplanation(question.explanation, protectedAnswers)} (−${cost} XP)`);
       return;
     }
     setHintMessage(`${domainHintLabel(question.domainId || currentDomainId)} focus — use the strongest core concept first. (−${cost} XP)`);
