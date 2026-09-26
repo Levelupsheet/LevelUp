@@ -607,7 +607,7 @@ export default function DiabloQuizRunner(props: {
       const responseTimeMs = Math.max(500, Date.now() - questionStartRef.current);
       setQuestionResults((current) => {
         const next = current.length === combatQuestions.length ? [...current] : Array.from({ length: combatQuestions.length }, (_, i) => current[i] ?? null);
-        next[state.idx] = r.correct ? "correct" : "wrong";
+        next[state.idx] = r.correct ? "correct" : (next[state.idx] === "partial" ? "partial" : "wrong");
         return next;
       });
       const baseTier = ((question?.level || 1) as DifficultyTier);
@@ -1008,8 +1008,14 @@ const showExpandedExplanation = useMemo(() => {
       if (nextCommand) setCommandHistory((current) => [nextCommand, ...current.filter((value) => value !== nextCommand)].slice(0, 4));
     }
 
-    const partialRatio = Number(result?.partialScore ?? result?.score ?? 0);
-    const scaledXp = result.correct ? undefined : Math.round((effectiveQuestionTier * 15) * Math.max(0, Math.min(1, partialRatio)));
+    const partialRatio = Math.max(0, Math.min(1, Number(result?.partialScore ?? result?.score ?? 0)));
+    const resultTone: "correct" | "partial" | "wrong" = result.correct ? "correct" : partialRatio > 0 ? "partial" : "wrong";
+    setQuestionResults((current) => {
+      const next = current.length === combatQuestions.length ? [...current] : Array.from({ length: combatQuestions.length }, (_, i) => current[i] ?? null);
+      next[state.idx] = resultTone;
+      return next;
+    });
+    const scaledXp = result.correct ? undefined : Math.round((effectiveQuestionTier * 15) * partialRatio);
     submitManual({
       correct: result.correct,
       domainId: question.domainId,
