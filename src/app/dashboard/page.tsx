@@ -68,7 +68,7 @@ function getFreeSessionCooldownKey(userId: string | null) {
 }
 
 function labelPos(p: string){
-  if (p === "HELPDESK_SUPPORT") return "Helpdesk Support";
+  if (p === "HELPDESK_SUPPORT") return "Help Desk Wizard";
   if (p === "DESKTOP_TECHNICIAN") return "Desktop Technician";
   if (p === "CLOUD_ENGINEER") return "Cloud Engineer";
   return p;
@@ -77,7 +77,7 @@ function labelPos(p: string){
 function RoleCard(props: { title: string; desc: string; icon: string; imageSrc?: string; videoSrc?: string; selected: boolean; onClick: () => void }){
   return (
     <button className={"luRoleCard" + (props.selected ? " selected" : "")} onClick={props.onClick} type="button">
-      {props.videoSrc ? <video className="luRolePlayerImage" src={props.videoSrc} autoPlay loop muted playsInline aria-label={`${props.title} player`} /> : props.imageSrc ? <img className="luRolePlayerImage" src={props.imageSrc} alt="" aria-hidden="true" /> : <div className="luRoleIcon" aria-hidden="true">{props.icon}</div>}
+      {props.videoSrc ? <video className="luRolePlayerImage" src={props.videoSrc} autoPlay loop muted playsInline disablePictureInPicture controlsList="nodownload noremoteplayback" aria-label={`${props.title} player`} /> : props.imageSrc ? <img className="luRolePlayerImage" src={props.imageSrc} alt="" aria-hidden="true" /> : <div className="luRoleIcon" aria-hidden="true">{props.icon}</div>}
       <div className="luRoleTitle">{props.title}</div>
       <div className="luRoleDesc">{props.desc}</div>
       <div className="luRoleCheck" aria-hidden="true">{props.selected ? "✓" : ""}</div>
@@ -856,14 +856,14 @@ async function analyzeResumeStage12() {
                 <div><small className="luHint">This personalizes your learning path. You can change it later.</small></div>
               </div>
               {positionChangeMode && (
-                <button className="secondaryBtn" type="button" onClick={() => setShowPositionModal(false)}>✕</button>
+                <button className="secondaryBtn positionModalExit" type="button" onClick={() => setShowPositionModal(false)}>EXIT</button>
               )}
             </div>
 
             <div className="luModalBody">
               <div className="luGrid3">
                 <RoleCard
-                  title="Helpdesk Support"
+                  title="Help Desk Wizard"
                   desc="Entry-level IT support: tickets, troubleshooting, user support."
                   icon="🧑‍💻"
                   videoSrc="/video/player-idle.mp4"
@@ -955,10 +955,14 @@ async function analyzeResumeStage12() {
             </div>
           </div>
           {user?.startingPosition === "HELPDESK_SUPPORT" ? (
-            <div className="dashboardSelectedPlayer" aria-label="Selected player">
-              <video src="/video/player-idle.mp4" autoPlay loop muted playsInline aria-label="Helpdesk Support player" />
-              <div><small>SELECTED PLAYER</small><b>Helpdesk Support</b></div>
-            </div>
+            <button className="dashboardSelectedPlayer dashboardSelectedPlayerButton" type="button" aria-label="Change selected player: Help Desk Wizard" onClick={() => {
+              setPendingPos(user.startingPosition);
+              setPositionChangeMode(true);
+              setShowPositionModal(true);
+            }}>
+              <video src="/video/player-idle.mp4" autoPlay loop muted playsInline disablePictureInPicture controlsList="nodownload noremoteplayback" aria-label="Help Desk Wizard player" />
+              <div><small>SELECTED PLAYER</small><b>Help Desk Wizard</b></div>
+            </button>
           ) : null}
 
           <button className="primary dashboardSidebarStart" style={{ width: "100%", marginTop: 8, opacity: hasFreeStartCooldown ? 0.7 : 1 }} onClick={() => !hasFreeStartCooldown && setShowLaunchModal(true)} disabled={hasFreeStartCooldown} title={hasFreeStartCooldown ? `Free tier cooldown: ${freeStartCooldownLabel}` : undefined}>
@@ -1089,17 +1093,7 @@ async function analyzeResumeStage12() {
             </button>
 
             <div className="kpiRow">
-              <button className="dashboardHeroPlayer" type="button" onClick={() => {
-                setPendingPos(user?.startingPosition || null);
-                setPositionChangeMode(true);
-                setShowPositionModal(true);
-              }} aria-label={user?.startingPosition ? `Change selected player: ${labelPos(user.startingPosition)}` : "Choose player"}>
-                {user?.startingPosition === "HELPDESK_SUPPORT" ? (
-                  <video src="/video/player-idle.mp4" autoPlay loop muted playsInline />
-                ) : (
-                  <span className="dashboardHeroPlayerPlaceholder">Choose player</span>
-                )}
-              </button>
+              
               {hrBattleUnlocked ? <button className="gold" type="button" onClick={() => setMockInterviewOpen(true)}>Start HR Battle</button> : null}
               {((localLevel || 1) >= 5 || hasTechReady) ? <button className="primary" type="button" onClick={() => setMockInterviewOpen(true)}>Start Tech Battle</button> : null}
             </div>
