@@ -29,15 +29,17 @@ export async function POST(req: Request) {
         blockedQuestions: blockedQuality.map((row: any) => ({ id: row.id, prompt: row.prompt, qualityScore: row.quality.qualityScore, issues: row.quality.issues })),
       }, { status: 400 });
     }
+    // Similar prompts are an automation concern, not an admin chore. Keep the
+    // first quality-ready question from each near-duplicate cluster and publish
+    // the rest of the batch without forcing a manual review.
     const similarityClusters = clusterQuestionsBySimilarity(block.generatedQuestions as any[], 0.84).filter((cluster) => cluster.ids.length > 1);
-    if (similarityClusters.length) {
-      return NextResponse.json({
-        error: "Publishing blocked: closely similar approved prompts require review.",
-        similarityClusters,
-      }, { status: 400 });
+    const duplicateGeneratedIds = new Set<string>();
+    for (const cluster of similarityClusters) {
+      for (const id of cluster.ids.slice(1)) duplicateGeneratedIds.add(String(id));
     }
+    const publishableQuestions = block.generatedQuestions.filter((q: any) => !duplicateGeneratedIds.has(String(q.id)));
 
-    const incoming = block.generatedQuestions.map((q: any, index: number) => {
+    const incoming = publishableQuestions.map((q: any, index: number) => {
       const mapped = mapCandidateToDbQuestion({ prompt: q.prompt, type: q.type.toLowerCase() as any, difficulty: q.difficulty, explanation: q.explanation, tags: q.tags, data: (q.data as any) || {}, choices: Array.isArray(q.choices) ? (q.choices as string[]) : null, correctIndex: q.correctIndex }, index);
       const quality = validateQuestionQuality(mapped as any);
       return {
@@ -97,7 +99,8 @@ export async function POST(req: Request) {
       setId,
       publishedCount: publishResult.insertedCount,
       appendedCount: publishResult.insertedCount,
-      skippedDuplicateCount: publishResult.skippedDuplicateCount,
+      skippedDuplicateCount: publishResult.skippedDuplicateCount + duplicateGeneratedIds.size,
+      autoRemovedSimilarCount: duplicateGeneratedIds.size,
       activeQuestionCount: publishResult.activeQuestionCount,
       replaceExisting,
     });
