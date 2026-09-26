@@ -908,7 +908,7 @@ async function analyzeResumeStage12() {
           </div>
           {user?.startingPosition === "HELPDESK_SUPPORT" ? (
             <div className="dashboardSelectedPlayer" aria-label="Selected player">
-              <img src="/players/helpdesk-support.png" alt="Helpdesk Support player" />
+              <video src="/video/player-idle.mp4" autoPlay loop muted playsInline aria-label="Helpdesk Support player" />
               <div><small>SELECTED PLAYER</small><b>Helpdesk Support</b></div>
             </div>
           ) : null}
@@ -1041,12 +1041,16 @@ async function analyzeResumeStage12() {
             </button>
 
             <div className="kpiRow">
-              <button className="badge" type="button" onClick={() => {
+              <button className="dashboardHeroPlayer" type="button" onClick={() => {
                 setPendingPos(user?.startingPosition || null);
                 setPositionChangeMode(true);
                 setShowPositionModal(true);
-              }}>
-                <b>Path</b>: {user?.startingPosition ? labelPos(user.startingPosition) : "Choose path"}
+              }} aria-label={user?.startingPosition ? `Change selected player: ${labelPos(user.startingPosition)}` : "Choose player"}>
+                {user?.startingPosition === "HELPDESK_SUPPORT" ? (
+                  <video src="/video/player-idle.mp4" autoPlay loop muted playsInline />
+                ) : (
+                  <span className="dashboardHeroPlayerPlaceholder">Choose player</span>
+                )}
               </button>
               {hrBattleUnlocked ? <button className="gold" type="button" onClick={() => setMockInterviewOpen(true)}>Start HR Battle</button> : null}
               {((localLevel || 1) >= 5 || hasTechReady) ? <button className="primary" type="button" onClick={() => setMockInterviewOpen(true)}>Start Tech Battle</button> : null}
