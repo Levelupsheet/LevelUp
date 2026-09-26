@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { requireAdminRequest } from "@/app/api/_lib/adminGuard";
 import { prisma } from "@/lib/prisma";
 import { normalizeQuestionType, safeArray, uniqueSortedNumbers } from "@/lib/questionTypes";
-import { validateQuestionQuality } from "@/lib/questionQuality";
+import { clusterQuestionsBySimilarity, validateQuestionQuality } from "@/lib/questionQuality";
 
 
 function isMissingSubdomainColumnError(error: any) {
@@ -339,6 +339,22 @@ export async function POST(req: Request) {
   }
 }
 
+export async function DELETE(req: Request) {
+  const admin = await requireAdminRequest();
+  if (!admin.ok) return admin.response;
+  try {
+    const body = await req.json().catch(() => ({}));
+    const ids = Array.isArray(body?.ids)
+      ? body.ids.map((v: any) => String(v).trim()).filter(Boolean)
+      : [String(body?.id || "").trim()].filter(Boolean);
+    if (!ids.length) return NextResponse.json({ error: "id or ids required" }, { status: 400 });
+    const result = await prisma.mCQQuestion.deleteMany({ where: { id: { in: ids } } });
+    return NextResponse.json({ ok: true, deleted: result.count });
+  } catch (e: any) {
+    return NextResponse.json({ error: e?.message || "Failed to delete question" }, { status: 500 });
+  }
+}
+
 export async function PATCH(req: Request) {
   const admin = await requireAdminRequest();
   if (!admin.ok) return admin.response;
@@ -346,14 +362,30 @@ export async function PATCH(req: Request) {
     const body = await req.json();
 
     if (body?.setId && Array.isArray(body?.order)) {
-      const order = body.order as string[];
-      await prisma.$transaction(order.map((id, idx) =>
+      const setId = String(body.setId);
+      const rows = await listQuestionsForSet(setId);
+      const clusters = clusterQuestionsBySimilarity(rows as any[], 0.84).filter((cluster: any) => cluster.ids.length > 1);
+      const duplicateIds = new Set<string>();
+      for (const cluster of clusters) {
+        for (const id of cluster.ids.slice(1)) duplicateIds.add(String(id));
+      }
+      const exactSeen = new Set<string>();
+      for (const row of rows) {
+        const sig = normalizePromptSignature(row);
+        if (exactSeen.has(sig)) duplicateIds.add(String((row as any).id));
+        else exactSeen.add(sig);
+      }
+      if (duplicateIds.size) {
+        await prisma.mCQQuestion.deleteMany({ where: { setId, id: { in: [...duplicateIds] } } });
+      }
+      const remainingOrder = (body.order as string[]).filter((id) => !duplicateIds.has(String(id)));
+      await prisma.$transaction(remainingOrder.map((id, idx) =>
         prisma.mCQQuestion.update({
           where: { id },
           data: { sortOrder: idx },
         })
       ));
-      return NextResponse.json({ ok: true });
+      return NextResponse.json({ ok: true, removedDuplicates: duplicateIds.size });
     }
 
     if (body?.id) {
