@@ -5443,3 +5443,141 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
    font-weight:900;
  }
 }
+
+
+/* ===== Quiz HUD checkpoint 17: mobile visual parity with desktop ===== */
+@media(max-width:860px){
+  .d2QuizShell{
+    background:linear-gradient(180deg,#070707,#020303) !important;
+    border:1px solid #3c291b !important;
+  }
+  .d2QuizShell .modalHead{
+    position:relative !important;
+    min-height:62px !important;
+    padding:7px 82px 7px 10px !important;
+    justify-content:center !important;
+    background:linear-gradient(180deg,#080807,#030303) !important;
+    border-bottom:1px solid #65310e !important;
+  }
+  .d2QuizShell .modalTitle{
+    position:relative !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    width:min(70vw,430px) !important;
+    min-height:42px !important;
+    padding:7px 42px !important;
+    box-sizing:border-box !important;
+    text-align:center !important;
+    color:#f2d39b !important;
+    font-family:Georgia,"Times New Roman",serif !important;
+    font-size:clamp(15px,4.5vw,20px) !important;
+    font-weight:800 !important;
+    line-height:1 !important;
+    text-transform:uppercase !important;
+    letter-spacing:.055em !important;
+    white-space:nowrap !important;
+    background:radial-gradient(ellipse at 50% 0%,rgba(230,91,11,.22),transparent 47%),linear-gradient(180deg,#21130c,#0b0a08 52%,#050505) !important;
+    border-top:1px solid #a75a19 !important;
+    border-bottom:1px solid #71360f !important;
+    clip-path:polygon(8% 0,42% 0,46% 12%,50% 0,54% 12%,58% 0,92% 0,100% 50%,92% 100%,58% 100%,54% 88%,50% 100%,46% 88%,42% 100%,8% 100%,0 50%) !important;
+    text-shadow:0 2px 1px #000,0 0 8px rgba(255,119,23,.28) !important;
+  }
+  .d2QuizShell .modalTitle::before{
+    content:"☠";
+    position:absolute;
+    left:50%;
+    top:-15px;
+    transform:translateX(-50%);
+    color:#d17a25;
+    font-size:17px;
+    line-height:1;
+    text-shadow:0 2px #000,0 0 7px rgba(255,95,9,.5);
+  }
+  .d2QuizShell .modalHead .d2ExitBtn{
+    position:absolute !important;
+    right:8px !important;
+    top:50% !important;
+    transform:translateY(-50%) !important;
+    min-width:68px !important;
+    min-height:36px !important;
+    border-radius:2px !important;
+    clip-path:polygon(8px 0,calc(100% - 8px) 0,100% 50%,calc(100% - 8px) 100%,8px 100%,0 50%);
+    font-family:Georgia,"Times New Roman",serif !important;
+    letter-spacing:.06em;
+    box-shadow:inset 0 0 14px rgba(255,132,31,.35),0 0 7px rgba(224,56,5,.25) !important;
+  }
+  .d2QuizBody{background:linear-gradient(180deg,#050606,#020303) !important;}
+  .mobileQuizStack{gap:7px !important;}
+  .mobileQuizTopMeta{
+    border:1px solid #613510 !important;
+    border-radius:2px !important;
+    background:linear-gradient(180deg,#15100c,#080807) !important;
+    box-shadow:inset 0 0 0 1px #020202 !important;
+  }
+  .mobileQuizProgress{
+    color:#eee6d6 !important;
+    font-family:Georgia,"Times New Roman",serif !important;
+    font-weight:900 !important;
+  }
+  .mobileEnemyCard{
+    border:2px solid #69370f !important;
+    border-radius:2px !important;
+    background:linear-gradient(180deg,#090b0d,#030405) !important;
+    box-shadow:inset 0 0 0 2px #020202,inset 0 0 16px #000 !important;
+  }
+  .mobileEnemyPortrait{border:1px solid #583116 !important;border-radius:2px !important;}
+  .mobileQuizQuestionCard{
+    border:2px solid #6e390e !important;
+    border-radius:2px !important;
+    background:radial-gradient(ellipse at 50% -10%,rgba(93,38,8,.08),transparent 38%),linear-gradient(180deg,#080b0d,#030506) !important;
+    box-shadow:inset 0 0 0 2px #020303,inset 0 0 0 3px rgba(202,104,24,.12),inset 0 0 22px rgba(0,0,0,.9) !important;
+  }
+  .mobileQuizPrompt{
+    color:#f1ede3 !important;
+    font-family:Georgia,"Times New Roman",serif !important;
+    letter-spacing:.005em !important;
+    text-shadow:0 2px 1px #000,0 0 9px rgba(255,139,43,.08) !important;
+  }
+  .mobileQuizQuestionCard .d2ChoiceBtn{
+    position:relative;
+    border:1px solid #553016 !important;
+    border-radius:2px !important;
+    background:linear-gradient(180deg,#101416,#07090a) !important;
+    box-shadow:inset 0 1px rgba(255,255,255,.025),inset 0 -2px #020202 !important;
+  }
+  .mobileQuizQuestionCard .d2ChoiceBtn.selected,
+  .mobileQuizQuestionCard .d2ChoiceBtn[aria-pressed="true"]{
+    border-color:#ff8a27 !important;
+    background:linear-gradient(180deg,#6c2a0d,#301006) !important;
+    box-shadow:inset 0 0 16px rgba(255,103,16,.30),0 0 0 1px #7f2c09,0 0 9px rgba(255,86,8,.22) !important;
+  }
+  .mobileQuizQuestionCard .quizHintRow .d2Btn,
+  .mobileQuizQuestionCard .mobileQuizActions .d2Btn{
+    border-radius:2px !important;
+    border:1px solid #4f321d !important;
+    color:#eadbc1 !important;
+    font-family:Georgia,"Times New Roman",serif !important;
+    font-weight:800 !important;
+    letter-spacing:.03em !important;
+    background:linear-gradient(180deg,#171513,#090909) !important;
+    clip-path:polygon(5% 0,95% 0,100% 50%,95% 100%,5% 100%,0 50%) !important;
+  }
+  .mobileQuizQuestionCard .mobileQuizActions .d2Btn:first-child{
+    border-color:#d94d13 !important;
+    color:#fff0d2 !important;
+    background:linear-gradient(180deg,#e43b15,#8c1107 48%,#b91d0a) !important;
+    box-shadow:inset 0 1px rgba(255,203,117,.42),inset 0 -4px rgba(72,5,2,.5),0 0 9px rgba(218,43,8,.20) !important;
+  }
+  .mobileQuizQuestionCard .stage5MergedFeedbackCard{
+    border:1px solid #198b48 !important;
+    border-radius:2px !important;
+    background:radial-gradient(ellipse at 50% 0%,rgba(14,112,62,.18),transparent 62%),linear-gradient(180deg,#05301f,#03140f) !important;
+    box-shadow:inset 0 0 18px rgba(0,0,0,.55),0 0 0 1px #06150d !important;
+  }
+}
+@media(max-width:430px){
+  .d2QuizShell .modalHead{padding-right:72px !important;}
+  .d2QuizShell .modalTitle{width:min(68vw,330px) !important;padding-inline:28px !important;font-size:clamp(13px,4.2vw,17px) !important;}
+  .d2QuizShell .modalHead .d2ExitBtn{right:6px !important;min-width:62px !important;font-size:12px !important;}
+}
