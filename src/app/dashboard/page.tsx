@@ -150,6 +150,8 @@ export default function Dashboard() {
   const [positionChangeMode, setPositionChangeMode] = useState(false);
   const [pendingPos, setPendingPos] = useState<string | null>(null);
   const [posSaving, setPosSaving] = useState(false);
+  const [positionConfirmOpen, setPositionConfirmOpen] = useState(false);
+  const [positionError, setPositionError] = useState<string | null>(null);
 
   const [notes, setNotes] = useState<Notification[]>([]);
   const [tokenBalance, setTokenBalance] = useState<number>(0);
@@ -447,10 +449,13 @@ async function analyzeResumeStage12() {
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error ?? "Failed to save position");
       setShowPositionModal(false);
+      setPositionConfirmOpen(false);
       setPositionChangeMode(false);
-
+      setPositionError(null);
       setUser({ startingPosition: pendingPos });
+      if (typeof data?.tokenBalance === "number") setTokenBalance(data.tokenBalance);
     }catch(e: any){
+      setPositionError(e?.message ?? "Unable to change player/path.");
       console.error(e?.message ?? "Error");
     }finally{
       setPosSaving(false);
@@ -882,9 +887,52 @@ async function analyzeResumeStage12() {
               </div>
             </div>
 
-            <div className="luModalFooter">
-              <button className="primary" disabled={!pendingPos || posSaving} onClick={confirmPosition}>
-                {posSaving ? "Saving..." : "Start Leveling"}
+            <div className="luModalFooter" style={{ display: "grid", gap: 8 }}>
+              {positionChangeMode && pendingPos && pendingPos !== user?.startingPosition ? (
+                <div className="positionChangeFeeNotice">
+                  Changing your player/path costs <b>300 tokens</b>. Your balance: <b>{tokenBalance}</b>.
+                </div>
+              ) : null}
+              {positionError ? <div className="positionChangeError">{positionError}</div> : null}
+              <button
+                className="primary"
+                disabled={!pendingPos || posSaving || (positionChangeMode && pendingPos === user?.startingPosition)}
+                onClick={() => {
+                  setPositionError(null);
+                  if (positionChangeMode && user?.startingPosition && pendingPos !== user.startingPosition) {
+                    setPositionConfirmOpen(true);
+                  } else {
+                    void confirmPosition();
+                  }
+                }}
+              >
+                {posSaving ? "Saving..." : positionChangeMode ? "Change Player / Path" : "Start Leveling"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {positionConfirmOpen && pendingPos && (
+        <div className="luModalOverlay" style={{ zIndex: 10020 }}>
+          <div className="luModal positionConfirmModal" role="alertdialog" aria-modal="true" aria-label="Confirm player path change">
+            <div className="luModalHeader">
+              <div>
+                <b style={{ fontSize: 20 }}>Confirm Player / Path Change</b>
+                <div><small className="luHint">This purchase cannot be completed without your confirmation.</small></div>
+              </div>
+            </div>
+            <div className="luModalBody">
+              <div className="positionConfirmCost">300 <span>tokens</span></div>
+              <p>You are changing from <b>{user?.startingPosition ? labelPos(user.startingPosition) : "your current path"}</b> to <b>{labelPos(pendingPos)}</b>.</p>
+              <p>Your current balance is <b>{tokenBalance} tokens</b>{tokenBalance >= 300 ? `, leaving ${tokenBalance - 300} after the change` : ""}.</p>
+              {tokenBalance < 300 ? <div className="positionChangeError">You need at least 300 tokens to change your player/path.</div> : null}
+              {positionError ? <div className="positionChangeError">{positionError}</div> : null}
+            </div>
+            <div className="luModalFooter positionConfirmActions">
+              <button className="secondaryBtn" type="button" disabled={posSaving} onClick={() => { setPositionConfirmOpen(false); setPositionError(null); }}>Cancel</button>
+              <button className="gold" type="button" disabled={posSaving || tokenBalance < 300} onClick={() => void confirmPosition()}>
+                {posSaving ? "Changing..." : "Confirm & Pay 300 Tokens"}
               </button>
             </div>
           </div>
