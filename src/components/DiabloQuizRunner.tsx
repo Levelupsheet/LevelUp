@@ -505,7 +505,7 @@ export default function DiabloQuizRunner(props: {
     metaRight,
     forceFinish,
     exitHref = "/dashboard",
-    exitLabel = "Close",
+    exitLabel = "EXIT",
     onExit,
     onComplete,
     onXp,
@@ -1145,9 +1145,9 @@ const showExpandedExplanation = useMemo(() => {
           
         </div>
         {onExit ? (
-          <button className="btn" type="button" onClick={onExit}>{exitLabel}</button>
+          <button className="d2Btn d2ExitBtn" type="button" onClick={onExit}>EXIT</button>
         ) : (
-          <Link className="btn" href={exitHref}>{exitLabel}</Link>
+          <Link className="d2Btn d2ExitBtn" href={exitHref}>EXIT</Link>
         )}
       </div>
 
@@ -1337,7 +1337,7 @@ const showExpandedExplanation = useMemo(() => {
 
             <div className="quizEnemyRail batch8CombatRail batch8EnemyRail" style={{ display: "grid", gap: 12 }}>
               <D2EnemyHealthBar value={stageEnemyHP} max={currentStageConfig.hp} name={currentStageEnemyName.toUpperCase().slice(0, 18)} />
-              <ModelPanel title={currentStageEnemyName.toUpperCase().slice(0, 18)} src={enemyVideo} loop={!isEnemyHitVideo} onEnded={isEnemyHitVideo ? () => setHitPulse(null) : undefined} height="clamp(180px, 22vh, 280px)" damageText={damageFloat.enemy || null} damageTone="enemy" />
+              <ModelPanel title="" src={enemyVideo} loop={!isEnemyHitVideo} onEnded={isEnemyHitVideo ? () => setHitPulse(null) : undefined} height="clamp(180px, 22vh, 280px)" damageText={damageFloat.enemy || null} damageTone="enemy" />
             </div>
           </div>
         ) : (
@@ -1385,7 +1385,7 @@ const showExpandedExplanation = useMemo(() => {
                   <D2EnemyHealthBar value={stageEnemyHP} max={currentStageConfig.hp} name={currentStageEnemyName.toUpperCase().slice(0, 18)} />
                 </div>
                 <div className="mobileEnemyPortrait">
-                  <ModelPanel title={currentStageEnemyName.toUpperCase().slice(0, 18)} src={enemyVideo} loop={!isEnemyHitVideo} onEnded={isEnemyHitVideo ? () => setHitPulse(null) : undefined} height={92} damageText={damageFloat.enemy || null} damageTone="enemy" />
+                  <ModelPanel title="" src={enemyVideo} loop={!isEnemyHitVideo} onEnded={isEnemyHitVideo ? () => setHitPulse(null) : undefined} height={92} damageText={damageFloat.enemy || null} damageTone="enemy" />
                 </div>
               </div>
             </div>
