@@ -137,6 +137,23 @@ export async function getLearningContext(userId?: string | null) {
   return getAdaptiveLearningContext(userId);
 }
 
+
+async function getUnseenCyclePool(userId: string | null | undefined, lane: string, questions: any[]) {
+  const safeUserId = String(userId || "").trim();
+  if (!safeUserId || !questions.length) return { questions, cycleReset: false, seenCount: 0 };
+  const ids = questions.map((q) => String(q.id || "")).filter(Boolean);
+  if (!ids.length) return { questions, cycleReset: false, seenCount: 0 };
+  const rows = await (prisma as any).$queryRawUnsafe(
+    `SELECT DISTINCT "questionId" FROM "QuestionExposure" WHERE "userId" = $1 AND "questionId" = ANY($2)`,
+    safeUserId, ids
+  ).catch(() => []);
+  const seen = new Set((rows || []).map((row: any) => String(row.questionId)));
+  const unseen = questions.filter((q) => !seen.has(String(q.id)));
+  // When the learner has exhausted the bank, begin a fresh cycle. We keep the
+  // historical exposure records for analytics; selection simply becomes eligible again.
+  return { questions: unseen.length ? unseen : questions, cycleReset: unseen.length === 0 && seen.size > 0, seenCount: seen.size };
+}
+
 export async function buildQuestionBankSelection(args: {
   lane: string;
   questionCount: number;
@@ -150,7 +167,10 @@ export async function buildQuestionBankSelection(args: {
   const bank = await loadActiveBank({ lane: args.lane, startingPosition: args.startingPosition, certExam: args.certExam });
   const excludeSet = new Set((args.excludeIds || []).map((v) => String(v)));
   const candidatePool = bank.questions.filter((q) => !excludeSet.has(String(q.id)));
-  const sourcePool = candidatePool.length >= args.questionCount ? candidatePool : [...candidatePool, ...bank.questions.filter((q) => !candidatePool.some((c) => c.id === q.id))];
+  const cycle = await getUnseenCyclePool(args.userId, args.lane, candidatePool);
+  const sourcePool = cycle.questions.length >= args.questionCount
+    ? cycle.questions
+    : [...cycle.questions, ...candidatePool.filter((q) => !cycle.questions.some((c) => c.id === q.id))];
   const learning = await getLearningContext(args.userId);
   const calibrationMap = await getQuestionCalibrationMap(sourcePool.map((q) => String(q.id)));
   const blueprint = buildSessionBlueprint(args.questionCount, learning.weakestTargetDifficulty);
@@ -171,5 +191,6 @@ export async function buildQuestionBankSelection(args: {
     learning,
     blueprint,
     calibrationMap,
+    exposureCycle: { reset: cycle.cycleReset, previouslySeen: cycle.seenCount, availableUnseen: cycle.questions.length, bankSize: candidatePool.length },
   };
 }
