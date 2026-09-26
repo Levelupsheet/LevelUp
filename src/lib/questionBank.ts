@@ -168,9 +168,10 @@ export async function buildQuestionBankSelection(args: {
   const excludeSet = new Set((args.excludeIds || []).map((v) => String(v)));
   const candidatePool = bank.questions.filter((q) => !excludeSet.has(String(q.id)));
   const cycle = await getUnseenCyclePool(args.userId, args.lane, candidatePool);
-  const sourcePool = cycle.questions.length >= args.questionCount
-    ? cycle.questions
-    : [...cycle.questions, ...candidatePool.filter((q) => !cycle.questions.some((c) => c.id === q.id))];
+  // Keep an active exposure cycle strictly unseen-first. If only a partial
+  // unseen remainder is left, finish that remainder instead of mixing already-seen
+  // questions back into the same session. The following session starts a fresh cycle.
+  const sourcePool = cycle.questions;
   const learning = await getLearningContext(args.userId);
   const calibrationMap = await getQuestionCalibrationMap(sourcePool.map((q) => String(q.id)));
   const blueprint = buildSessionBlueprint(args.questionCount, learning.weakestTargetDifficulty);
