@@ -69,7 +69,7 @@ function getFreeSessionCooldownKey(userId: string | null) {
 
 function labelPos(p: string){
   if (p === "HELPDESK_SUPPORT") return "Help Desk Wizard";
-  if (p === "DESKTOP_TECHNICIAN") return "Desktop Technician";
+  if (p === "DESKTOP_TECHNICIAN") return "Desktop Barbarian";
   if (p === "CLOUD_ENGINEER") return "Cloud Engineer";
   return p;
 }
@@ -871,9 +871,10 @@ async function analyzeResumeStage12() {
                   onClick={() => setPendingPos("HELPDESK_SUPPORT")}
                 />
                 <RoleCard
-                  title="Desktop Technician"
+                  title="Desktop Barbarian"
                   desc="Hardware, imaging, endpoint tooling, onsite escalations."
                   icon="🛠️"
+                  videoSrc="/video/desktop-barbarian-idle.mp4"
                   selected={pendingPos === "DESKTOP_TECHNICIAN"}
                   onClick={() => setPendingPos("DESKTOP_TECHNICIAN")}
                 />
