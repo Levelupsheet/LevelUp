@@ -1362,6 +1362,17 @@ const showExpandedExplanation = useMemo(() => {
           </div>
         ) : (
           <div className="mobileQuizStack">
+            <div className="mobileCombatCard mobileEnemyCard mobileEnemyCardTop">
+              <div className="mobileEnemyHud">
+                <div className="mobileEnemyHealth">
+                  <D2EnemyHealthBar value={stageEnemyHP} max={currentStageConfig.hp} name={currentStageEnemyName.toUpperCase().slice(0, 18)} />
+                </div>
+                <div className="mobileEnemyPortrait">
+                  <ModelPanel title="" src={enemyVideo} loop={!isEnemyHitVideo} onEnded={isEnemyHitVideo ? () => setHitPulse(null) : undefined} height={92} damageText={damageFloat.enemy || null} damageTone="enemy" />
+                </div>
+              </div>
+            </div>
+
             <div className="mobileQuizTopMeta">
               <div className="mobileQuizProgress">Q{Math.min(state.idx + 1, combatQuestions.length)} / {combatQuestions.length}</div>
               <div className="mobileQuizBadges">
@@ -1397,17 +1408,6 @@ const showExpandedExplanation = useMemo(() => {
             <div className="stage7PowerStrip mobile quizPowerStrip">
               <button className={"d2Btn power" + (powerups.shieldActive ? " active" : "")} type="button" disabled={state.locked || powerups.shieldActive || (powerups.shieldUses + stage9Inventory.shield) <= 0} onClick={activateShield}>Shield {powerups.shieldActive ? "On" : (powerups.shieldUses + stage9Inventory.shield) > 0 ? `x${powerups.shieldUses + stage9Inventory.shield}` : "Locked"}</button>
               <button className={"d2Btn power" + (powerups.furyActive ? " active" : "")} type="button" disabled={state.locked || powerups.furyActive || (powerups.furyUses + stage9Inventory.fury) <= 0} onClick={activateFury}>Fury {powerups.furyActive ? "On" : (powerups.furyUses + stage9Inventory.fury) > 0 ? `x${powerups.furyUses + stage9Inventory.fury}` : "Locked"}</button>
-            </div>
-
-            <div className="mobileCombatCard mobileEnemyCard">
-              <div className="mobileEnemyHud">
-                <div className="mobileEnemyHealth">
-                  <D2EnemyHealthBar value={stageEnemyHP} max={currentStageConfig.hp} name={currentStageEnemyName.toUpperCase().slice(0, 18)} />
-                </div>
-                <div className="mobileEnemyPortrait">
-                  <ModelPanel title="" src={enemyVideo} loop={!isEnemyHitVideo} onEnded={isEnemyHitVideo ? () => setHitPulse(null) : undefined} height={92} damageText={damageFloat.enemy || null} damageTone="enemy" />
-                </div>
-              </div>
             </div>
 
             <div className={"d2QuestionCard d2QuizQuestionCard mobileQuizQuestionCard " + (encounterType === "boss" ? " bossQuestionCard" : "") + (hitPulse === "enemy" ? " d2HitFlash" : "") + ((question as any)?.isGolden ? " d2GoldenQuestionCard" : "") + (isGoldenBoss ? " d2GoldenBossCard" : "")}>
