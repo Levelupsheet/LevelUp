@@ -4446,3 +4446,71 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
  .batch8CombatRail{padding:3px !important;}
  .batch8CombatRail video{height:105px !important;}
 }
+
+
+/* ===== Quiz HUD checkpoint 6: content-fit shell + zero page scrollbar ===== */
+@media(min-width:901px){
+ html:has(.d2QuizShell),
+ body:has(.d2QuizShell){
+   height:100dvh !important;
+   max-height:100dvh !important;
+   overflow:hidden !important;
+   overscroll-behavior:none !important;
+ }
+ .d2QuizShell{
+   width:min(96vw,1540px) !important;
+   height:min(820px,calc(100dvh - 16px)) !important;
+   max-height:calc(100dvh - 16px) !important;
+   min-height:0 !important;
+   margin:8px auto !important;
+   overflow:hidden !important;
+ }
+ .d2QuizShell .modalHead{
+   flex:0 0 38px !important;
+   height:38px !important;
+   min-height:38px !important;
+ }
+ .d2QuizBody{
+   flex:1 1 auto !important;
+   height:auto !important;
+   min-height:0 !important;
+   max-height:calc(100% - 38px) !important;
+   overflow:hidden !important;
+ }
+ .batch8DesktopQuizGrid{
+   height:100% !important;
+   max-height:100% !important;
+   min-height:0 !important;
+   overflow:hidden !important;
+ }
+ .batch8CombatRail,
+ .batch8LearningStage{
+   height:100% !important;
+   max-height:100% !important;
+   min-height:0 !important;
+   overflow:hidden !important;
+ }
+ .batch8LearningStage{
+   justify-content:flex-start !important;
+ }
+ .batch8LearningStage .adaptiveTeachingCard{
+   flex:0 1 auto !important;
+   max-height:132px !important;
+   overflow:auto !important;
+   scrollbar-width:thin;
+ }
+}
+@media(min-width:901px) and (max-height:850px){
+ .d2QuizShell{
+   height:calc(100dvh - 10px) !important;
+   max-height:calc(100dvh - 10px) !important;
+   margin:5px auto !important;
+ }
+ .d2QuizShell .modalHead{
+   flex-basis:34px !important;
+   height:34px !important;
+   min-height:34px !important;
+ }
+ .d2QuizBody{max-height:calc(100% - 34px) !important;}
+ .batch8LearningStage .adaptiveTeachingCard{max-height:112px !important;}
+}
