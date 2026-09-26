@@ -5775,3 +5775,21 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
   .dashboardGrimdarkPortrait{width:72px;height:72px;}
   .dashboardGrimdarkSidebar .dashboardGrimdarkPortrait video{inset:10px !important;width:52px !important;height:52px !important;}
 }
+
+
+/* Checkpoint 2 regression fix: keep animated selected player above the opaque
+   center of the forged frame, while retaining the visible metal rim. */
+.dashboardGrimdarkPortraitFrame{ z-index:2 !important; }
+.dashboardGrimdarkSidebar .dashboardGrimdarkPortrait video{
+  inset:16px !important;
+  width:56px !important;
+  height:56px !important;
+  z-index:3 !important;
+}
+@media(max-width:860px){
+  .dashboardGrimdarkSidebar .dashboardGrimdarkPortrait video{
+    inset:13px !important;
+    width:46px !important;
+    height:46px !important;
+  }
+}
