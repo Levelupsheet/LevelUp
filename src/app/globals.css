@@ -4514,3 +4514,171 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
  .d2QuizBody{max-height:calc(100% - 34px) !important;}
  .batch8LearningStage .adaptiveTeachingCard{max-height:112px !important;}
 }
+
+
+/* ===== Quiz HUD batch 7: complete dark-fantasy game treatment ===== */
+@media(min-width:901px){
+ .d2QuizShell{
+   background:
+     radial-gradient(circle at 50% -18%,rgba(185,64,8,.18),transparent 30%),
+     linear-gradient(180deg,#0b0908 0,#05070a 18%,#030507 100%) !important;
+   border:2px solid #6f350e !important;
+   box-shadow:inset 0 0 0 2px #020202,inset 0 0 0 4px #241006,inset 0 0 60px #000,0 0 22px rgba(219,71,5,.18) !important;
+ }
+ .d2QuizShell .modalHead{
+   background:
+    linear-gradient(90deg,transparent 5%,rgba(91,37,9,.45) 30%,rgba(154,60,8,.18) 50%,rgba(91,37,9,.45) 70%,transparent 95%),
+    linear-gradient(#15110e,#050607) !important;
+   border-bottom:2px solid #6e310b !important;
+ }
+ .d2QuizShell .modalHead>div:first-child{
+   min-width:390px !important;
+   border:1px solid #a85a17 !important;
+   background:linear-gradient(180deg,#2b190c,#090909 48%,#1a0e08) !important;
+   clip-path:polygon(8% 0,42% 0,45% 18%,55% 18%,58% 0,92% 0,100% 50%,92% 100%,58% 100%,55% 82%,45% 82%,42% 100%,8% 100%,0 50%);
+   box-shadow:inset 0 0 16px rgba(255,119,20,.2),0 0 14px #000 !important;
+ }
+ .d2QuizShell .modalTitle{
+   font-family:Georgia,"Times New Roman",serif !important;
+   font-weight:900 !important;
+   letter-spacing:.09em !important;
+   color:#f4c67a !important;
+   text-shadow:0 2px 1px #000,0 0 10px rgba(235,99,15,.35) !important;
+ }
+ .batch8DesktopQuizGrid{
+   background:
+    linear-gradient(90deg,rgba(114,44,7,.08),transparent 16%,transparent 84%,rgba(114,44,7,.08)),
+    #030507 !important;
+ }
+ .batch8CombatRail,.batch8LearningStage{
+   border:2px solid #74400f !important;
+   outline:1px solid #160b05;
+   box-shadow:inset 0 0 0 2px #020303,inset 0 0 0 3px rgba(219,113,25,.17),inset 0 0 28px #000,0 0 0 1px #050302 !important;
+ }
+ .batch8PlayerRail,.batch8EnemyRail{padding-top:9px !important;}
+ .batch8CombatRail .card{
+   border:1px solid #593316 !important;
+   background:linear-gradient(#15171a,#07090b) !important;
+   box-shadow:inset 0 0 0 1px #020202,inset 0 0 12px #000 !important;
+ }
+ .batch8CombatRail video{
+   border:1px solid #754010 !important;
+   outline:2px solid #020202;
+   box-shadow:0 0 0 1px #2b1608,inset 0 0 18px #000 !important;
+ }
+ .batch8PlayerRail .d2LifeOrb{
+   filter:drop-shadow(0 0 8px rgba(214,22,20,.24));
+ }
+ .batch8EnemyRail .d2EnemyHealthBar{
+   border-color:#874313 !important;
+   box-shadow:inset 0 0 0 1px #000,0 0 8px rgba(205,50,8,.16) !important;
+ }
+ .batch8LearningStage .stageHeaderRow{
+   position:relative;
+   border:1px solid #754010 !important;
+   background:linear-gradient(90deg,#351507 0,#100c0a 35%,#090b0e 70%,#1e1008 100%) !important;
+ }
+ .batch8LearningStage .stageHeaderRow::after{
+   content:"";
+   position:absolute;left:12px;right:12px;bottom:-4px;height:1px;
+   background:linear-gradient(90deg,transparent,#bd641c,transparent);
+ }
+ .batch8LearningStage .stageLabelPill{
+   color:#ffd47f !important;
+   background:linear-gradient(180deg,#7c350d,#321405) !important;
+   border:1px solid #bd661d !important;
+   text-shadow:0 1px #000,0 0 7px rgba(255,122,20,.32);
+ }
+ .batch8LearningStage .desktopQuizPrompt{
+   font-family:Georgia,"Times New Roman",serif !important;
+   color:#f4efe4 !important;
+   text-shadow:0 2px 1px #000 !important;
+ }
+ .batch8LearningStage .stageProgressDots{
+   display:flex !important;gap:8px !important;align-items:center;
+ }
+ .batch8LearningStage .stageDot{
+   width:11px !important;height:11px !important;border-radius:1px !important;
+   transform:rotate(45deg);
+   border:1px solid #654326 !important;
+   background:#101216 !important;
+   box-shadow:inset 0 0 4px #000;
+ }
+ .batch8LearningStage .stageDot.active,
+ .batch8LearningStage .stageDot.current{
+   border-color:#ff9b32 !important;
+   background:linear-gradient(135deg,#ffb13e,#f24b08) !important;
+   box-shadow:0 0 7px rgba(255,91,8,.7),inset 0 0 3px #fff1b4 !important;
+ }
+ .batch8LearningStage .batch8PrimaryProgress .badge,
+ .batch8LearningStage .batch8SecondarySignals .badge{
+   border-color:#51341d !important;
+   background:#0b0d10 !important;
+   color:#d9c7ad !important;
+ }
+ .batch8LearningStage .d2ChoiceBtn{
+   border:1px solid #53341f !important;
+   background:linear-gradient(180deg,#15191d,#07090c) !important;
+   color:#eee8dc !important;
+ }
+ .batch8LearningStage .d2ChoiceBtn::before{
+   color:#f2bd63 !important;
+   border:1px solid #a75b18 !important;
+   background:radial-gradient(circle,#4a2009,#0b0c0e 70%) !important;
+   box-shadow:0 0 0 2px #020202,inset 0 0 8px rgba(238,94,10,.32) !important;
+ }
+ .batch8LearningStage .d2ChoiceBtn.selected{
+   color:#fff6e9 !important;
+   border-color:#ff8122 !important;
+   background:linear-gradient(90deg,#321006,#702307 48%,#301006) !important;
+   box-shadow:inset 0 0 20px rgba(255,91,8,.24),0 0 10px rgba(255,91,8,.36) !important;
+ }
+ .batch8LearningStage .quizHintRow .d2Btn{
+   position:relative;
+   color:#ead4ae !important;
+   border:1px solid #6f421d !important;
+   background:linear-gradient(#24201b,#08090b 54%,#18110b) !important;
+   clip-path:polygon(8px 0,calc(100% - 8px) 0,100% 50%,calc(100% - 8px) 100%,8px 100%,0 50%);
+ }
+ .batch8LearningStage .stage8ActionDock{
+   grid-template-columns:minmax(0,1.65fr) minmax(140px,.8fr) !important;
+ }
+ .batch8LearningStage .stage8ActionDock .d2Btn,
+ .batch8LearningStage .stage8ActionDock .gold{
+   font-family:Georgia,"Times New Roman",serif !important;
+   font-size:14px !important;
+   letter-spacing:.055em !important;
+   text-shadow:0 1px 1px #000 !important;
+ }
+ .batch8LearningStage .stage8ActionDock .d2Btn:first-child,
+ .batch8LearningStage .stage8ActionDock .gold{
+   color:#fff1d8 !important;
+   border-color:#e36516 !important;
+   background:linear-gradient(180deg,#b02b13 0,#6d0d07 42%,#370504 55%,#9b1c0d 100%) !important;
+   box-shadow:inset 0 0 0 1px rgba(255,179,77,.14),inset 0 0 15px rgba(255,95,12,.32),0 0 8px rgba(209,45,5,.26) !important;
+ }
+ .batch8LearningStage .adaptiveTeachingCard{
+   position:relative;
+   border:1px solid #23884a !important;
+   background:linear-gradient(180deg,#062a1c,#03120e) !important;
+   box-shadow:inset 0 0 0 2px #020805,inset 0 0 22px rgba(20,144,73,.18),0 0 7px rgba(22,120,62,.12) !important;
+ }
+ .batch8LearningStage .adaptiveTeachingCard::before{
+   content:"";
+   position:absolute;left:8px;right:8px;top:4px;height:1px;
+   background:linear-gradient(90deg,transparent,#38ba68,transparent);
+ }
+ .batch8LearningStage .stage5ScorePill{
+   color:#bff59b !important;
+   border:1px solid #2f9b4d !important;
+   background:#082d17 !important;
+ }
+ .batch8PlayerRail .stage7PowerStrip{
+   border-top:1px solid #48270f;padding-top:5px;
+ }
+ .batch8PlayerRail .stage7PowerStrip .d2Btn{
+   border:1px solid #5b391e !important;
+   color:#ddd0bb !important;
+   background:linear-gradient(#191b1e,#07090b) !important;
+ }
+}
