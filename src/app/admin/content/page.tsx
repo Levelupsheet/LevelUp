@@ -295,6 +295,30 @@ export default function AdminContentStudioPage() {
     }
   }
 
+  async function generateAllBlocks() {
+    if (!blocks.length) return;
+    setLoading(true);
+    setMessage("");
+    try {
+      const res = await fetch("/api/admin/generate-questions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ knowledgeBlockIds: blocks.map((block) => block.id), autoApprove: true }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Generation failed");
+      setMessage(`Generated and auto-approved ${data.generatedCount} quality-ready question(s) across ${blocks.length} knowledge block(s)${data.rejectedCount ? ` • filtered out ${data.rejectedCount} weak question(s)` : ""}. Select any block to review, or use Sync fact bank to live DB to import, generate, and publish the JSON in one step.`);
+      await loadBlocks();
+      if (selectedBlockId) await refreshReviewData(selectedBlockId);
+      setTab("review");
+      setReviewPanel("generated");
+    } catch (e: any) {
+      setMessage(e?.message || "Generation failed");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   async function generateForSelected() {
     if (!selectedBlockId) return;
     setLoading(true);
@@ -533,7 +557,8 @@ export default function AdminContentStudioPage() {
               <textarea value={rawJson} onChange={(e) => setRawJson(e.target.value)} style={{ width: "100%", minHeight: 420, marginTop: 14, borderRadius: 12, padding: 14, background: "rgba(0,0,0,0.28)", color: "inherit", border: "1px solid rgba(255,255,255,0.12)", fontFamily: "monospace", fontSize: 13 }} />
               {selectedBlock ? (
                 <div style={{ marginTop: 14, display: "flex", gap: 8, flexWrap: "wrap" }}>
-                  <button onClick={generateForSelected} className="primaryBtn" disabled={loading || syncing}>Generate questions for selected block</button>
+                  <button onClick={generateForSelected} className="primaryBtn" disabled={loading || syncing}>Generate selected block</button>
+                  <button onClick={generateAllBlocks} className="secondaryBtn" disabled={loading || syncing || !blocks.length}>Generate all imported blocks</button>
                   <span className="badge">Selected: {selectedBlock.title}</span>
                 </div>
               ) : null}
