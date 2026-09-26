@@ -622,3 +622,28 @@
   .mobileQuizStack > .mobileSessionIntel { order:4 !important; }
   .mobileEnemyCardTop { margin-bottom:0 !important; }
 }
+
+
+/* Paid player/path change confirmation */
+.positionChangeFeeNotice {
+  padding:10px 12px;border:1px solid rgba(220,146,49,.5);border-radius:10px;
+  background:linear-gradient(180deg,rgba(94,55,12,.24),rgba(26,17,8,.5));
+  color:#ead9b8;text-align:center;font-size:13px;
+}
+.positionChangeError {
+  padding:10px 12px;border:1px solid rgba(239,76,65,.55);border-radius:9px;
+  background:rgba(112,20,16,.25);color:#ffb6ad;font-weight:700;
+}
+.positionConfirmModal { width:min(92vw,520px) !important; }
+.positionConfirmCost {
+  margin:4px auto 16px;width:max-content;padding:10px 22px;
+  border:1px solid rgba(238,166,54,.62);border-radius:999px;
+  background:linear-gradient(180deg,#5a350e,#251405);
+  color:#ffd978;font-size:30px;font-weight:900;text-shadow:0 0 12px rgba(255,176,45,.3);
+}
+.positionConfirmCost span { font-size:14px;text-transform:uppercase;letter-spacing:.08em; }
+.positionConfirmActions { display:grid !important;grid-template-columns:1fr 1.35fr;gap:10px; }
+@media(max-width:600px){
+  .positionConfirmActions { grid-template-columns:1fr !important; }
+  .positionConfirmActions .gold { order:-1;min-height:48px; }
+}
