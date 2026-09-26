@@ -1375,7 +1375,21 @@ export default function AdminPage(){
     });
     const j = await r.json();
     if (!r.ok) { setErr(j?.error || "Failed to save order"); return; }
-    popToast("Order saved");
+    popToast(j?.removedDuplicates ? `Order saved • removed ${j.removedDuplicates} duplicate question(s)` : "Order saved");
+    await refreshQuestions(selectedSet);
+  }
+
+  async function deleteQuestion(id: string){
+    if (!selectedSet) return;
+    setErr(null);
+    const r = await fetch("/api/admin/questions", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id }),
+    });
+    const j = await r.json();
+    if (!r.ok) { setErr(j?.error || "Failed to delete question"); return; }
+    popToast("Question deleted");
     await refreshQuestions(selectedSet);
   }
 
@@ -1714,6 +1728,7 @@ export default function AdminPage(){
                       <div className="row" style={{ gap: 8, flexWrap:"wrap" }}>
                         <button onClick={() => moveQuestion(idx, -1)} disabled={idx === 0}>↑</button>
                         <button onClick={() => moveQuestion(idx, 1)} disabled={idx === questions.length - 1}>↓</button>
+                        <button className="danger" onClick={() => deleteQuestion(q.id)}>Delete</button>
                       </div>
                     </div>
                     <div className="row" style={{ marginTop: 8, flexWrap:"wrap" }}>
