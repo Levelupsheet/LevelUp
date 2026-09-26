@@ -1205,7 +1205,6 @@ const showExpandedExplanation = useMemo(() => {
                         </span>
                       ) : null}
                       <span className="badge">{labelForType(questionType)}</span>
-                      {metaRight ? <span className="badge">{metaRight}</span> : null}
                     </div>
                   </div>
 
