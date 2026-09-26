@@ -4204,3 +4204,26 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
  .batch8LearningStage .quizHintRow{margin-top:4px !important;}
  .batch8LearningStage .adaptiveTeachingCard{font-size:12px !important;}
 }
+
+
+/* ===== Emergency quiz modal positioning fix =====
+   Keep the HUD viewport-sized without taking it out of the dashboard modal flow. */
+@media(min-width:901px){
+ body:has(.d2QuizShell){overflow:auto !important;}
+ .d2QuizShell{
+   position:relative !important;
+   inset:auto !important;
+   width:min(98vw,1600px) !important;
+   max-width:1600px !important;
+   height:calc(100dvh - 72px) !important;
+   max-height:calc(100dvh - 72px) !important;
+   min-height:0 !important;
+   margin:0 auto !important;
+ }
+ .d2QuizShell .modalBody{
+   flex:1 1 auto !important;
+   height:auto !important;
+   min-height:0 !important;
+   overflow:hidden !important;
+ }
+}
