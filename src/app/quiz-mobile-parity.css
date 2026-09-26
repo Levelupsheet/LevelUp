@@ -506,3 +506,95 @@
   .quizQuestionSegment{height:13px !important;min-width:5px !important}
   .luRolePlayerImage{height:110px}
 }
+
+
+/* Mobile dashboard primary training CTA. Hidden on desktop because the sidebar already owns this action. */
+.dashboardMobileStartNow { display:none; }
+
+/* Interview battle end-state: tighter Diablo/game-card hierarchy and mobile-safe actions. */
+.interviewBattleSummary {
+  width:min(100%,920px);
+  margin:0 auto;
+  padding:clamp(20px,3vw,34px) !important;
+  border-color:rgba(187,92,24,.52) !important;
+  background:
+    radial-gradient(circle at 82% 8%,rgba(174,68,15,.14),transparent 30%),
+    linear-gradient(180deg,rgba(18,14,12,.97),rgba(5,7,8,.98)) !important;
+  box-shadow:inset 0 0 0 1px rgba(255,154,67,.06),0 20px 50px rgba(0,0,0,.42);
+}
+.interviewBattleSummaryTitle {
+  margin:7px 0 10px;
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:clamp(28px,4vw,46px);
+  line-height:1.02;
+  color:#f4e4c7;
+}
+.interviewBattleSummaryCopy { max-width:720px;font-size:16px;line-height:1.5; }
+.interviewBattleStats {
+  display:grid !important;
+  grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+  gap:10px !important;
+  margin:20px 0 !important;
+}
+.interviewBattleStats > div {
+  min-width:0;
+  padding:15px !important;
+  border:1px solid rgba(178,92,34,.42) !important;
+  border-radius:10px !important;
+  background:linear-gradient(180deg,rgba(25,24,24,.92),rgba(10,10,11,.96)) !important;
+}
+.interviewBattleStats small { display:block;color:#c8bcae;margin-bottom:7px; }
+.interviewBattleStats strong { display:block;color:#fff;font-size:20px;line-height:1.1;overflow-wrap:anywhere; }
+.interviewBattleSummaryActions {
+  display:grid !important;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px !important;
+}
+.interviewBattleSummaryActions > * {
+  width:100% !important;
+  min-height:48px;
+  display:flex !important;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  text-decoration:none !important;
+}
+@media(max-width:860px){
+  .dashboardMobileStartNow {
+    display:block;
+    width:100%;
+    min-height:48px;
+    margin:14px 0 4px;
+    font-size:16px;
+    font-weight:900;
+  }
+  .dashboardHero { align-items:stretch !important; }
+  .interviewBattleOverlay--summary { align-items:flex-start !important; padding:14px 10px 92px !important; overflow-y:auto !important; }
+  .interviewBattleModal--summary {
+    width:min(100%,680px) !important;
+    max-width:680px !important;
+    max-height:none !important;
+    overflow:visible !important;
+    margin:0 auto !important;
+  }
+  .interviewBattleModal--summary .luModalHeader {
+    padding:16px 16px 13px !important;
+    align-items:flex-start !important;
+  }
+  .interviewBattleModal--summary .interviewBattleTitle { font-size:24px !important;line-height:1.05; }
+  .interviewBattleModal--summary .luHint { font-size:13px;line-height:1.35;display:block;margin-top:5px; }
+  .interviewBattleClose { width:48px !important;height:48px !important;min-width:48px !important;padding:0 !important; }
+  .interviewBattleModal--summary .luModalBody { padding:12px !important; }
+  .interviewBattleSummary { padding:18px 14px !important;border-radius:12px !important; }
+  .interviewBattleSummaryTitle { font-size:30px;margin-top:6px; }
+  .interviewBattleSummaryCopy { font-size:15px;margin:8px 0 14px; }
+  .interviewBattleStats { grid-template-columns:repeat(2,minmax(0,1fr)) !important;gap:8px !important;margin:14px 0 16px !important; }
+  .interviewBattleStats > div { min-height:92px;padding:12px !important; }
+  .interviewBattleStats strong { font-size:18px; }
+  .interviewBattleSummaryActions { grid-template-columns:1fr !important;gap:9px !important; }
+  .interviewBattleSummaryActions > * { min-height:46px !important; }
+}
+@media(max-width:390px){
+  .interviewBattleStats { grid-template-columns:1fr !important; }
+  .interviewBattleStats > div { min-height:0; }
+}
