@@ -143,14 +143,34 @@ async function getUnseenCyclePool(userId: string | null | undefined, lane: strin
   if (!safeUserId || !questions.length) return { questions, cycleReset: false, seenCount: 0 };
   const ids = questions.map((q) => String(q.id || "")).filter(Boolean);
   if (!ids.length) return { questions, cycleReset: false, seenCount: 0 };
-  const rows = await (prisma as any).$queryRawUnsafe(
+
+  // A question counts as seen as soon as it has been placed into one of this
+  // learner's prior sessions, even if the learner never submitted an answer.
+  // QuestionExposure remains useful for answer analytics, but session history is
+  // the authoritative anti-memorization source for rotation.
+  const sessionRows = await (prisma as any).$queryRawUnsafe(
+    `SELECT DISTINCT gsq."questionId"
+       FROM "GameSessionQuestion" gsq
+       INNER JOIN "GameSession" gs ON gs."id" = gsq."sessionId"
+      WHERE gs."userId" = $1
+        AND gs."lane" = $2::"ContentLane"
+        AND gsq."questionId" = ANY($3)
+        AND gsq."questionId" IS NOT NULL`,
+    safeUserId, String(lane || "").toUpperCase(), ids
+  ).catch(() => []);
+
+  const exposureRows = await (prisma as any).$queryRawUnsafe(
     `SELECT DISTINCT "questionId" FROM "QuestionExposure" WHERE "userId" = $1 AND "questionId" = ANY($2)`,
     safeUserId, ids
   ).catch(() => []);
-  const seen = new Set((rows || []).map((row: any) => String(row.questionId)));
+
+  const seen = new Set([
+    ...(sessionRows || []).map((row: any) => String(row.questionId)),
+    ...(exposureRows || []).map((row: any) => String(row.questionId)),
+  ]);
   const unseen = questions.filter((q) => !seen.has(String(q.id)));
-  // When the learner has exhausted the bank, begin a fresh cycle. We keep the
-  // historical exposure records for analytics; selection simply becomes eligible again.
+  // Once every eligible question has appeared, reopen the complete bank for a
+  // new cycle. Historical records stay intact for mastery/calibration analytics.
   return { questions: unseen.length ? unseen : questions, cycleReset: unseen.length === 0 && seen.size > 0, seenCount: seen.size };
 }
 
