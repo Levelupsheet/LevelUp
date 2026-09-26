@@ -381,17 +381,73 @@ function definitionQuestions(block: NormalizedKnowledgeBlock, def: any): Candida
   const definition = String(def?.definition || "").trim();
   if (!term || !definition) return [];
   const aliases = uniqueStrings(def?.aliases || []);
-  // Prefer verified terms from neighboring definitions as realistic wrong answers.
-  // They are valid concepts in this knowledge block, but do not match this definition.
-  const siblingTerms = uniqueStrings(block.definitions.map((item: any) => item?.term))
-    .filter((value) => normalizeChoiceText(value) !== normalizeChoiceText(term));
-  const distractors = uniqueStrings([...(def?.distractors || []), ...siblingTerms, ...plausibleTechnicalDistractors(term, definition, block)]).filter((v) => normalizeChoiceText(v) !== normalizeChoiceText(term)).slice(0, 3);
-  if (distractors.length < 3) return [];
-  const choices = shuffle([term, ...distractors]);
-  const correctIndex = choices.findIndex((choice) => choice === term);
-  return [
-    { prompt: `Which term matches this definition: ${definition}`, type: "multiple_choice", difficulty: block.difficulty, explanation: `${term}: ${definition}`, tags: questionTags(block, [term]), choices, correctIndex, data: { ...toBase(block).data, ...questionMeta(block), choices, correctIndex, sourceDefinition: definition }, ...goldenDefaults(block, block.difficulty) },
-  ];
+  const siblingDefinitions = block.definitions
+    .map((item: any) => ({ term: String(item?.term || "").trim(), definition: String(item?.definition || "").trim() }))
+    .filter((item) => item.term && item.definition && normalizeChoiceText(item.term) !== normalizeChoiceText(term));
+  const siblingTerms = uniqueStrings(siblingDefinitions.map((item) => item.term));
+  const termDistractors = uniqueStrings([...(def?.distractors || []), ...siblingTerms, ...plausibleTechnicalDistractors(term, definition, block)])
+    .filter((v) => normalizeChoiceText(v) !== normalizeChoiceText(term))
+    .slice(0, 3);
+
+  const questions: CandidateQuestion[] = [];
+  if (termDistractors.length >= 3) {
+    const choices = shuffle([term, ...termDistractors]);
+    const correctIndex = choices.findIndex((choice) => choice === term);
+    questions.push({
+      prompt: `Which term matches this definition: ${definition}`,
+      type: "multiple_choice",
+      difficulty: block.difficulty,
+      explanation: `${term}: ${definition}`,
+      tags: questionTags(block, [term, "definition"]),
+      choices,
+      correctIndex,
+      data: { ...toBase(block).data, ...questionMeta(block), choices, correctIndex, sourceDefinition: definition, answer: term },
+      ...goldenDefaults(block, block.difficulty),
+    });
+  }
+
+  // Reverse the relationship as a separate comprehension check. Neighboring
+  // verified definitions become realistic wrong answers instead of invented text.
+  const definitionDistractors = uniqueStrings([
+    ...(Array.isArray(def?.definitionDistractors) ? def.definitionDistractors : []),
+    ...siblingDefinitions.map((item) => item.definition),
+  ]).filter((value) => normalizeChoiceText(value) !== normalizeChoiceText(definition)).slice(0, 3);
+  if (definitionDistractors.length >= 3) {
+    const choices = shuffle([definition, ...definitionDistractors]);
+    const correctIndex = choices.findIndex((choice) => choice === definition);
+    questions.push({
+      prompt: `Which description best matches ${term}?`,
+      type: "multiple_choice",
+      difficulty: block.difficulty,
+      explanation: `${term}: ${definition}`,
+      tags: questionTags(block, [term, "definition", "comprehension"]),
+      choices,
+      correctIndex,
+      data: { ...toBase(block).data, ...questionMeta(block), choices, correctIndex, sourceDefinition: definition, answer: definition },
+      ...goldenDefaults(block, block.difficulty),
+    });
+  }
+
+  // Keep fill-in-the-blank intentionally simple: one named term is missing,
+  // rather than asking the learner to reproduce an entire definition sentence.
+  questions.push({
+    prompt: `_____ is defined as: ${definition}`,
+    type: "fill_blank",
+    difficulty: Math.min(2, block.difficulty),
+    explanation: `${term}: ${definition}`,
+    tags: questionTags(block, [term, "definition", "recall"]),
+    data: {
+      ...toBase(block, Math.min(2, block.difficulty)).data,
+      ...questionMeta(block, Math.min(2, block.difficulty)),
+      answers: uniqueStrings([term, ...aliases]),
+      placeholder: "Type the missing term",
+      caseSensitive: false,
+      sourceDefinition: definition,
+    },
+    ...goldenDefaults(block, Math.min(2, block.difficulty)),
+  });
+
+  return questions;
 }
 function procedureQuestion(block: NormalizedKnowledgeBlock, procedure: any): CandidateQuestion | null {
   const steps = uniqueStrings(procedure?.steps || []);
