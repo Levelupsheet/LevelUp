@@ -117,10 +117,10 @@ function buildStageConfigs(title: string, maxStages: number, encounterType: "sta
   });
 }
 
-function ModelPanel(props: { title: string; src?: string; mirrored?: boolean; loop?: boolean; onEnded?: () => void; height?: number | string; damageText?: string | null; damageTone?: "enemy" | "player" | null }) {
-  const { title, src, mirrored = false, loop = true, onEnded, height = 230, damageText, damageTone } = props;
+function ModelPanel(props: { title: string; src?: string; mirrored?: boolean; loop?: boolean; onEnded?: () => void; height?: number | string; damageText?: string | null; damageTone?: "enemy" | "player" | null; compact?: boolean }) {
+  const { title, src, mirrored = false, loop = true, onEnded, height = 230, damageText, damageTone, compact = false } = props;
   return (
-    <div className="card" style={{ padding: 10, background: "rgba(255,255,255,0.04)", minHeight: 250 }}>
+    <div className="card" style={{ padding: 10, background: "rgba(255,255,255,0.04)", minHeight: compact ? 0 : 250 }}>
       {title ? <div style={{ fontSize: 12, fontWeight: 900, letterSpacing: 0.6, opacity: 0.88, marginBottom: 8 }}>{title}</div> : null}
       <div style={{ position: "relative", borderRadius: 16, overflow: "hidden", border: "1px solid rgba(255,255,255,0.08)", background: "rgba(5,10,20,0.85)" }}>
         {src ? (
@@ -1355,9 +1355,9 @@ const showExpandedExplanation = useMemo(() => {
               )}
             </div>
 
-            <div className="quizEnemyRail batch8CombatRail batch8EnemyRail" style={{ display: "grid", gap: 12 }}>
+            <div className="quizEnemyRail batch8CombatRail batch8EnemyRail" style={{ display: "grid", gap: 12, alignContent: "start", minHeight: 0 }}>
               <D2EnemyHealthBar value={stageEnemyHP} max={currentStageConfig.hp} name={currentStageEnemyName.toUpperCase().slice(0, 18)} />
-              <ModelPanel title="" src={enemyVideo} loop={!isEnemyHitVideo} onEnded={isEnemyHitVideo ? () => setHitPulse(null) : undefined} height="clamp(180px, 22vh, 280px)" damageText={damageFloat.enemy || null} damageTone="enemy" />
+              <ModelPanel compact title="" src={enemyVideo} loop={!isEnemyHitVideo} onEnded={isEnemyHitVideo ? () => setHitPulse(null) : undefined} height="clamp(180px, 22vh, 280px)" damageText={damageFloat.enemy || null} damageTone="enemy" />
             </div>
           </div>
         ) : (
