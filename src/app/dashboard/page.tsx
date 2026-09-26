@@ -74,10 +74,10 @@ function labelPos(p: string){
   return p;
 }
 
-function RoleCard(props: { title: string; desc: string; icon: string; selected: boolean; onClick: () => void }){
+function RoleCard(props: { title: string; desc: string; icon: string; imageSrc?: string; selected: boolean; onClick: () => void }){
   return (
     <button className={"luRoleCard" + (props.selected ? " selected" : "")} onClick={props.onClick} type="button">
-      <div className="luRoleIcon" aria-hidden="true">{props.icon}</div>
+      {props.imageSrc ? <img className="luRolePlayerImage" src={props.imageSrc} alt="" aria-hidden="true" /> : <div className="luRoleIcon" aria-hidden="true">{props.icon}</div>}
       <div className="luRoleTitle">{props.title}</div>
       <div className="luRoleDesc">{props.desc}</div>
       <div className="luRoleCheck" aria-hidden="true">{props.selected ? "✓" : ""}</div>
@@ -861,6 +861,7 @@ async function analyzeResumeStage12() {
                   title="Helpdesk Support"
                   desc="Entry-level IT support: tickets, troubleshooting, user support."
                   icon="🧑‍💻"
+                  imageSrc="/players/helpdesk-support.png"
                   selected={pendingPos === "HELPDESK_SUPPORT"}
                   onClick={() => setPendingPos("HELPDESK_SUPPORT")}
                 />
@@ -905,6 +906,12 @@ async function analyzeResumeStage12() {
               <div><small>Interview Prep</small></div>
             </div>
           </div>
+          {user?.startingPosition === "HELPDESK_SUPPORT" ? (
+            <div className="dashboardSelectedPlayer" aria-label="Selected player">
+              <img src="/players/helpdesk-support.png" alt="Helpdesk Support player" />
+              <div><small>SELECTED PLAYER</small><b>Helpdesk Support</b></div>
+            </div>
+          ) : null}
 
           <button className="primary dashboardSidebarStart" style={{ width: "100%", marginTop: 8, opacity: hasFreeStartCooldown ? 0.7 : 1 }} onClick={() => !hasFreeStartCooldown && setShowLaunchModal(true)} disabled={hasFreeStartCooldown} title={hasFreeStartCooldown ? `Free tier cooldown: ${freeStartCooldownLabel}` : undefined}>
             {hasFreeStartCooldown ? `Start Now! (${freeStartCooldownLabel})` : "Start Now!"}
