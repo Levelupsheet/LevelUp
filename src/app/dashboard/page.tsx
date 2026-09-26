@@ -74,10 +74,10 @@ function labelPos(p: string){
   return p;
 }
 
-function RoleCard(props: { title: string; desc: string; icon: string; imageSrc?: string; selected: boolean; onClick: () => void }){
+function RoleCard(props: { title: string; desc: string; icon: string; imageSrc?: string; videoSrc?: string; selected: boolean; onClick: () => void }){
   return (
     <button className={"luRoleCard" + (props.selected ? " selected" : "")} onClick={props.onClick} type="button">
-      {props.imageSrc ? <img className="luRolePlayerImage" src={props.imageSrc} alt="" aria-hidden="true" /> : <div className="luRoleIcon" aria-hidden="true">{props.icon}</div>}
+      {props.videoSrc ? <video className="luRolePlayerImage" src={props.videoSrc} autoPlay loop muted playsInline aria-label={`${props.title} player`} /> : props.imageSrc ? <img className="luRolePlayerImage" src={props.imageSrc} alt="" aria-hidden="true" /> : <div className="luRoleIcon" aria-hidden="true">{props.icon}</div>}
       <div className="luRoleTitle">{props.title}</div>
       <div className="luRoleDesc">{props.desc}</div>
       <div className="luRoleCheck" aria-hidden="true">{props.selected ? "✓" : ""}</div>
@@ -866,7 +866,7 @@ async function analyzeResumeStage12() {
                   title="Helpdesk Support"
                   desc="Entry-level IT support: tickets, troubleshooting, user support."
                   icon="🧑‍💻"
-                  imageSrc="/players/helpdesk-support.png"
+                  videoSrc="/video/player-idle.mp4"
                   selected={pendingPos === "HELPDESK_SUPPORT"}
                   onClick={() => setPendingPos("HELPDESK_SUPPORT")}
                 />
