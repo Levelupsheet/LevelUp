@@ -4054,3 +4054,153 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
  .batch8LearningStage .d2ChoiceBtn{min-height:36px !important;}
  .batch8LearningStage .adaptiveTeachingCard{padding:7px 9px !important;}
 }
+
+
+/* ===== Quiz HUD pass 3: viewport lock + forged frame detail ===== */
+@media(min-width:901px){
+ body:has(.d2QuizShell){overflow:hidden !important;}
+ .d2QuizShell{
+   position:fixed !important;
+   inset:6px !important;
+   width:auto !important;
+   max-width:none !important;
+   height:auto !important;
+   max-height:none !important;
+   margin:0 !important;
+   border:2px solid #8d470f !important;
+   border-radius:12px !important;
+   background:#05070a !important;
+   box-shadow:
+     inset 0 0 0 2px #130b06,
+     inset 0 0 0 4px rgba(224,104,17,.18),
+     inset 0 0 38px rgba(0,0,0,.92),
+     0 0 0 1px #020202,
+     0 0 24px rgba(210,69,7,.16) !important;
+ }
+ .d2QuizShell::before{
+   content:"";
+   position:absolute;inset:4px;pointer-events:none;z-index:8;
+   border:1px solid rgba(246,139,39,.32);
+   clip-path:polygon(0 0,18% 0,20% 3px,80% 3px,82% 0,100% 0,100% 100%,82% 100%,80% calc(100% - 3px),20% calc(100% - 3px),18% 100%,0 100%);
+ }
+ .d2QuizShell .modalHead{
+   position:relative;
+   min-height:54px !important;
+   justify-content:center !important;
+   border-bottom:2px solid #6f340c !important;
+   background:
+     linear-gradient(90deg,transparent,rgba(138,53,10,.15),transparent),
+     linear-gradient(#16120f,#070809) !important;
+ }
+ .d2QuizShell .modalHead>div:first-child{
+   position:absolute;left:50%;transform:translateX(-50%);
+   min-width:360px;text-align:center;
+   padding:7px 38px;
+   border:1px solid #a75a18;
+   clip-path:polygon(7% 0,93% 0,100% 50%,93% 100%,7% 100%,0 50%);
+   background:linear-gradient(180deg,#29180d,#090a0c 50%,#201209);
+   box-shadow:inset 0 0 14px rgba(236,105,15,.2),0 0 12px rgba(0,0,0,.8);
+ }
+ .d2QuizShell .modalHead .btn{position:absolute;right:10px;z-index:3;}
+ .d2QuizShell .modalTitle{font-size:20px !important;color:#f0c47b !important;}
+ .d2QuizBody{height:calc(100% - 54px) !important;overflow:hidden !important;}
+ .batch8DesktopQuizGrid{
+   padding:8px !important;
+   grid-template-columns:174px minmax(0,1fr) 174px !important;
+ }
+ .batch8CombatRail,.batch8LearningStage{
+   border:2px solid #75400f !important;
+   border-radius:3px !important;
+   box-shadow:
+     inset 0 0 0 2px #020303,
+     inset 0 0 0 3px rgba(225,119,27,.18),
+     inset 0 0 22px rgba(0,0,0,.88),
+     0 0 0 1px #160b04 !important;
+ }
+ .batch8CombatRail{position:relative;background:linear-gradient(#101216,#05070a) !important;}
+ .batch8CombatRail::before,.batch8LearningStage::before{
+   content:"◆";
+   position:absolute;left:-7px;top:-10px;z-index:4;
+   color:#d36917;font-size:15px;text-shadow:0 0 8px #e64d05,0 0 2px #000;
+ }
+ .batch8CombatRail::after{
+   content:"◆";
+   position:absolute;right:-7px;bottom:-10px;z-index:4;
+   color:#d36917;font-size:15px;text-shadow:0 0 8px #e64d05,0 0 2px #000;
+ }
+ .batch8LearningStage{padding:10px 12px !important;}
+ .batch8LearningStage .stageHeaderRow{
+   min-height:50px;
+   border-radius:2px !important;
+   border:1px solid #6f390f !important;
+   background:linear-gradient(90deg,rgba(76,30,8,.52),rgba(12,12,13,.92) 40%,rgba(31,16,8,.62)) !important;
+ }
+ .batch8LearningStage .stageLabelPill{
+   clip-path:polygon(7px 0,calc(100% - 7px) 0,100% 50%,calc(100% - 7px) 100%,7px 100%,0 50%);
+   border-radius:0 !important;
+   padding-left:14px !important;padding-right:14px !important;
+ }
+ .batch8LearningStage .desktopQuizPrompt{
+   padding:2px 4px 5px;
+   color:#f3eee3 !important;
+   border-bottom:1px solid rgba(145,77,26,.28);
+ }
+ .batch8LearningStage .d2ChoiceBtn{
+   border-radius:1px !important;
+   border-color:#633b20 !important;
+   background:linear-gradient(180deg,#15191e,#07090c) !important;
+ }
+ .batch8LearningStage .d2ChoiceBtn::before{
+   border-radius:3px !important;
+   transform:translateY(-50%) rotate(45deg) !important;
+   width:29px;height:29px;
+ }
+ .batch8LearningStage .d2ChoiceBtn::after{
+   content:"";
+   position:absolute;inset:3px;
+   border:1px solid rgba(238,131,35,.08);
+   pointer-events:none;
+ }
+ .batch8LearningStage .d2ChoiceBtn.selected{
+   border-color:#ff7a18 !important;
+   box-shadow:inset 0 0 24px rgba(207,67,5,.28),0 0 10px rgba(255,88,5,.34) !important;
+ }
+ .batch8LearningStage .stage8ActionDock{
+   display:grid !important;
+   grid-template-columns:2fr 1fr;
+   gap:7px !important;
+ }
+ .batch8LearningStage .stage8ActionDock .d2Btn,
+ .batch8LearningStage .stage8ActionDock .gold{
+   min-height:38px !important;
+   clip-path:polygon(10px 0,calc(100% - 10px) 0,100% 50%,calc(100% - 10px) 100%,10px 100%,0 50%);
+   border-radius:0 !important;
+ }
+ .batch8LearningStage .stage8ActionDock .d2Btn:first-child,
+ .batch8LearningStage .stage8ActionDock .gold{
+   background:linear-gradient(180deg,#a62913,#4b0905 48%,#9b1b0d) !important;
+   box-shadow:inset 0 0 16px rgba(255,132,31,.38),0 0 9px rgba(224,56,5,.32) !important;
+ }
+ .batch8LearningStage .adaptiveTeachingCard{
+   border-radius:2px !important;
+   border:1px solid #26874d !important;
+   box-shadow:inset 0 0 0 2px #03110b,inset 0 0 22px rgba(13,109,55,.19),0 0 0 1px #07150e !important;
+ }
+ .batch8CombatRail .card{border-radius:2px !important;}
+ .batch8CombatRail video{border-radius:0 !important;}
+}
+@media(min-width:901px) and (max-height:820px){
+ .d2QuizShell .modalHead{min-height:46px !important;}
+ .d2QuizShell .modalHead>div:first-child{padding:4px 30px;}
+ .d2QuizBody{height:calc(100% - 46px) !important;}
+ .batch8DesktopQuizGrid{padding:5px !important;grid-template-columns:150px minmax(0,1fr) 150px !important;}
+ .batch8CombatRail{padding:5px !important;}
+ .batch8CombatRail video{height:130px !important;}
+ .batch8LearningStage{padding:7px 9px !important;}
+ .batch8LearningStage .stageHeaderRow{min-height:42px;}
+ .batch8LearningStage .desktopQuizPrompt{font-size:18px !important;}
+ .batch8LearningStage .stage8CompactBar{margin-top:3px !important;}
+ .batch8LearningStage .d2ChoiceBtn{min-height:35px !important;}
+ .batch8LearningStage .quizHintRow{margin-top:4px !important;}
+ .batch8LearningStage .adaptiveTeachingCard{font-size:12px !important;}
+}
