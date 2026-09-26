@@ -23,6 +23,7 @@ type Props = {
   metaRight?: string;
   startingPosition?: string | null;
   certExam?: string | null;
+  bankDomain?: string | null;
   enemyName?: string;
   questionCount?: number;
   questionsOverride?: DiabloQuestion[] | null;
@@ -69,7 +70,7 @@ function mapQuestion(q: any, idx: number): DiabloQuestion {
 }
 
 export default function GameEngine(props: Props) {
-  const { lane, title, subtitle, timed = false, exitHref = "/dashboard", exitLabel = "Close", onExit, metaLeft, metaRight, startingPosition, certExam, enemyName = "Lagger", questionCount, questionsOverride, rulesOverride, onComplete, encounterType = questionsOverride?.length ? "boss" : "standard" } = props;
+  const { lane, title, subtitle, timed = false, exitHref = "/dashboard", exitLabel = "Close", onExit, metaLeft, metaRight, startingPosition, certExam, bankDomain, enemyName = "Lagger", questionCount, questionsOverride, rulesOverride, onComplete, encounterType = questionsOverride?.length ? "boss" : "standard" } = props;
   const [loading, setLoading] = useState(true);
   const [questions, setQuestions] = useState<DiabloQuestion[]>([]);
   const [setLabel, setSetLabel] = useState<string>(subtitle || title);
@@ -111,7 +112,7 @@ export default function GameEngine(props: Props) {
     const res = await fetch("/api/test-now/session", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ userId, questionCount: effectiveCount }),
+      body: JSON.stringify({ userId, questionCount: effectiveCount, bankDomain }),
       cache: "no-store" as any,
     });
     const json = await res.json().catch(() => null);
@@ -126,7 +127,7 @@ export default function GameEngine(props: Props) {
       setQuestions(FALLBACK_BY_LANE.TEST_NOW);
       setSetLabel(`${title} · Sample`);
     }
-  }, [effectiveCount, title]);
+  }, [effectiveCount, title, bankDomain]);
 
   const load = useCallback(async () => {
     setLoading(true);
