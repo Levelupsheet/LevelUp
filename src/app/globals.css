@@ -5661,3 +5661,117 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     border-radius:2px !important;
   }
 }
+
+
+/* ===== Grimdark Forged dashboard — checkpoint 2: character HUD + sidebar ===== */
+.dashboardGrimdarkSidebar .dashboardSidebarBrand{
+  position:relative;
+  padding:9px 10px !important;
+  border:1px solid #4c3424;
+  background:linear-gradient(180deg,#1b1814,#0a0908);
+  box-shadow:inset 0 0 0 2px #050505,inset 0 0 14px rgba(0,0,0,.5);
+}
+.dashboardGrimdarkSidebar .dashboardSidebarBrand::after{
+  content:"";
+  position:absolute;
+  left:12%;right:12%;bottom:-1px;height:1px;
+  background:linear-gradient(90deg,transparent,#b36c32,transparent);
+}
+.dashboardGrimdarkSidebar .dashboardSelectedPlayerButton{
+  position:relative;
+  display:grid !important;
+  grid-template-columns:88px minmax(0,1fr);
+  align-items:center;
+  gap:10px;
+  width:100%;
+  min-height:104px;
+  padding:8px 10px 8px 7px !important;
+  overflow:hidden;
+  border:1px solid #553821 !important;
+  border-radius:2px !important;
+  background:radial-gradient(circle at 25% 45%,rgba(126,51,18,.14),transparent 38%),linear-gradient(180deg,#181512,#080807) !important;
+  box-shadow:inset 0 0 0 2px #050505,inset 0 0 20px rgba(0,0,0,.58) !important;
+  text-align:left;
+}
+.dashboardGrimdarkPortrait{
+  position:relative;
+  display:block;
+  width:88px;
+  height:88px;
+  flex:0 0 88px;
+}
+.dashboardGrimdarkSidebar .dashboardGrimdarkPortrait video{
+  position:absolute !important;
+  inset:12px !important;
+  width:64px !important;
+  height:64px !important;
+  min-height:0 !important;
+  border:0 !important;
+  border-radius:50% !important;
+  object-fit:cover !important;
+  object-position:center 20% !important;
+  background:#050505;
+  box-shadow:none !important;
+}
+.dashboardGrimdarkPortraitFrame{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  z-index:2;
+  pointer-events:none;
+  filter:drop-shadow(0 4px 6px rgba(0,0,0,.85));
+}
+.dashboardGrimdarkSidebar .dashboardSelectedPlayerButton small{
+  color:#b88a55;
+  letter-spacing:.12em;
+  font-size:10px;
+}
+.dashboardGrimdarkSidebar .dashboardSelectedPlayerButton b{
+  display:block;
+  margin-top:4px;
+  color:#f0dfbf;
+  font-family:Cinzel,Georgia,serif;
+  font-size:15px;
+  line-height:1.2;
+  text-shadow:0 2px 2px #000;
+}
+.dashboardGrimdarkSidebar .dashboardSelectedPlayerButton:hover{
+  border-color:#87552d !important;
+  filter:brightness(1.08);
+}
+.dashboardGrimdarkSidebar .dashboardGrimdarkPrimary{
+  min-height:48px !important;
+  border:0 !important;
+  border-radius:0 !important;
+  background-image:url('/ui/grimdark/button-orange.png') !important;
+  background-repeat:no-repeat !important;
+  background-position:center !important;
+  background-size:100% 100% !important;
+  box-shadow:none !important;
+  color:#fff0ce !important;
+  font-family:Cinzel,Georgia,serif !important;
+  font-weight:800 !important;
+  text-shadow:0 2px 2px #000 !important;
+}
+.dashboardGrimdarkSidebar .dashboardGrimdarkPrimary:hover:not(:disabled){ filter:brightness(1.12) saturate(1.06); }
+.dashboardGrimdarkSidebar .dashboardGrimdarkPrimary:focus-visible{ outline:2px solid #dda157 !important; outline-offset:2px; }
+.dashboardGrimdarkSidebar .dashboardProgressHeading{
+  color:#d3a060;
+  font-family:Cinzel,Georgia,serif;
+  letter-spacing:.08em;
+}
+.dashboardGrimdarkSidebar hr{
+  border:0 !important;
+  height:1px;
+  background:linear-gradient(90deg,transparent,#614025,#a06a37,#614025,transparent) !important;
+}
+@media(max-width:860px){
+  .dashboardGrimdarkSidebar .dashboardSelectedPlayerButton{
+    grid-template-columns:72px minmax(0,1fr);
+    min-height:88px;
+  }
+  .dashboardGrimdarkPortrait{width:72px;height:72px;}
+  .dashboardGrimdarkSidebar .dashboardGrimdarkPortrait video{inset:10px !important;width:52px !important;height:52px !important;}
+}
