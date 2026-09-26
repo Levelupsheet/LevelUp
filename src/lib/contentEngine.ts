@@ -419,9 +419,21 @@ function logAnalysisQuestion(block: NormalizedKnowledgeBlock, source: any): Cand
 }
 function scenarioQuestion(block: NormalizedKnowledgeBlock, scenario: any): CandidateQuestion | null {
   const scenarioText = String(scenario?.scenario || "").trim();
-  const bestAction = String(scenario?.bestAction || "").trim();
+  const bestAction = String(scenario?.bestAction || scenario?.correctAnswer || "").trim();
   if (!scenarioText || !bestAction) return null;
-  const distractors = uniqueStrings([...(scenario?.distractors || []), ...plausibleTechnicalDistractors(bestAction, scenarioText, block)]).filter((v) => normalizeChoiceText(v) !== normalizeChoiceText(bestAction)).slice(0, 3);
+  // Prefer the source-authored options first. They are grounded wrong answers and
+  // are usually much more plausible than generic generated distractors.
+  const authoredOptions = uniqueStrings(Array.isArray(scenario?.options) ? scenario.options : [])
+    .filter((v) => normalizeChoiceText(v) !== normalizeChoiceText(bestAction));
+  const siblingWrongAnswers = uniqueStrings(block.scenarios.flatMap((item: any) =>
+    Array.isArray(item?.options) ? item.options : []
+  )).filter((v) => normalizeChoiceText(v) !== normalizeChoiceText(bestAction));
+  const distractors = uniqueStrings([
+    ...authoredOptions,
+    ...(scenario?.distractors || []),
+    ...siblingWrongAnswers,
+    ...plausibleTechnicalDistractors(bestAction, scenarioText, block),
+  ]).filter((v) => normalizeChoiceText(v) !== normalizeChoiceText(bestAction)).slice(0, 3);
   if (distractors.length < 3) return null;
   const choices = shuffle([bestAction, ...distractors]);
   const correctIndex = choices.findIndex((choice) => choice === bestAction);
