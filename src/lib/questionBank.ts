@@ -97,8 +97,11 @@ export async function loadActiveBank(args: {
   lane: string;
   startingPosition?: string | null;
   certExam?: string | null;
+  bankDomain?: string | null;
 }) {
   const where: any = { lane: String(args.lane || "").toUpperCase(), isActive: true };
+  const bankDomain = String(args.bankDomain || "").trim().toUpperCase();
+  if (bankDomain) where.set = { domain: bankDomain };
   if (where.lane === "TRAINING") where.startingPosition = args.startingPosition || null;
   if (where.lane === "CERTIFICATIONS") where.certExam = args.certExam || null;
 
@@ -181,10 +184,11 @@ export async function buildQuestionBankSelection(args: {
   excludeIds?: string[];
   startingPosition?: string | null;
   certExam?: string | null;
+  bankDomain?: string | null;
   userId?: string | null;
   sessionState?: { wrongStreak?: number; inRecovery?: boolean; typeCounts?: Record<string, number> } | null;
 }) {
-  const bank = await loadActiveBank({ lane: args.lane, startingPosition: args.startingPosition, certExam: args.certExam });
+  const bank = await loadActiveBank({ lane: args.lane, startingPosition: args.startingPosition, certExam: args.certExam, bankDomain: args.bankDomain });
   const excludeSet = new Set((args.excludeIds || []).map((v) => String(v)));
   const candidatePool = bank.questions.filter((q) => !excludeSet.has(String(q.id)));
   const cycle = await getUnseenCyclePool(args.userId, args.lane, candidatePool);
