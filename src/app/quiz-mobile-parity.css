@@ -977,3 +977,44 @@
   .mobileEnemyCardTop .d2EnemyNums { width:52px !important; max-width:52px !important; font-size:11px !important; }
   .mobileEnemyCardTop .d2EnemyBarFrame { height:24px !important; margin-inline:3px !important; }
 }
+
+
+/* Desktop enemy rail polish: compact combat identity aligned to the player rail. */
+@media (min-width: 861px) {
+  .d2QuizShell .batch8EnemyRail {
+    align-self:start !important; align-content:start !important; grid-auto-rows:max-content !important;
+    min-height:0 !important; height:auto !important; gap:8px !important; padding-bottom:0 !important;
+  }
+  .d2QuizShell .batch8EnemyRail > .d2EnemyCard {
+    min-height:0 !important; margin:0 !important; padding:8px 9px 9px !important;
+    border:1px solid #4c2b19 !important; border-radius:14px !important;
+    background:radial-gradient(ellipse at 50% 0,rgba(116,44,24,.12),transparent 60%),linear-gradient(180deg,#171719,#08090a) !important;
+    box-shadow:inset 0 0 0 2px #030303,inset 0 0 14px #000 !important;
+  }
+  .d2QuizShell .batch8EnemyRail .d2EnemyTop {
+    display:grid !important; grid-template-columns:minmax(0,1fr) auto !important; gap:6px !important;
+    align-items:center !important; min-height:38px !important; margin:0 2px 6px !important;
+  }
+  .d2QuizShell .batch8EnemyRail .d2EnemyName {
+    min-width:0 !important; font-size:clamp(17px,1.45vw,24px) !important; line-height:1 !important; white-space:normal !important;
+  }
+  .d2QuizShell .batch8EnemyRail .d2EnemyNums {
+    width:46px !important; max-width:46px !important; font-size:10px !important; line-height:1.12 !important;
+    text-align:right !important; white-space:normal !important; opacity:.82 !important;
+  }
+  .d2QuizShell .batch8EnemyRail .d2EnemyBarFrame {
+    height:24px !important; min-height:24px !important; margin:0 4px !important;
+    border:1px solid #482519 !important; border-radius:13px !important; background:#030303 !important;
+  }
+  .d2QuizShell .batch8EnemyRail .d2EnemyBarInner { inset:4px 7px !important; border-radius:9px !important; overflow:hidden !important; }
+  .d2QuizShell .batch8EnemyRail > .card {
+    min-height:0 !important; height:auto !important; margin:0 !important; padding:5px !important;
+    border:1px solid #754019 !important; border-radius:2px !important;
+    background:linear-gradient(180deg,#141719,#070809) !important;
+    box-shadow:inset 0 0 0 2px #030303,inset 0 0 13px #000 !important;
+  }
+  .d2QuizShell .batch8EnemyRail > .card video {
+    display:block !important; width:100% !important; height:auto !important; aspect-ratio:1/.78 !important;
+    min-height:0 !important; max-height:150px !important; object-fit:cover !important; object-position:center center !important; border-radius:8px !important;
+  }
+}
