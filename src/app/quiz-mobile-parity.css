@@ -1201,3 +1201,49 @@
     flex:0 0 auto !important;
   }
 }
+
+
+/* Grimdark Forged asset system — primary quiz actions.
+   Shared by desktop and mobile; retain native button semantics and focus states. */
+.d2QuizShell .grimdarkPrimaryAction {
+  position:relative !important;
+  min-width:136px !important;
+  min-height:52px !important;
+  padding:10px 28px !important;
+  border:0 !important;
+  border-radius:0 !important;
+  background-image:url('/ui/grimdark/button-orange.png') !important;
+  background-repeat:no-repeat !important;
+  background-position:center !important;
+  background-size:100% 100% !important;
+  box-shadow:none !important;
+  color:#fff3d4 !important;
+  font-family:Georgia,'Times New Roman',serif !important;
+  font-weight:900 !important;
+  letter-spacing:.04em !important;
+  text-shadow:0 2px 2px #000,0 0 5px rgba(255,128,35,.42) !important;
+  clip-path:none !important;
+}
+.d2QuizShell .grimdarkPrimaryAction:hover:not(:disabled) {
+  filter:brightness(1.12) saturate(1.08);
+}
+.d2QuizShell .grimdarkPrimaryAction:active:not(:disabled) {
+  transform:translateY(1px);
+  filter:brightness(.92);
+}
+.d2QuizShell .grimdarkPrimaryAction:focus-visible {
+  outline:2px solid #e7a348 !important;
+  outline-offset:2px !important;
+}
+.d2QuizShell .grimdarkPrimaryAction:disabled {
+  opacity:.48 !important;
+  filter:grayscale(.45) brightness(.7);
+}
+@media (max-width:860px) {
+  .d2QuizShell .grimdarkPrimaryAction {
+    width:100% !important;
+    min-width:0 !important;
+    min-height:48px !important;
+    background-size:100% 100% !important;
+  }
+}
