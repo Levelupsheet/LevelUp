@@ -3,6 +3,7 @@ import { requireAdminRequest } from "@/app/api/_lib/adminGuard";
 import { prisma } from "@/lib/prisma";
 import { generateQuestionsFromBlock, mapCandidateToDbQuestion, normalizeKnowledgeBlock } from "@/lib/contentEngine";
 import { QuestionSetStatus } from "@prisma/client";
+import { promptSignature, validateQuestionQuality } from "@/lib/questionQuality";
 export async function POST(req: Request) {
   const admin = await requireAdminRequest();
   if (!admin.ok) return admin.response;
@@ -10,11 +11,26 @@ export async function POST(req: Request) {
     const body = await req.json();
     const incoming = Array.isArray(body?.blocks) ? body.blocks : Array.isArray(body) ? body : [];
     if (!incoming.length) return NextResponse.json({ error: "blocks array is required" }, { status: 400 });
-    const summary = { blocksImported: 0, generatedQuestions: 0, approvedQuestions: 0, publishedQuestions: 0, setsPublished: 0 };
+    const summary = { blocksImported: 0, generatedQuestions: 0, approvedQuestions: 0, publishedQuestions: 0, skippedDuplicates: 0, rejectedWeak: 0, setsPublished: 0 };
     const results: Array<{ sourceBlockId: string; setId: string; lane: string; startingPosition: string | null; certExam: string | null; publishedCount: number }> = [];
     for (let i = 0; i < incoming.length; i += 1) {
       const block = normalizeKnowledgeBlock(incoming[i], i);
-      const candidates = generateQuestionsFromBlock(block);
+      const rawCandidates = generateQuestionsFromBlock(block);
+      const localSeen = new Set<string>();
+      const candidates = rawCandidates.filter((q: any) => {
+        const quality = validateQuestionQuality(q);
+        if (quality.qualityScore < 80 || quality.issues.length) {
+          summary.rejectedWeak += 1;
+          return false;
+        }
+        const signature = promptSignature(q);
+        if (localSeen.has(signature)) {
+          summary.skippedDuplicates += 1;
+          return false;
+        }
+        localSeen.add(signature);
+        return true;
+      });
       const setId = `kb-${block.sourceBlockId}`;
       const placementFilter: any = { lane: block.lane, isActive: true };
       if (block.lane === "TRAINING") placementFilter.startingPosition = block.startingPosition;
@@ -29,11 +45,24 @@ export async function POST(req: Request) {
         await tx.questionSet.upsert({ where: { id: setId }, update: { name: block.setName, domain: block.domain, status: QuestionSetStatus.PUBLISHED }, create: { id: setId, name: block.setName, domain: block.domain, status: QuestionSetStatus.PUBLISHED } });
         await tx.questionSetPlacement.updateMany({ where: placementFilter, data: { isActive: false } });
         await tx.questionSetPlacement.create({ data: { setId, lane: block.lane, startingPosition: block.lane === "TRAINING" ? block.startingPosition : null, certExam: block.lane === "CERTIFICATIONS" ? block.certExam : null, isActive: true } });
-        await tx.mCQQuestion.deleteMany({ where: { setId } });
-        const rows = candidates.map((q: any, idx: number) => ({ setId, ...mapCandidateToDbQuestion(q, idx) }));
+        const existing = await tx.mCQQuestion.findMany({ where: { setId }, select: { prompt: true, type: true, choices: true, data: true } });
+        const seen = new Set(existing.map((q: any) => promptSignature(q)));
+        const rows: any[] = [];
+        let nextOrder = Number((await tx.mCQQuestion.aggregate({ where: { setId }, _max: { sortOrder: true } }))?._max?.sortOrder ?? -1) + 1;
+        for (const q of candidates as any[]) {
+          const mapped: any = mapCandidateToDbQuestion(q, nextOrder);
+          const signature = promptSignature(mapped);
+          if (seen.has(signature)) {
+            summary.skippedDuplicates += 1;
+            continue;
+          }
+          seen.add(signature);
+          rows.push({ setId, ...mapped, sortOrder: nextOrder++ });
+        }
         if (rows.length) await tx.mCQQuestion.createMany({ data: rows });
+        summary.publishedQuestions += rows.length;
       });
-      summary.blocksImported += 1; summary.generatedQuestions += candidates.length; summary.approvedQuestions += candidates.length; summary.publishedQuestions += candidates.length; summary.setsPublished += 1;
+      summary.blocksImported += 1; summary.generatedQuestions += candidates.length; summary.approvedQuestions += candidates.length; summary.setsPublished += 1;
       results.push({ sourceBlockId: block.sourceBlockId, setId, lane: block.lane, startingPosition: block.startingPosition, certExam: block.certExam, publishedCount: candidates.length });
     }
     return NextResponse.json({ ok: true, summary, results });
