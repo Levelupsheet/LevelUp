@@ -647,3 +647,24 @@
   .positionConfirmActions { grid-template-columns:1fr !important; }
   .positionConfirmActions .gold { order:-1;min-height:48px; }
 }
+
+
+/* Selected player is controlled exclusively from the left rail. */
+.dashboardSelectedPlayerButton {
+  width:100%;font:inherit;color:inherit;text-align:left;cursor:pointer;
+  appearance:none;-webkit-appearance:none;
+}
+.dashboardSelectedPlayerButton:hover {
+  border-color:rgba(255,148,58,.72);
+  box-shadow:inset 0 0 0 1px rgba(255,138,39,.12),0 0 14px rgba(255,100,20,.12);
+}
+.positionModalExit {
+  min-width:88px !important;height:44px !important;padding:0 20px !important;
+  font-family:Georgia,"Times New Roman",serif !important;font-weight:900 !important;
+  letter-spacing:.08em !important;color:#fff1df !important;
+  border-color:#c64c25 !important;
+  background:linear-gradient(180deg,#b43a20,#65160f) !important;
+  clip-path:polygon(9% 0,91% 0,100% 50%,91% 100%,9% 100%,0 50%);
+}
+.luRolePlayerImage::-webkit-media-controls,
+.dashboardSelectedPlayer video::-webkit-media-controls { display:none !important; }
