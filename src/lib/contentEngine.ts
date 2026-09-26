@@ -328,16 +328,29 @@ function fillBlankFromFact(block: NormalizedKnowledgeBlock, factInput: any): Can
   const fact = normalizeFact(factInput);
   if (!fact.statement || !fact.answer) return null;
   const answer = String(fact.answer).trim();
-  const index = fact.statement.toLowerCase().indexOf(answer.toLowerCase());
-  if (index < 0) return null;
-  const prompt = fact.statement.slice(0, index) + "_____" + fact.statement.slice(index + answer.length);
+  const subject = String(fact.subject || "").trim();
+  const statementLower = fact.statement.toLowerCase();
+  const answerIndex = statementLower.indexOf(answer.toLowerCase());
+  const subjectIndex = subject ? statementLower.indexOf(subject.toLowerCase()) : -1;
+
+  // Prefer a literal source answer when it appears in the verified statement.
+  // When the source answer is a paraphrase, test the named subject instead of
+  // generating an awkward or impossible blank from text that is not present.
+  const blankValue = answerIndex >= 0 ? answer : subjectIndex >= 0 ? subject : "";
+  const blankIndex = answerIndex >= 0 ? answerIndex : subjectIndex;
+  if (!blankValue || blankIndex < 0) return null;
+
+  const prompt = fact.statement.slice(0, blankIndex) + "_____" + fact.statement.slice(blankIndex + blankValue.length);
+  const accepted = blankValue === answer
+    ? uniqueStrings([answer, ...fact.synonyms])
+    : uniqueStrings([subject, ...fact.synonyms]);
   return {
     prompt,
     type: "fill_blank",
     difficulty: Math.min(3, block.difficulty),
     explanation: buildTeachingExplanation(fact),
     tags: questionTags(block, [...fact.tags, "recall"]),
-    data: { ...toBase(block, Math.min(3, block.difficulty)).data, ...questionMeta(block, Math.min(3, block.difficulty)), answers: uniqueStrings([answer, ...fact.synonyms]), placeholder: "Type the missing term or value", caseSensitive: false, sourceStatement: fact.statement },
+    data: { ...toBase(block, Math.min(3, block.difficulty)).data, ...questionMeta(block, Math.min(3, block.difficulty)), answers: accepted, placeholder: "Type the missing term or value", caseSensitive: false, sourceStatement: fact.statement },
     ...goldenDefaults(block, Math.min(3, block.difficulty))
   };
 }
