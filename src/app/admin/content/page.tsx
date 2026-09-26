@@ -136,6 +136,7 @@ export default function AdminContentStudioPage() {
   const [liveQuestions, setLiveQuestions] = useState<LiveQuestion[]>([]);
   const [bankSummary, setBankSummary] = useState<Array<{ id: string; name: string; domain: string; questionCount: number }>>([]);
   const [publishBankId, setPublishBankId] = useState<string>("");
+  const [selectedAdminBankId, setSelectedAdminBankId] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
@@ -183,8 +184,11 @@ export default function AdminContentStudioPage() {
   }
 
   async function clearSelectedBank() {
-    const setId = goldenTracking?.setId;
-    if (!setId) return;
+    const setId = selectedAdminBankId;
+    if (!setId) {
+      setMessage("Select a live DB bank first.");
+      return;
+    }
     const bank = bankSummary.find((row) => row.id === setId);
     if (!window.confirm(`Clear all ${bank?.questionCount || liveQuestions.length} live questions from ${bank?.name || selectedBlock?.setName || "this bank"}? This cannot be undone.`)) return;
     setLoading(true);
@@ -197,7 +201,8 @@ export default function AdminContentStudioPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || "Failed to clear bank");
-      await Promise.all([loadLiveQuestions(setId), loadBankSummary(), loadGoldenTracking(selectedBlockId)]);
+      await Promise.all([loadLiveQuestions(setId), loadBankSummary(), selectedBlockId ? loadGoldenTracking(selectedBlockId) : Promise.resolve()]);
+      setSelectedAdminBankId("");
       setMessage(`Cleared ${data.deleted || 0} question(s) from the selected live DB bank. You can now generate a fresh pool.`);
     } catch (e: any) {
       setMessage(e?.message || "Failed to clear bank");
@@ -600,15 +605,45 @@ export default function AdminContentStudioPage() {
           <div className="card" style={{ padding: 10, marginBottom: 10, background: "rgba(255,255,255,0.035)" }}>
             <div style={{ fontSize: 12, fontWeight: 800, opacity: 0.75 }}>LIVE DB BANKS</div>
             <div style={{ fontSize: 20, fontWeight: 900, marginTop: 4 }}>{bankSummary.reduce((sum, row) => sum + row.questionCount, 0)} questions</div>
-            <div style={{ display: "grid", gap: 4, marginTop: 8, fontSize: 12 }}>
-              {bankSummary.filter((row) => row.questionCount > 0).map((row) => (
-                <div key={row.id} style={{ display: "flex", justifyContent: "space-between", gap: 8 }}>
-                  <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{row.name}</span>
-                  <strong>{row.questionCount}</strong>
+            <div style={{ marginTop: 10 }}>
+              <select
+                aria-label="Select live DB bank to manage"
+                value={selectedAdminBankId}
+                onChange={(e) => {
+                  const setId = e.target.value;
+                  setSelectedAdminBankId(setId);
+                  if (setId) {
+                    setReviewPanel("live");
+                    loadLiveQuestions(setId).catch((err) => setMessage(err.message));
+                  } else {
+                    setLiveQuestions([]);
+                  }
+                }}
+                style={{ ...fieldStyle, width: "100%", minHeight: 42, height: 42 }}
+              >
+                <option value="">Select a DB bank...</option>
+                {bankSummary.map((row) => (
+                  <option key={row.id} value={row.id}>{row.name} • {row.domain} • {row.questionCount} questions</option>
+                ))}
+              </select>
+              {selectedAdminBankId ? (
+                <div style={{ marginTop: 8, padding: 9, borderRadius: 10, background: "rgba(255,255,255,0.04)", fontSize: 12 }}>
+                  <div style={{ fontWeight: 800 }}>{bankSummary.find((row) => row.id === selectedAdminBankId)?.name || "Selected bank"}</div>
+                  <div style={{ opacity: 0.75, marginTop: 3 }}>
+                    {bankSummary.find((row) => row.id === selectedAdminBankId)?.questionCount || 0} questions • ready to manage
+                  </div>
                 </div>
-              ))}
+              ) : null}
             </div>
-            {goldenTracking?.setId ? <button type="button" className="secondaryBtn" style={{ marginTop: 10, width: "100%" }} onClick={clearSelectedBank} disabled={loading}>Clear selected bank</button> : null}
+            <button
+              type="button"
+              className="secondaryBtn"
+              style={{ marginTop: 10, width: "100%" }}
+              onClick={clearSelectedBank}
+              disabled={loading || !selectedAdminBankId}
+            >
+              {selectedAdminBankId ? "Clear selected bank" : "Select bank to clear"}
+            </button>
           </div>
           <div style={{ display: "grid", gap: 8, maxHeight: "70vh", overflow: "auto" }}>
             {blocks.map((block) => (
