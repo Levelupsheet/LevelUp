@@ -301,3 +301,70 @@
   .d2QuizShell .modalTitle { min-height: 35px !important; height: 35px !important; font-size: 13px !important; }
   .d2QuizShell .modalHead .d2ExitBtn { min-width: 58px !important; max-width: 64px !important; height: 32px !important; min-height: 32px !important; }
 }
+
+
+/* Quiz HUD semantics: one segment per question; diamonds show adaptive question mastery tier. */
+.quizQuestionTrack {
+  display: grid;
+  grid-template-columns: repeat(var(--question-count, 1), minmax(8px, 1fr));
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(8px, 1fr);
+  gap: 6px;
+  width: 100%;
+  margin-top: 9px;
+  padding: 8px 10px;
+  border: 1px solid rgba(117,66,25,.48);
+  background: linear-gradient(180deg,#0a0c0d,#030404);
+  box-shadow: inset 0 0 12px #000;
+}
+.quizQuestionSegment {
+  height: 13px;
+  min-width: 8px;
+  border: 1px solid #343434;
+  border-radius: 6px;
+  background: linear-gradient(180deg,#1a1d1e,#0b0d0e);
+  box-shadow: inset 0 1px rgba(255,255,255,.04);
+}
+.quizQuestionSegment.current {
+  border-color: #d66c1a;
+  box-shadow: 0 0 8px rgba(255,111,20,.45), inset 0 0 5px rgba(255,111,20,.18);
+}
+.quizQuestionSegment.correct {
+  border-color: #32b867;
+  background: linear-gradient(180deg,#35c66f,#0d6f39);
+  box-shadow: 0 0 7px rgba(43,206,108,.35);
+}
+.quizQuestionSegment.wrong {
+  border-color: #e5483d;
+  background: linear-gradient(180deg,#e94b42,#8d1515);
+  box-shadow: 0 0 7px rgba(235,55,47,.35);
+}
+.quizQuestionSegment.partial {
+  border-color: #e3bd37;
+  background: linear-gradient(180deg,#f0cc49,#9a6d0c);
+  box-shadow: 0 0 7px rgba(239,194,47,.35);
+}
+.quizMasteryDiamonds {
+  display:flex;
+  gap:9px;
+  align-items:center;
+  margin:7px 3px 1px;
+}
+.quizMasteryDiamond {
+  width:14px;
+  height:14px;
+  transform:rotate(45deg);
+  border:1px solid #6a421f;
+  background:#0b0c0d;
+  box-shadow:inset 0 0 4px #000;
+}
+.quizMasteryDiamond.active {
+  border-color:#ff8a25;
+  background:linear-gradient(135deg,#ffb23f,#c74708);
+  box-shadow:0 0 8px rgba(255,105,15,.5),inset 0 0 3px #ffe0a0;
+}
+@media (max-width:860px) {
+  .quizQuestionTrack { gap:3px; padding:6px; overflow:hidden; }
+  .quizQuestionSegment { height:11px; min-width:5px; }
+  .quizMasteryDiamonds { margin-left:5px; }
+}
