@@ -181,8 +181,13 @@ export async function POST(req: Request) {
     const bankDomain = String(body?.bankDomain || "").trim().toUpperCase() || null;
     if (!userId) return NextResponse.json({ error: "Sign in required" }, { status: 401 });
     await ensureUser(userId);
-    const existing = await findActiveSession(userId);
-    if (existing) return NextResponse.json(serializeSession(existing));
+    // Starting Test Now from the dashboard is an explicit new run. Do not
+    // restore a stale ACTIVE session (including TIME'S UP/locked feedback).
+    // Preserve old attempts for history, but mark them abandoned first.
+    await (prisma as any).gameSession.updateMany({
+      where: { userId, mode: "TEST_NOW", status: "ACTIVE" },
+      data: { status: "ABANDONED", completedAt: new Date() },
+    });
     const session = await buildNewSession(userId, questionCount, bankDomain);
     return NextResponse.json(serializeSession(session));
   } catch (e: any) {
