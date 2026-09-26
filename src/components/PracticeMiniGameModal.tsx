@@ -152,8 +152,8 @@ export default function PracticeMiniGameModal(props: {
           <video className="luVideoEl" autoPlay loop muted playsInline preload="metadata"><source src="/video/blackhole-loop.mp4" type="video/mp4" /></video>
           <div className="luVideoVignette" />
         </div>
-        <div className="luModalHeader" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <div><b style={{ fontSize: 18 }}>{title}</b><div><small className="luHint">{subtitle}</small></div></div>
+        <div className={"luModalHeader practiceGameOuterHeader" + ((step === "quiz" || step === "boss") ? " gameActive" : "")} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div className="practiceGameOuterTitle"><b style={{ fontSize: 18 }}>{title}</b><div><small className="luHint">{subtitle}</small></div></div>
           <button className="secondaryBtn" type="button" onClick={onClose}>✕</button>
         </div>
 
@@ -170,7 +170,7 @@ export default function PracticeMiniGameModal(props: {
           {step === "quiz" && (
             <GameEngine
               lane={lane}
-              title=""
+              title={title}
               subtitle={subtitle}
               timed={kind === "test"}
               startingPosition={kind === "position" ? path : undefined}
