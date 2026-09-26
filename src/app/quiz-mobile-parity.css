@@ -415,3 +415,94 @@
   .quizDomainMasteryLine { font-size:10px; letter-spacing:.75px; }
   .quizCountdownTimer.critical[aria-label="0 seconds remaining"] { min-width:108px !important; }
 }
+
+
+/* HUD polish pass: compact timer + forged question result rail. */
+.quizCountdownTimer {
+  min-width: 128px !important;
+  width: auto !important;
+  height: 44px !important;
+  min-height: 44px !important;
+  padding: 4px 18px !important;
+  justify-content: center !important;
+  white-space: nowrap !important;
+  clip-path: polygon(9% 0,91% 0,100% 50%,91% 100%,9% 100%,0 50%) !important;
+}
+.quizCountdownTimer .quizCountdownValue { font-size: 25px !important; line-height:1 !important; }
+.quizCountdownTimer .quizCountdownUnit { font-size: 10px !important; }
+.quizCountdownTimer.critical[aria-label="0 seconds remaining"] {
+  min-width: 148px !important;
+  height: 44px !important;
+  padding-inline: 16px !important;
+}
+.quizQuestionTrack {
+  position:relative;
+  display:flex !important;
+  gap:7px !important;
+  align-items:center;
+  height:34px;
+  margin-top:8px;
+  padding:7px 11px !important;
+  border:1px solid #71390e !important;
+  border-radius:2px !important;
+  background:
+    linear-gradient(90deg,rgba(91,40,8,.16),transparent 12%,transparent 88%,rgba(91,40,8,.16)),
+    linear-gradient(180deg,#0b0d0e,#030404) !important;
+  box-shadow:inset 0 0 0 1px #020202,inset 0 0 15px #000,0 1px 0 rgba(211,102,24,.15) !important;
+  overflow:hidden;
+}
+.quizQuestionTrack::before,.quizQuestionTrack::after{
+  content:"";position:absolute;top:3px;bottom:3px;width:2px;background:#9b4d12;opacity:.45
+}
+.quizQuestionTrack::before{left:4px}.quizQuestionTrack::after{right:4px}
+.quizQuestionSegment {
+  flex:1 1 0 !important;
+  height:16px !important;
+  min-width:10px !important;
+  border-radius:6px !important;
+  border:1px solid #35393b !important;
+  background:linear-gradient(180deg,#202426,#0c0e0f) !important;
+  box-shadow:inset 0 1px 1px rgba(255,255,255,.07),inset 0 -2px 3px #050505 !important;
+}
+.quizQuestionSegment.current {
+  border-color:#ff8a22 !important;
+  background:linear-gradient(180deg,#2b2119,#120b07) !important;
+  box-shadow:0 0 9px rgba(255,112,18,.65),inset 0 0 8px rgba(255,118,22,.22) !important;
+}
+.quizQuestionSegment.correct {
+  border-color:#42e68a !important;
+  background:linear-gradient(180deg,#38dd83,#087844 72%,#064d2d) !important;
+  box-shadow:0 0 8px rgba(42,221,124,.42),inset 0 1px rgba(215,255,231,.45) !important;
+}
+.quizQuestionSegment.wrong {
+  border-color:#ff5a4d !important;
+  background:linear-gradient(180deg,#ef5049,#a61718 72%,#6d0c0d) !important;
+  box-shadow:0 0 8px rgba(244,54,46,.42),inset 0 1px rgba(255,220,210,.35) !important;
+}
+.quizQuestionSegment.partial {
+  border-color:#ffd34f !important;
+  background:linear-gradient(180deg,#f2cf45,#a7790b 72%,#6d4b05) !important;
+  box-shadow:0 0 8px rgba(242,193,49,.42),inset 0 1px rgba(255,245,190,.4) !important;
+}
+.luRolePlayerImage {
+  width:100%;height:132px;object-fit:cover;object-position:center;
+  border-radius:10px;border:1px solid rgba(255,130,35,.45);
+  box-shadow:inset 0 0 0 1px #000,0 0 16px rgba(255,100,20,.12);
+  margin-bottom:10px;background:#050607;
+}
+.dashboardSelectedPlayer {
+  display:grid;grid-template-columns:72px minmax(0,1fr);gap:10px;align-items:center;
+  margin:8px 0 12px;padding:7px;border:1px solid rgba(255,120,30,.42);
+  border-radius:12px;background:linear-gradient(180deg,rgba(20,22,24,.9),rgba(6,7,8,.92));
+}
+.dashboardSelectedPlayer img { width:72px;height:72px;object-fit:cover;border-radius:9px;border:1px solid rgba(255,132,34,.45); }
+.dashboardSelectedPlayer small { display:block;font-size:9px;letter-spacing:.08em;opacity:.68;margin-bottom:3px; }
+.dashboardSelectedPlayer b { display:block;font-size:12px;line-height:1.15; }
+@media(max-width:860px){
+  .quizCountdownTimer{min-width:104px !important;height:38px !important;min-height:38px !important;padding:3px 13px !important}
+  .quizCountdownTimer .quizCountdownValue{font-size:20px !important}
+  .quizCountdownTimer.critical[aria-label="0 seconds remaining"]{min-width:122px !important;height:38px !important}
+  .quizQuestionTrack{height:30px;gap:4px !important;padding:6px 7px !important}
+  .quizQuestionSegment{height:13px !important;min-width:5px !important}
+  .luRolePlayerImage{height:110px}
+}
