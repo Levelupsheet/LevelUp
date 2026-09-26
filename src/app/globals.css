@@ -5002,3 +5002,43 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 @media(max-width:900px){
   .quizCountdownTimer{font-variant-numeric:tabular-nums;font-weight:900}
 }
+
+
+/* ===== Quiz HUD checkpoint 12: timer + feedback fit polish ===== */
+@media(min-width:901px){
+  .quizCountdownTimer{
+    min-width:126px;
+    height:42px;
+    padding:0 17px;
+    top:51%;
+  }
+  .quizCountdownTimer.safe{
+    color:#71e98b;
+    border-color:#318c4b;
+    background:linear-gradient(180deg,#102a19,#06110a);
+  }
+  .quizCountdownTimer.warning{
+    color:#ffd65c;
+    border-color:#b67a16;
+    background:linear-gradient(180deg,#3b2b08,#160f03);
+    box-shadow:inset 0 0 12px rgba(0,0,0,.82),0 0 13px rgba(255,188,49,.48);
+  }
+  .quizCountdownTimer.critical{
+    border-color:#d13a2e;
+    animation:quizTimerCritical .9s ease-in-out infinite alternate;
+  }
+  .quizCountdownValue{font-size:29px}
+  .batch8LearningStage .adaptiveTeachingCard{
+    max-height:none !important;
+    overflow:visible !important;
+    padding:10px 12px !important;
+  }
+  .batch8LearningStage .adaptiveTeachingCard .muted{
+    line-height:1.3 !important;
+  }
+  .batch8LearningStage .adaptiveCoachFeedback{
+    margin-top:5px !important;
+    padding-top:5px !important;
+    padding-bottom:5px !important;
+  }
+}
