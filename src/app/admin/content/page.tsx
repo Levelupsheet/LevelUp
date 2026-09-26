@@ -134,6 +134,7 @@ export default function AdminContentStudioPage() {
   const [selectedBlockId, setSelectedBlockId] = useState<string>("");
   const [questions, setQuestions] = useState<GeneratedQuestion[]>([]);
   const [liveQuestions, setLiveQuestions] = useState<LiveQuestion[]>([]);
+  const [bankSummary, setBankSummary] = useState<Array<{ id: string; name: string; domain: string; questionCount: number }>>([]);
   const [loading, setLoading] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
@@ -170,6 +171,37 @@ export default function AdminContentStudioPage() {
     if (!res.ok) throw new Error(data?.error || "Failed to load knowledge blocks");
     setBlocks(data.blocks || []);
     if (!selectedBlockId && data.blocks?.[0]?.id) setSelectedBlockId(data.blocks[0].id);
+  }
+
+  async function loadBankSummary() {
+    const res = await fetch("/api/admin/questions?summary=1", { cache: "no-store" });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data?.error || "Failed to load question bank counts");
+    setBankSummary(data.sets || []);
+  }
+
+  async function clearSelectedBank() {
+    const setId = goldenTracking?.setId;
+    if (!setId) return;
+    const bank = bankSummary.find((row) => row.id === setId);
+    if (!window.confirm(`Clear all ${bank?.questionCount || liveQuestions.length} live questions from ${bank?.name || selectedBlock?.setName || "this bank"}? This cannot be undone.`)) return;
+    setLoading(true);
+    setMessage("");
+    try {
+      const res = await fetch("/api/admin/questions", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ setId, clearSet: true }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Failed to clear bank");
+      await Promise.all([loadLiveQuestions(setId), loadBankSummary(), loadGoldenTracking(selectedBlockId)]);
+      setMessage(`Cleared ${data.deleted || 0} question(s) from the selected live DB bank. You can now generate a fresh pool.`);
+    } catch (e: any) {
+      setMessage(e?.message || "Failed to clear bank");
+    } finally {
+      setLoading(false);
+    }
   }
 
   async function loadQuestions(blockId: string) {
@@ -223,7 +255,7 @@ export default function AdminContentStudioPage() {
           window.location.href = "/dashboard";
           return;
         }
-        await loadBlocks().catch((e) => setMessage(e.message));
+        await Promise.all([loadBlocks(), loadBankSummary()]).catch((e) => setMessage(e.message));
       } finally {
         if (mounted) setAuthChecked(true);
       }
@@ -284,7 +316,7 @@ export default function AdminContentStudioPage() {
       if (!res.ok) throw new Error(data?.error || "Fact bank sync failed");
       const s = data?.summary || {};
       setMessage(`Synced ${s.blocksImported || 0} block(s), generated ${s.generatedQuestions || 0} quality-ready question(s), and added ${s.publishedQuestions || 0} new live question(s)${s.skippedDuplicates ? ` • skipped ${s.skippedDuplicates} duplicate(s)` : ""}${s.rejectedWeak ? ` • filtered ${s.rejectedWeak} weak question(s)` : ""}. Existing bank questions were preserved.`);
-      await loadBlocks();
+      await Promise.all([loadBlocks(), loadBankSummary()]);
       if (selectedBlockId) await refreshReviewData(selectedBlockId);
       setTab("review");
       setReviewPanel("live");
@@ -332,7 +364,7 @@ export default function AdminContentStudioPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || "Generation failed");
       setMessage(`Generated and auto-approved ${data.generatedCount} quality-ready question(s)${data.rejectedCount ? ` • filtered out ${data.rejectedCount} weak question(s)` : ""}. Review only what you want to change, then publish the batch.`);
-      await loadBlocks();
+      await Promise.all([loadBlocks(), loadBankSummary()]);
       await refreshReviewData(selectedBlockId);
       setTab("review");
       setReviewPanel("generated");
@@ -525,6 +557,19 @@ export default function AdminContentStudioPage() {
       <div className="content-grid" style={{ marginTop: 16 }}>
         <aside className="card content-sidebar" style={{ padding: 14, position: "sticky", top: 18 }}>
           <div style={{ fontWeight: 800, marginBottom: 10 }}>Knowledge blocks</div>
+          <div className="card" style={{ padding: 10, marginBottom: 10, background: "rgba(255,255,255,0.035)" }}>
+            <div style={{ fontSize: 12, fontWeight: 800, opacity: 0.75 }}>LIVE DB BANKS</div>
+            <div style={{ fontSize: 20, fontWeight: 900, marginTop: 4 }}>{bankSummary.reduce((sum, row) => sum + row.questionCount, 0)} questions</div>
+            <div style={{ display: "grid", gap: 4, marginTop: 8, fontSize: 12 }}>
+              {bankSummary.filter((row) => row.questionCount > 0).map((row) => (
+                <div key={row.id} style={{ display: "flex", justifyContent: "space-between", gap: 8 }}>
+                  <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{row.name}</span>
+                  <strong>{row.questionCount}</strong>
+                </div>
+              ))}
+            </div>
+            {goldenTracking?.setId ? <button type="button" className="secondaryBtn" style={{ marginTop: 10, width: "100%" }} onClick={clearSelectedBank} disabled={loading}>Clear selected bank</button> : null}
+          </div>
           <div style={{ display: "grid", gap: 8, maxHeight: "70vh", overflow: "auto" }}>
             {blocks.map((block) => (
               <button
