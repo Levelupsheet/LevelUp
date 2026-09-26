@@ -568,6 +568,7 @@ export default function DiabloQuizRunner(props: {
   const [sessionStage, setSessionStage] = useState(1);
   const [stageAnswered, setStageAnswered] = useState(0);
   const [stageCorrect, setStageCorrect] = useState(0);
+  const [questionResults, setQuestionResults] = useState<Array<"correct" | "partial" | "wrong" | null>>([]);
   const [stageBanner, setStageBanner] = useState<string | null>(null);
   const [stageEnemyHP, setStageEnemyHP] = useState(90);
   const questionStartRef = useRef(Date.now());
@@ -604,6 +605,11 @@ export default function DiabloQuizRunner(props: {
     },
     onSubmit: (r) => {
       const responseTimeMs = Math.max(500, Date.now() - questionStartRef.current);
+      setQuestionResults((current) => {
+        const next = current.length === combatQuestions.length ? [...current] : Array.from({ length: combatQuestions.length }, (_, i) => current[i] ?? null);
+        next[state.idx] = r.correct ? "correct" : "wrong";
+        return next;
+      });
       const baseTier = ((question?.level || 1) as DifficultyTier);
       setHitPulse(r.correct ? "enemy" : "player");
       if (r.correct) {
@@ -757,6 +763,7 @@ const showExpandedExplanation = useMemo(() => {
     setSessionStage(1);
     setStageAnswered(0);
     setStageCorrect(0);
+    setQuestionResults(Array.from({ length: combatQuestions.length }, () => null));
     setStageBanner(null);
     setStageEnemyHP(stageConfigs[0]?.hp || 90);
     questionStartRef.current = Date.now();
@@ -1178,9 +1185,6 @@ const showExpandedExplanation = useMemo(() => {
                   {goldenEntryFlash ? <div className="badge" style={{ marginBottom: 10, borderColor: "rgba(255,215,64,0.55)", color: "#ffe28a", background: "rgba(255,215,64,0.10)" }}>{goldenEntryFlash}</div> : null}
                   <div className="stageHeaderRow">
                     <div>
-                      <div style={{ fontWeight: 900, letterSpacing: 0.6, opacity: 0.9 }}>
-                        Q{state.idx + 1} / {combatQuestions.length}
-                      </div>
                       <div className="stageLabelPill">Stage {sessionStage} • {metaLeft || "Combat Quiz"}</div>
                     </div>
                     <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap", justifyContent: "flex-end" }}>
@@ -1202,11 +1206,19 @@ const showExpandedExplanation = useMemo(() => {
                   <div className="desktopQuizPrompt" style={{ marginTop: 10, fontSize: "clamp(18px, 1.7vw, 32px)", lineHeight: 1.16, fontWeight: 900 }}>{question.prompt}</div>
 
                   <DomainRuneBar domainLabel={domainLabel} mastery={currentMastery} tier={state.tier} />
-                  <div className="stageProgressDots">{Array.from({ length: 3 }).map((_, idx) => <span key={idx} className={"stageDot" + (idx < stageAnswered ? " active" : "") + (idx === stageAnswered && !state.locked ? " current" : "") } />)}</div>
+                  <div className="quizQuestionTrack" aria-label={`Question ${Math.min(state.idx + 1, combatQuestions.length)} of ${combatQuestions.length}`}>
+                    {combatQuestions.map((_, idx) => {
+                      const result = questionResults[idx];
+                      const isCurrent = idx === state.idx && !finished;
+                      return <span key={idx} className={`quizQuestionSegment ${result || ""}${isCurrent ? " current" : ""}`} title={`Question ${idx + 1}`} />;
+                    })}
+                  </div>
+                  <div className="quizMasteryDiamonds" aria-label={`Question mastery level ${effectiveQuestionTier} of 3`}>
+                    {Array.from({ length: 3 }).map((_, idx) => <span key={idx} className={"quizMasteryDiamond" + (idx < effectiveQuestionTier ? " active" : "")} />)}
+                  </div>
 
                   <div className="stage5MetaStrip quizSecondaryMeta batch8PrimaryProgress">
                     <span className="badge">Mastery {masteryPercent}%</span>
-                    <span className="badge">Q {Math.min(state.idx + 1)} / {combatQuestions.length}</span>
                     <span className="badge">Streak {streak}</span>
                     {partialPercent > 0 && state.locked ? <span className="badge">Partial {partialPercent}%</span> : null}
                   </div>
