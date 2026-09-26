@@ -1031,6 +1031,15 @@ async function analyzeResumeStage12() {
               </div>
             </div>
 
+            <button
+              className="primary dashboardMobileStartNow"
+              type="button"
+              onClick={() => !hasFreeStartCooldown && setShowLaunchModal(true)}
+              disabled={hasFreeStartCooldown}
+            >
+              {hasFreeStartCooldown ? `Start Now! (${freeStartCooldownLabel})` : "Start Now!"}
+            </button>
+
             <div className="kpiRow">
               <button className="badge" type="button" onClick={() => {
                 setPendingPos(user?.startingPosition || null);
