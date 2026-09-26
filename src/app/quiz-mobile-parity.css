@@ -368,3 +368,50 @@
   .quizQuestionSegment { height:11px; min-width:5px; }
   .quizMasteryDiamonds { margin-left:5px; }
 }
+
+
+/* HUD cleanup: one bar row only + urgent countdown behavior. */
+.quizDomainMasteryLine {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  margin-top:10px;
+  color:#d7d2ca;
+  font:900 12px/1.2 Georgia,"Times New Roman",serif;
+  letter-spacing:1.05px;
+  text-transform:uppercase;
+}
+.quizCountdownTimer.critical {
+  animation: quizCriticalFlash .58s steps(2,end) infinite !important;
+  border-color:#ff3b2f !important;
+  color:#fff0df !important;
+  background:linear-gradient(180deg,#8d120d,#3b0504) !important;
+  box-shadow:0 0 16px rgba(255,40,28,.55),inset 0 0 14px rgba(255,69,30,.28) !important;
+}
+.quizCountdownTimer.critical .quizCountdownValue {
+  text-shadow:0 0 9px #ff3b2f,0 1px #000 !important;
+}
+@keyframes quizCriticalFlash {
+  0%,45% { filter:brightness(1); opacity:1; }
+  46%,100% { filter:brightness(1.55); opacity:.72; }
+}
+/* Once zero is reached the engine locks the question; show a steady TIME'S UP state. */
+.quizCountdownTimer.critical[aria-label="0 seconds remaining"] {
+  animation:none !important;
+  min-width:132px !important;
+  filter:none !important;
+  opacity:1 !important;
+  background:linear-gradient(180deg,#76110d,#260403) !important;
+}
+.quizCountdownTimer.critical[aria-label="0 seconds remaining"] .quizCountdownValue {
+  font-size:14px !important;
+  letter-spacing:.08em !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .quizCountdownTimer.critical { animation:none !important; }
+}
+@media (max-width:860px) {
+  .quizDomainMasteryLine { font-size:10px; letter-spacing:.75px; }
+  .quizCountdownTimer.critical[aria-label="0 seconds remaining"] { min-width:108px !important; }
+}
