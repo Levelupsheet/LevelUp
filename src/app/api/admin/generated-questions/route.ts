@@ -49,3 +49,20 @@ export async function PATCH(req: Request) {
     return NextResponse.json({ error: e?.message || "Failed to update generated question" }, { status: 500 });
   }
 }
+
+
+export async function DELETE(req: Request) {
+  const admin = await requireAdminRequest();
+  if (!admin.ok) return admin.response;
+  try {
+    const body = await req.json().catch(() => ({}));
+    const ids = Array.isArray(body?.ids)
+      ? body.ids.map((value: any) => String(value).trim()).filter(Boolean)
+      : [String(body?.id || "").trim()].filter(Boolean);
+    if (!ids.length) return NextResponse.json({ error: "id or ids required" }, { status: 400 });
+    const result = await prisma.generatedQuestion.deleteMany({ where: { id: { in: ids } } });
+    return NextResponse.json({ ok: true, deleted: result.count });
+  } catch (e: any) {
+    return NextResponse.json({ error: e?.message || "Failed to delete generated question" }, { status: 500 });
+  }
+}
