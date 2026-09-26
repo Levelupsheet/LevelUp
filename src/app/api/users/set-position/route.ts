@@ -38,7 +38,8 @@ export async function POST(req: Request) {
       return Response.json({ ok: true, charged: 0, tokenBalance: wallet?.tokenBalance ?? 0, user: { id: body.userId, startingPosition: existing.startingPosition } });
     }
 
-    const result = await prisma.$transaction(async (tx) => {
+    const result: { user: { id: string; startingPosition: string | null }; tokenBalance: number } =
+      await prisma.$transaction(async (tx): Promise<{ user: { id: string; startingPosition: string | null }; tokenBalance: number }> => {
       const charged = await tx.wallet.updateMany({
         where: { userId: body.userId, tokenBalance: { gte: POSITION_CHANGE_COST } },
         data: { tokenBalance: { decrement: POSITION_CHANGE_COST } },
