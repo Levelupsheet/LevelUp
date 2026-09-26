@@ -4227,3 +4227,108 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
    overflow:hidden !important;
  }
 }
+
+
+/* ===== Quiz HUD pass 4: compact frame, full rails, stronger forged hierarchy ===== */
+@media(min-width:901px){
+ .d2QuizShell{
+   height:calc(100dvh - 48px) !important;
+   max-height:calc(100dvh - 48px) !important;
+ }
+ .d2QuizShell .modalHead{
+   min-height:44px !important;
+   height:44px !important;
+   padding:4px 10px !important;
+ }
+ .d2QuizShell .modalHead>div:first-child{
+   min-width:330px !important;
+   padding:4px 30px !important;
+ }
+ .d2QuizShell .modalTitle{font-size:18px !important;}
+ .d2QuizBody{
+   height:auto !important;
+   padding:6px 8px 8px !important;
+ }
+ .batch8DesktopQuizGrid{
+   grid-template-columns:minmax(150px,165px) minmax(0,1fr) minmax(150px,165px) !important;
+   gap:8px !important;
+   padding:4px !important;
+ }
+ .batch8CombatRail{
+   padding:6px !important;
+   gap:6px !important;
+   min-width:0 !important;
+ }
+ .batch8EnemyRail,.batch8PlayerRail{overflow:hidden !important;}
+ .batch8CombatRail video{
+   width:100% !important;
+   max-width:100% !important;
+   height:clamp(125px,18vh,180px) !important;
+   object-fit:cover !important;
+ }
+ .batch8LearningStage{
+   padding:8px 10px !important;
+   min-width:0 !important;
+ }
+ .batch8LearningStage .stageHeaderRow{
+   min-height:42px !important;
+   padding:5px 8px !important;
+ }
+ .batch8LearningStage .desktopQuizPrompt{
+   margin-top:5px !important;
+   padding-bottom:4px !important;
+   font-size:clamp(18px,1.45vw,23px) !important;
+ }
+ .batch8LearningStage .quizInputGroup{margin-top:5px !important;}
+ .batch8LearningStage .d2ChoiceBtn{min-height:38px !important;}
+ .batch8LearningStage .quizHintRow{margin-top:4px !important;padding-top:4px !important;}
+ .batch8LearningStage .stage8ActionDock{margin-top:5px !important;}
+ .batch8LearningStage .adaptiveTeachingCard{margin-top:5px !important;padding:7px 10px !important;}
+
+ /* Forged inner rails: heavier than the outer shell, without changing layout. */
+ .batch8CombatRail,.batch8LearningStage{
+   background:
+     linear-gradient(90deg,rgba(255,115,17,.035),transparent 10%,transparent 90%,rgba(255,115,17,.035)),
+     linear-gradient(180deg,#0d1014,#05070a) !important;
+   border-color:#925016 !important;
+ }
+ .batch8CombatRail::before,.batch8LearningStage::before{
+   content:"";
+   position:absolute !important;
+   left:7px !important;right:7px !important;top:4px !important;
+   width:auto !important;height:2px !important;
+   background:linear-gradient(90deg,transparent,#5b2b0c 15%,#d06b18 50%,#5b2b0c 85%,transparent) !important;
+   box-shadow:0 0 6px rgba(230,91,8,.22);
+   color:transparent !important;
+ }
+ .batch8CombatRail::after{
+   content:"";
+   position:absolute !important;
+   left:7px !important;right:7px !important;bottom:4px !important;
+   width:auto !important;height:1px !important;
+   background:linear-gradient(90deg,transparent,#71350d,#d06b18,#71350d,transparent) !important;
+   color:transparent !important;
+ }
+ .batch8LearningStage .stageHeaderRow{
+   box-shadow:inset 0 0 0 1px rgba(0,0,0,.8),inset 0 -10px 22px rgba(0,0,0,.24) !important;
+ }
+ .batch8LearningStage .d2ChoiceBtn{
+   box-shadow:inset 0 1px rgba(255,180,87,.035),inset 0 -12px 22px rgba(0,0,0,.3),0 1px 2px #000 !important;
+ }
+ .batch8LearningStage .d2ChoiceBtn:hover:not(:disabled){
+   border-color:#b7651d !important;
+   box-shadow:inset 0 0 18px rgba(177,71,9,.13),0 0 8px rgba(225,91,11,.14) !important;
+ }
+ .batch8LearningStage .d2ChoiceBtn.selected{
+   background:linear-gradient(90deg,#371408,#5c1d08 50%,#301207) !important;
+   border-color:#f27b1d !important;
+ }
+}
+@media(min-width:901px) and (max-width:1250px){
+ .batch8DesktopQuizGrid{
+   grid-template-columns:138px minmax(0,1fr) 138px !important;
+   gap:6px !important;
+ }
+ .batch8CombatRail{padding:4px !important;}
+ .batch8CombatRail video{height:125px !important;}
+}
