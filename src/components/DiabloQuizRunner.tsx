@@ -121,7 +121,7 @@ function ModelPanel(props: { title: string; src?: string; mirrored?: boolean; lo
   const { title, src, mirrored = false, loop = true, onEnded, height = 230, damageText, damageTone } = props;
   return (
     <div className="card" style={{ padding: 10, background: "rgba(255,255,255,0.04)", minHeight: 250 }}>
-      <div style={{ fontSize: 12, fontWeight: 900, letterSpacing: 0.6, opacity: 0.88, marginBottom: 8 }}>{title}</div>
+      {title ? <div style={{ fontSize: 12, fontWeight: 900, letterSpacing: 0.6, opacity: 0.88, marginBottom: 8 }}>{title}</div> : null}
       <div style={{ position: "relative", borderRadius: 16, overflow: "hidden", border: "1px solid rgba(255,255,255,0.08)", background: "rgba(5,10,20,0.85)" }}>
         {src ? (
           <video
