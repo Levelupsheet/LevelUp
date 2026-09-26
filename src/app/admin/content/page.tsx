@@ -283,7 +283,7 @@ export default function AdminContentStudioPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || "Fact bank sync failed");
       const s = data?.summary || {};
-      setMessage(`Synced ${s.blocksImported || 0} block(s), generated ${s.generatedQuestions || 0} question(s), and published ${s.publishedQuestions || 0} live question(s).`);
+      setMessage(`Synced ${s.blocksImported || 0} block(s), generated ${s.generatedQuestions || 0} quality-ready question(s), and added ${s.publishedQuestions || 0} new live question(s)${s.skippedDuplicates ? ` • skipped ${s.skippedDuplicates} duplicate(s)` : ""}${s.rejectedWeak ? ` • filtered ${s.rejectedWeak} weak question(s)` : ""}. Existing bank questions were preserved.`);
       await loadBlocks();
       if (selectedBlockId) await refreshReviewData(selectedBlockId);
       setTab("review");
@@ -359,6 +359,27 @@ export default function AdminContentStudioPage() {
       setMessage("Question updated.");
     } catch (e: any) {
       setMessage(e?.message || "Save failed");
+    } finally {
+      setSavingId("");
+    }
+  }
+
+  async function deleteGeneratedQuestion(question: GeneratedQuestion) {
+    if (!window.confirm("Remove this generated question? It will not be published to the DB bank.")) return;
+    setSavingId(question.id);
+    setMessage("");
+    try {
+      const res = await fetch("/api/admin/generated-questions", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: question.id }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error || "Delete failed");
+      await loadQuestions(selectedBlockId);
+      setMessage("Generated question removed.");
+    } catch (e: any) {
+      setMessage(e?.message || "Delete failed");
     } finally {
       setSavingId("");
     }
@@ -619,7 +640,7 @@ export default function AdminContentStudioPage() {
               {reviewPanel === "generated" ? (
                 <div style={{ display: "grid", gap: 12, marginTop: 16 }}>
                   {questions.map((question) => (
-                    <GeneratedQuestionCard key={question.id} question={question} saving={savingId === question.id} onSave={updateQuestion} />
+                    <GeneratedQuestionCard key={question.id} question={question} saving={savingId === question.id} onSave={updateQuestion} onDelete={deleteGeneratedQuestion} />
                   ))}
                   {!questions.length ? <div style={{ opacity: 0.75 }}>No generated questions for this block yet.</div> : null}
                 </div>
@@ -674,7 +695,7 @@ export default function AdminContentStudioPage() {
   );
 }
 
-function GeneratedQuestionCard({ question, saving, onSave }: { question: GeneratedQuestion; saving: boolean; onSave: (q: GeneratedQuestion, patch: Partial<GeneratedQuestion>) => Promise<void> }) {
+function GeneratedQuestionCard({ question, saving, onSave, onDelete }: { question: GeneratedQuestion; saving: boolean; onSave: (q: GeneratedQuestion, patch: Partial<GeneratedQuestion>) => Promise<void>; onDelete: (q: GeneratedQuestion) => Promise<void> }) {
   const [prompt, setPrompt] = useState(question.prompt);
   const [explanation, setExplanation] = useState(question.explanation || "");
   const [reviewStatus, setReviewStatus] = useState(question.reviewStatus);
@@ -723,6 +744,7 @@ function GeneratedQuestionCard({ question, saving, onSave }: { question: Generat
             <option value="EDITED">Edited</option>
           </select>
           <button onClick={save} className="primaryBtn" disabled={saving}>{saving ? "Saving..." : "Save"}</button>
+          <button onClick={() => onDelete(question)} className="secondaryBtn" disabled={saving}>Delete</button>
         </div>
       </div>
       <div style={{ display: "grid", gap: 10, marginTop: 12 }}>
