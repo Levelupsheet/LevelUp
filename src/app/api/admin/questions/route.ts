@@ -279,10 +279,21 @@ export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
     const setId = searchParams.get("setId");
+    const summary = searchParams.get("summary") === "1";
+    if (summary) {
+      const sets = await prisma.questionSet.findMany({
+        orderBy: { name: "asc" },
+        select: { id: true, name: true, domain: true, status: true, _count: { select: { questions: true } } },
+      });
+      return NextResponse.json({
+        sets: sets.map((set: any) => ({ id: set.id, name: set.name, domain: set.domain, status: set.status, questionCount: set._count?.questions || 0 })),
+        totalQuestions: sets.reduce((sum: number, set: any) => sum + Number(set._count?.questions || 0), 0),
+      });
+    }
     if (!setId) return NextResponse.json({ error: "setId is required" }, { status: 400 });
 
     const questions = await listQuestionsForSet(setId);
-    return NextResponse.json({ questions });
+    return NextResponse.json({ questions, questionCount: questions.length });
   } catch (e: any) {
     return NextResponse.json({ error: e?.message || "Failed" }, { status: 500 });
   }
@@ -347,6 +358,11 @@ export async function DELETE(req: Request) {
     const ids = Array.isArray(body?.ids)
       ? body.ids.map((v: any) => String(v).trim()).filter(Boolean)
       : [String(body?.id || "").trim()].filter(Boolean);
+    const setId = String(body?.setId || "").trim();
+    if (body?.clearSet === true && setId) {
+      const result = await prisma.mCQQuestion.deleteMany({ where: { setId } });
+      return NextResponse.json({ ok: true, deleted: result.count, setId });
+    }
     if (!ids.length) return NextResponse.json({ error: "id or ids required" }, { status: 400 });
     const result = await prisma.mCQQuestion.deleteMany({ where: { id: { in: ids } } });
     return NextResponse.json({ ok: true, deleted: result.count });
