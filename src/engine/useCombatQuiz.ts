@@ -257,6 +257,17 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
         });
       });
 
+      // A lethal wrong answer ends the run immediately. Previously defeat was
+      // only finalized by next(), which left the quiz active at 0 HP.
+      if (playerHP <= 0) {
+        stopTimer();
+        return { ...next, finished: true };
+      }
+      if (finishOnEnemyDefeat && enemyHP <= 0) {
+        stopTimer();
+        return { ...next, finished: true };
+      }
+
       return next;
     });
   }, [q, rules, resolveQuestionLevel]);
@@ -324,6 +335,17 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
           masteryValue: nextMastery,
         });
       });
+
+      // A lethal wrong answer ends the run immediately. Previously defeat was
+      // only finalized by next(), which left the quiz active at 0 HP.
+      if (playerHP <= 0) {
+        stopTimer();
+        return { ...next, finished: true };
+      }
+      if (finishOnEnemyDefeat && enemyHP <= 0) {
+        stopTimer();
+        return { ...next, finished: true };
+      }
 
       return next;
     });
