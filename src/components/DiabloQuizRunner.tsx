@@ -679,8 +679,8 @@ export default function DiabloQuizRunner(props: {
           setBestStreak((best) => Math.max(best, nextValue));
           setPowerups((currentPowerups) => {
             const next = { ...currentPowerups };
-            if (nextValue === 3 && next.shieldUses < 1 && !next.shieldActive) next.shieldUses = 1;
-            if (nextValue === 5 && next.furyUses < 1 && !next.furyActive) next.furyUses = 1;
+            // Purchased powerups are inventory-only. Do not inject free combat
+            // consumables into the rack from streak/adaptive events.
             return next;
           });
 
@@ -707,10 +707,6 @@ export default function DiabloQuizRunner(props: {
         setXpBoostRemaining((remaining) => Math.max(0, remaining - 1));
         if (fatigue.fatigued) {
           setHintMessage(fatigue.suggestion || "Momentum dipped. Try a hint or use a power-up.");
-          setPowerups((current) => ({
-            ...current,
-            shieldUses: current.shieldUses < 1 ? 1 : current.shieldUses,
-          }));
         }
       }
       if ((r.correct && !media?.enemyHitSrc) || (!r.correct && !media?.playerHitSrc)) {
@@ -1243,7 +1239,7 @@ const showExpandedExplanation = useMemo(() => {
             <div className="quizPlayerRail batch8CombatRail batch8PlayerRail" style={{ display: "grid", gap: 10, alignContent: "start", minHeight: 0 }}>
               <div className={"playerOrbComposite " + (hitPulse === "player" ? "d2Shake" : "")} aria-label={`${playerName} health ${state.playerHP}%`}>
                 <img className="playerOrbFrameAsset" src="/ui/grimdark/flow_main_panel_player.png" alt="" aria-hidden="true" />
-                <div className="playerOrbBlood">
+                <div className="playerOrbBlood" style={{ "--player-hp": Math.max(0, Math.min(100, state.playerHP)) } as React.CSSProperties}>
                   <img src="/ui/blood-orb.webp" alt="" aria-hidden="true" />
                 </div>
               </div>
