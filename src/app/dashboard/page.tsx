@@ -70,7 +70,7 @@ function getFreeSessionCooldownKey(userId: string | null) {
 function labelPos(p: string){
   if (p === "HELPDESK_SUPPORT") return "Help Desk Wizard";
   if (p === "DESKTOP_TECHNICIAN") return "Desktop Barbarian";
-  if (p === "CLOUD_ENGINEER") return "Cloud Engineer";
+  if (p === "CLOUD_ENGINEER") return "Cloud Assassin";
   return p;
 }
 
@@ -879,9 +879,10 @@ async function analyzeResumeStage12() {
                   onClick={() => setPendingPos("DESKTOP_TECHNICIAN")}
                 />
                 <RoleCard
-                  title="Cloud Engineer"
+                  title="Cloud Assassin"
                   desc="Cloud fundamentals, IAM, networking, services, and automation."
                   icon="☁️"
+                  videoSrc="/video/T2V diablo 4 assassin Idle.mp4"
                   selected={pendingPos === "CLOUD_ENGINEER"}
                   onClick={() => setPendingPos("CLOUD_ENGINEER")}
                 />
@@ -891,7 +892,7 @@ async function analyzeResumeStage12() {
             <div className="luModalFooter" style={{ display: "grid", gap: 8 }}>
               {positionChangeMode && pendingPos && pendingPos !== user?.startingPosition ? (
                 <div className="positionChangeFeeNotice">
-                  Changing your player/path costs <b>300 tokens</b>. Your balance: <b>{tokenBalance}</b>.
+                  Changing your player/path costs <b>200 tokens</b>. Your balance: <b>{tokenBalance}</b>.
                 </div>
               ) : null}
               {positionError ? <div className="positionChangeError">{positionError}</div> : null}
@@ -924,15 +925,15 @@ async function analyzeResumeStage12() {
               </div>
             </div>
             <div className="luModalBody">
-              <div className="positionConfirmCost">300 <span>tokens</span></div>
+              <div className="positionConfirmCost">200 <span>tokens</span></div>
               <p>You are changing from <b>{user?.startingPosition ? labelPos(user.startingPosition) : "your current path"}</b> to <b>{labelPos(pendingPos)}</b>.</p>
-              <p>Your current balance is <b>{tokenBalance} tokens</b>{tokenBalance >= 300 ? `, leaving ${tokenBalance - 300} after the change` : ""}.</p>
-              {tokenBalance < 300 ? <div className="positionChangeError">You need at least 300 tokens to change your player/path.</div> : null}
+              <p>Your current balance is <b>{tokenBalance} tokens</b>{tokenBalance >= 200 ? `, leaving ${tokenBalance - 200} after the change` : ""}.</p>
+              {tokenBalance < 200 ? <div className="positionChangeError">You need at least 200 tokens to change your player/path.</div> : null}
               {positionError ? <div className="positionChangeError">{positionError}</div> : null}
             </div>
             <div className="luModalFooter positionConfirmActions">
               <button className="secondaryBtn gdActionRed gdActionCompact" type="button" disabled={posSaving} onClick={() => { setPositionConfirmOpen(false); setPositionError(null); }}>Cancel</button>
-              <button className="gold gdActionOrange" type="button" disabled={posSaving || tokenBalance < 300} onClick={() => void confirmPosition()}>
+              <button className="gold gdActionOrange" type="button" disabled={posSaving || tokenBalance < 200} onClick={() => void confirmPosition()}>
                 {posSaving ? "Changing..." : "Confirm & Pay 300 Tokens"}
               </button>
             </div>
