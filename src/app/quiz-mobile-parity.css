@@ -1258,3 +1258,10 @@
 }
 .d2OrbFrame .d2OrbShine,
 .d2OrbFrame .d2OrbFlash{ z-index:6 !important; }
+
+
+/* Fine alignment: center the blood artwork visually inside the forged circular rim. */
+.d2OrbFrame .d2AssetBloodOrb{
+  inset:15% !important;
+  transform:translateY(-3px);
+}
