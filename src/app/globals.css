@@ -8830,3 +8830,73 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     min-height:40px!important;
   }
 }
+
+
+/* 2026-09-27 stage/path header refinement from live screenshot */
+.d2QuizQuestionCard .stageHeaderRow{
+  position:relative!important;
+  min-height:52px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  padding:0 150px!important;
+  box-sizing:border-box!important;
+}
+.d2QuizQuestionCard .stageHeaderRow > div:first-child{
+  position:absolute!important;
+  left:50%!important;
+  top:50%!important;
+  width:min(440px,48%)!important;
+  height:50px!important;
+  transform:translate(-50%,-50%)!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+}
+.d2QuizQuestionCard .stageLabelPill.stageLabelArtwork{
+  width:100%!important;
+  min-width:0!important;
+  max-width:none!important;
+  min-height:50px!important;
+  height:50px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  padding:0 58px!important;
+  box-sizing:border-box!important;
+  background-color:transparent!important;
+  background-image:url('/ui/grimdark/character_popup_window_bg_001.png?v=20260927-stage-fit2')!important;
+  background-repeat:no-repeat!important;
+  background-position:center!important;
+  background-size:100% 100%!important;
+  border:0!important;
+  outline:0!important;
+  box-shadow:none!important;
+  clip-path:none!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  line-height:1!important;
+}
+.d2QuizQuestionCard .stageHeaderRow > span:last-child{
+  position:absolute!important;
+  right:10px!important;
+  top:8px!important;
+  z-index:2!important;
+}
+@media(max-width:700px){
+  .d2QuizQuestionCard .stageHeaderRow{
+    min-height:44px!important;
+    padding:0 84px 0 4px!important;
+  }
+  .d2QuizQuestionCard .stageHeaderRow > div:first-child{
+    width:min(72%,360px)!important;
+    height:42px!important;
+  }
+  .d2QuizQuestionCard .stageLabelPill.stageLabelArtwork{
+    height:42px!important;
+    min-height:42px!important;
+    padding:0 32px!important;
+    font-size:12px!important;
+  }
+}
