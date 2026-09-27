@@ -753,7 +753,7 @@ async function analyzeResumeStage12() {
                 <b style={{ fontSize: 18 }}>Start leveling</b>
                 <div><small className="luHint">Choose what you want to work on right now.</small></div>
               </div>
-              <button className="secondaryBtn" type="button" onClick={() => setShowLaunchModal(false)}>✕</button>
+              <button className="secondaryBtn gdActionRed gdActionCompact" type="button" onClick={() => setShowLaunchModal(false)}>EXIT</button>
             </div>
 
             <div className="luModalBody">
@@ -856,7 +856,7 @@ async function analyzeResumeStage12() {
                 <div><small className="luHint">This personalizes your learning path. You can change it later.</small></div>
               </div>
               {positionChangeMode && (
-                <button className="secondaryBtn positionModalExit" type="button" onClick={() => setShowPositionModal(false)}>EXIT</button>
+                <button className="secondaryBtn positionModalExit gdActionRed gdActionCompact" type="button" onClick={() => setShowPositionModal(false)}>EXIT</button>
               )}
             </div>
 
@@ -931,8 +931,8 @@ async function analyzeResumeStage12() {
               {positionError ? <div className="positionChangeError">{positionError}</div> : null}
             </div>
             <div className="luModalFooter positionConfirmActions">
-              <button className="secondaryBtn" type="button" disabled={posSaving} onClick={() => { setPositionConfirmOpen(false); setPositionError(null); }}>Cancel</button>
-              <button className="gold" type="button" disabled={posSaving || tokenBalance < 300} onClick={() => void confirmPosition()}>
+              <button className="secondaryBtn gdActionRed gdActionCompact" type="button" disabled={posSaving} onClick={() => { setPositionConfirmOpen(false); setPositionError(null); }}>Cancel</button>
+              <button className="gold gdActionOrange" type="button" disabled={posSaving || tokenBalance < 300} onClick={() => void confirmPosition()}>
                 {posSaving ? "Changing..." : "Confirm & Pay 300 Tokens"}
               </button>
             </div>
@@ -1040,7 +1040,7 @@ async function analyzeResumeStage12() {
                 <div className="dashboardUtilityEyebrow">COMBAT LOADOUT</div><div style={{ fontWeight: 900 }}>PowerUps</div>
                 <div style={{ opacity: 0.78 }}><small>Inventory + daily claims</small></div>
               </div>
-              <button className="secondaryBtn" type="button" onClick={() => setPowerupsOpen(true)} style={{ minHeight: 30, padding: "5px 12px", fontSize: 12, borderColor: "rgba(110,190,255,0.35)", background: "linear-gradient(180deg, rgba(46,104,172,0.24), rgba(24,64,118,0.18))" }}>Open</button>
+              <button className="secondaryBtn gdActionBlue gdActionCompact" type="button" onClick={() => setPowerupsOpen(true)} style={{ minHeight: 30, padding: "5px 12px", fontSize: 12, borderColor: "rgba(110,190,255,0.35)", background: "linear-gradient(180deg, rgba(46,104,172,0.24), rgba(24,64,118,0.18))" }}>Open</button>
             </div>
             <div className="powerHudTray" style={{ marginTop: 10, display: "flex", gap: 6, flexWrap: "wrap" }}>
               {compactInventory.length ? compactInventory.map((row) => (
@@ -1059,7 +1059,7 @@ async function analyzeResumeStage12() {
               </div>
               <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                 <span className="badge" style={{ minHeight: 34, padding: "6px 12px", background: "rgba(255,214,102,0.12)", borderColor: "rgba(255,214,102,0.28)" }}>Weekly XP</span>
-                <a className="secondaryBtn" href="/leaderboard" style={{ textDecoration: "none", padding: "8px 14px", minHeight: 38 }}>Open</a>
+                <a className="secondaryBtn gdActionBlue gdActionCompact" href="/leaderboard" style={{ textDecoration: "none", padding: "8px 14px", minHeight: 38 }}>Open</a>
               </div>
             </div>
             <div style={{ marginTop: 12, display: "grid", gap: 10 }}>
@@ -1130,7 +1130,7 @@ async function analyzeResumeStage12() {
                 <h3 style={{ margin: 0 }}>Plan perks</h3>
                 <div><small style={{ opacity: 0.9 }}>{entitlements?.label || tierLabel} plan • Adaptive depth: <b>{entitlements?.adaptiveDepth || "standard"}</b> • Reward track: <b>{entitlements?.rewardsTrack || "core"}</b></small></div>
               </div>
-              {nextPlanLabel ? <a href="/start#pricing" className="secondaryBtn" style={{ textDecoration: 'none' }}>Upgrade to {nextPlanLabel}</a> : <span className="badge">Top tier unlocked</span>}
+              {nextPlanLabel ? <a href="/start#pricing" className="secondaryBtn gdActionOrange" style={{ textDecoration: 'none' }}>Upgrade to {nextPlanLabel}</a> : <span className="badge">Top tier unlocked</span>}
             </div>
             <div style={{ marginTop: 12, display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 10 }}>
               <div className="featureCard">
@@ -1289,14 +1289,14 @@ async function analyzeResumeStage12() {
                 <div><small className="luHint">Review alerts, PvP updates, rewards, and invitations.</small></div>
               </div>
               <div style={{ display: "flex", gap: 8 }}>
-                <button className="secondaryBtn" type="button" onClick={async () => {
+                <button className="secondaryBtn gdActionRed gdActionCompact" type="button" onClick={async () => {
                   try {
                     await fetch('/api/notifications/clear', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ userId, all: true }) });
                   } catch {}
                   setNotes([]);
                   try { if (userId) { clearActivities(userId); setActivity([]); } } catch {}
                 }}>Clear all</button>
-                <button className="secondaryBtn" type="button" onClick={() => setNotificationsOpen(false)}>✕</button>
+                <button className="secondaryBtn gdActionRed gdActionCompact" type="button" onClick={() => setNotificationsOpen(false)}>EXIT</button>
               </div>
             </div>
             <div className="luModalBody">
@@ -1324,7 +1324,7 @@ async function analyzeResumeStage12() {
                 <b style={{ fontSize: 18 }}>PowerUps and Claims</b>
                 <div><small className="luHint">Purchase reusable powerups and claim your daily token bonus.</small></div>
               </div>
-              <button className="secondaryBtn" type="button" onClick={() => setPowerupsOpen(false)}>✕</button>
+              <button className="secondaryBtn gdActionRed gdActionCompact" type="button" onClick={() => setPowerupsOpen(false)}>EXIT</button>
             </div>
             <div className="luModalBody">
               <div className="card" style={{ marginBottom: 12, borderColor: "rgba(93,168,255,0.22)" }}>
@@ -1333,7 +1333,7 @@ async function analyzeResumeStage12() {
                     <h3 style={{ margin: 0 }}>Daily claim</h3>
                     <div><small>Wallet: {Number.isFinite(tokenBalance) ? tokenBalance : 0} tokens</small></div>
                   </div>
-                  <button className="primary" type="button" disabled={!stage9Status?.claimableToday || claimingDaily} onClick={claimStage9DailyBonus}>
+                  <button className="primary gdActionOrange" type="button" disabled={!stage9Status?.claimableToday || claimingDaily} onClick={claimStage9DailyBonus}>
                     {claimingDaily ? "Claiming..." : stage9Status?.claimableToday ? `Claim +${stage9Status?.dailyBonusTokens || 0}` : "Bonus claimed"}
                   </button>
                 </div>
@@ -1351,7 +1351,7 @@ async function analyzeResumeStage12() {
                       <div style={{ marginTop: 8, fontWeight: 800 }}>{item.cost} tokens</div>
                     </div>
                     <div style={{ marginTop: 10 }}>
-                      <button className="secondaryBtn" type="button" disabled={buyingItemId === item.id || tokenBalance < item.cost} onClick={() => purchaseStage9StoreItem(item.id)}>
+                      <button className="secondaryBtn gdActionBlue gdActionCompact" type="button" disabled={buyingItemId === item.id || tokenBalance < item.cost} onClick={() => purchaseStage9StoreItem(item.id)}>
                         {buyingItemId === item.id ? "Purchasing..." : tokenBalance < item.cost ? "Need more tokens" : "Buy now"}
                       </button>
                     </div>
