@@ -1093,7 +1093,7 @@ async function analyzeResumeStage12() {
             {hasTechReady ? (
               <button className="primary dashboardNextButton gdActionBlue" type="button" onClick={() => setMockInterviewOpen(true)}>Start Tech Battle →</button>
             ) : hrBattleUnlocked && !hrPassed ? (
-              <button className="dashboardNextButton dashboardAssetButton dashboardAssetButtonOrange dashboardNextAssetButton" type="button" onClick={() => setMockInterviewOpen(true)}><span className="dashboardButtonAssetLabel">Start HR Battle →</span></button>
+              <button className="dashboardNextButton dashboardAssetButton dashboardAssetButtonOrange dashboardNextAssetButton" type="button" onClick={() => setMockInterviewOpen(true)}><img className="dashboardButtonAssetImage" src="/ui/grimdark/button-orange.png?v=20260927-next-hr" alt="" aria-hidden="true" /><span className="dashboardButtonAssetLabel">Start HR Battle →</span></button>
             ) : (
               <button className="gold dashboardNextButton gdActionOrange" type="button" onClick={() => !hasFreeStartCooldown && setShowLaunchModal(true)} disabled={hasFreeStartCooldown}>
                 {hasFreeStartCooldown ? `Available in ${freeStartCooldownLabel}` : "Continue training →"}
