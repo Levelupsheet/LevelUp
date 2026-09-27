@@ -10072,3 +10072,30 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     overflow:hidden!important;
   }
 }
+
+
+/* 2026-09-27 localized rail refinement from 23:03 live build.
+   Do not move either rail/frame/portrait globally. */
+@media (min-width:901px){
+  /* Player: fit blood orb within the existing dark circular well. */
+  .batch8DesktopQuizGrid .playerOrbBlood{
+    width:42px!important;
+    height:42px!important;
+    left:65px!important;
+    top:51px!important;
+  }
+
+  /* Enemy: remove the remaining grid gap and keep a 2px seam from orb to portrait. */
+  .batch8DesktopQuizGrid .batch8EnemyRail{
+    gap:2px!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail > :first-child{
+    margin:0 auto!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail > .modelPanel{
+    margin:0 auto!important;
+  }
+  .batch8DesktopQuizGrid .quizEnemyNameBelow{
+    margin-top:0!important;
+  }
+}
