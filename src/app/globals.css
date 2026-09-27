@@ -5852,3 +5852,85 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
   z-index:0!important;max-width:78%!important;pointer-events:none!important;
 }
 .dashboardGrimdarkHero>div{position:relative!important;z-index:2!important}
+
+
+/* DESKTOP DASHBOARD FINAL OVERRIDE — 2026-09-27
+   One rendering path only. Earlier experiments are intentionally superseded here. */
+@media (min-width:861px){
+  .dashboardGrimdarkSidebar button.dashboardAssetButton,
+  .dashboardGrimdarkSidebar .dashboardBattleShortcuts > button.dashboardAssetButton,
+  .dashboardNextAction button.dashboardNextAssetButton{
+    all:unset!important;
+    box-sizing:border-box!important;
+    position:relative!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    width:100%!important;
+    height:58px!important;
+    min-height:58px!important;
+    padding:0 20px!important;
+    overflow:hidden!important;
+    cursor:pointer!important;
+    color:#f8ecd6!important;
+    font-family:Cinzel,Georgia,serif!important;
+    font-size:15px!important;
+    font-weight:800!important;
+    line-height:1!important;
+    text-align:center!important;
+    text-shadow:0 2px 2px #000!important;
+    background-color:transparent!important;
+    background-position:center!important;
+    background-repeat:no-repeat!important;
+    background-size:100% 100%!important;
+  }
+  .dashboardGrimdarkSidebar button.dashboardAssetButtonOrange,
+  .dashboardGrimdarkSidebar .dashboardBattleShortcuts > button.dashboardAssetButtonOrange,
+  .dashboardNextAction button.dashboardNextAssetButton.dashboardAssetButtonOrange{
+    background-image:url('/ui/grimdark/button-orange.png?v=20260927-desktop-final')!important;
+  }
+  .dashboardGrimdarkSidebar button.dashboardAssetButtonBlue,
+  .dashboardGrimdarkSidebar .dashboardBattleShortcuts > button.dashboardAssetButtonBlue{
+    background-image:url('/ui/grimdark/button-blue.png?v=20260927-desktop-final')!important;
+  }
+  .dashboardNextAction button.dashboardNextAssetButton{
+    width:230px!important;
+    flex:0 0 230px!important;
+  }
+  .dashboardGrimdarkSidebar .dashboardButtonAssetLabel,
+  .dashboardNextAction .dashboardButtonAssetLabel{
+    position:relative!important;
+    z-index:2!important;
+    display:block!important;
+  }
+  .dashboardGrimdarkSidebar .dashboardButtonSkinImage,
+  .dashboardNextAction .dashboardButtonSkinImage,
+  .dashboardGrimdarkSidebar .dashboardButtonSkin{
+    display:none!important;
+  }
+  .dashboardGrimdarkSidebar button.dashboardSelectedPlayerButton,
+  .dashboardGrimdarkSidebar button.dashboardSelectedPlayerButton > .dashboardPlayerOnly{
+    border:0!important;
+    border-image:none!important;
+    outline:0!important;
+    box-shadow:none!important;
+    background:transparent!important;
+  }
+  .dashboardGrimdarkSidebar button.dashboardSelectedPlayerButton > .dashboardPlayerOnly{
+    padding:0!important;
+    overflow:hidden!important;
+  }
+  .dashboardGrimdarkSidebar button.dashboardSelectedPlayerButton > .dashboardPlayerOnly > video{
+    position:static!important;
+    inset:auto!important;
+    display:block!important;
+    width:100%!important;
+    height:100%!important;
+    object-fit:cover!important;
+    object-position:38% center!important;
+    border:0!important;
+    border-radius:0!important;
+    outline:0!important;
+    box-shadow:none!important;
+  }
+}
