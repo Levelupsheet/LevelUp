@@ -1172,7 +1172,7 @@ const showExpandedExplanation = useMemo(() => {
               <div className={hitPulse === "player" ? "d2Shake" : ""}>
                 <D2LifeOrb value={state.playerHP} name={playerName} />
               </div>
-              <ModelPanel title={playerName} src={playerVideo} loop={!isPlayerHitVideo} onEnded={isPlayerHitVideo ? () => setHitPulse(null) : undefined} height="clamp(180px, 22vh, 280px)" damageText={damageFloat.player || null} damageTone="player" />
+              <ModelPanel title="" src={playerVideo} loop={!isPlayerHitVideo} onEnded={isPlayerHitVideo ? () => setHitPulse(null) : undefined} height="clamp(180px, 22vh, 280px)" damageText={damageFloat.player || null} damageTone="player" />
               <div className="stage7PowerStrip underPlayer">
                 <button className={"d2Btn power" + (powerups.shieldActive ? " active" : "")} type="button" disabled={state.locked || powerups.shieldActive || (powerups.shieldUses + stage9Inventory.shield) <= 0} onClick={activateShield}>Shield {powerups.shieldActive ? "On" : (powerups.shieldUses + stage9Inventory.shield) > 0 ? `x${powerups.shieldUses + stage9Inventory.shield}` : "Locked"}</button>
                 <button className={"d2Btn power" + (powerups.furyActive ? " active" : "")} type="button" disabled={state.locked || powerups.furyActive || (powerups.furyUses + stage9Inventory.fury) <= 0} onClick={activateFury}>Fury {powerups.furyActive ? "On" : (powerups.furyUses + stage9Inventory.fury) > 0 ? `x${powerups.furyUses + stage9Inventory.fury}` : "Locked"}</button>
@@ -1520,7 +1520,7 @@ const showExpandedExplanation = useMemo(() => {
                 <D2LifeOrb value={state.playerHP} name={playerName} />
               </div>
               <div style={{ marginTop: 10 }}>
-                <ModelPanel title={playerName} src={playerVideo} loop={!isPlayerHitVideo} onEnded={isPlayerHitVideo ? () => setHitPulse(null) : undefined} height="clamp(180px, 22vh, 280px)" damageText={damageFloat.player || null} damageTone="player" />
+                <ModelPanel title="" src={playerVideo} loop={!isPlayerHitVideo} onEnded={isPlayerHitVideo ? () => setHitPulse(null) : undefined} height="clamp(180px, 22vh, 280px)" damageText={damageFloat.player || null} damageTone="player" />
               </div>
             </div>
           </div>
