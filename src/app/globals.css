@@ -8669,3 +8669,55 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     z-index:3!important;
   }
 }
+
+
+/* 2026-09-27 live quiz interaction repair:
+   preserve purchased answer/action artwork after selection/submit. */
+.d2QuizQuestionCard .d2ChoiceBtn.selected:not(.answerCorrect):not(.answerWrong),
+.d2QuizQuestionCard .d2ChoiceBtn.selected:disabled:not(.answerCorrect):not(.answerWrong),
+.d2QuizQuestionCard .d2ChoiceBtn.answerWrong,
+.d2QuizQuestionCard .d2ChoiceBtn.answerWrong.selected,
+.d2QuizQuestionCard .d2ChoiceBtn.answerWrong:disabled{
+  background-color:transparent!important;
+  background-image:url('/ui/grimdark/red-answer.png?v=20260927-selected-lockfix')!important;
+  background-repeat:no-repeat!important;
+  background-position:center!important;
+  background-size:100% 100%!important;
+  border:0!important;
+  outline:0!important;
+  box-shadow:none!important;
+  opacity:1!important;
+}
+.d2QuizQuestionCard .d2ChoiceBtn.answerCorrect,
+.d2QuizQuestionCard .d2ChoiceBtn.answerCorrect.selected,
+.d2QuizQuestionCard .d2ChoiceBtn.answerCorrect:disabled{
+  background-color:transparent!important;
+  background-image:url('/ui/grimdark/core_standard_button_blue_001.png?v=20260927-correct-lockfix')!important;
+  background-repeat:no-repeat!important;
+  background-position:center!important;
+  background-size:100% 100%!important;
+  border:0!important;
+  outline:0!important;
+  box-shadow:none!important;
+  opacity:1!important;
+}
+.d2QuizQuestionCard .stage8ActionDock > button:not(:disabled),
+.d2QuizQuestionCard .stage8ActionDock > button.d2Btn:not(:disabled),
+.d2QuizQuestionCard .stage8ActionDock > button.grimdarkPrimaryAction:not(:disabled){
+  background-color:transparent!important;
+  background-image:url('/ui/grimdark/core_toggle_switch_on_001.png?v=20260927-action-lockfix')!important;
+  background-repeat:no-repeat!important;
+  background-position:center!important;
+  background-size:100% 100%!important;
+  border:0!important;
+  box-shadow:none!important;
+  opacity:1!important;
+}
+.d2QuizQuestionCard .stage8ActionDock > button:disabled{
+  background-color:transparent!important;
+  background-image:url('/ui/grimdark/core_toggle_switch_off_001.png?v=20260927-action-lockfix')!important;
+  background-repeat:no-repeat!important;
+  background-position:center!important;
+  background-size:100% 100%!important;
+  opacity:1!important;
+}
