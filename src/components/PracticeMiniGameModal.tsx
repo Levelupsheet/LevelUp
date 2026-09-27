@@ -36,6 +36,9 @@ export default function PracticeMiniGameModal(props: {
 
   useEffect(() => {
     if (!open) return;
+    // Always start Position Training on the player's currently selected dashboard path.
+    // This prevents a path chosen in an earlier modal session from leaking into a later run.
+    if (kind === "position") setPath(defaultPath ?? "HELPDESK_SUPPORT");
     setStep("setup");
     setFinalScore({ correct: 0, total: 0, xp: 0 });
     setLearningPath(null);
