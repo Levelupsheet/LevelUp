@@ -967,7 +967,26 @@ const showExpandedExplanation = useMemo(() => {
 
   async function handleNext() {
     if (state.finished && finishFeedbackPending) {
-      setFinishFeedbackPending(false);
+      // The lethal answer has already been reviewed. Complete the run directly
+      // from this click instead of briefly re-rendering the finished quiz.
+      if (!finishedOnceRef.current) {
+        finishedOnceRef.current = true;
+        onComplete?.({
+          outcome: outcome as DiabloQuizRunSummary['outcome'],
+          xpEarned: Math.max(0, state.xpEarned - hintXpSpent),
+          rawXpEarned: state.xpEarned,
+          hintXpSpent,
+          hintsUsedCount,
+          correctCount: state.correctCount,
+          totalQuestions: combatQuestions.length,
+          playerHP: state.playerHP,
+          enemyHP: state.enemyHP,
+          timeLeft: state.timeLeft,
+          masteryByDomain: state.mastery,
+          bestStreak,
+          bossEligible: combatQuestions.length > 0 ? (state.correctCount / combatQuestions.length) >= 0.7 : false,
+        });
+      }
       return;
     }
     const currentQuestion = question as any;
