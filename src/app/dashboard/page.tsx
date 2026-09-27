@@ -966,12 +966,12 @@ async function analyzeResumeStage12() {
             </button>
           ) : null}
 
-          <button className="dashboardAssetButton dashboardAssetButtonOrange" style={{ width: "100%", marginTop: 8, opacity: hasFreeStartCooldown ? 0.7 : 1 }} onClick={() => !hasFreeStartCooldown && setShowLaunchModal(true)} disabled={hasFreeStartCooldown} title={hasFreeStartCooldown ? `Free tier cooldown: ${freeStartCooldownLabel}` : undefined}>
+          <button className="dashboardAssetButton dashboardAssetButtonBlue dashboardStartNowButton" style={{ width: "100%", marginTop: 8, opacity: hasFreeStartCooldown ? 0.7 : 1 }} onClick={() => !hasFreeStartCooldown && setShowLaunchModal(true)} disabled={hasFreeStartCooldown} title={hasFreeStartCooldown ? `Free tier cooldown: ${freeStartCooldownLabel}` : undefined}>
             <span className="dashboardButtonAssetLabel">{hasFreeStartCooldown ? `Start Now! (${freeStartCooldownLabel})` : "Start Now!"}</span></button>
 
           <div className="dashboardBattleShortcuts" style={{ marginTop: 10, display: "grid", gap: 10 }}>
             {hrBattleUnlocked ? (
-              <button className="dashboardAssetButton dashboardAssetButtonRed" style={{ width: "100%" }} onClick={() => setMockInterviewOpen(true)}>
+              <button className="dashboardAssetButton dashboardAssetButtonBlue dashboardHrBattleButton" style={{ width: "100%" }} onClick={() => setMockInterviewOpen(true)}>
                 <span className="dashboardButtonAssetLabel">{hrPassed ? "Start HR Battle →" : "Start HR Battle →"}</span></button>
             ) : (
               <button className="dashboardAssetButton dashboardAssetButtonOrange" style={{ width: "100%", opacity: 0.65, cursor: "not-allowed" }} disabled title="HR battle unlocks automatically when you qualify.">
