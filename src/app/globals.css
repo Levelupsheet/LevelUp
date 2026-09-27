@@ -10110,3 +10110,33 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     transition:clip-path .35s ease!important;
   }
 }
+
+
+/* 2026-09-27 final HP-orb behavior.
+   The circular orb never clips/moves; only an internal bottom-anchored fill
+   drains. The orb artwork stays fixed behind the fill viewport. */
+@media (min-width:901px){
+  .batch8DesktopQuizGrid .playerOrbBlood{
+    clip-path:none!important;
+    overflow:hidden!important;
+    border-radius:50%!important;
+  }
+  .batch8DesktopQuizGrid .playerOrbBloodFill{
+    position:absolute!important;
+    left:0!important;
+    right:0!important;
+    bottom:0!important;
+    overflow:hidden!important;
+    transition:height .35s ease!important;
+  }
+  .batch8DesktopQuizGrid .playerOrbBloodFill img{
+    position:absolute!important;
+    left:0!important;
+    bottom:0!important;
+    width:42px!important;
+    height:42px!important;
+    max-width:none!important;
+    max-height:none!important;
+    object-fit:cover!important;
+  }
+}
