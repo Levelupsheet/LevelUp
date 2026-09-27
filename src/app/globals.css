@@ -9733,3 +9733,25 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .sessionInfoIconButton.active img{
   filter:brightness(1.12) drop-shadow(0 0 6px rgba(225,145,58,.55))!important;
 }
+
+
+/* Powerup store/inventory artwork mapping. */
+.powerHudIcon{
+  width:58px!important;
+  height:58px!important;
+  flex:0 0 58px!important;
+  display:grid!important;
+  place-items:center!important;
+  overflow:hidden!important;
+  background:transparent!important;
+}
+.powerHudIcon .powerupItemArtwork,
+.dashboardPowerupIconSlot .powerupItemArtwork{
+  display:block!important;
+  width:100%!important;
+  height:100%!important;
+  object-fit:contain!important;
+}
+.dashboardPowerupIconSlot{
+  overflow:hidden!important;
+}
