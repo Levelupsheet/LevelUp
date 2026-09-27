@@ -117,14 +117,24 @@ function buildStageConfigs(title: string, maxStages: number, encounterType: "sta
   });
 }
 
-function ModelPanel(props: { title: string; src?: string; mirrored?: boolean; loop?: boolean; onEnded?: () => void; height?: number | string; damageText?: string | null; damageTone?: "enemy" | "player" | null; compact?: boolean }) {
-  const { title, src, mirrored = false, loop = true, onEnded, height = 230, damageText, damageTone, compact = false } = props;
+function ModelPanel(props: { title: string; src?: string; mirrored?: boolean; loop?: boolean; onEnded?: () => void; height?: number | string; damageText?: string | null; damageTone?: "enemy" | "player" | null; compact?: boolean; forceReload?: boolean }) {
+  const { title, src, mirrored = false, loop = true, onEnded, height = 230, damageText, damageTone, compact = false, forceReload = false } = props;
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  useEffect(() => {
+    if (!forceReload || !src || !videoRef.current) return;
+    const video = videoRef.current;
+    video.pause();
+    video.load();
+    const playPromise = video.play();
+    if (playPromise && typeof playPromise.catch === "function") playPromise.catch(() => {});
+  }, [src, forceReload]);
   return (
     <div className="card" style={{ padding: 10, background: "rgba(255,255,255,0.04)", minHeight: compact ? 0 : 250 }}>
       {title ? <div style={{ fontSize: 12, fontWeight: 900, letterSpacing: 0.6, opacity: 0.88, marginBottom: 8 }}>{title}</div> : null}
       <div style={{ position: "relative", borderRadius: 16, overflow: "hidden", border: "1px solid rgba(255,255,255,0.08)", background: "rgba(5,10,20,0.85)" }}>
         {src ? (
           <video
+            ref={videoRef}
             key={src}
             autoPlay
             loop={loop}
@@ -1209,7 +1219,7 @@ const showExpandedExplanation = useMemo(() => {
               <div className={hitPulse === "player" ? "d2Shake" : ""}>
                 <D2LifeOrb value={state.playerHP} name={playerName} />
               </div>
-              <ModelPanel key={playerVideoKey} title="" src={playerVideo} loop={!isPlayerHitVideo} onEnded={isPlayerHitVideo ? () => setHitPulse(null) : undefined} height="clamp(180px, 22vh, 280px)" damageText={damageFloat.player || null} damageTone="player" />
+              <ModelPanel key={playerVideoKey} title="" src={playerVideo} forceReload={hitPulse === "player"} loop={!isPlayerHitVideo} onEnded={isPlayerHitVideo ? () => setHitPulse(null) : undefined} height="clamp(180px, 22vh, 280px)" damageText={damageFloat.player || null} damageTone="player" />
             </div>
 
             <div className={"d2QuestionCard d2QuizQuestionCard batch8LearningStage " + (hitPulse === "enemy" ? "d2HitFlash" : "") + ((question as any)?.isGolden ? " d2GoldenQuestionCard" : "") + (isGoldenBoss ? " d2GoldenBossCard" : "") } style={{ minHeight: 0, height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
@@ -1557,7 +1567,7 @@ const showExpandedExplanation = useMemo(() => {
                 <D2LifeOrb value={state.playerHP} name={playerName} />
               </div>
               <div style={{ marginTop: 10 }}>
-                <ModelPanel key={playerVideoKey} title="" src={playerVideo} loop={!isPlayerHitVideo} onEnded={isPlayerHitVideo ? () => setHitPulse(null) : undefined} height="clamp(180px, 22vh, 280px)" damageText={damageFloat.player || null} damageTone="player" />
+                <ModelPanel key={playerVideoKey} title="" src={playerVideo} forceReload={hitPulse === "player"} loop={!isPlayerHitVideo} onEnded={isPlayerHitVideo ? () => setHitPulse(null) : undefined} height="clamp(180px, 22vh, 280px)" damageText={damageFloat.player || null} damageTone="player" />
               </div>
             </div>
           </div>
