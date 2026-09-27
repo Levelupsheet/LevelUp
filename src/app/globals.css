@@ -5602,12 +5602,12 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 
 /* Native button roles. */
 .gdActionOrange,.gdActionBlue,.gdActionRed{position:relative!important;display:flex!important;align-items:center!important;justify-content:center!important;min-height:52px!important;padding:10px 24px!important;border:0!important;border-radius:0!important;background-color:transparent!important;background-repeat:no-repeat!important;background-position:center!important;background-size:100% 100%!important;box-shadow:none!important;color:#f8ecd6!important;font-family:Cinzel,Georgia,serif!important;font-weight:800!important;text-shadow:0 2px 2px #000!important;text-decoration:none!important}
-.gdActionOrange{background-image:url('/ui/grimdark/button-orange.png')!important}.gdActionBlue{background-image:url('/ui/grimdark/button-blue.png')!important}.gdActionRed{background-image:url('/ui/grimdark/button-red.png')!important}
-.dashboardGrimdarkSidebar button.dashboardSidebarStart{width:100%!important;height:58px!important;min-height:58px!important;margin:8px 0 0!important;background-image:url('/ui/grimdark/button-red.png')!important}
-.dashboardGrimdarkSidebar .dashboardBattleShortcuts button.gdActionOrange{width:100%!important;height:58px!important;min-height:58px!important;background-image:url('/ui/grimdark/button-orange.png')!important}
-.dashboardGrimdarkSidebar .dashboardBattleShortcuts button.gdActionBlue{width:100%!important;height:58px!important;min-height:58px!important;background-image:url('/ui/grimdark/button-blue.png')!important}
-.dashboardGrimdarkSidebar .dashboardSidebarStart.gdActionRed{display:flex!important;width:100%!important;height:58px!important;min-height:58px!important;padding:10px 24px!important;background:transparent url('/ui/grimdark/button-red.png') center/100% 100% no-repeat!important;color:#f8ecd6!important}
-.dashboardGrimdarkSidebar .dashboardBattleShortcuts button.gdActionOrange{display:flex!important;width:100%!important;height:58px!important;min-height:58px!important;padding:10px 24px!important;background:transparent url('/ui/grimdark/button-orange.png') center/100% 100% no-repeat!important;color:#f8ecd6!important}
+.gdActionOrange{background-image:url('/ui/grimdark/button-orange.png?v=20260927c')!important}.gdActionBlue{background-image:url('/ui/grimdark/button-blue.png?v=20260927c')!important}.gdActionRed{background-image:url('/ui/grimdark/button-red.png?v=20260927c')!important}
+.dashboardGrimdarkSidebar button.dashboardSidebarStart{width:100%!important;height:58px!important;min-height:58px!important;margin:8px 0 0!important;background-image:url('/ui/grimdark/button-red.png?v=20260927c')!important}
+.dashboardGrimdarkSidebar .dashboardBattleShortcuts button.gdActionOrange{width:100%!important;height:58px!important;min-height:58px!important;background-image:url('/ui/grimdark/button-orange.png?v=20260927c')!important}
+.dashboardGrimdarkSidebar .dashboardBattleShortcuts button.gdActionBlue{width:100%!important;height:58px!important;min-height:58px!important;background-image:url('/ui/grimdark/button-blue.png?v=20260927c')!important}
+.dashboardGrimdarkSidebar .dashboardSidebarStart.gdActionRed{display:flex!important;width:100%!important;height:58px!important;min-height:58px!important;padding:10px 24px!important;background:transparent url('/ui/grimdark/button-red.png?v=20260927c') center/100% 100% no-repeat!important;color:#f8ecd6!important}
+.dashboardGrimdarkSidebar .dashboardBattleShortcuts button.gdActionOrange{display:flex!important;width:100%!important;height:58px!important;min-height:58px!important;padding:10px 24px!important;background:transparent url('/ui/grimdark/button-orange.png?v=20260927c') center/100% 100% no-repeat!important;color:#f8ecd6!important}
 
 .gdActionOrange:hover:not(:disabled),.gdActionBlue:hover:not(:disabled),.gdActionRed:hover:not(:disabled){filter:brightness(1.13) saturate(1.08)}.gdActionOrange:active:not(:disabled),.gdActionBlue:active:not(:disabled),.gdActionRed:active:not(:disabled){transform:translateY(1px);filter:brightness(.92)}.gdActionOrange:disabled,.gdActionBlue:disabled,.gdActionRed:disabled{opacity:.46!important;filter:grayscale(.5) brightness(.7)}
 
@@ -5654,13 +5654,13 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 }
 .dashboardGrimdarkSidebar .dashboardSidebarStart{
   margin-top:10px!important;
-  background-image:url('/ui/grimdark/button-red.png')!important;
+  background-image:url('/ui/grimdark/button-red.png?v=20260927c')!important;
 }
 .dashboardGrimdarkSidebar .dashboardBattleShortcuts > button.gdActionOrange{
-  background-image:url('/ui/grimdark/button-orange.png')!important;
+  background-image:url('/ui/grimdark/button-orange.png?v=20260927c')!important;
 }
 .dashboardGrimdarkSidebar .dashboardBattleShortcuts > button.gdActionBlue{
-  background-image:url('/ui/grimdark/button-blue.png')!important;
+  background-image:url('/ui/grimdark/button-blue.png?v=20260927c')!important;
 }
 .dashboardGrimdarkSidebar .dashboardPlayerOnly{
   height:320px!important;
@@ -5678,3 +5678,14 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
   height:100%!important;
   object-fit:fill!important;
 }
+
+/* Asset-backed sidebar controls: cache-busted after validating source PNGs. */
+.dashboardGrimdarkSidebar .dashboardSidebarStart,
+.dashboardGrimdarkSidebar .dashboardBattleShortcuts>button{position:relative!important;overflow:hidden!important;isolation:isolate!important;background-image:none!important}
+.dashboardGrimdarkSidebar .dashboardSidebarStart::before,
+.dashboardGrimdarkSidebar .dashboardBattleShortcuts>button::before{content:""!important;position:absolute!important;inset:0!important;z-index:-1!important;background-position:center!important;background-repeat:no-repeat!important;background-size:100% 100%!important;pointer-events:none!important}
+.dashboardGrimdarkSidebar .dashboardSidebarStart::before{background-image:url('/ui/grimdark/button-red.png?v=20260927c')!important}
+.dashboardGrimdarkSidebar .dashboardBattleShortcuts>button.gdActionOrange::before{background-image:url('/ui/grimdark/button-orange.png?v=20260927c')!important}
+.dashboardGrimdarkSidebar .dashboardBattleShortcuts>button.gdActionBlue::before{background-image:url('/ui/grimdark/button-blue.png?v=20260927c')!important}
+.dashboardGrimdarkSidebar .dashboardPlayerOnly{padding:10px!important;height:330px!important;min-height:330px!important}
+.dashboardGrimdarkSidebar .dashboardCharacterTitleFrame{object-fit:fill!important}
