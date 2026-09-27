@@ -8781,3 +8781,52 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
   font-weight:800!important;
   text-shadow:0 1px 2px #000!important;
 }
+
+
+/* 2026-09-27 quiz EXIT: use the same purchased button artwork as CLEAR, not CSS framing. */
+.d2QuizShell .modalHead .d2ExitBtn,
+.d2QuizShell .modalHead a.d2ExitBtn,
+.d2QuizShell .modalHead button.d2ExitBtn{
+  appearance:none!important;
+  -webkit-appearance:none!important;
+  width:150px!important;
+  min-width:150px!important;
+  max-width:150px!important;
+  height:44px!important;
+  min-height:44px!important;
+  padding:0!important;
+  border:0!important;
+  border-image:none!important;
+  border-radius:0!important;
+  outline:0!important;
+  clip-path:none!important;
+  box-shadow:none!important;
+  background-color:transparent!important;
+  background-image:url('/ui/grimdark/core_toggle_switch_on_001.png?v=20260927-exit-clear-art')!important;
+  background-repeat:no-repeat!important;
+  background-position:center!important;
+  background-size:100% 100%!important;
+  color:#f6ead5!important;
+  font-family:Georgia,'Times New Roman',serif!important;
+  font-weight:800!important;
+  letter-spacing:.06em!important;
+  text-shadow:0 1px 2px #000!important;
+  opacity:1!important;
+}
+.d2QuizShell .modalHead .d2ExitBtn:hover,
+.d2QuizShell .modalHead .d2ExitBtn:focus{
+  background-image:url('/ui/grimdark/core_toggle_switch_on_001.png?v=20260927-exit-clear-art')!important;
+  filter:brightness(1.06)!important;
+  box-shadow:none!important;
+}
+@media(max-width:900px){
+  .d2QuizShell .modalHead .d2ExitBtn,
+  .d2QuizShell .modalHead a.d2ExitBtn,
+  .d2QuizShell .modalHead button.d2ExitBtn{
+    width:112px!important;
+    min-width:112px!important;
+    max-width:112px!important;
+    height:40px!important;
+    min-height:40px!important;
+  }
+}
