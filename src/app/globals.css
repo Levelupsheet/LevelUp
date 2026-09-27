@@ -7961,3 +7961,145 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     transform:translateY(10px)!important;
   }
 }
+
+
+/* 2026-09-27 live-build HUD polish: side rails, type badge, compact summary. */
+@media (min-width:901px){
+  /* Player orb: smaller and seated slightly left/up inside purchased holder. */
+  .batch8DesktopQuizGrid .batch8PlayerRail > div:first-child{
+    transform:translate(-18px,-13px)!important;
+    margin-bottom:8px!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail .d2OrbWrap,
+  .batch8DesktopQuizGrid .batch8PlayerRail .d2OrbFrame{
+    width:92px!important;
+    height:92px!important;
+    min-width:92px!important;
+    min-height:92px!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail .d2AssetBloodOrb{
+    inset:9%!important;
+  }
+
+  /* Preserve the complete player portrait instead of cropping the right/bottom edge. */
+  .batch8DesktopQuizGrid .batch8PlayerRail > .card{
+    width:150px!important;
+    height:150px!important;
+    padding:5px!important;
+    transform:translate(-4px,4px)!important;
+    overflow:visible!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail > .card > div{
+    width:100%!important;
+    height:100%!important;
+    overflow:hidden!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail > .card video,
+  .batch8DesktopQuizGrid .batch8PlayerRail > .card img{
+    width:100%!important;
+    height:100%!important;
+    object-fit:contain!important;
+    object-position:center bottom!important;
+    transform:scale(.76)!important;
+    transform-origin:center bottom!important;
+  }
+
+  /* Enemy orb: remove any inherited blue glow/frame treatment; purchased PNG only. */
+  .batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyCard{
+    width:92px!important;
+    height:92px!important;
+    min-width:92px!important;
+    min-height:92px!important;
+    margin-top:26px!important;
+    margin-bottom:46px!important;
+    background:transparent!important;
+    background-image:none!important;
+    box-shadow:none!important;
+    filter:none!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyEnergyOrbShell{
+    inset:8%!important;
+    background:transparent!important;
+    background-image:none!important;
+    box-shadow:none!important;
+    filter:none!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyEnergyOrb{
+    background:transparent!important;
+    box-shadow:none!important;
+    filter:none!important;
+  }
+
+  /* Drop the enemy portrait farther below the orb and keep its full art visible. */
+  .batch8DesktopQuizGrid .batch8EnemyRail > .card{
+    width:150px!important;
+    height:150px!important;
+    padding:5px!important;
+    transform:translateY(24px)!important;
+    overflow:visible!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail > .card > div{
+    width:100%!important;
+    height:100%!important;
+    overflow:hidden!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail > .card video,
+  .batch8DesktopQuizGrid .batch8EnemyRail > .card img{
+    width:100%!important;
+    height:100%!important;
+    object-fit:contain!important;
+    object-position:center bottom!important;
+    transform:scale(.80)!important;
+    transform-origin:center bottom!important;
+  }
+
+  /* Question-type text only: remove legacy CSS pill/bar around Multiple Choice etc. */
+  .batch8LearningStage .stageHeaderRow .badge{
+    border:0!important;
+    outline:0!important;
+    border-radius:0!important;
+    background:transparent!important;
+    background-image:none!important;
+    box-shadow:none!important;
+    padding:0!important;
+  }
+}
+
+/* Completion modal: reduce hero/content enough to fit a normal desktop viewport without inner scrolling. */
+@media (min-width:901px){
+  .practiceGameModal--summary{
+    width:min(88vw,820px)!important;
+    max-width:820px!important;
+    height:min(88vh,760px)!important;
+    max-height:88vh!important;
+    overflow:hidden!important;
+  }
+  .practiceGameModal--summary .luModalBody{
+    height:calc(88vh - 76px)!important;
+    max-height:684px!important;
+    overflow:hidden!important;
+  }
+  .practiceGameModal--summary .practiceRunSummaryShell{
+    transform:scale(.78)!important;
+    transform-origin:top center!important;
+    width:128.21%!important;
+    margin-left:-14.105%!important;
+    padding:6px!important;
+  }
+  .practiceGameModal--summary .practiceRunResultHero{
+    width:82%!important;
+    height:210px!important;
+    min-height:210px!important;
+    max-height:210px!important;
+    margin:0 auto 2px!important;
+  }
+  .practiceGameModal--summary .practiceRunResultArt{
+    width:100%!important;
+    height:100%!important;
+    object-fit:contain!important;
+  }
+  .practiceGameModal--summary .practiceSummaryClose{
+    top:4px!important;
+    margin-bottom:-38px!important;
+  }
+}
