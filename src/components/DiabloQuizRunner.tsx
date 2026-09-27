@@ -572,6 +572,7 @@ export default function DiabloQuizRunner(props: {
   const timeSlowActiveRef = useRef(false);
 
   const finishedOnceRef = useRef(false);
+  const [finishFeedbackPending, setFinishFeedbackPending] = useState(false);
 
   const maxStages = useMemo(() => inferMaxStages(title, combatQuestions.length), [title, combatQuestions.length]);
   const stageConfigs = useMemo(() => buildStageConfigs(title, maxStages, encounterType), [title, maxStages, encounterType]);
@@ -749,6 +750,7 @@ const showExpandedExplanation = useMemo(() => {
 
   useEffect(() => {
     finishedOnceRef.current = false;
+    setFinishFeedbackPending(false);
     setStreak(0);
     setBestStreak(0);
     setPowerups({ shieldActive: false, furyActive: false, shieldUses: 0, furyUses: 0 });
@@ -834,6 +836,12 @@ const showExpandedExplanation = useMemo(() => {
 
   useEffect(() => {
     if (!state.finished || finishedOnceRef.current) return;
+    // A lethal/final answer should remain on screen long enough to review the
+    // correct answer and explanation before the outer modal shows Defeat.
+    if (state.locked && question) {
+      if (!finishFeedbackPending) setFinishFeedbackPending(true);
+      return;
+    }
     finishedOnceRef.current = true;
     onComplete?.({
       outcome: outcome as DiabloQuizRunSummary['outcome'],
@@ -850,7 +858,7 @@ const showExpandedExplanation = useMemo(() => {
       bestStreak,
       bossEligible: combatQuestions.length > 0 ? (state.correctCount / combatQuestions.length) >= 0.7 : false,
     });
-  }, [state.finished, state.xpEarned, state.correctCount, state.playerHP, state.enemyHP, state.timeLeft, combatQuestions.length, onComplete, outcome, hintXpSpent, hintsUsedCount, bestStreak]);
+  }, [state.finished, state.locked, question, finishFeedbackPending, state.xpEarned, state.correctCount, state.playerHP, state.enemyHP, state.timeLeft, combatQuestions.length, onComplete, outcome, hintXpSpent, hintsUsedCount, bestStreak]);
 
   const playerName = useMemo(() => {
     try {
@@ -882,7 +890,7 @@ const showExpandedExplanation = useMemo(() => {
   }, [title]);
 
   const domainLabel = labelForDomain(currentDomainId);
-  const finished = Boolean(forceFinish) || state.finished;
+  const finished = Boolean(forceFinish) || (state.finished && !finishFeedbackPending);
   const displayedXp = Math.max(0, state.xpEarned - hintXpSpent);
   const partialScore = Number(answerInsight?.evaluation?.partialScore ?? answerInsight?.evaluation?.score ?? 0);
   const partialPercent = Math.max(0, Math.min(100, Math.round(partialScore * 100)));
@@ -954,6 +962,10 @@ const showExpandedExplanation = useMemo(() => {
   }
 
   async function handleNext() {
+    if (state.finished && finishFeedbackPending) {
+      setFinishFeedbackPending(false);
+      return;
+    }
     const currentQuestion = question as any;
     let awarded = false;
     if (state.locked && currentQuestion?.sessionQuestionId && onAdvanceQuestion) {
