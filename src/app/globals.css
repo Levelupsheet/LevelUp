@@ -6130,3 +6130,42 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .dashboardGrimdarkSidebar .dashboardBattleShortcuts .gdActionOrange{
   background-image:url('/ui/grimdark/button-orange.png') !important;
 }
+
+
+/* Screenshot correction: force native artwork on sidebar actions and restore player-frame layering. */
+.dashboardGrimdarkSidebar .dashboardSidebarStart.gdActionRed,
+.dashboardGrimdarkSidebar button.dashboardSidebarStart{
+  display:flex !important;align-items:center !important;justify-content:center !important;
+  width:100% !important;min-height:58px !important;padding:10px 24px !important;
+  border:0 !important;border-radius:0 !important;
+  background-color:transparent !important;
+  background-image:url('/ui/grimdark/button-red.png') !important;
+  background-position:center !important;background-repeat:no-repeat !important;background-size:100% 100% !important;
+  box-shadow:none !important;color:#fff1d1 !important;
+}
+.dashboardGrimdarkSidebar .dashboardBattleShortcuts button.gdActionOrange{
+  display:flex !important;align-items:center !important;justify-content:center !important;
+  width:100% !important;min-height:58px !important;padding:10px 24px !important;
+  border:0 !important;border-radius:0 !important;
+  background-color:transparent !important;
+  background-image:url('/ui/grimdark/button-orange.png') !important;
+  background-position:center !important;background-repeat:no-repeat !important;background-size:100% 100% !important;
+  box-shadow:none !important;color:#fff1d1 !important;
+}
+.dashboardSelectedPlayer.dashboardSelectedPlayerButton{
+  position:relative !important;display:block !important;width:100% !important;
+}
+.dashboardSelectedPlayer .dashboardGrimdarkPortrait.dashboardPlayerOnly{
+  position:relative !important;display:block !important;width:100% !important;
+  height:278px !important;min-height:278px !important;padding:0 !important;overflow:hidden !important;
+}
+.dashboardSelectedPlayer .dashboardGrimdarkPortrait.dashboardPlayerOnly video{
+  position:absolute !important;z-index:1 !important;
+  inset:16px !important;width:calc(100% - 32px) !important;height:calc(100% - 32px) !important;
+  display:block !important;object-fit:cover !important;object-position:center !important;
+}
+.dashboardSelectedPlayer .dashboardCharacterTitleFrame{
+  position:absolute !important;z-index:5 !important;inset:0 !important;
+  display:block !important;width:100% !important;height:100% !important;
+  object-fit:fill !important;pointer-events:none !important;
+}
