@@ -8930,3 +8930,42 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     max-height:none!important;
   }
 }
+
+
+/* 2026-09-27 live screenshot cleanup: stage artwork stands alone; feedback is revealed after submit. */
+.d2QuizQuestionCard .stageHeaderRow{
+  background:transparent!important;
+  background-image:none!important;
+  border:0!important;
+  border-top:0!important;
+  border-right:0!important;
+  border-bottom:0!important;
+  border-left:0!important;
+  box-shadow:none!important;
+  outline:0!important;
+}
+.d2QuizQuestionCard .stageHeaderRow::before,
+.d2QuizQuestionCard .stageHeaderRow::after{
+  content:none!important;
+  display:none!important;
+}
+.d2QuizQuestionCard .stageHeaderRow > div:first-child{
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+}
+.d2QuizQuestionCard .stageLabelPill.stageLabelArtwork{
+  position:relative!important;
+  z-index:2!important;
+}
+@media (min-width:901px){
+  .d2QuizQuestionCard{
+    scroll-behavior:smooth!important;
+  }
+  .d2QuizQuestionCard:has(.adaptiveTeachingCard) .adaptiveTeachingCard{
+    scroll-margin-top:14px!important;
+  }
+  .d2QuizQuestionCard:has(.adaptiveTeachingCard){
+    padding-bottom:48px!important;
+  }
+}
