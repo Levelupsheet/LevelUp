@@ -1087,14 +1087,6 @@ async function analyzeResumeStage12() {
               </div>
             </div>
 
-            <button
-              className="primary dashboardMobileStartNow gdActionOrange"
-              type="button"
-              onClick={() => !hasFreeStartCooldown && setShowLaunchModal(true)}
-              disabled={hasFreeStartCooldown}
-            >
-              {hasFreeStartCooldown ? `Start Now! (${freeStartCooldownLabel})` : "Start Now!"}
-            </button>
           </div>
 
           <div className="card dashboardNextAction dashboardGrimdarkPanel">
