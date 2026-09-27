@@ -7706,3 +7706,38 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     border-radius:0!important;
   }
 }
+
+
+/* 2026-09-27 completion screen: compact, scrollable, and viewport-safe. */
+.practiceGameModal--summary{
+  width:min(90vw,882px)!important;
+  max-width:882px!important;
+  max-height:90vh!important;
+  overflow:hidden!important;
+}
+.practiceGameModal--summary .luModalBody{
+  max-height:calc(90vh - 82px)!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  overscroll-behavior:contain!important;
+  scrollbar-gutter:stable!important;
+}
+.practiceGameModal--summary .practiceRunSummaryShell{
+  width:100%!important;
+  box-sizing:border-box!important;
+  padding:12px!important;
+}
+.practiceGameModal--summary .practiceRunResultHero{
+  width:90%!important;
+  min-height:clamp(250px,43vw,450px)!important;
+  margin-left:auto!important;
+  margin-right:auto!important;
+}
+.practiceGameModal--summary .adaptiveSummaryGrid{
+  gap:10px!important;
+}
+@media(max-width:700px){
+  .practiceGameModal--summary{width:94vw!important;max-height:92vh!important}
+  .practiceGameModal--summary .luModalBody{max-height:calc(92vh - 66px)!important}
+  .practiceGameModal--summary .practiceRunResultHero{width:94%!important;min-height:300px!important}
+}
