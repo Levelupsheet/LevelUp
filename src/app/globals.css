@@ -6195,7 +6195,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     border:0!important;
     outline:0!important;
     box-shadow:none!important;
-    background:url('/ui/grimdark/flow-main-panel-left.webp?v=20260927-playerrail') top center/100% 100% no-repeat!important;
+    background:url('/ui/grimdark/flow-main-panel-player.png?v=20260927-nativepng') top center/100% 100% no-repeat!important;
   }
   .batch8DesktopQuizGrid .batch8PlayerRail::before,
   .batch8DesktopQuizGrid .batch8PlayerRail::after{content:none!important;display:none!important}
@@ -6240,4 +6240,22 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     box-shadow:none!important;
     background:transparent!important;
   }
+}
+
+/* Native flow panel visibility/fitting fix. Keep artwork as its own layer. */
+@media (min-width:901px){
+ .batch8DesktopQuizGrid .batch8PlayerRail{
+   background-image:url('/ui/grimdark/flow-main-panel-player.png?v=20260927-nativepng')!important;
+   background-repeat:no-repeat!important;
+   background-position:top center!important;
+   background-size:100% 100%!important;
+   overflow:visible!important;
+ }
+ .batch8DesktopQuizGrid .batch8PlayerRail > div:first-child{
+   margin-top:14px!important;
+   width:88%!important;
+ }
+ .batch8DesktopQuizGrid .batch8PlayerRail > div:first-child > *{
+   width:70%!important;height:70%!important;max-width:70%!important;max-height:70%!important;
+ }
 }
