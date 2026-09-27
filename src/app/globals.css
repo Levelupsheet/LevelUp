@@ -9007,3 +9007,23 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     overscroll-behavior:contain!important;
   }
 }
+
+
+/* 2026-09-27 keep both combat orbs below the Position Training header */
+@media (min-width:901px){
+  .batch8DesktopQuizGrid{
+    overflow:visible!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail,
+  .batch8DesktopQuizGrid .batch8EnemyRail{
+    box-sizing:border-box!important;
+    padding-top:18px!important;
+    overflow:visible!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail > :first-child,
+  .batch8DesktopQuizGrid .batch8EnemyRail > :first-child{
+    transform:translateY(0)!important;
+    margin-top:0!important;
+    max-width:100%!important;
+  }
+}
