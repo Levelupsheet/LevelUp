@@ -7125,3 +7125,39 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     margin-top:8px!important;
   }
 }
+
+
+/* Final dedicated orb holders supplied for each combat side. */
+@media (min-width:901px){
+  .batch8DesktopQuizGrid .batch8PlayerRail::before{
+    background-image:url('/ui/grimdark/flow_main_panel_player.png?v=20260927-dedicated')!important;
+    background-position:top center!important;
+    background-repeat:no-repeat!important;
+    background-size:contain!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail::before{
+    background-image:url('/ui/grimdark/flow_main_panel_enemy.png?v=20260927-dedicated')!important;
+    background-position:top center!important;
+    background-repeat:no-repeat!important;
+    background-size:contain!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail .d2OrbWrap,
+  .batch8DesktopQuizGrid .batch8PlayerRail .d2OrbFrame{
+    width:150px!important;
+    height:150px!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail .d2AssetBloodOrb{
+    inset:5%!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyCard{
+    width:150px!important;
+    height:150px!important;
+    min-width:150px!important;
+    min-height:150px!important;
+    margin:27px auto 28px!important;
+    background-image:url('/ui/grimdark/flow_energy_ball_001.png?v=20260927-dedicated')!important;
+    background-position:center!important;
+    background-repeat:no-repeat!important;
+    background-size:90% 90%!important;
+  }
+}
