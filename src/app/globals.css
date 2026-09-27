@@ -5959,3 +5959,18 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     background-image:url('/ui/grimdark/button-red.png?v=20260927-proven')!important;
   }
 }
+
+
+/* Toggle fallback for the two desktop actions that resisted the standard orange/red skins. */
+@media (min-width:861px){
+  .dashboardGrimdarkSidebar button.dashboardToggleAction.dashboardStartNowButton,
+  .dashboardGrimdarkSidebar button.dashboardToggleAction.dashboardHrBattleButton{
+    background-image:url('/ui/grimdark/toggle-on.webp?v=20260927-toggle')!important;
+    background-color:transparent!important;
+    background-position:center!important;
+    background-repeat:no-repeat!important;
+    background-size:100% 100%!important;
+    height:58px!important;
+    min-height:58px!important;
+  }
+}
