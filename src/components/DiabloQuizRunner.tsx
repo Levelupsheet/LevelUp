@@ -581,6 +581,8 @@ export default function DiabloQuizRunner(props: {
   const [stageEnemyHP, setStageEnemyHP] = useState(90);
   const questionStartRef = useRef(Date.now());
   const timeSlowActiveRef = useRef(false);
+  const shieldQuestionRef = useRef<number | null>(null);
+  const furyQuestionRef = useRef<number | null>(null);
 
   const finishedOnceRef = useRef(false);
   const feedbackRevealRef = useRef<HTMLDivElement | null>(null);
@@ -594,7 +596,10 @@ export default function DiabloQuizRunner(props: {
     rules,
     timed,
     onXp,
-    getActiveModifiers: () => ({ shieldActive: powerups.shieldActive, furyActive: powerups.furyActive }),
+    getActiveModifiers: () => ({
+      shieldActive: powerups.shieldActive && shieldQuestionRef.current === state.idx,
+      furyActive: powerups.furyActive && furyQuestionRef.current === state.idx,
+    }),
     getQuestionLevel: () => (Math.max(effectiveQuestionTier, Math.min(3, Math.ceil(sessionStage / 2))) as DifficultyTier),
     getPlayerDamageTaken: ({ usedShield }) => usedShield ? 0 : Math.max(34, currentStageConfig.playerDamage),
     getEnemyDamageDealt: ({ correct }) => correct ? Math.ceil(currentStageConfig.hp / 3) : 0,
@@ -607,6 +612,8 @@ export default function DiabloQuizRunner(props: {
     },
     finishOnEnemyDefeat: encounterType === "boss",
     onConsumeModifier: (name) => {
+      if (name === "shieldActive") shieldQuestionRef.current = null;
+      if (name === "furyActive") furyQuestionRef.current = null;
       setPowerups((current) => ({
         ...current,
         shieldActive: name === "shieldActive" ? false : current.shieldActive,
@@ -1079,6 +1086,7 @@ const showExpandedExplanation = useMemo(() => {
 
   async function activateShield() {
     if (powerups.shieldActive || state.locked) return;
+    shieldQuestionRef.current = state.idx;
     if (powerups.shieldUses > 0) {
       setPowerups((current) => ({ ...current, shieldUses: current.shieldUses - 1, shieldActive: true }));
       return;
@@ -1095,6 +1103,7 @@ const showExpandedExplanation = useMemo(() => {
 
   async function activateFury() {
     if (powerups.furyActive || state.locked) return;
+    furyQuestionRef.current = state.idx;
     if (powerups.furyUses > 0) {
       setPowerups((current) => ({ ...current, furyUses: current.furyUses - 1, furyActive: true }));
       return;
