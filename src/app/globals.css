@@ -6394,3 +6394,18 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     display:none!important;
   }
 }
+
+
+/* 2026-09-27: preserve the native character-popup frame proportions.
+   Never stretch this artwork independently on X/Y. */
+@media (min-width:901px){
+  .d2QuestionCard.d2QuizQuestionCard.batch8LearningStage{
+    background-color:#171915!important;
+    background-image:
+      linear-gradient(rgba(5,5,5,.14),rgba(5,5,5,.14)),
+      url('/ui/grimdark/character-popup-window.webp?v=20260927-nativeaspect')!important;
+    background-repeat:no-repeat,no-repeat!important;
+    background-position:center,center!important;
+    background-size:100% 100%,contain!important;
+  }
+}
