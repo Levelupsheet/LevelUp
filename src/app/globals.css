@@ -5934,3 +5934,17 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     box-shadow:none!important;
   }
 }
+
+
+/* Desktop sidebar action palette: same proven renderer as Tech Battle. */
+@media (min-width:861px){
+  .dashboardGrimdarkSidebar button.dashboardAssetButtonRed{
+    background-image:url('/ui/grimdark/button-red.png?v=20260927-actions')!important;
+  }
+  .dashboardGrimdarkSidebar button.dashboardAssetButtonOrange{
+    background-image:url('/ui/grimdark/button-orange.png?v=20260927-actions')!important;
+  }
+  .dashboardGrimdarkSidebar button.dashboardAssetButtonBlue{
+    background-image:url('/ui/grimdark/button-blue.png?v=20260927-actions')!important;
+  }
+}
