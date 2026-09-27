@@ -966,22 +966,22 @@ async function analyzeResumeStage12() {
             </button>
           ) : null}
 
-          <button className="primary dashboardSidebarStart dashboardGrimdarkPrimary gdActionRed gdDashboardWideAction" style={{ width: "100%", marginTop: 8, opacity: hasFreeStartCooldown ? 0.7 : 1 }} onClick={() => !hasFreeStartCooldown && setShowLaunchModal(true)} disabled={hasFreeStartCooldown} title={hasFreeStartCooldown ? `Free tier cooldown: ${freeStartCooldownLabel}` : undefined}>
+          <button className="dashboardSidebarStart dashboardAssetButton dashboardAssetButtonRed" style={{ width: "100%", marginTop: 8, opacity: hasFreeStartCooldown ? 0.7 : 1 }} onClick={() => !hasFreeStartCooldown && setShowLaunchModal(true)} disabled={hasFreeStartCooldown} title={hasFreeStartCooldown ? `Free tier cooldown: ${freeStartCooldownLabel}` : undefined}>
             {hasFreeStartCooldown ? `Start Now! (${freeStartCooldownLabel})` : "Start Now!"}
           </button>
 
           <div className="dashboardBattleShortcuts" style={{ marginTop: 10, display: "grid", gap: 10 }}>
             {hrBattleUnlocked ? (
-              <button className="gold dashboardGrimdarkPrimary gdActionOrange gdDashboardWideAction" style={{ width: "100%" }} onClick={() => setMockInterviewOpen(true)}>
+              <button className="dashboardAssetButton dashboardAssetButtonOrange" style={{ width: "100%" }} onClick={() => setMockInterviewOpen(true)}>
                 {hrPassed ? "Start HR Battle →" : "Start HR Battle →"}
               </button>
             ) : (
-              <button className="gold gdActionOrange gdDashboardWideAction" style={{ width: "100%", opacity: 0.65, cursor: "not-allowed" }} disabled title="HR battle unlocks automatically when you qualify.">
+              <button className="dashboardAssetButton dashboardAssetButtonOrange" style={{ width: "100%", opacity: 0.65, cursor: "not-allowed" }} disabled title="HR battle unlocks automatically when you qualify.">
                 Begin Boss Battle 🔒
               </button>
             )}
             {((localLevel || 1) >= 5 || hasTechReady) ? (
-              <button className="primary dashboardGrimdarkPrimary gdActionBlue" style={{ width: "100%" }} type="button" onClick={() => setMockInterviewOpen(true)}>
+              <button className="dashboardAssetButton dashboardAssetButtonBlue" style={{ width: "100%" }} type="button" onClick={() => setMockInterviewOpen(true)}>
                 Start Tech Battle →
               </button>
             ) : null}
