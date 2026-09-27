@@ -50,14 +50,6 @@ export default function D2LifeOrb(props: {
         <div className={"d2OrbFlash" + (flash ? " on" : "")} aria-hidden />
       </div>
 
-      <div className="d2NamePlate" aria-label="Player name">
-        <div className="d2NamePlateInner">
-          <span className="d2Roman">{name}</span>
-          <span className="d2NameNums">
-            {Math.max(0, Math.floor(pct))} / 100
-          </span>
-        </div>
-      </div>
     </div>
   );
 }
