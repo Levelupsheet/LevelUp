@@ -9195,3 +9195,79 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     z-index:1!important;
   }
 }
+
+
+/* 2026-09-27 final combat rail alignment: smaller neutral enemy stack */
+@media (min-width:901px){
+  /* player orb/frame centered and lowered to meet portrait */
+  .batch8DesktopQuizGrid .batch8PlayerRail{
+    padding-top:42px!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail > :first-child{
+    width:178px!important;
+    height:178px!important;
+    min-height:178px!important;
+    flex-basis:178px!important;
+    margin:0 auto -1px!important;
+    transform:none!important;
+  }
+
+  /* enemy orb is intentionally 10% smaller than player orb */
+  .batch8DesktopQuizGrid .batch8EnemyRail{
+    padding-top:42px!important;
+    filter:none!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail > :first-child{
+    width:160px!important;
+    max-width:160px!important;
+    height:160px!important;
+    min-height:160px!important;
+    flex:0 0 160px!important;
+    margin:0 auto 4px!important;
+    transform:none!important;
+    filter:none!important;
+    box-shadow:none!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail > :first-child::before,
+  .batch8DesktopQuizGrid .batch8EnemyRail > :first-child::after{
+    filter:none!important;
+    mix-blend-mode:normal!important;
+  }
+
+  /* neutralize legacy blue rail/model treatment */
+  .batch8DesktopQuizGrid .batch8EnemyRail,
+  .batch8DesktopQuizGrid .batch8EnemyRail .modelPanel,
+  .batch8DesktopQuizGrid .batch8EnemyRail .modelPanel *,
+  .batch8DesktopQuizGrid .batch8EnemyRail video,
+  .batch8DesktopQuizGrid .batch8EnemyRail img{
+    filter:none!important;
+    mix-blend-mode:normal!important;
+    backdrop-filter:none!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail .modelPanel{
+    width:160px!important;
+    max-width:160px!important;
+    margin:0 auto!important;
+    background:#050505!important;
+    box-shadow:none!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail .modelPanel::before,
+  .batch8DesktopQuizGrid .batch8EnemyRail .modelPanel::after{
+    background:transparent!important;
+    background-image:none!important;
+    filter:none!important;
+    box-shadow:none!important;
+    mix-blend-mode:normal!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail .enemyNamePlate,
+  .batch8DesktopQuizGrid .batch8EnemyRail .enemyName,
+  .batch8DesktopQuizGrid .batch8EnemyRail .modelPanel + *{
+    width:160px!important;
+    max-width:160px!important;
+    margin:0 auto!important;
+    filter:none!important;
+    background-color:#050505!important;
+    background-image:none!important;
+    box-shadow:none!important;
+  }
+}
