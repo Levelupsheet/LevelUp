@@ -218,17 +218,9 @@ export default function PracticeMiniGameModal(props: {
             const masteryState = mastery >= 85 ? "MASTERED" : mastery >= 70 ? "STRENGTHENED" : mastery >= 50 ? "IMPROVING" : "FOCUS AREA";
             return (
             <div className="card practiceRunSummaryShell" style={{ padding: 14 }}>
+              <button className="d2Btn practiceSummaryClose" type="button" onClick={onClose}>DONE</button>
               <div className={"practiceRunResultHero " + (finalScore.outcome === "defeat" ? "defeat" : "victory")}>
-                <img className="practiceRunResultArt" src={finalScore.outcome === "defeat" ? "/ui/grimdark/flow_game_flow_death_panel_001_001.png" : "/ui/grimdark/flow_game_flow_victory_panel_001_001.png"} alt="" aria-hidden />
-                <div className="practiceRunResultOverlay">
-                  <div className="practiceRunResultLabel">{finalScore.outcome === "defeat" ? "DEFEAT" : "VICTORY"}</div>
-                  <div className="practiceRunResultQuickStats">
-                    <span><small>SCORE</small><b>{finalScore.correct} / {finalScore.total}</b></span>
-                    <span><small>XP EARNED</small><b>+{finalScore.xp}</b></span>
-                    <span><small>BEST STREAK</small><b>{finalScore.bestStreak ?? 0}</b></span>
-                    <span><small>PLAYER HP</small><b>{Math.max(0, Math.round(finalScore.playerHP ?? 0))}</b></span>
-                  </div>
-                </div>
+                <img className="practiceRunResultArt" src={finalScore.outcome === "defeat" ? "/ui/grimdark/flow_game_flow_death_panel_001_001.png" : "/ui/grimdark/flow_game_flow_victory_panel_001_001.png"} alt={finalScore.outcome === "defeat" ? "Defeat" : "Victory"} />
               </div>
               <div className="practiceRunSyncLine"><span>Session complete</span><small className="luHint">XP was synced to the user profile and DB.</small></div>
               <div style={{ marginTop: 12, display: "grid", gap: 10 }}>
