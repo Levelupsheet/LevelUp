@@ -5606,6 +5606,9 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .dashboardGrimdarkSidebar button.dashboardSidebarStart{width:100%!important;height:58px!important;min-height:58px!important;margin:8px 0 0!important;background-image:url('/ui/grimdark/button-red.png')!important}
 .dashboardGrimdarkSidebar .dashboardBattleShortcuts button.gdActionOrange{width:100%!important;height:58px!important;min-height:58px!important;background-image:url('/ui/grimdark/button-orange.png')!important}
 .dashboardGrimdarkSidebar .dashboardBattleShortcuts button.gdActionBlue{width:100%!important;height:58px!important;min-height:58px!important;background-image:url('/ui/grimdark/button-blue.png')!important}
+.dashboardGrimdarkSidebar .dashboardSidebarStart.gdActionRed{display:flex!important;width:100%!important;height:58px!important;min-height:58px!important;padding:10px 24px!important;background:transparent url('/ui/grimdark/button-red.png') center/100% 100% no-repeat!important;color:#f8ecd6!important}
+.dashboardGrimdarkSidebar .dashboardBattleShortcuts button.gdActionOrange{display:flex!important;width:100%!important;height:58px!important;min-height:58px!important;padding:10px 24px!important;background:transparent url('/ui/grimdark/button-orange.png') center/100% 100% no-repeat!important;color:#f8ecd6!important}
+
 .gdActionOrange:hover:not(:disabled),.gdActionBlue:hover:not(:disabled),.gdActionRed:hover:not(:disabled){filter:brightness(1.13) saturate(1.08)}.gdActionOrange:active:not(:disabled),.gdActionBlue:active:not(:disabled),.gdActionRed:active:not(:disabled){transform:translateY(1px);filter:brightness(.92)}.gdActionOrange:disabled,.gdActionBlue:disabled,.gdActionRed:disabled{opacity:.46!important;filter:grayscale(.5) brightness(.7)}
 
 /* Welcome title uses the native core header ribbon above the panel background. */
