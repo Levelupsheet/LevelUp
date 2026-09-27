@@ -1265,3 +1265,29 @@
   inset:15% !important;
   transform:translateY(-3px);
 }
+
+
+/* Final desktop quiz frame cleanup: the engraved artwork is the sole outer edge.
+   The shell shadow must not read as a second rounded CSS border. */
+@media (min-width:861px){
+  .d2QuizShell.modalShell{
+    box-sizing:border-box !important;
+    outline:none !important;
+    border-radius:0 !important;
+    box-shadow:none !important;
+  }
+  .d2QuizShell.modalShell::before,
+  .d2QuizShell.modalShell::after{
+    content:none !important;
+    display:none !important;
+    border:0 !important;
+    outline:0 !important;
+    box-shadow:none !important;
+  }
+  .d2QuizShell .batch8PlayerRail > div:first-child{
+    transform:translateX(-3px);
+  }
+  .d2QuizShell .batch8PlayerRail > div:first-child .d2AssetBloodOrb{
+    transform:translateY(-3px) !important;
+  }
+}
