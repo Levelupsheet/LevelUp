@@ -9271,3 +9271,14 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     box-shadow:none!important;
   }
 }
+
+
+/* 2026-09-27 flip player powerup rack so its bottom edge meets portrait */
+@media (min-width:901px){
+  .batch8DesktopQuizGrid .batch8PlayerRail::after{
+    transform:scaleY(-1)!important;
+    transform-origin:top center!important;
+    top:455px!important;
+    margin:0!important;
+  }
+}
