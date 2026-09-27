@@ -6368,3 +6368,29 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     box-shadow:none!important;
   }
 }
+
+
+/* 2026-09-27: use character_popup_window_bg_001 artwork as the actual quiz/test text frame. */
+@media (min-width:901px){
+  .d2QuestionCard.d2QuizQuestionCard.batch8LearningStage{
+    position:relative!important;
+    isolation:isolate!important;
+    border:0!important;
+    border-image:none!important;
+    outline:0!important;
+    box-shadow:none!important;
+    border-radius:0!important;
+    background:
+      linear-gradient(rgba(5,5,5,.22),rgba(5,5,5,.22)),
+      url('/ui/grimdark/character-popup-window.webp?v=20260927-textframe2') center/100% 100% no-repeat!important;
+    padding:32px 34px!important;
+  }
+  .d2QuestionCard.d2QuizQuestionCard.batch8LearningStage::before,
+  .d2QuestionCard.d2QuizQuestionCard.batch8LearningStage::after{
+    content:none!important;
+    display:none!important;
+  }
+  .d2QuestionCard.d2QuizQuestionCard.batch8LearningStage > .d2Rivet{
+    display:none!important;
+  }
+}
