@@ -961,8 +961,7 @@ async function analyzeResumeStage12() {
               setPositionChangeMode(true);
               setShowPositionModal(true);
             }}>
-              <span className="dashboardGrimdarkPortrait"><video src="/video/helpdesk-wizard-idle.mp4" autoPlay loop muted playsInline disablePictureInPicture controlsList="nodownload noremoteplayback" aria-label="Help Desk Wizard player" /><img className="dashboardGrimdarkPortraitFrame" src="/ui/unit-frame.png" alt="" aria-hidden="true" draggable={false} /></span>
-              <div><small>SELECTED PLAYER</small><b>Help Desk Wizard</b></div>
+              <span className="dashboardGrimdarkPortrait dashboardPlayerOnly"><video src="/video/helpdesk-wizard-idle.mp4" autoPlay loop muted playsInline disablePictureInPicture controlsList="nodownload noremoteplayback" aria-label="Help Desk Wizard player" /></span>
             </button>
           ) : user?.startingPosition === "DESKTOP_TECHNICIAN" ? (
             <button className="dashboardSelectedPlayer dashboardSelectedPlayerButton" type="button" aria-label="Change selected player: Desktop Barbarian" onClick={() => {
@@ -970,8 +969,7 @@ async function analyzeResumeStage12() {
               setPositionChangeMode(true);
               setShowPositionModal(true);
             }}>
-              <span className="dashboardGrimdarkPortrait"><video src="/video/desktop-barbarian-idle.mp4" autoPlay loop muted playsInline disablePictureInPicture controlsList="nodownload noremoteplayback" aria-label="Desktop Barbarian player" /><img className="dashboardGrimdarkPortraitFrame" src="/ui/unit-frame.png" alt="" aria-hidden="true" draggable={false} /></span>
-              <div><small>SELECTED PLAYER</small><b>Desktop Barbarian</b></div>
+              <span className="dashboardGrimdarkPortrait dashboardPlayerOnly"><video src="/video/desktop-barbarian-idle.mp4" autoPlay loop muted playsInline disablePictureInPicture controlsList="nodownload noremoteplayback" aria-label="Desktop Barbarian player" /></span>
             </button>
           ) : null}
 
