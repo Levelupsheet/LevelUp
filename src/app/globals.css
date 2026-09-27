@@ -5689,3 +5689,31 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .dashboardGrimdarkSidebar .dashboardBattleShortcuts>button.gdActionBlue::before{background-image:url('/ui/grimdark/button-blue.png?v=20260927c')!important}
 .dashboardGrimdarkSidebar .dashboardPlayerOnly{padding:10px!important;height:330px!important;min-height:330px!important}
 .dashboardGrimdarkSidebar .dashboardCharacterTitleFrame{object-fit:fill!important}
+
+/* Dashboard sidebar screenshot correction: native frame only + explicit asset buttons. */
+@media (min-width:641px){
+  .dashboardGrimdarkSidebar .dashboardPlayerOnly{
+    border:0!important;border-image:none!important;outline:0!important;box-shadow:none!important;
+    background:transparent!important;padding:10px!important;
+  }
+  .dashboardGrimdarkSidebar .dashboardPlayerOnly::before,
+  .dashboardGrimdarkSidebar .dashboardPlayerOnly::after{content:none!important;display:none!important}
+  .dashboardGrimdarkSidebar .dashboardSidebarStart,
+  .dashboardGrimdarkSidebar .dashboardBattleShortcuts>button{
+    position:relative!important;z-index:0!important;overflow:visible!important;
+    background-color:transparent!important;background-repeat:no-repeat!important;
+    background-position:center!important;background-size:100% 100%!important;
+    border:0!important;border-image:none!important;box-shadow:none!important;
+  }
+  .dashboardGrimdarkSidebar .dashboardSidebarStart::before,
+  .dashboardGrimdarkSidebar .dashboardBattleShortcuts>button::before{display:none!important;content:none!important}
+  .dashboardGrimdarkSidebar .dashboardSidebarStart{
+    background-image:url('/ui/grimdark/button-red.png?v=20260927d')!important;
+  }
+  .dashboardGrimdarkSidebar .dashboardBattleShortcuts>button.gdActionOrange{
+    background-image:url('/ui/grimdark/button-orange.png?v=20260927d')!important;
+  }
+  .dashboardGrimdarkSidebar .dashboardBattleShortcuts>button.gdActionBlue{
+    background-image:url('/ui/grimdark/button-blue.png?v=20260927d')!important;
+  }
+}
