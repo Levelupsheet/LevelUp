@@ -6211,3 +6211,43 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 @media(max-width:860px){
  .dashboardGrimdarkSidebar .dashboardSelectedPlayer .dashboardGrimdarkPortrait{height:280px !important;min-height:280px !important;}
 }
+
+
+/* Final dashboard frame correction: transparent rarity frame over live video + visible title ribbon. */
+.dashboardGrimdarkSidebar .dashboardSelectedPlayer .dashboardGrimdarkPortrait{
+  overflow:hidden !important;
+  background:#07090a !important;
+}
+.dashboardGrimdarkSidebar .dashboardSelectedPlayer .dashboardGrimdarkPortrait video{
+  inset:10px !important;
+  width:calc(100% - 20px) !important;
+  height:calc(100% - 20px) !important;
+}
+.dashboardGrimdarkSidebar .dashboardSelectedPlayer .dashboardCharacterTitleFrame{
+  content:url('/ui/grimdark/character-rarity-border-4-transparent.png') !important;
+  inset:0 !important;
+  width:100% !important;
+  height:100% !important;
+  object-fit:fill !important;
+}
+.dashboardGrimdarkHero{
+  min-height:112px !important;
+  background:#0e151b !important;
+  overflow:hidden !important;
+}
+.dashboardGrimdarkHero .dashboardHeaderRibbon{
+  display:block !important;
+  position:absolute !important;
+  z-index:0 !important;
+  left:50% !important;
+  top:50% !important;
+  width:min(760px,78%) !important;
+  height:94px !important;
+  transform:translate(-50%,-50%) !important;
+  object-fit:fill !important;
+  opacity:1 !important;
+}
+.dashboardGrimdarkHero > div{
+  position:relative !important;
+  z-index:2 !important;
+}

@@ -961,7 +961,7 @@ async function analyzeResumeStage12() {
               setPositionChangeMode(true);
               setShowPositionModal(true);
             }}>
-              <span className="dashboardGrimdarkPortrait dashboardPlayerOnly"><img className="dashboardCharacterTitleFrame" src="/ui/grimdark/character-title.png" alt="" aria-hidden="true" /><video src="/video/helpdesk-wizard-idle.mp4" autoPlay loop muted playsInline disablePictureInPicture controlsList="nodownload noremoteplayback" aria-label="Help Desk Wizard player" /><img className="dashboardCharacterRarityFrame" src="/ui/grimdark/character-rarity-border-4.png" alt="" aria-hidden="true" /></span>
+              <span className="dashboardGrimdarkPortrait dashboardPlayerOnly"><img className="dashboardCharacterTitleFrame" src="/ui/grimdark/character-rarity-border-4-transparent.png" alt="" aria-hidden="true" /><video src="/video/helpdesk-wizard-idle.mp4" autoPlay loop muted playsInline disablePictureInPicture controlsList="nodownload noremoteplayback" aria-label="Help Desk Wizard player" /><img className="dashboardCharacterRarityFrame" src="/ui/grimdark/character-rarity-border-4.png" alt="" aria-hidden="true" /></span>
             </button>
           ) : user?.startingPosition === "DESKTOP_TECHNICIAN" ? (
             <button className="dashboardSelectedPlayer dashboardSelectedPlayerButton" type="button" aria-label="Change selected player: Desktop Barbarian" onClick={() => {
@@ -969,7 +969,7 @@ async function analyzeResumeStage12() {
               setPositionChangeMode(true);
               setShowPositionModal(true);
             }}>
-              <span className="dashboardGrimdarkPortrait dashboardPlayerOnly"><img className="dashboardCharacterTitleFrame" src="/ui/grimdark/character-title.png" alt="" aria-hidden="true" /><video src="/video/desktop-barbarian-idle.mp4" autoPlay loop muted playsInline disablePictureInPicture controlsList="nodownload noremoteplayback" aria-label="Desktop Barbarian player" /><img className="dashboardCharacterRarityFrame" src="/ui/grimdark/character-rarity-border-4.png" alt="" aria-hidden="true" /></span>
+              <span className="dashboardGrimdarkPortrait dashboardPlayerOnly"><img className="dashboardCharacterTitleFrame" src="/ui/grimdark/character-rarity-border-4-transparent.png" alt="" aria-hidden="true" /><video src="/video/desktop-barbarian-idle.mp4" autoPlay loop muted playsInline disablePictureInPicture controlsList="nodownload noremoteplayback" aria-label="Desktop Barbarian player" /><img className="dashboardCharacterRarityFrame" src="/ui/grimdark/character-rarity-border-4.png" alt="" aria-hidden="true" /></span>
             </button>
           ) : null}
 
