@@ -6156,3 +6156,28 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .dashboardGrimdarkSidebar .dashboardPvpShortcut button.dashboardPvpBlue:focus-visible .dashboardPvpBlueAsset{
   filter:brightness(1.12)!important;
 }
+
+
+/* Purchased character popup artwork is the primary quiz text/question frame. */
+@media (min-width:901px){
+  .d2QuestionCard.d2QuizQuestionCard.batch8LearningStage{
+    position:relative!important;
+    isolation:isolate!important;
+    border:0!important;
+    border-image:none!important;
+    outline:0!important;
+    box-shadow:none!important;
+    background:
+      linear-gradient(rgba(7,7,7,.88),rgba(7,7,7,.88)),
+      url('/ui/grimdark/character-popup-window.webp?v=20260927-questionframe') center/100% 100% no-repeat!important;
+    padding:22px 24px!important;
+  }
+  .d2QuestionCard.d2QuizQuestionCard.batch8LearningStage::before,
+  .d2QuestionCard.d2QuizQuestionCard.batch8LearningStage::after{
+    content:none!important;
+    display:none!important;
+  }
+  .d2QuestionCard.d2QuizQuestionCard.batch8LearningStage > .d2Rivet{
+    display:none!important;
+  }
+}
