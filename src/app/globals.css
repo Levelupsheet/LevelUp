@@ -7077,3 +7077,51 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     box-sizing:border-box!important;
   }
 }
+
+
+/* Enemy HUD counterpart: cut1 supplies the frame, energy ball fills its circular socket. */
+@media (min-width:901px){
+  .batch8DesktopQuizGrid .batch8EnemyRail{
+    position:relative!important;
+    overflow:hidden!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail::before{
+    content:""!important;
+    display:block!important;
+    position:absolute!important;
+    z-index:1!important;
+    pointer-events:none!important;
+    top:0!important;
+    left:50%!important;
+    width:min(100%,235px)!important;
+    height:410px!important;
+    transform:translateX(-50%)!important;
+    background:url('/ui/grimdark/flow_main_panel_cut1.png?v=20260927-enemycut') top center/contain no-repeat!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail > *{
+    position:relative!important;
+    z-index:2!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyCard{
+    width:150px!important;
+    height:150px!important;
+    min-width:150px!important;
+    min-height:150px!important;
+    margin:27px auto 28px!important;
+    padding:0!important;
+    display:grid!important;
+    place-items:center!important;
+    border:0!important;
+    border-radius:50%!important;
+    overflow:hidden!important;
+    box-shadow:none!important;
+    background:url('/ui/grimdark/flow_energy_ball_001.png?v=20260927-enemyorb') center/94% 94% no-repeat!important;
+  }
+  /* The orb itself is the enemy health display; remove the old text/bar overlay from its face. */
+  .batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyCard > *{
+    display:none!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail .card{
+    margin-top:8px!important;
+  }
+}
