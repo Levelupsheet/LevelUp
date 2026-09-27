@@ -5717,3 +5717,25 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     background-image:url('/ui/grimdark/button-blue.png?v=20260927d')!important;
   }
 }
+
+/* Sidebar controls are intentionally standalone so legacy primary/gold rules cannot mask purchased assets. */
+@media (min-width:641px){
+  .dashboardGrimdarkSidebar .dashboardAssetButton{
+    all:unset!important;box-sizing:border-box!important;display:flex!important;align-items:center!important;justify-content:center!important;
+    width:100%!important;height:58px!important;min-height:58px!important;cursor:pointer!important;
+    background-position:center!important;background-repeat:no-repeat!important;background-size:100% 100%!important;
+    color:#f8ecd6!important;font-family:Cinzel,Georgia,serif!important;font-weight:800!important;text-align:center!important;text-shadow:0 2px 2px #000!important;
+  }
+  .dashboardGrimdarkSidebar .dashboardAssetButtonRed{background-image:url('/ui/grimdark/button-red.png?v=20260927e')!important}
+  .dashboardGrimdarkSidebar .dashboardAssetButtonOrange{background-image:url('/ui/grimdark/button-orange.png?v=20260927e')!important}
+  .dashboardGrimdarkSidebar .dashboardAssetButtonBlue{background-image:url('/ui/grimdark/button-blue.png?v=20260927e')!important}
+  .dashboardGrimdarkSidebar .dashboardPlayerOnly{
+    padding:0!important;border:0!important;border-radius:0!important;outline:0!important;background:none!important;box-shadow:none!important;
+  }
+  .dashboardGrimdarkSidebar .dashboardPlayerOnly video{
+    position:absolute!important;z-index:1!important;left:18px!important;right:18px!important;top:18px!important;bottom:18px!important;
+    width:calc(100% - 36px)!important;height:calc(100% - 36px)!important;
+    object-fit:cover!important;object-position:38% center!important;border:0!important;border-radius:0!important;outline:0!important;box-shadow:none!important;
+  }
+  .dashboardGrimdarkSidebar .dashboardCharacterTitleFrame{z-index:5!important;pointer-events:none!important}
+}
