@@ -967,11 +967,15 @@ async function analyzeResumeStage12() {
           ) : null}
 
           <button className="dashboardAssetButton dashboardAssetButtonBlue dashboardToggleAction dashboardStartNowButton" style={{ width: "100%", marginTop: 8, opacity: hasFreeStartCooldown ? 0.7 : 1 }} onClick={() => !hasFreeStartCooldown && setShowLaunchModal(true)} disabled={hasFreeStartCooldown} title={hasFreeStartCooldown ? `Free tier cooldown: ${freeStartCooldownLabel}` : undefined}>
+            <img className="dashboardToggleState dashboardToggleOnState" src="/ui/grimdark/toggle-on.webp?v=20260927-layerfix" alt="" aria-hidden="true" />
+            <img className="dashboardToggleState dashboardToggleOffState" src="/ui/grimdark/toggle-off.png?v=20260927-layerfix" alt="" aria-hidden="true" />
             <span className="dashboardButtonAssetLabel">{hasFreeStartCooldown ? `Start Now! (${freeStartCooldownLabel})` : "Start Now!"}</span></button>
 
           <div className="dashboardBattleShortcuts" style={{ marginTop: 10, display: "grid", gap: 10 }}>
             {hrBattleUnlocked ? (
               <button className="dashboardAssetButton dashboardAssetButtonBlue dashboardToggleAction dashboardHrBattleButton" style={{ width: "100%" }} onClick={() => setMockInterviewOpen(true)}>
+                <img className="dashboardToggleState dashboardToggleOnState" src="/ui/grimdark/toggle-on.webp?v=20260927-layerfix" alt="" aria-hidden="true" />
+                <img className="dashboardToggleState dashboardToggleOffState" src="/ui/grimdark/toggle-off.png?v=20260927-layerfix" alt="" aria-hidden="true" />
                 <span className="dashboardButtonAssetLabel">{hrPassed ? "Start HR Battle →" : "Start HR Battle →"}</span></button>
             ) : (
               <button className="dashboardAssetButton dashboardAssetButtonOrange" style={{ width: "100%", opacity: 0.65, cursor: "not-allowed" }} disabled title="HR battle unlocks automatically when you qualify.">
@@ -987,7 +991,8 @@ async function analyzeResumeStage12() {
 
           <div className="dashboardPvpShortcut" style={{ marginTop: 10 }}>
             <button className="secondaryBtn gdActionRed dashboardPvpRed" style={{ width: "100%" }} type="button" onClick={() => (window.location.href = "/pvp")}>
-              Enter PvP Arena
+              <img className="dashboardPvpRedAsset" src="/ui/grimdark/button-red.png?v=20260927-layerfix" alt="" aria-hidden="true" />
+              <span className="dashboardButtonAssetLabel">Enter PvP Arena</span>
             </button>
           </div>
 
@@ -1031,7 +1036,7 @@ async function analyzeResumeStage12() {
             <div className="powerHudTray" style={{ marginTop: 10, display: "flex", gap: 6, flexWrap: "wrap" }}>
               {compactInventory.length ? compactInventory.map((row) => (
                 <div key={`${row.itemType}_${row.itemRef || "base"}`} className="badge" title={`${itemLabel(row.itemType, row.itemRef)} x${row.quantity}`} style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "4px 8px", minHeight: 26, borderRadius: 999, borderColor: "rgba(111,175,255,0.26)", background: "rgba(18,28,44,0.66)", fontSize: 12, boxShadow: "0 0 0 1px rgba(111,175,255,0.06) inset" }}>
-                  <span aria-hidden="true" style={{ fontSize: 12, lineHeight: 1 }}>{itemIcon(row.itemType, row.itemRef)}</span>
+                  <span aria-hidden="true" className="dashboardPowerupIconSlot">{String(row.itemRef || row.itemType || "").toLowerCase().includes("fury") || String(row.itemRef || row.itemType || "").toLowerCase().includes("attack") ? <img src="/ui/grimdark/flow-skill1.png?v=20260927-powerups" alt="" /> : itemIcon(row.itemType, row.itemRef)}</span>
                   <span style={{ fontWeight: 900, fontSize: 12 }}>{row.quantity}</span>
                 </div>
               )) : <small style={{ opacity: 0.78 }}>No powerups banked yet.</small>}
