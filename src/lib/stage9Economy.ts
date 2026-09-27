@@ -33,6 +33,7 @@ export type Stage9Status = {
 
 const STORE: Stage9StoreItem[] = [
   { id: "shield_charge", name: "Shield Charge", cost: 30, description: "Adds one extra shield use to your inventory.", itemType: "POWERUP", quantity: 1, badge: "Defense" },
+  { id: "health_restore", name: "Health Restore", cost: 40, description: "Restores 25% of maximum player HP during a battle.", itemType: "POWERUP", quantity: 1, badge: "Healing" },
   { id: "fury_charge", name: "Fury Charge", cost: 45, description: "Adds one fury burst for tougher sessions.", itemType: "POWERUP", quantity: 1, badge: "Damage" },
   { id: "hint_discount", name: "Hint Discount", cost: 35, description: "Banks one reduced-cost hint for a future run.", itemType: "BOOST", quantity: 1, badge: "Support" },
   { id: "extra_life", name: "Boss Extra Life", cost: 80, description: "Stores one extra life for boss battle runs.", itemType: "BOSS", quantity: 1, badge: "Boss" },
