@@ -564,7 +564,7 @@ export default function DiabloQuizRunner(props: {
   const [streak, setStreak] = useState(0);
   const [bestStreak, setBestStreak] = useState(0);
   const [powerups, setPowerups] = useState<Stage7PowerupState>({ shieldActive: false, furyActive: false, shieldUses: 0, furyUses: 0 });
-  const [stage9Inventory, setStage9Inventory] = useState<{ shield: number; fury: number; xpSurge: number; hintDiscount: number; extraLife: number }>({ shield: 0, fury: 0, xpSurge: 0, hintDiscount: 0, extraLife: 0 });
+  const [stage9Inventory, setStage9Inventory] = useState<{ shield: number; fury: number; restore: number; xpSurge: number; hintDiscount: number; extraLife: number }>({ shield: 0, fury: 0, restore: 0, xpSurge: 0, hintDiscount: 0, extraLife: 0 });
   const userIdRef = useRef<string>("");
   const consumedInventoryRef = useRef<{ shield: number; fury: number; xpSurge: number }>({ shield: 0, fury: 0, xpSurge: 0 });
   const [stage8History, setStage8History] = useState<Stage8QuestionResult[]>([]);
@@ -592,7 +592,7 @@ export default function DiabloQuizRunner(props: {
   const stageConfigs = useMemo(() => buildStageConfigs(title, maxStages, encounterType), [title, maxStages, encounterType]);
   const currentStageConfig = useMemo(() => stageConfigs[Math.min(stageConfigs.length - 1, Math.max(0, sessionStage - 1))] || buildStageConfigs(title, 1, encounterType)[0], [stageConfigs, sessionStage, title, encounterType]);
 
-  const { state, question, select, clear, submit, submitManual, next, addTime, reset, currentDomainId, currentMastery, outcome } = useCombatQuiz({    questions: combatQuestions,
+  const { state, question, select, clear, submit, submitManual, next, addTime, restorePlayerHP, reset, currentDomainId, currentMastery, outcome } = useCombatQuiz({    questions: combatQuestions,
     rules,
     timed,
     onXp,
@@ -899,6 +899,7 @@ const showExpandedExplanation = useMemo(() => {
         setStage9Inventory({
           shield: Math.max(0, countFor("shield_charge") - consumedInventoryRef.current.shield),
           fury: Math.max(0, countFor("fury_charge") - consumedInventoryRef.current.fury),
+          restore: Math.max(0, countFor("health_restore") - (consumedInventoryRef.current.restore || 0)),
           xpSurge: Math.max(0, countFor("xp_surge") - consumedInventoryRef.current.xpSurge),
           hintDiscount: countFor("hint_discount"),
           extraLife: countFor("extra_life"),
@@ -1126,6 +1127,18 @@ const showExpandedExplanation = useMemo(() => {
     }
   }
 
+  async function activateRestore() {
+    if (state.locked || state.playerHP >= rules.playerMaxHP || stage9Inventory.restore <= 0 || !userIdRef.current) return;
+    const res = await fetch("/api/stage9/use-item", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ userId: userIdRef.current, itemId: "health_restore" }) }).then((r) => r.json()).catch(() => null);
+    if (res?.ok) {
+      consumedInventoryRef.current.restore += 1;
+      setStage9Inventory((current) => ({ ...current, restore: Math.max(0, Number(res.remaining ?? current.restore - 1)) }));
+      restorePlayerHP(Math.ceil(rules.playerMaxHP * 0.25));
+      setMicroRewardFlash("❤️ Health restored +25%");
+      window.setTimeout(() => setMicroRewardFlash(null), 1800);
+    }
+  }
+
   async function activateXpSurge() {
     if (state.locked || stage9Inventory.xpSurge <= 0 || !userIdRef.current) return;
     const res = await fetch("/api/stage9/use-item", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ userId: userIdRef.current, itemId: "xp_surge" }) }).then((r) => r.json()).catch(() => null);
@@ -1256,6 +1269,7 @@ const showExpandedExplanation = useMemo(() => {
                   {[
                     { key: "shield", qty: stage9Inventory.shield + powerups.shieldUses, src: "/ui/grimdark/flow_skill3_001.png", label: "Shield", action: activateShield, disabled: state.locked || powerups.shieldActive },
                     { key: "fury", qty: stage9Inventory.fury + powerups.furyUses, src: "/ui/grimdark/flow_skill1_001.png", label: "Fury", action: activateFury, disabled: state.locked || powerups.furyActive },
+                    { key: "restore", qty: stage9Inventory.restore, src: "/ui/grimdark/flow_skill7_001.png", label: "Restore Health", action: activateRestore, disabled: state.locked || state.playerHP >= rules.playerMaxHP },
                     { key: "xpSurge", qty: stage9Inventory.xpSurge, src: "/ui/grimdark/flow_skill6_001.png", label: "Time Slow", action: activateXpSurge, disabled: state.locked },
                   ].filter((item) => item.qty > 0).slice(0, 4).map((item, index) => (
                     <button className={`playerPowerupSlot slot${index + 1}`} type="button" key={item.key} title={`Use ${item.label} (x${item.qty})`} aria-label={`Use ${item.label}, ${item.qty} available`} onClick={item.action} disabled={item.disabled}>
