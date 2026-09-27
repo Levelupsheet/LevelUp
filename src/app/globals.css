@@ -8969,3 +8969,41 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     padding-bottom:48px!important;
   }
 }
+
+
+/* 2026-09-27 keep combat rails fixed while center feedback scrolls */
+@media (min-width:901px){
+  .d2QuizBody{
+    min-height:0!important;
+    overflow:hidden!important;
+  }
+  .batch8DesktopQuizGrid{
+    height:100%!important;
+    min-height:0!important;
+    overflow:hidden!important;
+    align-items:stretch!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail,
+  .batch8DesktopQuizGrid .batch8EnemyRail{
+    height:100%!important;
+    min-height:0!important;
+    overflow:visible!important;
+    align-self:stretch!important;
+    position:relative!important;
+    top:0!important;
+    transform:none!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail > :first-child,
+  .batch8DesktopQuizGrid .batch8EnemyRail > :first-child{
+    flex:0 0 auto!important;
+    position:relative!important;
+    top:0!important;
+    margin-top:0!important;
+  }
+  .d2QuizQuestionCard.batch8LearningStage{
+    height:100%!important;
+    min-height:0!important;
+    overflow-y:auto!important;
+    overscroll-behavior:contain!important;
+  }
+}
