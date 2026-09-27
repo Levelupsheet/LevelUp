@@ -5974,3 +5974,41 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     min-height:58px!important;
   }
 }
+
+
+/* Grimdark core-controls dashboard pass: native pack tabs, panels and dividers. */
+.dashboardGrimdarkMain .dashboardPlanCard,
+.dashboardGrimdarkMain .dashboardMomentumCard,
+.dashboardGrimdarkMain .dashboardSweepstakesCard,
+.dashboardGrimdarkMain .dashboardCareerCard{
+  background-color:#080808!important;
+  background-image:url('/ui/grimdark/core-inner-panel.png?v=20260927-core')!important;
+  background-size:100% 100%!important;
+  background-repeat:no-repeat!important;
+  border-color:transparent!important;
+}
+.dashboardGrimdarkMain .dashboardPlanCard::after,
+.dashboardGrimdarkMain .dashboardMomentumCard::after{
+  content:""!important;display:block!important;width:100%!important;height:4px!important;
+  margin-top:14px!important;background:url('/ui/grimdark/core-divider.png?v=20260927-core') center/100% 4px no-repeat!important;
+}
+.dashboardGrimdarkMain .dashboardPill,
+.dashboardGrimdarkMain .tag,
+.dashboardGrimdarkMain .chip{
+  background-image:url('/ui/grimdark/core-tab-inactive.png?v=20260927-core')!important;
+  background-size:100% 100%!important;background-repeat:no-repeat!important;background-color:transparent!important;
+  border:0!important;border-radius:0!important;
+}
+.dashboardGrimdarkMain .dashboardPill.active,
+.dashboardGrimdarkMain .tag.active,
+.dashboardGrimdarkMain .chip.active{
+  background-image:url('/ui/grimdark/core-tab-active.png?v=20260927-core')!important;
+}
+@media (max-width:860px){
+  .dashboardGrimdarkMain .dashboardPlanCard,
+  .dashboardGrimdarkMain .dashboardMomentumCard,
+  .dashboardGrimdarkMain .dashboardSweepstakesCard,
+  .dashboardGrimdarkMain .dashboardCareerCard{
+    background-size:100% 100%!important;
+  }
+}
