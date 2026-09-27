@@ -6409,3 +6409,126 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     background-size:100% 100%,contain!important;
   }
 }
+
+
+/* 2026-09-27 full native game-flow HUD.
+   One complete flow_main_panel spans the desktop combat grid; side rails are transparent overlays. */
+@media (min-width:901px){
+  .batch8DesktopQuizGrid{
+    position:relative!important;
+    isolation:isolate!important;
+    grid-template-columns:minmax(150px,16%) minmax(0,1fr) minmax(150px,16%)!important;
+    column-gap:10px!important;
+  }
+  .batch8DesktopQuizGrid::before{
+    content:""!important;
+    position:absolute!important;
+    left:0!important;
+    right:0!important;
+    top:50%!important;
+    z-index:0!important;
+    aspect-ratio:1374/416!important;
+    transform:translateY(-50%)!important;
+    background:url('/ui/grimdark/flow_main_panel_001.png?v=20260927-fullflow') center/contain no-repeat!important;
+    pointer-events:none!important;
+  }
+  .batch8DesktopQuizGrid > *{position:relative!important;z-index:1!important}
+
+  .batch8DesktopQuizGrid .batch8PlayerRail,
+  .batch8DesktopQuizGrid .batch8EnemyRail{
+    background:none!important;
+    border:0!important;
+    outline:0!important;
+    box-shadow:none!important;
+    padding:0!important;
+    overflow:visible!important;
+    display:grid!important;
+    grid-template-rows:minmax(132px,17vw) minmax(0,1fr)!important;
+    align-content:stretch!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail::before,
+  .batch8DesktopQuizGrid .batch8EnemyRail::before,
+  .batch8DesktopQuizGrid .batch8PlayerRail::after,
+  .batch8DesktopQuizGrid .batch8EnemyRail::after{
+    content:none!important;
+    display:none!important;
+  }
+
+  /* Left socket: native blood orb. Hide the legacy unit-frame artwork but keep HP drain/flash logic. */
+  .batch8DesktopQuizGrid .batch8PlayerRail > div:first-child{
+    width:100%!important;
+    aspect-ratio:1/1!important;
+    margin:0!important;
+    display:grid!important;
+    place-items:center!important;
+    align-self:start!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail .d2OrbWrap,
+  .batch8DesktopQuizGrid .batch8PlayerRail .d2OrbFrame{
+    width:min(12.5vw,176px)!important;
+    height:min(12.5vw,176px)!important;
+    max-width:100%!important;
+    border:0!important;
+    background:none!important;
+    box-shadow:none!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail .d2UnitFrameAsset{display:none!important}
+  .batch8DesktopQuizGrid .batch8PlayerRail .d2AssetBloodOrb{
+    inset:5%!important;
+    border-radius:50%!important;
+    overflow:hidden!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail .d2AssetBloodOrb img{
+    content:url('/ui/grimdark/flow_blood_ball_001.png?v=20260927-native')!important;
+    width:100%!important;height:100%!important;object-fit:contain!important;
+  }
+
+  /* Right socket: real energy ball, with existing enemy HP text/bar over it. */
+  .batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyCard{
+    width:min(12.5vw,176px)!important;
+    height:min(12.5vw,176px)!important;
+    max-width:100%!important;
+    justify-self:center!important;
+    align-self:start!important;
+    box-sizing:border-box!important;
+    border:0!important;
+    border-radius:50%!important;
+    box-shadow:none!important;
+    padding:20% 8% 10%!important;
+    background:url('/ui/grimdark/flow_energy_ball_001.png?v=20260927-native') center/contain no-repeat!important;
+    display:flex!important;
+    flex-direction:column!important;
+    justify-content:center!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyName,
+  .batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyNums{
+    text-shadow:0 2px 4px #000,0 0 5px #000!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyBarFrame{margin-top:4px!important}
+
+  /* Character/video panels sit below the two circular sockets without extra CSS chrome. */
+  .batch8DesktopQuizGrid .batch8PlayerRail .card,
+  .batch8DesktopQuizGrid .batch8EnemyRail .card,
+  .batch8DesktopQuizGrid .batch8PlayerRail .card > div,
+  .batch8DesktopQuizGrid .batch8EnemyRail .card > div{
+    border:0!important;
+    outline:0!important;
+    box-shadow:none!important;
+    background:transparent!important;
+  }
+
+  /* The quiz window keeps the native popup aspect instead of being stretched to fill the column. */
+  .d2QuestionCard.d2QuizQuestionCard.batch8LearningStage{
+    align-self:center!important;
+    height:auto!important;
+    min-height:min(68vh,680px)!important;
+    max-height:calc(100% - 20px)!important;
+    overflow:auto!important;
+    background-color:transparent!important;
+    background-image:url('/ui/grimdark/character-popup-window.webp?v=20260927-nativeframe3')!important;
+    background-position:center!important;
+    background-repeat:no-repeat!important;
+    background-size:100% 100%!important;
+    padding:clamp(26px,3vw,46px)!important;
+  }
+}
