@@ -6088,3 +6088,36 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 @media(max-width:860px){
   .dashboardHeaderRibbon{width:calc(100% - 8px) !important;height:calc(100% - 6px) !important;}
 }
+
+
+/* Selected-player title frame and video layering. */
+.dashboardSelectedPlayer .dashboardGrimdarkPortrait.dashboardPlayerOnly{
+  position:relative !important;
+  padding:18px 14px 14px !important;
+  aspect-ratio:auto !important;
+  min-height:250px !important;
+}
+.dashboardSelectedPlayer .dashboardGrimdarkPortrait.dashboardPlayerOnly video{
+  position:absolute !important;
+  z-index:1 !important;
+  inset:18px 14px 14px !important;
+  width:calc(100% - 28px) !important;
+  height:calc(100% - 32px) !important;
+  min-height:0 !important;
+  object-fit:cover !important;
+  object-position:center center !important;
+  clip-path:none !important;
+  opacity:1 !important;
+  visibility:visible !important;
+}
+.dashboardCharacterTitleFrame{
+  position:absolute;
+  z-index:4;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:fill;
+  pointer-events:none;
+  user-select:none;
+}
+.dashboardSelectedPlayer .dashboardCharacterRarityFrame{display:none !important;}
