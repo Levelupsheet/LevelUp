@@ -5787,3 +5787,11 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .dashboardGrimdarkSidebar button.dashboardSelectedPlayerButton>.dashboardPlayerOnly{
   border:0!important;border-radius:0!important;outline:0!important;box-shadow:none!important;background:none!important;
 }
+
+/* Explicit artwork layers: no button background cascade involved. */
+.dashboardGrimdarkSidebar button.dashboardAssetButton{position:relative!important;overflow:hidden!important;background:none!important}
+.dashboardGrimdarkSidebar .dashboardButtonAssetImage{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;display:block!important;object-fit:fill!important;z-index:0!important;pointer-events:none!important}
+.dashboardGrimdarkSidebar .dashboardButtonAssetLabel{position:relative!important;z-index:2!important;display:block!important}
+.dashboardGrimdarkSidebar .dashboardSelectedPlayerButton,
+.dashboardGrimdarkSidebar .dashboardPlayerOnly{border:none!important;border-color:transparent!important;border-width:0!important;border-style:none!important;border-radius:0!important;outline:none!important;box-shadow:none!important}
+.dashboardGrimdarkSidebar .dashboardSelectedPlayerButton{overflow:visible!important}
