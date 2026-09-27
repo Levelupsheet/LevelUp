@@ -1301,8 +1301,8 @@ const showExpandedExplanation = useMemo(() => {
                         <span className="badge">Stage {sessionStage}/{maxStages} • Tier {effectiveQuestionTier}</span>
                         {microRewardFlash ? <span className="badge stage8MicroFlash">{microRewardFlash}</span> : null}
                       </div>
-                      <button type="button" className="d2Btn compact" onClick={() => setShowSessionIntel((v) => !v)}>
-                        {showSessionIntel ? "Hide session info" : "Session info"}
+                      <button type="button" className={"sessionInfoIconButton" + (showSessionIntel ? " active" : "")} onClick={() => setShowSessionIntel((v) => !v)} aria-label={showSessionIntel ? "Hide session info" : "Show session info"} title={showSessionIntel ? "Hide session info" : "Session info"} aria-pressed={showSessionIntel}>
+                        <img src="/ui/grimdark/flow_icon_information_001.png" alt="" aria-hidden="true" />
                       </button>
                     </div>
                     {showSessionIntel ? (
