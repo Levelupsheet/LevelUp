@@ -174,16 +174,19 @@ export async function claimDailyBonus(userId: string) {
   }
 }
 
-export async function purchaseStage9Item(userId: string, itemId: string) {
+export async function purchaseStage9Item(userId: string, itemId: string, options?: { free?: boolean }) {
   const item = STORE.find((x) => x.id === itemId);
   if (!item) return { ok: false as const, error: "Item not found" };
   await prisma.wallet.upsert({ where: { userId }, update: {}, create: { userId, tokenBalance: 0 } });
+  const free = Boolean(options?.free);
   const next = await prisma.$transaction(async (tx) => {
-    const debited = await tx.wallet.updateMany({
-      where: { userId, tokenBalance: { gte: item.cost } },
-      data: { tokenBalance: { decrement: item.cost } },
-    });
-    if (debited.count !== 1) throw new Error("Not enough tokens");
+    if (!free) {
+      const debited = await tx.wallet.updateMany({
+        where: { userId, tokenBalance: { gte: item.cost } },
+        data: { tokenBalance: { decrement: item.cost } },
+      });
+      if (debited.count !== 1) throw new Error("Not enough tokens");
+    }
     const updatedWallet = await tx.wallet.findUnique({ where: { userId } });
     if (!updatedWallet) throw new Error("Wallet not found");
     const existing = await tx.inventoryItem.findFirst({ where: { userId, itemType: item.itemType, itemRef: item.id } });
@@ -193,11 +196,11 @@ export async function purchaseStage9Item(userId: string, itemId: string) {
       await tx.inventoryItem.create({ data: { userId, itemType: item.itemType, itemRef: item.id, quantity: item.quantity } });
     }
     try {
-      await tx.notification.create({ data: { userId, type: "STAGE9_STORE_PURCHASE", title: `${item.name} purchased`, body: `-${item.cost} tokens • ${item.description}` } as any });
+      await tx.notification.create({ data: { userId, type: "STAGE9_STORE_PURCHASE", title: `${item.name} purchased`, body: free ? `Admin purchase • ${item.description}` : `-${item.cost} tokens • ${item.description}` } as any });
     } catch {}
     return updatedWallet;
   });
-  return { ok: true as const, walletTokens: Number((next as any)?.tokenBalance || 0), item };
+  return { ok: true as const, walletTokens: Number((next as any)?.tokenBalance || 0), item, charged: free ? 0 : item.cost, adminBypass: free };
 }
 
 
