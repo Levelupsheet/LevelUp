@@ -6066,3 +6066,21 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
   background:url('/ui/grimdark/button-red.png?v=20260927-freshred') center/100% 100% no-repeat!important;
   filter:brightness(1.12)!important;
 }
+
+
+/* Explicit dashboard art layers: avoids background-image cascade conflicts. */
+.dashboardGrimdarkSidebar button.dashboardToggleAction,
+.dashboardGrimdarkSidebar .dashboardPvpShortcut button.dashboardPvpRed{position:relative!important;overflow:hidden!important;isolation:isolate!important;background:none!important}
+.dashboardGrimdarkSidebar .dashboardToggleState,
+.dashboardGrimdarkSidebar .dashboardPvpRedAsset{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;object-fit:fill!important;pointer-events:none!important;z-index:0!important;visibility:visible!important;opacity:1!important}
+.dashboardGrimdarkSidebar .dashboardToggleOffState{opacity:0!important}
+.dashboardGrimdarkSidebar button.dashboardToggleAction:hover .dashboardToggleOnState,
+.dashboardGrimdarkSidebar button.dashboardToggleAction:focus-visible .dashboardToggleOnState{opacity:0!important}
+.dashboardGrimdarkSidebar button.dashboardToggleAction:hover .dashboardToggleOffState,
+.dashboardGrimdarkSidebar button.dashboardToggleAction:focus-visible .dashboardToggleOffState{opacity:1!important}
+.dashboardGrimdarkSidebar button.dashboardToggleAction:disabled:hover .dashboardToggleOnState{opacity:0!important}
+.dashboardGrimdarkSidebar button.dashboardToggleAction:disabled:hover .dashboardToggleOffState{opacity:1!important}
+.dashboardGrimdarkSidebar button.dashboardToggleAction .dashboardButtonAssetLabel,
+.dashboardGrimdarkSidebar .dashboardPvpShortcut .dashboardButtonAssetLabel{position:relative!important;z-index:2!important}
+.dashboardPowerupIconSlot{display:inline-grid!important;place-items:center!important;width:28px!important;height:28px!important;flex:0 0 28px!important}
+.dashboardPowerupIconSlot img{display:block!important;width:28px!important;height:28px!important;object-fit:contain!important}
