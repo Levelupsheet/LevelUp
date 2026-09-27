@@ -804,6 +804,7 @@ async function analyzeResumeStage12() {
         open={positionTrainingOpen}
         kind="position"
         defaultPath={(user?.startingPosition as any) ?? "HELPDESK_SUPPORT"}
+        playerPosition={(user?.startingPosition as any) ?? "HELPDESK_SUPPORT"}
         onClose={() => setPositionTrainingOpen(false)}
         onXpChange={(xp, level) => {
           setLocalXp(xp);
@@ -829,6 +830,7 @@ async function analyzeResumeStage12() {
       <PracticeMiniGameModal
         open={certPracticeOpen}
         kind="cert"
+        playerPosition={(user?.startingPosition as any) ?? "HELPDESK_SUPPORT"}
         onClose={() => setCertPracticeOpen(false)}
         onXpChange={(xp, level) => {
           setLocalXp(xp);
@@ -839,6 +841,7 @@ async function analyzeResumeStage12() {
       <PracticeMiniGameModal
         open={testNowOpen}
         kind="test"
+        playerPosition={(user?.startingPosition as any) ?? "HELPDESK_SUPPORT"}
         onClose={() => setTestNowOpen(false)}
         onXpChange={(xp, level) => {
           setLocalXp(xp);
@@ -934,7 +937,7 @@ async function analyzeResumeStage12() {
             <div className="luModalFooter positionConfirmActions">
               <button className="secondaryBtn gdActionRed gdActionCompact" type="button" disabled={posSaving} onClick={() => { setPositionConfirmOpen(false); setPositionError(null); }}>Cancel</button>
               <button className="gold gdActionOrange" type="button" disabled={posSaving || tokenBalance < 200} onClick={() => void confirmPosition()}>
-                {posSaving ? "Changing..." : "Confirm & Pay 300 Tokens"}
+                {posSaving ? "Changing..." : "Confirm & Pay 200 Tokens"}
               </button>
             </div>
           </div>
