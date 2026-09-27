@@ -8103,3 +8103,70 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     margin-bottom:-38px!important;
   }
 }
+
+
+/* 2026-09-27 screenshot calibration: final side-HUD alignment. */
+@media (min-width:901px){
+  /* Player: center the blood orb in its metal socket; move portrait inward and expose full frame. */
+  .batch8DesktopQuizGrid .batch8PlayerRail > div:first-child{
+    transform:translate(-9px,-8px)!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail .d2OrbWrap,
+  .batch8DesktopQuizGrid .batch8PlayerRail .d2OrbFrame{
+    width:96px!important;
+    height:96px!important;
+    min-width:96px!important;
+    min-height:96px!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail > .card{
+    width:154px!important;
+    height:154px!important;
+    transform:translate(8px,8px)!important;
+    overflow:visible!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail > .card video,
+  .batch8DesktopQuizGrid .batch8PlayerRail > .card img{
+    transform:scale(.86)!important;
+    object-position:center bottom!important;
+  }
+
+  /* Enemy: retain the clean purple orb, then separate portrait/name vertically. */
+  .batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyCard{
+    width:96px!important;
+    height:96px!important;
+    min-width:96px!important;
+    min-height:96px!important;
+    margin-top:25px!important;
+    margin-bottom:54px!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail > .card{
+    width:154px!important;
+    height:154px!important;
+    transform:translate(-6px,34px)!important;
+    overflow:visible!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail > .card video,
+  .batch8DesktopQuizGrid .batch8EnemyRail > .card img{
+    transform:scale(.84)!important;
+    object-position:center bottom!important;
+  }
+
+  /* Enemy label belongs beneath the portrait instead of crossing its lower border. */
+  .batch8DesktopQuizGrid .batch8EnemyRail > .card + div,
+  .batch8DesktopQuizGrid .batch8EnemyRail .quizEnemyLabel{
+    margin-top:36px!important;
+    position:relative!important;
+    z-index:5!important;
+  }
+
+  /* Keep question type unobtrusive and eliminate remaining pill-like spacing. */
+  .batch8LearningStage .stageHeaderRow > div:last-child > .badge{
+    min-height:0!important;
+    height:auto!important;
+    line-height:1!important;
+    padding:0 2px!important;
+    border:0!important;
+    background:none!important;
+    box-shadow:none!important;
+  }
+}
