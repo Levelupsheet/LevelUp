@@ -948,20 +948,13 @@ async function analyzeResumeStage12() {
       <div className="shell dashboardGrimdarkShell">
         <aside className="sidebar dashboardSidebar dashboardGrimdarkSidebar">
           <div className="dashboardSidebarMobileTitle">Progress & shortcuts</div>
-          <div className="dashboardSidebarBrand" style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
-            <div className="sidebarLogoBox"><img src="/levelup-pro-icon.png" alt="LevelUp Pro" className="sidebarLogoImg" /></div>
-            <div>
-              <div style={{ fontWeight: 900, fontSize: 22, lineHeight: 1.05 }}>LevelUp Pro</div>
-              <div><small>Interview Prep</small></div>
-            </div>
-          </div>
           {user?.startingPosition === "HELPDESK_SUPPORT" ? (
             <button className="dashboardSelectedPlayer dashboardSelectedPlayerButton" type="button" aria-label="Change selected player: Help Desk Wizard" onClick={() => {
               setPendingPos(user.startingPosition);
               setPositionChangeMode(true);
               setShowPositionModal(true);
             }}>
-              <span className="dashboardGrimdarkPortrait dashboardPlayerOnly"><img className="dashboardCharacterTitleFrame" src="/ui/grimdark/character-rarity-border-4-transparent.png" alt="" aria-hidden="true" /><video src="/video/helpdesk-wizard-idle.mp4" autoPlay loop muted playsInline disablePictureInPicture controlsList="nodownload noremoteplayback" aria-label="Help Desk Wizard player" /><img className="dashboardCharacterRarityFrame" src="/ui/grimdark/character-rarity-border-4.png" alt="" aria-hidden="true" /></span>
+              <span className="dashboardGrimdarkPortrait dashboardPlayerOnly"><img className="dashboardCharacterTitleFrame" src="/ui/grimdark/character-rarity-border-4-transparent.png" alt="" aria-hidden="true" /><video src="/video/helpdesk-wizard-idle.mp4" autoPlay loop muted playsInline disablePictureInPicture controlsList="nodownload noremoteplayback" aria-label="Help Desk Wizard player" /></span>
             </button>
           ) : user?.startingPosition === "DESKTOP_TECHNICIAN" ? (
             <button className="dashboardSelectedPlayer dashboardSelectedPlayerButton" type="button" aria-label="Change selected player: Desktop Barbarian" onClick={() => {
@@ -969,7 +962,7 @@ async function analyzeResumeStage12() {
               setPositionChangeMode(true);
               setShowPositionModal(true);
             }}>
-              <span className="dashboardGrimdarkPortrait dashboardPlayerOnly"><img className="dashboardCharacterTitleFrame" src="/ui/grimdark/character-rarity-border-4-transparent.png" alt="" aria-hidden="true" /><video src="/video/desktop-barbarian-idle.mp4" autoPlay loop muted playsInline disablePictureInPicture controlsList="nodownload noremoteplayback" aria-label="Desktop Barbarian player" /><img className="dashboardCharacterRarityFrame" src="/ui/grimdark/character-rarity-border-4.png" alt="" aria-hidden="true" /></span>
+              <span className="dashboardGrimdarkPortrait dashboardPlayerOnly"><img className="dashboardCharacterTitleFrame" src="/ui/grimdark/character-rarity-border-4-transparent.png" alt="" aria-hidden="true" /><video src="/video/desktop-barbarian-idle.mp4" autoPlay loop muted playsInline disablePictureInPicture controlsList="nodownload noremoteplayback" aria-label="Desktop Barbarian player" /></span>
             </button>
           ) : null}
 
