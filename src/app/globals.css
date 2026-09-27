@@ -6181,3 +6181,63 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     display:none!important;
   }
 }
+
+
+/* Flow main panel now supplies the desktop player/orb rail artwork. */
+@media (min-width:901px){
+  .batch8DesktopQuizGrid .batch8PlayerRail{
+    position:relative!important;
+    isolation:isolate!important;
+    box-sizing:border-box!important;
+    min-height:0!important;
+    padding:28px 18px 26px!important;
+    gap:8px!important;
+    border:0!important;
+    outline:0!important;
+    box-shadow:none!important;
+    background:url('/ui/grimdark/flow-main-panel-left.webp?v=20260927-playerrail') top center/100% 100% no-repeat!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail::before,
+  .batch8DesktopQuizGrid .batch8PlayerRail::after{content:none!important;display:none!important}
+
+  /* The flow panel owns the orb frame; strip the older standalone orb surround. */
+  .batch8DesktopQuizGrid .batch8PlayerRail > div:first-child{
+    position:relative!important;
+    width:84%!important;
+    aspect-ratio:1/1!important;
+    justify-self:center!important;
+    margin:3% auto 0!important;
+    display:grid!important;
+    place-items:center!important;
+    overflow:visible!important;
+    border:0!important;
+    outline:0!important;
+    box-shadow:none!important;
+    background:transparent!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail > div:first-child > *{
+    width:78%!important;
+    height:78%!important;
+    max-width:78%!important;
+    max-height:78%!important;
+    margin:auto!important;
+    border:0!important;
+    outline:0!important;
+    box-shadow:none!important;
+    background:transparent!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail .d2LifeOrb,
+  .batch8DesktopQuizGrid .batch8PlayerRail .d2LifeOrbFrame,
+  .batch8DesktopQuizGrid .batch8PlayerRail .d2OrbFrame{
+    border:0!important;
+    outline:0!important;
+    box-shadow:none!important;
+    background:transparent!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail .modelPanel{
+    border:0!important;
+    outline:0!important;
+    box-shadow:none!important;
+    background:transparent!important;
+  }
+}
