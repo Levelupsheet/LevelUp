@@ -6038,3 +6038,31 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
   background-size:100% 100%!important;
   border:0!important;
 }
+
+
+/* Dashboard toggle correction: ON at rest, OFF on hover. */
+.dashboardGrimdarkSidebar button.dashboardToggleAction.dashboardStartNowButton,
+.dashboardGrimdarkSidebar button.dashboardToggleAction.dashboardHrBattleButton{
+  background:url('/ui/grimdark/toggle-on.webp?v=20260927-togglefix') center/100% 100% no-repeat!important;
+  border:0!important;
+  color:#fff3d4!important;
+}
+.dashboardGrimdarkSidebar button.dashboardToggleAction.dashboardStartNowButton:hover:not(:disabled),
+.dashboardGrimdarkSidebar button.dashboardToggleAction.dashboardStartNowButton:focus-visible:not(:disabled),
+.dashboardGrimdarkSidebar button.dashboardToggleAction.dashboardHrBattleButton:hover:not(:disabled),
+.dashboardGrimdarkSidebar button.dashboardToggleAction.dashboardHrBattleButton:focus-visible:not(:disabled){
+  background:url('/ui/grimdark/toggle-off.png?v=20260927-togglefix') center/100% 100% no-repeat!important;
+  filter:none!important;
+}
+.dashboardGrimdarkSidebar .dashboardPvpShortcut button.dashboardPvpRed{
+  min-height:58px!important;
+  background:url('/ui/grimdark/button-red.png?v=20260927-freshred') center/100% 100% no-repeat!important;
+  border:0!important;
+  color:#fff3d4!important;
+  box-shadow:none!important;
+}
+.dashboardGrimdarkSidebar .dashboardPvpShortcut button.dashboardPvpRed:hover,
+.dashboardGrimdarkSidebar .dashboardPvpShortcut button.dashboardPvpRed:focus-visible{
+  background:url('/ui/grimdark/button-red.png?v=20260927-freshred') center/100% 100% no-repeat!important;
+  filter:brightness(1.12)!important;
+}
