@@ -566,6 +566,7 @@ export default function DiabloQuizRunner(props: {
   const [powerups, setPowerups] = useState<Stage7PowerupState>({ shieldActive: false, furyActive: false, shieldUses: 0, furyUses: 0 });
   const [stage9Inventory, setStage9Inventory] = useState<{ shield: number; fury: number; xpSurge: number; hintDiscount: number; extraLife: number }>({ shield: 0, fury: 0, xpSurge: 0, hintDiscount: 0, extraLife: 0 });
   const userIdRef = useRef<string>("");
+  const consumedInventoryRef = useRef<{ shield: number; fury: number; xpSurge: number }>({ shield: 0, fury: 0, xpSurge: 0 });
   const [stage8History, setStage8History] = useState<Stage8QuestionResult[]>([]);
   const [xpBoostRemaining, setXpBoostRemaining] = useState(0);
   const [microRewardFlash, setMicroRewardFlash] = useState<string | null>(null);
@@ -893,9 +894,9 @@ const showExpandedExplanation = useMemo(() => {
         const rows = Array.isArray(json?.inventory) ? json.inventory : [];
         const countFor = (id: string) => rows.filter((row: any) => String(row?.itemRef || "") === id).reduce((sum: number, row: any) => sum + Number(row?.quantity || 0), 0);
         setStage9Inventory({
-          shield: countFor("shield_charge"),
-          fury: countFor("fury_charge"),
-          xpSurge: countFor("xp_surge"),
+          shield: Math.max(0, countFor("shield_charge") - consumedInventoryRef.current.shield),
+          fury: Math.max(0, countFor("fury_charge") - consumedInventoryRef.current.fury),
+          xpSurge: Math.max(0, countFor("xp_surge") - consumedInventoryRef.current.xpSurge),
           hintDiscount: countFor("hint_discount"),
           extraLife: countFor("extra_life"),
         });
@@ -1085,7 +1086,8 @@ const showExpandedExplanation = useMemo(() => {
     if (stage9Inventory.shield > 0 && userIdRef.current) {
       const res = await fetch("/api/stage9/use-item", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ userId: userIdRef.current, itemId: "shield_charge" }) }).then((r) => r.json()).catch(() => null);
       if (res?.ok) {
-        setStage9Inventory((current) => ({ ...current, shield: Math.max(0, current.shield - 1) }));
+        consumedInventoryRef.current.shield += 1;
+        setStage9Inventory((current) => ({ ...current, shield: Math.max(0, Number(res.remaining ?? current.shield - 1)) }));
         setPowerups((current) => ({ ...current, shieldActive: true }));
       }
     }
@@ -1100,7 +1102,8 @@ const showExpandedExplanation = useMemo(() => {
     if (stage9Inventory.fury > 0 && userIdRef.current) {
       const res = await fetch("/api/stage9/use-item", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ userId: userIdRef.current, itemId: "fury_charge" }) }).then((r) => r.json()).catch(() => null);
       if (res?.ok) {
-        setStage9Inventory((current) => ({ ...current, fury: Math.max(0, current.fury - 1) }));
+        consumedInventoryRef.current.fury += 1;
+        setStage9Inventory((current) => ({ ...current, fury: Math.max(0, Number(res.remaining ?? current.fury - 1)) }));
         setPowerups((current) => ({ ...current, furyActive: true }));
       }
     }
@@ -1110,7 +1113,8 @@ const showExpandedExplanation = useMemo(() => {
     if (state.locked || stage9Inventory.xpSurge <= 0 || !userIdRef.current) return;
     const res = await fetch("/api/stage9/use-item", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ userId: userIdRef.current, itemId: "xp_surge" }) }).then((r) => r.json()).catch(() => null);
     if (res?.ok) {
-      setStage9Inventory((current) => ({ ...current, xpSurge: Math.max(0, current.xpSurge - 1) }));
+      consumedInventoryRef.current.xpSurge += 1;
+      setStage9Inventory((current) => ({ ...current, xpSurge: Math.max(0, Number(res.remaining ?? current.xpSurge - 1)) }));
       addTime(10);
       timeSlowActiveRef.current = true;
       setMicroRewardFlash("⏳ Time Slow active for +10s");
