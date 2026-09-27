@@ -6012,3 +6012,29 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     background-size:100% 100%!important;
   }
 }
+
+
+/* Dashboard interaction pass — toggle assets + red PvP. */
+.dashboardGrimdarkSidebar button.dashboardToggleAction.dashboardStartNowButton,
+.dashboardGrimdarkSidebar button.dashboardToggleAction.dashboardHrBattleButton{
+  background-image:url('/ui/grimdark/toggle-off.png?v=20260927-hover')!important;
+  transition:filter .14s ease,transform .14s ease!important;
+}
+.dashboardGrimdarkSidebar button.dashboardToggleAction.dashboardStartNowButton:hover:not(:disabled),
+.dashboardGrimdarkSidebar button.dashboardToggleAction.dashboardStartNowButton:focus-visible:not(:disabled),
+.dashboardGrimdarkSidebar button.dashboardToggleAction.dashboardHrBattleButton:hover:not(:disabled),
+.dashboardGrimdarkSidebar button.dashboardToggleAction.dashboardHrBattleButton:focus-visible:not(:disabled){
+  background-image:url('/ui/grimdark/toggle-on.webp?v=20260927-hover')!important;
+  filter:brightness(1.08)!important;
+}
+.dashboardGrimdarkSidebar button.dashboardToggleAction:active:not(:disabled){
+  transform:translateY(1px)!important;
+}
+.dashboardGrimdarkSidebar .dashboardPvpShortcut button.dashboardPvpRed{
+  background-image:url('/ui/grimdark/button-red.png?v=20260927-pvp-red')!important;
+  background-color:transparent!important;
+  background-position:center!important;
+  background-repeat:no-repeat!important;
+  background-size:100% 100%!important;
+  border:0!important;
+}
