@@ -1227,16 +1227,14 @@ const showExpandedExplanation = useMemo(() => {
                 <img className="playerPowerupRackAsset" src="/ui/grimdark/flow_main_panel_powerup1.png" alt="" aria-hidden="true" />
                 <div className="playerPowerupSlots">
                   {[
-                    { key: "shield", qty: stage9Inventory.shield, src: "/ui/grimdark/flow_skill3_001.png", label: "Shield" },
-                    { key: "fury", qty: stage9Inventory.fury + powerups.furyUses, src: "/ui/grimdark/flow_skill1_001.png", label: "Fury" },
-                    { key: "xpSurge", qty: stage9Inventory.xpSurge, src: "/ui/grimdark/flow_skill6_001.png", label: "Time Slow" },
-                    { key: "hintDiscount", qty: stage9Inventory.hintDiscount, src: "/ui/grimdark/flow_skill7_001.png", label: "Hint" },
-                    { key: "extraLife", qty: stage9Inventory.extraLife, src: "/ui/grimdark/flow_skill8_001.png", label: "Extra Life" },
+                    { key: "shield", qty: stage9Inventory.shield + powerups.shieldUses, src: "/ui/grimdark/flow_skill3_001.png", label: "Shield", action: activateShield, disabled: state.locked || powerups.shieldActive },
+                    { key: "fury", qty: stage9Inventory.fury + powerups.furyUses, src: "/ui/grimdark/flow_skill1_001.png", label: "Fury", action: activateFury, disabled: state.locked || powerups.furyActive },
+                    { key: "xpSurge", qty: stage9Inventory.xpSurge, src: "/ui/grimdark/flow_skill6_001.png", label: "Time Slow", action: activateXpSurge, disabled: state.locked },
                   ].filter((item) => item.qty > 0).slice(0, 4).map((item, index) => (
-                    <div className={`playerPowerupSlot slot${index + 1}`} key={item.key} title={`${item.label} x${item.qty}`}>
-                      <img src={item.src} alt={item.label} />
+                    <button className={`playerPowerupSlot slot${index + 1}`} type="button" key={item.key} title={`Use ${item.label} (x${item.qty})`} aria-label={`Use ${item.label}, ${item.qty} available`} onClick={item.action} disabled={item.disabled}>
+                      <img src={item.src} alt="" aria-hidden="true" />
                       {item.qty > 1 ? <span className="playerPowerupQty">x{item.qty}</span> : null}
-                    </div>
+                    </button>
                   ))}
                 </div>
               </div>
