@@ -856,7 +856,7 @@ async function analyzeResumeStage12() {
                 <div><small className="luHint">This personalizes your learning path. You can change it later.</small></div>
               </div>
               {positionChangeMode && (
-                <button className="secondaryBtn positionModalExit gdCloseButton" type="button" onClick={() => setShowPositionModal(false)}>EXIT</button>
+                <button className="secondaryBtn positionModalExit gdCloseButton" aria-label="Close" title="Close" type="button" onClick={() => setShowPositionModal(false)}>EXIT</button>
               )}
             </div>
 
@@ -973,17 +973,17 @@ async function analyzeResumeStage12() {
             </button>
           ) : null}
 
-          <button className="primary dashboardSidebarStart dashboardGrimdarkPrimary gdActionOrange" style={{ width: "100%", marginTop: 8, opacity: hasFreeStartCooldown ? 0.7 : 1 }} onClick={() => !hasFreeStartCooldown && setShowLaunchModal(true)} disabled={hasFreeStartCooldown} title={hasFreeStartCooldown ? `Free tier cooldown: ${freeStartCooldownLabel}` : undefined}>
+          <button className="primary dashboardSidebarStart dashboardGrimdarkPrimary gdActionOrange gdDashboardWideAction" style={{ width: "100%", marginTop: 8, opacity: hasFreeStartCooldown ? 0.7 : 1 }} onClick={() => !hasFreeStartCooldown && setShowLaunchModal(true)} disabled={hasFreeStartCooldown} title={hasFreeStartCooldown ? `Free tier cooldown: ${freeStartCooldownLabel}` : undefined}>
             {hasFreeStartCooldown ? `Start Now! (${freeStartCooldownLabel})` : "Start Now!"}
           </button>
 
           <div className="dashboardBattleShortcuts" style={{ marginTop: 10, display: "grid", gap: 10 }}>
             {hrBattleUnlocked ? (
-              <button className="gold dashboardGrimdarkPrimary gdActionOrange" style={{ width: "100%" }} onClick={() => setMockInterviewOpen(true)}>
+              <button className="gold dashboardGrimdarkPrimary gdActionOrange gdDashboardWideAction" style={{ width: "100%" }} onClick={() => setMockInterviewOpen(true)}>
                 {hrPassed ? "Start HR Battle →" : "Start HR Battle →"}
               </button>
             ) : (
-              <button className="gold" style={{ width: "100%", opacity: 0.65, cursor: "not-allowed" }} disabled title="HR battle unlocks automatically when you qualify.">
+              <button className="gold gdActionOrange gdDashboardWideAction" style={{ width: "100%", opacity: 0.65, cursor: "not-allowed" }} disabled title="HR battle unlocks automatically when you qualify.">
                 Begin Boss Battle 🔒
               </button>
             )}
@@ -1102,7 +1102,7 @@ async function analyzeResumeStage12() {
 
             <div className="kpiRow">
               
-              {hrBattleUnlocked ? <button className="gold gdActionOrange" type="button" onClick={() => setMockInterviewOpen(true)}>Start HR Battle</button> : null}
+              {hrBattleUnlocked ? <button className="gold gdActionOrange gdDashboardHeroAction" type="button" onClick={() => setMockInterviewOpen(true)}>Start HR Battle</button> : null}
               {((localLevel || 1) >= 5 || hasTechReady) ? <button className="primary gdActionBlue" type="button" onClick={() => setMockInterviewOpen(true)}>Start Tech Battle</button> : null}
             </div>
           </div>
