@@ -380,6 +380,11 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
     setState((s) => ({ ...s, timeLeft: Math.max(0, s.timeLeft + Math.floor(seconds)) }));
   }, []);
 
+  const restorePlayerHP = useCallback((amount: number) => {
+    if (!amount) return;
+    setState((s) => ({ ...s, playerHP: clamp(s.playerHP + Math.floor(amount), 0, rules.playerMaxHP) }));
+  }, [rules.playerMaxHP]);
+
   const reset = useCallback(() => {
     stopTimer();
     setState(initialCombatState(rules, timed));
@@ -406,6 +411,7 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
     submitManual,
     next,
     addTime,
+    restorePlayerHP,
     reset,
     timed,
     currentDomainId,
