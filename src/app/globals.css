@@ -9856,3 +9856,40 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     top:72px!important;
   }
 }
+
+
+/* 2026-09-27 definitive player orb geometry from live screenshots.
+   flow_main_panel_player has an offset circular well, so center the blood orb
+   on that well rather than the full transparent asset bounds. */
+@media (min-width:901px){
+  .batch8DesktopQuizGrid .batch8PlayerRail > .playerOrbComposite{
+    width:170px!important;
+    height:169px!important;
+    flex-basis:169px!important;
+  }
+  .batch8DesktopQuizGrid .playerOrbFrameAsset{
+    left:0!important;
+    top:30px!important;
+    width:170px!important;
+    height:139px!important;
+  }
+  .batch8DesktopQuizGrid .playerOrbBlood{
+    left:5px!important;
+    top:30px!important;
+    width:104px!important;
+    height:104px!important;
+    border-radius:50%!important;
+    overflow:hidden!important;
+    clip-path:circle(50% at 50% 50%)!important;
+  }
+  .batch8DesktopQuizGrid .playerOrbBloodBase,
+  .batch8DesktopQuizGrid .playerOrbBloodMask,
+  .batch8DesktopQuizGrid .playerOrbBloodMask img{
+    width:104px!important;
+    height:104px!important;
+    border-radius:50%!important;
+  }
+  .batch8DesktopQuizGrid .playerOrbBloodMask{
+    overflow:hidden!important;
+  }
+}
