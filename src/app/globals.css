@@ -8492,3 +8492,52 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     pointer-events:none!important;
   }
 }
+
+
+/* 2026-09-27 live screenshot correction: native toggle artwork + power-up rail placement */
+.d2QuizQuestionCard .stage8ActionDock > button,
+.d2QuizQuestionCard .stage8ActionDock > .grimdarkPrimaryAction{
+  width:176px!important;
+  min-width:176px!important;
+  max-width:176px!important;
+  height:44px!important;
+  min-height:44px!important;
+  padding:0!important;
+  background-color:transparent!important;
+  background-image:url('/ui/grimdark/core_toggle_switch_on_001.png?v=20260927-native-toggle2')!important;
+  background-repeat:no-repeat!important;
+  background-position:center!important;
+  background-size:contain!important;
+  border:0!important;
+  outline:0!important;
+  box-shadow:none!important;
+  border-radius:0!important;
+}
+.d2QuizQuestionCard .stage8ActionDock > button:disabled,
+.d2QuizQuestionCard .stage8ActionDock > .grimdarkPrimaryAction:disabled{
+  background-image:url('/ui/grimdark/core_toggle_switch_off_001.png?v=20260927-native-toggle2')!important;
+  background-size:contain!important;
+  opacity:1!important;
+}
+@media (min-width:901px){
+  .batch8DesktopQuizGrid .batch8PlayerRail{
+    position:relative!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail::after{
+    position:absolute!important;
+    left:-12px!important;
+    top:118px!important;
+    width:108px!important;
+    height:300px!important;
+    margin:0!important;
+    background-image:url('/ui/grimdark/flow_main_panel_powerup1.png?v=20260927-powerup-placement2')!important;
+    background-repeat:no-repeat!important;
+    background-position:top left!important;
+    background-size:contain!important;
+    z-index:1!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail > .card{
+    position:relative!important;
+    z-index:2!important;
+  }
+}
