@@ -14,10 +14,11 @@ export default function PracticeMiniGameModal(props: {
   open: boolean;
   kind: Kind;
   defaultPath?: PositionPath;
+  playerPosition?: PositionPath;
   onClose: () => void;
   onXpChange?: (xp: number, level: number) => void;
 }) {
-  const { open, kind, defaultPath, onClose, onXpChange } = props;
+  const { open, kind, defaultPath, playerPosition, onClose, onXpChange } = props;
   const [step, setStep] = useState<"setup" | "quiz" | "summary" | "boss">("setup");
   const [path, setPath] = useState<PositionPath>(defaultPath ?? "HELPDESK_SUPPORT");
   const [cert, setCert] = useState<CertTrack>("A_PLUS");
@@ -181,6 +182,7 @@ export default function PracticeMiniGameModal(props: {
               subtitle={subtitle}
               timed={kind === "test"}
               startingPosition={kind === "position" ? path : undefined}
+              playerPosition={playerPosition ?? defaultPath}
               certExam={kind === "cert" ? cert : undefined}
               bankDomain={kind === "test" && testBank !== "GENERAL" ? testBank : undefined}
               exitLabel="EXIT"
@@ -198,6 +200,7 @@ export default function PracticeMiniGameModal(props: {
               subtitle={`${title} • bonus challenge`}
               timed
               enemyName={bossMeta.bossName}
+              playerPosition={playerPosition ?? defaultPath}
               exitLabel="Back"
               onExit={() => setStep("summary")}
               metaLeft="Bonus boss"
