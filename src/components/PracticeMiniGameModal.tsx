@@ -22,7 +22,7 @@ export default function PracticeMiniGameModal(props: {
   const [path, setPath] = useState<PositionPath>(defaultPath ?? "HELPDESK_SUPPORT");
   const [cert, setCert] = useState<CertTrack>("A_PLUS");
   const [testBank, setTestBank] = useState<"GENERAL" | "IDENTITY" | "NETWORKING" | "SECURITY" | "COMPUTE" | "STORAGE" | "AZURE" | "AWS" | "WINDOWS">("GENERAL");
-  const [finalScore, setFinalScore] = useState<{ correct: number; total: number; xp: number; timeLeft?: number; bestStreak?: number }>({ correct: 0, total: 0, xp: 0 });
+  const [finalScore, setFinalScore] = useState<{ correct: number; total: number; xp: number; timeLeft?: number; bestStreak?: number; outcome?: "victory" | "defeat" | "complete" | null; playerHP?: number }>({ correct: 0, total: 0, xp: 0, outcome: null });
   const [learningPath, setLearningPath] = useState<any | null>(null);
   const [sessionMastery, setSessionMastery] = useState<Record<string, number>>({});
   const [previousLearningPath, setPreviousLearningPath] = useState<any | null>(null);
@@ -133,7 +133,7 @@ export default function PracticeMiniGameModal(props: {
   }
 
   function finishRun(summary: DiabloQuizRunSummary & { awardedXp?: number }) {
-    setFinalScore({ correct: summary.correctCount, total: summary.totalQuestions, xp: summary.awardedXp ?? summary.xpEarned, timeLeft: summary.timeLeft, bestStreak: summary.bestStreak });
+    setFinalScore({ correct: summary.correctCount, total: summary.totalQuestions, xp: summary.awardedXp ?? summary.xpEarned, timeLeft: summary.timeLeft, bestStreak: summary.bestStreak, outcome: summary.outcome, playerHP: summary.playerHP });
     setSessionMastery(summary.masteryByDomain || {});
     setPreviousLearningPath(learningPath);
     setStep("summary");
@@ -217,8 +217,20 @@ export default function PracticeMiniGameModal(props: {
             const mastery = Number(weakest?.mastery ?? 0);
             const masteryState = mastery >= 85 ? "MASTERED" : mastery >= 70 ? "STRENGTHENED" : mastery >= 50 ? "IMPROVING" : "FOCUS AREA";
             return (
-            <div className="card" style={{ padding: 14 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}><div><div style={{ fontSize: 18, fontWeight: 950 }}>Run complete</div><small className="luHint">XP was synced to the user profile and DB.</small></div><span className="badge">+{finalScore.xp} XP</span></div>
+            <div className="card practiceRunSummaryShell" style={{ padding: 14 }}>
+              <div className={"practiceRunResultHero " + (finalScore.outcome === "defeat" ? "defeat" : "victory")}>
+                <img className="practiceRunResultArt" src={finalScore.outcome === "defeat" ? "/ui/grimdark/flow_game_flow_death_panel_001_001.png" : "/ui/grimdark/flow_game_flow_victory_panel_001_001.png"} alt="" aria-hidden />
+                <div className="practiceRunResultOverlay">
+                  <div className="practiceRunResultLabel">{finalScore.outcome === "defeat" ? "DEFEAT" : "VICTORY"}</div>
+                  <div className="practiceRunResultQuickStats">
+                    <span><small>SCORE</small><b>{finalScore.correct} / {finalScore.total}</b></span>
+                    <span><small>XP EARNED</small><b>+{finalScore.xp}</b></span>
+                    <span><small>BEST STREAK</small><b>{finalScore.bestStreak ?? 0}</b></span>
+                    <span><small>PLAYER HP</small><b>{Math.max(0, Math.round(finalScore.playerHP ?? 0))}</b></span>
+                  </div>
+                </div>
+              </div>
+              <div className="practiceRunSyncLine"><span>Session complete</span><small className="luHint">XP was synced to the user profile and DB.</small></div>
               <div style={{ marginTop: 12, display: "grid", gap: 10 }}>
                 <div className="card" style={{ padding: 12, background: "rgba(255,255,255,0.04)" }}><b>Score</b>: {finalScore.correct} / {finalScore.total}</div>
                 {kind === "test" && <div className="card" style={{ padding: 12, background: "rgba(255,255,255,0.04)" }}><b>Time left</b>: {Math.max(0, finalScore.timeLeft || 0)}s</div>}
