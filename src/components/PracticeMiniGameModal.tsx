@@ -146,8 +146,8 @@ export default function PracticeMiniGameModal(props: {
   }
 
   return (
-    <div className="luModalOverlay" onMouseDown={onClose}>
-      <div className="luModal" role="dialog" aria-modal="true" aria-label={title} onMouseDown={(e) => e.stopPropagation()} style={{ width: (step === "quiz" || step === "boss") ? "min(96vw, 1800px)" : "min(92vw, 980px)", maxWidth: (step === "quiz" || step === "boss") ? 1800 : 980 }}>
+    <div className={`luModalOverlay practiceGameOverlay practiceGameOverlay--${kind}`} onMouseDown={onClose}>
+      <div className={`luModal practiceGameModal practiceGameModal--${step}`} role="dialog" aria-modal="true" aria-label={title} onMouseDown={(e) => e.stopPropagation()} style={{ width: (step === "quiz" || step === "boss") ? "min(96vw, 1800px)" : "min(92vw, 980px)", maxWidth: (step === "quiz" || step === "boss") ? 1800 : 980 }}>
         <div className="luVideoBg" aria-hidden="true">
           <video className="luVideoEl" autoPlay loop muted playsInline preload="metadata"><source src="/video/blackhole-loop.mp4" type="video/mp4" /></video>
           <div className="luVideoVignette" />
@@ -155,17 +155,17 @@ export default function PracticeMiniGameModal(props: {
         {step !== "quiz" && step !== "boss" ? (
           <div className="luModalHeader practiceGameOuterHeader" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <div className="practiceGameOuterTitle"><b style={{ fontSize: 18 }}>{title}</b><div><small className="luHint">{subtitle}</small></div></div>
-            <button className="secondaryBtn" type="button" onClick={onClose}>✕</button>
+            <button className="secondaryBtn gdCloseButton practiceGameExit" type="button" aria-label="Exit" title="Exit" onClick={onClose}><span>EXIT</span></button>
           </div>
         ) : null}
 
         <div className="luModalBody">
           {step === "setup" && (
-            <div className="card" style={{ padding: 14 }}>
+            <div className="card practiceGameSetupCard" style={{ padding: 14 }}>
               {kind === "position" && <div style={{ display: "grid", gap: 10 }}><div style={{ fontWeight: 800 }}>Choose your path</div><div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>{([ ["HELPDESK_SUPPORT", "Helpdesk"], ["DESKTOP_TECHNICIAN", "Desktop"], ["CLOUD_ENGINEER", "Cloud"] ] as const).map(([k, label]) => <button key={k} className={"trackBtn" + (path === k ? " active" : "")} type="button" onClick={() => setPath(k)}>{label}</button>)}</div><small className="luHint">12 questions • 4 stages • 3 questions per stage</small></div>}
               {kind === "cert" && <div style={{ display: "grid", gap: 10 }}><div style={{ fontWeight: 800 }}>Choose a certification pack</div><div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>{([ ["A_PLUS", "A+"], ["SECURITY_PLUS", "Security+"], ["AZ_900", "AZ-900"], ["AWS", "AWS"], ["AZURE", "Azure"] ] as const).map(([k, label]) => <button key={k} className={"trackBtn" + (cert === k ? " active" : "")} type="button" onClick={() => setCert(k)}>{label}</button>)}</div><small className="luHint">12 questions • 4 stages • 3 questions per stage</small></div>}
               {kind === "test" && <div style={{ display: "grid", gap: 10 }}><div style={{ fontWeight: 800 }}>Choose a question bank</div><div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>{([ ["GENERAL", "Mixed"], ["IDENTITY", "Identity"], ["NETWORKING", "Networking"], ["SECURITY", "Security"], ["COMPUTE", "Compute"], ["STORAGE", "Storage"], ["AZURE", "Azure"], ["AWS", "AWS"], ["WINDOWS", "Windows"] ] as const).map(([k, label]) => <button key={k} className={"trackBtn" + (testBank === k ? " active" : "")} type="button" onClick={() => setTestBank(k)}>{label}</button>)}</div><small className="luHint">15 questions • unseen questions first • the selected bank resets after you have seen its full pool</small></div>}
-              <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 14 }}><button className="primaryBtn" type="button" onClick={() => setStep("quiz")}>Start →</button></div>
+              <div className="practiceGameStartRow" style={{ display: "flex", justifyContent: "flex-end", marginTop: 14 }}><button className="primaryBtn gdActionOrange practiceGameStartButton" type="button" onClick={() => setStep("quiz")}>Start →</button></div>
             </div>
           )}
 
