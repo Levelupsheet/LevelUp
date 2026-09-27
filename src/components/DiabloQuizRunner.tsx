@@ -1213,7 +1213,7 @@ const showExpandedExplanation = useMemo(() => {
                     {combatQuestions.map((_, idx) => {
                       const result = questionResults[idx];
                       const isCurrent = idx === state.idx && !finished;
-                      return <span key={idx} className={`quizQuestionSegment ${result || ""}${isCurrent ? " current" : ""}`} title={`Question ${idx + 1}`} />;
+                      return <span key={idx} className={`quizQuestionSegment ${result || ""}${isCurrent ? " current" : ""}`} title={`Question ${idx + 1}`}><span className="quizQuestionSegmentFill" /></span>;
                     })}
                   </div>
                   <div className="quizMasteryDiamonds" aria-label={`Question mastery level ${effectiveQuestionTier} of 3`}>
