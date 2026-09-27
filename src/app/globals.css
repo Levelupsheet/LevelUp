@@ -5918,3 +5918,41 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     padding:9px 18px !important;
   }
 }
+
+
+/* Core-control continuation: utility and modal buttons share the same native art.
+   Modal controls live outside .dashboardGrimdarkShell, so keep these role classes portable. */
+.gdActionOrange,.gdActionBlue,.gdActionRed{
+  position:relative !important;
+  min-height:52px !important;
+  padding:10px 24px !important;
+  border:0 !important;
+  border-radius:0 !important;
+  background-color:transparent !important;
+  background-repeat:no-repeat !important;
+  background-position:center !important;
+  background-size:100% 100% !important;
+  box-shadow:none !important;
+  color:#f8ecd6 !important;
+  font-family:Cinzel,Georgia,serif !important;
+  font-weight:800 !important;
+  letter-spacing:.025em;
+  text-shadow:0 2px 2px #000 !important;
+  text-decoration:none !important;
+}
+.gdActionOrange{background-image:url('/ui/grimdark/button-orange.png') !important;}
+.gdActionBlue{background-image:url('/ui/grimdark/button-blue.png') !important;}
+.gdActionRed{background-image:url('/ui/grimdark/button-red.png') !important;}
+.gdActionOrange:hover:not(:disabled),.gdActionBlue:hover:not(:disabled),.gdActionRed:hover:not(:disabled){filter:brightness(1.13) saturate(1.08);}
+.gdActionOrange:active:not(:disabled),.gdActionBlue:active:not(:disabled),.gdActionRed:active:not(:disabled){transform:translateY(1px);filter:brightness(.92);}
+.gdActionOrange:focus-visible,.gdActionBlue:focus-visible,.gdActionRed:focus-visible{outline:2px solid #dfa65c !important;outline-offset:2px !important;}
+.gdActionOrange:disabled,.gdActionBlue:disabled,.gdActionRed:disabled{opacity:.46 !important;filter:grayscale(.5) brightness(.7);}
+.gdActionCompact{
+  min-height:38px !important;
+  padding:6px 16px !important;
+  font-size:12px !important;
+}
+@media(max-width:860px){
+  .gdActionOrange,.gdActionBlue,.gdActionRed{min-height:48px !important;padding:9px 18px !important;}
+  .gdActionCompact{min-height:38px !important;padding:6px 14px !important;}
+}
