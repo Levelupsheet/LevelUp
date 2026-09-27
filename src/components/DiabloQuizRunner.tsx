@@ -581,7 +581,7 @@ export default function DiabloQuizRunner(props: {
     onXp,
     getActiveModifiers: () => ({ shieldActive: powerups.shieldActive, furyActive: powerups.furyActive }),
     getQuestionLevel: () => (Math.max(effectiveQuestionTier, Math.min(3, Math.ceil(sessionStage / 2))) as DifficultyTier),
-    getPlayerDamageTaken: () => currentStageConfig.playerDamage,
+    getPlayerDamageTaken: ({ usedShield }) => usedShield ? 0 : Math.max(34, currentStageConfig.playerDamage),
     getEnemyDamageDealt: ({ correct }) => correct ? Math.ceil(currentStageConfig.hp / 3) : 0,
     getHealOnCorrect: () => (Math.random() < currentStageConfig.healChance ? (currentStageConfig.healMin + Math.floor(Math.random() * (currentStageConfig.healMax - currentStageConfig.healMin + 1))) : 0),
     getXpMultiplier: ({ correct }) => (correct && xpBoostRemaining > 0 ? 1.25 : 1),
