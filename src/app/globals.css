@@ -6704,3 +6704,86 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
   .practiceRunResultOverlay{width:82%;padding:88px 12px 70px}
   .practiceRunResultQuickStats{grid-template-columns:1fr 1fr}
 }
+
+
+/* Purchased character_title artwork frames the game-mode title (Position Training, Test Now, Certification Practice, boss title). */
+.d2QuizShell .modalHead{
+  position:relative!important;
+  min-height:82px!important;
+  justify-content:center!important;
+  padding:10px clamp(86px,10vw,150px)!important;
+}
+.d2QuizShell .modalHead > div:first-child{
+  position:relative!important;
+  width:min(54vw,700px)!important;
+  min-height:64px!important;
+  display:grid!important;
+  place-items:center!important;
+  isolation:isolate!important;
+}
+.d2QuizShell .modalHead > div:first-child::before{
+  content:""!important;
+  position:absolute!important;
+  inset:0!important;
+  z-index:-1!important;
+  background:url('/ui/grimdark/character_title_001.png?v=20260927-titleframe') center/contain no-repeat!important;
+  pointer-events:none!important;
+}
+.d2QuizShell .modalTitle{
+  width:78%!important;
+  margin:0 auto!important;
+  padding:10px 12px!important;
+  text-align:center!important;
+  line-height:1.05!important;
+  text-shadow:0 2px 4px #000,0 0 8px #000!important;
+}
+.d2QuizShell .modalHead .d2ExitBtn{
+  position:absolute!important;
+  right:20px!important;
+  top:50%!important;
+  transform:translateY(-50%)!important;
+}
+
+.practiceGameOuterHeader{
+  position:relative!important;
+  min-height:82px!important;
+  justify-content:center!important;
+  padding:10px clamp(86px,10vw,150px)!important;
+}
+.practiceGameOuterTitle{
+  position:relative!important;
+  width:min(54vw,700px)!important;
+  min-height:64px!important;
+  display:grid!important;
+  place-items:center!important;
+  isolation:isolate!important;
+  text-align:center!important;
+}
+.practiceGameOuterTitle::before{
+  content:""!important;
+  position:absolute!important;
+  inset:0!important;
+  z-index:-1!important;
+  background:url('/ui/grimdark/character_title_001.png?v=20260927-titleframe') center/contain no-repeat!important;
+  pointer-events:none!important;
+}
+.practiceGameOuterTitle > b{
+  width:78%!important;
+  font-family:var(--font-cinzel),Georgia,serif!important;
+  text-transform:uppercase!important;
+  letter-spacing:.04em!important;
+  text-shadow:0 2px 4px #000,0 0 8px #000!important;
+}
+.practiceGameOuterTitle .luHint{display:none!important}
+.practiceGameOuterHeader .practiceGameExit{
+  position:absolute!important;
+  right:20px!important;
+  top:50%!important;
+  transform:translateY(-50%)!important;
+}
+@media(max-width:700px){
+  .d2QuizShell .modalHead,.practiceGameOuterHeader{min-height:66px!important;padding:7px 68px!important}
+  .d2QuizShell .modalHead > div:first-child,.practiceGameOuterTitle{width:100%!important;min-height:52px!important}
+  .d2QuizShell .modalTitle,.practiceGameOuterTitle > b{width:82%!important;font-size:clamp(14px,4.5vw,20px)!important}
+  .d2QuizShell .modalHead .d2ExitBtn,.practiceGameOuterHeader .practiceGameExit{right:8px!important}
+}
