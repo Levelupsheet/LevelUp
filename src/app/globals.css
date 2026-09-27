@@ -8296,3 +8296,57 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     padding-left:46px!important;
   }
 }
+
+
+/* 2026-09-27 quiz control/HUD calibration from live screenshots */
+.d2QuizQuestionCard .d2ChoiceBtn:hover:not(:disabled),
+.d2QuizQuestionCard .d2ChoiceBtn.selected,
+.d2QuizQuestionCard .d2ChoiceBtn.selected:hover:not(:disabled),
+.d2QuizQuestionCard .d2ChoiceBtn:active:not(:disabled),
+.d2QuizQuestionCard .d2ChoiceBtn.answerWrong{
+  background-color:transparent!important;
+  background-image:url('/ui/grimdark/red-answer.png?v=20260927-redstate2')!important;
+  background-repeat:no-repeat!important;
+  background-position:center!important;
+  background-size:100% 100%!important;
+  filter:none!important;
+}
+.d2QuizQuestionCard .quizHintRow{
+  grid-template-columns:repeat(2,minmax(0,260px))!important;
+  justify-content:center!important;
+  gap:10px!important;
+  width:100%!important;
+}
+.d2QuizQuestionCard .quizHintRow > .d2Btn{
+  min-height:38px!important;
+  height:38px!important;
+  padding:5px 12px!important;
+  font-size:13px!important;
+}
+@media (min-width:901px){
+  .batch8DesktopQuizGrid .batch8PlayerRail .d2OrbWrap,
+  .batch8DesktopQuizGrid .batch8PlayerRail .d2OrbFrame{
+    width:96px!important;
+    height:96px!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail .d2AssetBloodOrb{
+    inset:7%!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail .d2UnitFrameAsset{
+    width:100%!important;
+    height:100%!important;
+    object-fit:contain!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyEnergyOrb{
+    filter:hue-rotate(-18deg) saturate(1.08) brightness(1.04)!important;
+  }
+}
+@media(max-width:900px){
+  .d2QuizQuestionCard .quizHintRow{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  }
+  .d2QuizQuestionCard .quizHintRow > .d2Btn{
+    min-height:38px!important;
+    height:38px!important;
+  }
+}
