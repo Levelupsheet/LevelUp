@@ -1,5 +1,7 @@
 import { z } from "zod";
 import { prisma } from "../../_lib/prisma";
+import { getSessionUser } from "@/lib/auth/session";
+import { isAdminEmail } from "@/lib/adminAuth";
 
 const POSITION_CHANGE_COST = 200;
 
@@ -11,6 +13,14 @@ const Body = z.object({
 export async function POST(req: Request) {
   try {
     const body = Body.parse(await req.json());
+
+    // Character-change pricing is enforced server-side. Admins bypass the
+    // token charge only for their own authenticated account.
+    const sessionUser = await getSessionUser();
+    const isAdminCharacterChange =
+      Boolean(sessionUser?.email) &&
+      isAdminEmail(sessionUser?.email) &&
+      String(sessionUser?.id || "") === body.userId;
 
     const existing = await prisma.user.findUnique({
       where: { id: body.userId },
@@ -36,6 +46,21 @@ export async function POST(req: Request) {
     if (existing.startingPosition === body.startingPosition) {
       const wallet = await prisma.wallet.findUnique({ where: { userId: body.userId } });
       return Response.json({ ok: true, charged: 0, tokenBalance: wallet?.tokenBalance ?? 0, user: { id: body.userId, startingPosition: existing.startingPosition } });
+    }
+
+    if (isAdminCharacterChange) {
+      const user = await prisma.user.update({
+        where: { id: body.userId },
+        data: { startingPosition: body.startingPosition },
+      });
+      const wallet = await prisma.wallet.findUnique({ where: { userId: body.userId } });
+      return Response.json({
+        ok: true,
+        charged: 0,
+        adminBypass: true,
+        tokenBalance: wallet?.tokenBalance ?? 0,
+        user: { id: user.id, startingPosition: user.startingPosition },
+      });
     }
 
     const result: { user: { id: string; startingPosition: string | null }; tokenBalance: number } =
