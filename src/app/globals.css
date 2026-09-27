@@ -6115,3 +6115,44 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     background:transparent!important;
   }
 }
+
+
+/* Dashboard action polish — keep toggle ON artwork at rest and fade it on hover. */
+.dashboardGrimdarkSidebar button.dashboardToggleAction .dashboardToggleOnState{
+  opacity:1!important;
+  transition:opacity .18s ease,filter .18s ease!important;
+}
+.dashboardGrimdarkSidebar button.dashboardToggleAction .dashboardToggleOffState{
+  display:none!important;
+  opacity:0!important;
+}
+.dashboardGrimdarkSidebar button.dashboardToggleAction:hover .dashboardToggleOnState,
+.dashboardGrimdarkSidebar button.dashboardToggleAction:focus-visible .dashboardToggleOnState{
+  opacity:.62!important;
+  filter:brightness(1.08)!important;
+}
+.dashboardGrimdarkSidebar .dashboardPvpShortcut button.dashboardPvpBlue{
+  position:relative!important;
+  overflow:hidden!important;
+  isolation:isolate!important;
+  min-height:58px!important;
+  background:none!important;
+  border:0!important;
+  color:#fff3d4!important;
+  box-shadow:none!important;
+}
+.dashboardGrimdarkSidebar .dashboardPvpBlueAsset{
+  position:absolute!important;
+  inset:0!important;
+  width:100%!important;
+  height:100%!important;
+  object-fit:fill!important;
+  pointer-events:none!important;
+  z-index:0!important;
+  opacity:1!important;
+  visibility:visible!important;
+}
+.dashboardGrimdarkSidebar .dashboardPvpShortcut button.dashboardPvpBlue:hover .dashboardPvpBlueAsset,
+.dashboardGrimdarkSidebar .dashboardPvpShortcut button.dashboardPvpBlue:focus-visible .dashboardPvpBlueAsset{
+  filter:brightness(1.12)!important;
+}
