@@ -7663,3 +7663,111 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
   }
   .batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyName{display:none!important}
 }
+
+
+/* 2026-09-27 HUD proportion pass from live screenshot. */
+@media (min-width:901px){
+  /* Give both side HUDs the same footprint and shrink the center quiz surface ~15%. */
+  .batch8DesktopQuizGrid{
+    grid-template-columns:minmax(185px,14vw) minmax(0,1fr) minmax(185px,14vw)!important;
+    gap:8px!important;
+  }
+  .d2QuestionCard.d2QuizQuestionCard.batch8LearningStage{
+    width:85%!important;
+    height:85%!important;
+    max-width:85%!important;
+    max-height:85%!important;
+    min-height:0!important;
+    justify-self:center!important;
+    align-self:center!important;
+    overflow:auto!important;
+  }
+
+  /* Player/enemy holder artwork uses identical dimensions. */
+  .batch8DesktopQuizGrid .batch8PlayerRail::before,
+  .batch8DesktopQuizGrid .batch8EnemyRail::before{
+    top:0!important;
+    left:50%!important;
+    width:190px!important;
+    height:332px!important;
+    transform:translateX(-50%)!important;
+    background-position:top center!important;
+    background-size:contain!important;
+    background-repeat:no-repeat!important;
+  }
+
+  /* Both actual orb PNGs are the same size. Player is nudged left/up into its socket. */
+  .batch8DesktopQuizGrid .batch8PlayerRail > div:first-child{
+    height:158px!important;
+    min-height:158px!important;
+    transform:translate(-15px,-5px)!important;
+    margin:0 0 8px!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail .d2OrbWrap,
+  .batch8DesktopQuizGrid .batch8PlayerRail .d2OrbFrame,
+  .batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyCard{
+    width:96px!important;
+    height:96px!important;
+    min-width:96px!important;
+    min-height:96px!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail .d2AssetBloodOrb{
+    inset:7%!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyCard{
+    margin:20px auto 42px!important;
+  }
+
+  /* Portrait/video cards are identical on both sides. */
+  .batch8DesktopQuizGrid .batch8PlayerRail > .card,
+  .batch8DesktopQuizGrid .batch8EnemyRail > .card{
+    width:158px!important;
+    max-width:158px!important;
+    padding:0!important;
+    margin-left:auto!important;
+    margin-right:auto!important;
+    justify-self:center!important;
+    border:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail > .card > div,
+  .batch8DesktopQuizGrid .batch8EnemyRail > .card > div{
+    width:158px!important;
+    height:158px!important;
+    box-sizing:border-box!important;
+    overflow:hidden!important;
+    border:1px solid #b46b1f!important;
+    border-radius:0!important;
+    outline:1px solid rgba(45,22,5,.95)!important;
+    background:#050505!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail > .card video,
+  .batch8DesktopQuizGrid .batch8EnemyRail > .card video{
+    width:100%!important;
+    height:100%!important;
+    object-fit:cover!important;
+  }
+}
+
+/* Question-state strip: purchased PNGs only; explicitly clear all legacy CSS fills. */
+.batch8LearningStage .quizQuestionSegment{
+  background:transparent url('/ui/grimdark/energy_bar_001bg.png?v=20260927-pngonly2') center/100% 100% no-repeat!important;
+  border:0!important;
+  outline:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+}
+.batch8LearningStage .quizQuestionSegmentFill{
+  background:transparent!important;
+  border:0!important;
+  outline:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+}
+.batch8LearningStage .quizQuestionSegment.correct .quizQuestionSegmentFill{
+  background:transparent url('/ui/grimdark/energy_bar_001.png?v=20260927-pngonly2') center/100% 100% no-repeat!important;
+}
+.batch8LearningStage .quizQuestionSegment.wrong .quizQuestionSegmentFill{
+  background:transparent url('/ui/grimdark/hud_health_bar_002.png?v=20260927-pngonly2') center/100% 100% no-repeat!important;
+}
