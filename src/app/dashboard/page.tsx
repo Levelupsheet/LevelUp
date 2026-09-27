@@ -104,14 +104,18 @@ function isGoldenNotification(n: { type?: string; title?: string; body?: string 
 }
 
 
-function itemIcon(itemType?: string | null, itemRef?: string | null) {
+function itemIconAsset(itemType?: string | null, itemRef?: string | null) {
   const key = String(itemRef || itemType || "").toLowerCase();
-  if (key.includes("shield")) return "🛡️";
-  if (key.includes("fury")) return "🔥";
-  if (key.includes("xp")) return "⚡";
-  if (key.includes("hint")) return "💡";
-  if (key.includes("streak")) return "🏁";
-  return "✨";
+  if (key.includes("fury") || key.includes("attack")) return "/ui/grimdark/flow_skill1_001.png";
+  if (key.includes("shield")) return "/ui/grimdark/flow_skill3_001.png";
+  if (key.includes("xp") || key.includes("time")) return "/ui/grimdark/flow_skill6_001.png";
+  if (key.includes("hint") || key.includes("rune")) return "/ui/grimdark/flow_skill7_001.png";
+  if (key.includes("life") || key.includes("boss")) return "/ui/grimdark/flow_skill8_001.png";
+  return "/ui/grimdark/flow_skill2_001.png";
+}
+
+function itemIcon(itemType?: string | null, itemRef?: string | null) {
+  return <img className="powerupItemArtwork" src={itemIconAsset(itemType, itemRef)} alt="" aria-hidden="true" />;
 }
 
 function itemLabel(itemType?: string | null, itemRef?: string | null) {
@@ -1048,7 +1052,7 @@ async function analyzeResumeStage12() {
             <div className="powerHudTray" style={{ marginTop: 10, display: "flex", gap: 6, flexWrap: "wrap" }}>
               {compactInventory.length ? compactInventory.map((row) => (
                 <div key={`${row.itemType}_${row.itemRef || "base"}`} className="badge" title={`${itemLabel(row.itemType, row.itemRef)} x${row.quantity}`} style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "4px 8px", minHeight: 26, borderRadius: 999, borderColor: "rgba(111,175,255,0.26)", background: "rgba(18,28,44,0.66)", fontSize: 12, boxShadow: "0 0 0 1px rgba(111,175,255,0.06) inset" }}>
-                  <span aria-hidden="true" className="dashboardPowerupIconSlot">{String(row.itemRef || row.itemType || "").toLowerCase().includes("fury") || String(row.itemRef || row.itemType || "").toLowerCase().includes("attack") ? <img src="/ui/grimdark/flow-skill1.png?v=20260927-powerups" alt="" /> : itemIcon(row.itemType, row.itemRef)}</span>
+                  <span aria-hidden="true" className="dashboardPowerupIconSlot">{itemIcon(row.itemType, row.itemRef)}</span>
                   <span style={{ fontWeight: 900, fontSize: 12 }}>{row.quantity}</span>
                 </div>
               )) : <small style={{ opacity: 0.78 }}>No powerups banked yet.</small>}
