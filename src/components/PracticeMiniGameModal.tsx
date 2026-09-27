@@ -226,7 +226,6 @@ export default function PracticeMiniGameModal(props: {
             const masteryState = mastery >= 85 ? "MASTERED" : mastery >= 70 ? "STRENGTHENED" : mastery >= 50 ? "IMPROVING" : "FOCUS AREA";
             return (
             <div className="card practiceRunSummaryShell" style={{ padding: 14 }}>
-              <button className="d2Btn practiceSummaryClose" type="button" onClick={onClose}>DONE</button>
               <div className={"practiceRunResultHero " + (finalScore.outcome === "defeat" ? "defeat" : "victory")}>
                 <img className="practiceRunResultArt" src={finalScore.outcome === "defeat" ? "/ui/grimdark/flow_game_flow_death_panel_001_001.png" : "/ui/grimdark/flow_game_flow_victory_panel_001_001.png"} alt={finalScore.outcome === "defeat" ? "Defeat" : "Victory"} />
               </div>
@@ -270,8 +269,8 @@ export default function PracticeMiniGameModal(props: {
                   <div className="adaptiveReadinessNote">Readiness reflects your stored mastery across learning domains, not just this run's score.</div>
                 </div>
               </div>
-              <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 14, flexWrap: "wrap" }}>
-                {!bossReward ? <button className="secondaryBtn" type="button" onClick={() => setStep("setup")}>Try again</button> : null}
+              <div className="practiceSummaryActions">
+                {!bossReward ? <button className="primaryBtn" type="button" onClick={() => setStep("setup")}>Try again</button> : null}
                 <button className="primaryBtn" type="button" onClick={onClose}>{bossReward ? "Finish" : "Done"}</button>
               </div>
             </div>
