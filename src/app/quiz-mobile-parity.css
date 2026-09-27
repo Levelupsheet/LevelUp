@@ -1291,3 +1291,143 @@
     transform:translateY(-3px) !important;
   }
 }
+
+
+/* Mobile dashboard + Position Training parity — 2026-09-27.
+   Keep desktop unchanged; mobile uses the purchased Grimdark controls directly. */
+@media (max-width: 860px) {
+  .dashboardGrimdarkSidebar button.dashboardAssetButton,
+  .dashboardGrimdarkSidebar .dashboardBattleShortcuts > button.dashboardAssetButton,
+  .dashboardNextAction button.dashboardNextAssetButton {
+    border:0 !important;
+    border-radius:0 !important;
+    outline:0 !important;
+    box-shadow:none !important;
+    background-color:transparent !important;
+    background-repeat:no-repeat !important;
+    background-position:center !important;
+    background-size:100% 100% !important;
+    min-height:54px !important;
+    color:#f8ecd6 !important;
+  }
+  .dashboardGrimdarkSidebar button.dashboardAssetButtonOrange,
+  .dashboardNextAction button.dashboardAssetButtonOrange {
+    background-image:url('/ui/grimdark/button-orange.png?v=20260927-mobile1') !important;
+  }
+  .dashboardGrimdarkSidebar button.dashboardAssetButtonBlue {
+    background-image:url('/ui/grimdark/button-blue.png?v=20260927-mobile1') !important;
+  }
+  .dashboardGrimdarkSidebar .dashboardButtonSkinImage,
+  .dashboardNextAction .dashboardButtonSkinImage {
+    display:none !important;
+  }
+  .dashboardGrimdarkSidebar .dashboardButtonAssetLabel,
+  .dashboardNextAction .dashboardButtonAssetLabel {
+    position:relative !important;
+    z-index:2 !important;
+  }
+
+  .practiceGameOverlay {
+    align-items:flex-start !important;
+    padding:max(14px, env(safe-area-inset-top)) 12px max(18px, env(safe-area-inset-bottom)) !important;
+    overflow-y:auto !important;
+  }
+  .practiceGameOverlay > .practiceGameModal--setup {
+    width:min(94vw, 720px) !important;
+    max-width:720px !important;
+    min-height:0 !important;
+    height:auto !important;
+    margin:0 auto !important;
+    overflow:hidden !important;
+    border:8px solid transparent !important;
+    border-image:url('/ui/dark-fantasy-panel.webp') 32 / 8px stretch !important;
+    border-radius:0 !important;
+    background:#090909 !important;
+    box-shadow:0 18px 48px rgba(0,0,0,.72) !important;
+  }
+  .practiceGameModal--setup .luVideoBg {
+    opacity:.32 !important;
+  }
+  .practiceGameModal--setup > .practiceGameOuterHeader {
+    min-height:78px !important;
+    padding:14px 16px !important;
+    border:0 !important;
+    border-bottom:1px solid #6f3c1d !important;
+    background:linear-gradient(180deg,rgba(20,14,10,.96),rgba(8,8,8,.98)) !important;
+  }
+  .practiceGameModal--setup .practiceGameOuterTitle b {
+    font-family:Cinzel,Georgia,serif !important;
+    text-transform:uppercase !important;
+    letter-spacing:.06em !important;
+    color:#f5e7c8 !important;
+    font-size:19px !important;
+  }
+  .practiceGameModal--setup .practiceGameExit {
+    width:82px !important;
+    min-width:82px !important;
+    height:48px !important;
+    min-height:48px !important;
+    background:transparent url('/ui/grimdark/button-red.png?v=20260927-mobile1') center/100% 100% no-repeat !important;
+    color:#f8ecd6 !important;
+    font-family:Cinzel,Georgia,serif !important;
+    font-size:13px !important;
+    font-weight:800 !important;
+  }
+  .practiceGameModal--setup .practiceGameExit span {
+    display:block !important;
+    color:inherit !important;
+    font-size:inherit !important;
+  }
+  .practiceGameModal--setup > .luModalBody {
+    padding:12px !important;
+  }
+  .practiceGameModal--setup .practiceGameSetupCard {
+    padding:16px !important;
+    border:5px solid transparent !important;
+    border-image:url('/ui/dark-fantasy-panel.webp') 32 / 5px stretch !important;
+    border-radius:0 !important;
+    background:linear-gradient(180deg,rgba(18,18,17,.98),rgba(7,7,7,.98)) !important;
+    box-shadow:none !important;
+  }
+  .practiceGameModal--setup .practiceGameSetupCard > div:first-child > div:first-child {
+    font-family:Cinzel,Georgia,serif !important;
+    color:#f5e7c8 !important;
+    font-size:20px !important;
+    letter-spacing:.02em !important;
+  }
+  .practiceGameModal--setup .trackBtn {
+    min-height:46px !important;
+    padding:8px 15px !important;
+    border:1px solid #6f3c1d !important;
+    border-radius:0 !important;
+    background:linear-gradient(180deg,#171717,#090909) !important;
+    color:#eee5d7 !important;
+    font-family:Cinzel,Georgia,serif !important;
+    box-shadow:inset 0 0 0 1px #050505 !important;
+  }
+  .practiceGameModal--setup .trackBtn.active {
+    border-color:#b5682b !important;
+    color:#ffd99a !important;
+    background:linear-gradient(180deg,#2b1a10,#100c09) !important;
+  }
+  .practiceGameModal--setup .practiceGameStartRow {
+    justify-content:stretch !important;
+    margin-top:16px !important;
+  }
+  .practiceGameModal--setup .practiceGameStartButton {
+    width:100% !important;
+    min-height:54px !important;
+    background:transparent url('/ui/grimdark/button-orange.png?v=20260927-mobile1') center/100% 100% no-repeat !important;
+  }
+
+  /* Remove the oversized black separator bands introduced by desktop spacing. */
+  .dashboardGrimdarkMain > .card,
+  .dashboardGrimdarkMain > .dashboardGrimdarkHero,
+  .dashboardGrimdarkMain > .dashboardNextAction,
+  .dashboardGrimdarkMain > .dashboardPlanCard {
+    margin-bottom:10px !important;
+  }
+  .dashboardGrimdarkMain {
+    gap:0 !important;
+  }
+}
