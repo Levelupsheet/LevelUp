@@ -9495,3 +9495,27 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     z-index:3!important;
   }
 }
+
+
+/* 2026-09-27 exact left-stack seam correction from deployed screenshot.
+   Move the complete stack down 10px. Keep the portrait/powerup seam unchanged.
+   Orb frame must END at the portrait border, never cover it. */
+@media (min-width:901px){
+  .batch8DesktopQuizGrid .batch8PlayerRail{
+    padding-top:52px!important;
+  }
+
+  /* Previous -88px pulled the decorative orb frame across the portrait.
+     Reduce that pull so the visible bottom edge stops at the portrait top. */
+  .batch8DesktopQuizGrid .batch8PlayerRail > .card{
+    margin:-58px auto 1px!important;
+  }
+
+  /* Center the life-orb content within its decorative frame without moving
+     the frame itself relative to the portrait. */
+  .batch8DesktopQuizGrid .batch8PlayerRail > :first-child .d2OrbWrap{
+    position:relative!important;
+    left:8px!important;
+    top:5px!important;
+  }
+}
