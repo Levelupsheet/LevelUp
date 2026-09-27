@@ -8900,3 +8900,33 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     font-size:12px!important;
   }
 }
+
+
+/* 2026-09-27 locked-answer feedback must remain fully visible on desktop. */
+@media (min-width:901px){
+  .d2QuizBody{
+    overflow:hidden!important;
+  }
+  .batch8DesktopQuizGrid{
+    min-height:0!important;
+    overflow:hidden!important;
+  }
+  .d2QuizQuestionCard.batch8LearningStage{
+    min-height:0!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    justify-content:flex-start!important;
+    padding-bottom:28px!important;
+    scrollbar-gutter:stable!important;
+  }
+  .d2QuizQuestionCard .adaptiveTeachingCard{
+    flex:0 0 auto!important;
+    min-height:max-content!important;
+    margin-bottom:12px!important;
+  }
+  .d2QuizQuestionCard .stage5MergedFeedbackCard,
+  .d2QuizQuestionCard .stage5MergedExplanation{
+    overflow:visible!important;
+    max-height:none!important;
+  }
+}
