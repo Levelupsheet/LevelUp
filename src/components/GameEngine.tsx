@@ -22,6 +22,7 @@ type Props = {
   metaLeft?: string;
   metaRight?: string;
   startingPosition?: string | null;
+  playerPosition?: string | null;
   certExam?: string | null;
   bankDomain?: string | null;
   enemyName?: string;
@@ -70,7 +71,7 @@ function mapQuestion(q: any, idx: number): DiabloQuestion {
 }
 
 export default function GameEngine(props: Props) {
-  const { lane, title, subtitle, timed = false, exitHref = "/dashboard", exitLabel = "Close", onExit, metaLeft, metaRight, startingPosition, certExam, bankDomain, enemyName = "Lagger", questionCount, questionsOverride, rulesOverride, onComplete, encounterType = questionsOverride?.length ? "boss" : "standard" } = props;
+  const { lane, title, subtitle, timed = false, exitHref = "/dashboard", exitLabel = "Close", onExit, metaLeft, metaRight, startingPosition, playerPosition, certExam, bankDomain, enemyName = "Lagger", questionCount, questionsOverride, rulesOverride, onComplete, encounterType = questionsOverride?.length ? "boss" : "standard" } = props;
   const [loading, setLoading] = useState(true);
   const [questions, setQuestions] = useState<DiabloQuestion[]>([]);
   const [setLabel, setSetLabel] = useState<string>(subtitle || title);
@@ -227,7 +228,7 @@ export default function GameEngine(props: Props) {
   }, [timed, lane, title, onComplete, sessionId, initialState]);
 
   if (loading) return <div className="page"><div className="container" style={{ maxWidth: 1280 }}><div className="card" style={{ padding: 18 }}><div style={{ fontWeight: 800, fontSize: 18 }}>Loading {title}…</div><div className="muted" style={{ marginTop: 8 }}>{lane === "TEST_NOW" ? "Restoring or creating your saved Test Now session." : "Pulling randomized questions from your active database set."}</div></div></div></div>;
-  const activePosition = startingPosition || String((getActiveUser() as any)?.startingPosition || "HELPDESK_SUPPORT");
+  const activePosition = playerPosition || String((getActiveUser() as any)?.startingPosition || "HELPDESK_SUPPORT");
   const playerMedia = activePosition === "CLOUD_ENGINEER"
     ? { playerIdleSrc: "/video/T2V diablo 4 assassin Idle.mp4", playerAttackSrc: "/video/I2V diablo 4 assassin attack.mp4", playerHitSrc: "/video/T2V diablo 4 assassin damage.mp4" }
     : activePosition === "DESKTOP_TECHNICIAN"
