@@ -928,16 +928,16 @@ async function analyzeResumeStage12() {
               </div>
             </div>
             <div className="luModalBody">
-              <div className="positionConfirmCost">200 <span>tokens</span></div>
+              <div className="positionConfirmCost">{isAdminUser ? 0 : 200} <span>tokens</span></div>
               <p>You are changing from <b>{user?.startingPosition ? labelPos(user.startingPosition) : "your current path"}</b> to <b>{labelPos(pendingPos)}</b>.</p>
-              <p>Your current balance is <b>{tokenBalance} tokens</b>{tokenBalance >= 200 ? `, leaving ${tokenBalance - 200} after the change` : ""}.</p>
-              {tokenBalance < 200 ? <div className="positionChangeError">You need at least 200 tokens to change your player/path.</div> : null}
+              <p>{isAdminUser ? <><b>Admin account:</b> character/path changes are free.</> : <>Your current balance is <b>{tokenBalance} tokens</b>{tokenBalance >= 200 ? `, leaving ${tokenBalance - 200} after the change` : ""}.</>}</p>
+              {!isAdminUser && tokenBalance < 200 ? <div className="positionChangeError">You need at least 200 tokens to change your player/path.</div> : null}
               {positionError ? <div className="positionChangeError">{positionError}</div> : null}
             </div>
             <div className="luModalFooter positionConfirmActions">
               <button className="secondaryBtn gdActionRed gdActionCompact" type="button" disabled={posSaving} onClick={() => { setPositionConfirmOpen(false); setPositionError(null); }}>Cancel</button>
-              <button className="gold gdActionOrange" type="button" disabled={posSaving || tokenBalance < 200} onClick={() => void confirmPosition()}>
-                {posSaving ? "Changing..." : "Confirm & Pay 200 Tokens"}
+              <button className="gold gdActionOrange" type="button" disabled={posSaving || (!isAdminUser && tokenBalance < 200)} onClick={() => void confirmPosition()}>
+                {posSaving ? "Changing..." : isAdminUser ? "Confirm Character Change" : "Confirm & Pay 200 Tokens"}
               </button>
             </div>
           </div>
