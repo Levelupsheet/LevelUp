@@ -8454,3 +8454,41 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     object-position:left bottom!important;
   }
 }
+
+
+/* 2026-09-27 enemy orb cleanup, hint spacing, and player power-up panel */
+.d2QuizQuestionCard .quizHintRow{
+  margin-top:20px!important;
+  padding-top:4px!important;
+}
+@media (min-width:901px){
+  .batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyCard{
+    width:88px!important;
+    height:88px!important;
+    min-width:88px!important;
+    min-height:88px!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyEnergyOrbShell{
+    inset:8%!important;
+    background:none!important;
+    box-shadow:none!important;
+    filter:none!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyEnergyOrb{
+    filter:none!important;
+    box-shadow:none!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyEnergyFlash{
+    box-shadow:none!important;
+    background:transparent!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail::after{
+    content:""!important;
+    display:block!important;
+    width:104px!important;
+    height:340px!important;
+    margin:-2px 0 0 -8px!important;
+    background:url('/ui/grimdark/flow_main_panel_powerup1.png?v=20260927-powerup1') top center/contain no-repeat!important;
+    pointer-events:none!important;
+  }
+}
