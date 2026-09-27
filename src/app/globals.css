@@ -9700,3 +9700,36 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     text-align:center!important;
   }
 }
+
+
+/* Purchased information icon replaces the text Session Info button. */
+.sessionInfoIconButton{
+  appearance:none!important;
+  border:0!important;
+  outline:0!important;
+  padding:0!important;
+  margin:0!important;
+  width:72px!important;
+  height:54px!important;
+  flex:0 0 72px!important;
+  display:grid!important;
+  place-items:center!important;
+  background:transparent!important;
+  cursor:pointer!important;
+  filter:drop-shadow(0 2px 3px rgba(0,0,0,.8))!important;
+}
+.sessionInfoIconButton img{
+  display:block!important;
+  width:100%!important;
+  height:100%!important;
+  object-fit:contain!important;
+  transition:filter .15s ease,transform .15s ease!important;
+}
+.sessionInfoIconButton:hover img,
+.sessionInfoIconButton:focus-visible img{
+  filter:brightness(1.18) drop-shadow(0 0 5px rgba(225,145,58,.45))!important;
+  transform:scale(1.04)!important;
+}
+.sessionInfoIconButton.active img{
+  filter:brightness(1.12) drop-shadow(0 0 6px rgba(225,145,58,.55))!important;
+}
