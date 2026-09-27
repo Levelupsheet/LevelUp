@@ -10099,3 +10099,14 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     margin-top:0!important;
   }
 }
+
+
+/* Player blood orb HP visualization.
+   Keep the approved orb geometry fixed while the visible blood level falls
+   with state.playerHP. */
+@media (min-width:901px){
+  .batch8DesktopQuizGrid .playerOrbBlood{
+    clip-path:inset(calc((100 - var(--player-hp, 100)) * 1%) 0 0 0 round 50%)!important;
+    transition:clip-path .35s ease!important;
+  }
+}
