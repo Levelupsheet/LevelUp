@@ -9580,6 +9580,15 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     justify-self:center!important;
     overflow:visible!important;
   }
+  .batch8DesktopQuizGrid .batch8PlayerRail::before,
+  .batch8DesktopQuizGrid .batch8PlayerRail::after{
+    content:none!important;
+    display:none!important;
+    background:none!important;
+    background-image:none!important;
+    border:0!important;
+    box-shadow:none!important;
+  }
   .batch8DesktopQuizGrid .batch8PlayerRail > .playerOrbComposite{
     position:relative!important;
     width:170px!important;
