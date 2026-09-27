@@ -967,12 +967,12 @@ async function analyzeResumeStage12() {
           ) : null}
 
           <button className="dashboardSidebarStart dashboardAssetButton dashboardAssetButtonOrange" style={{ width: "100%", marginTop: 8, opacity: hasFreeStartCooldown ? 0.7 : 1 }} onClick={() => !hasFreeStartCooldown && setShowLaunchModal(true)} disabled={hasFreeStartCooldown} title={hasFreeStartCooldown ? `Free tier cooldown: ${freeStartCooldownLabel}` : undefined}>
-            <img className="dashboardButtonAssetImage" src="/ui/grimdark/button-orange.png?v=20260927h" alt="" aria-hidden="true" />\n            <span className="dashboardButtonAssetLabel">{hasFreeStartCooldown ? `Start Now! (${freeStartCooldownLabel})` : "Start Now!"}</span>\n          </button>
+            <span className="dashboardButtonSkin dashboardButtonSkinOrange" aria-hidden="true" /><span className="dashboardButtonAssetLabel">{hasFreeStartCooldown ? `Start Now! (${freeStartCooldownLabel})` : "Start Now!"}</span></button>
 
           <div className="dashboardBattleShortcuts" style={{ marginTop: 10, display: "grid", gap: 10 }}>
             {hrBattleUnlocked ? (
               <button className="dashboardAssetButton dashboardAssetButtonOrange" style={{ width: "100%" }} onClick={() => setMockInterviewOpen(true)}>
-                <img className="dashboardButtonAssetImage" src="/ui/grimdark/button-orange.png?v=20260927h" alt="" aria-hidden="true" />\n                <span className="dashboardButtonAssetLabel">{hrPassed ? "Start HR Battle →" : "Start HR Battle →"}</span>\n              </button>
+                <span className="dashboardButtonSkin dashboardButtonSkinOrange" aria-hidden="true" /><span className="dashboardButtonAssetLabel">{hrPassed ? "Start HR Battle →" : "Start HR Battle →"}</span></button>
             ) : (
               <button className="dashboardAssetButton dashboardAssetButtonOrange" style={{ width: "100%", opacity: 0.65, cursor: "not-allowed" }} disabled title="HR battle unlocks automatically when you qualify.">
                 Begin Boss Battle 🔒
@@ -980,7 +980,7 @@ async function analyzeResumeStage12() {
             )}
             {((localLevel || 1) >= 5 || hasTechReady) ? (
               <button className="dashboardAssetButton dashboardAssetButtonBlue" style={{ width: "100%" }} type="button" onClick={() => setMockInterviewOpen(true)}>
-                <img className="dashboardButtonAssetImage" src="/ui/grimdark/button-blue.png?v=20260927h" alt="" aria-hidden="true" />\n                <span className="dashboardButtonAssetLabel">Start Tech Battle →</span>\n              </button>
+                <span className="dashboardButtonSkin dashboardButtonSkinBlue" aria-hidden="true" /><span className="dashboardButtonAssetLabel">Start Tech Battle →</span></button>
             ) : null}
             {hasFreeStartCooldown && <small style={{ display: "block", marginTop: 0, color: "#f5d37b" }}>Free users can start another session in {freeStartCooldownLabel}.</small>}
           </div>
