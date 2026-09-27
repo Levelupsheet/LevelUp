@@ -1173,11 +1173,6 @@ const showExpandedExplanation = useMemo(() => {
                 <D2LifeOrb value={state.playerHP} name={playerName} />
               </div>
               <ModelPanel title="" src={playerVideo} loop={!isPlayerHitVideo} onEnded={isPlayerHitVideo ? () => setHitPulse(null) : undefined} height="clamp(180px, 22vh, 280px)" damageText={damageFloat.player || null} damageTone="player" />
-              <div className="stage7PowerStrip underPlayer">
-                <button className={"d2Btn power" + (powerups.shieldActive ? " active" : "")} type="button" disabled={state.locked || powerups.shieldActive || (powerups.shieldUses + stage9Inventory.shield) <= 0} onClick={activateShield}>Shield {powerups.shieldActive ? "On" : (powerups.shieldUses + stage9Inventory.shield) > 0 ? `x${powerups.shieldUses + stage9Inventory.shield}` : "Locked"}</button>
-                <button className={"d2Btn power" + (powerups.furyActive ? " active" : "")} type="button" disabled={state.locked || powerups.furyActive || (powerups.furyUses + stage9Inventory.fury) <= 0} onClick={activateFury}>Fury {powerups.furyActive ? "On" : (powerups.furyUses + stage9Inventory.fury) > 0 ? `x${powerups.furyUses + stage9Inventory.fury}` : "Locked"}</button>
-                <button className="d2Btn power" type="button" disabled={state.locked || stage9Inventory.xpSurge <= 0} onClick={activateXpSurge}>Time Slow {stage9Inventory.xpSurge > 0 ? `x${stage9Inventory.xpSurge}` : "Locked"}</button>
-              </div>
             </div>
 
             <div className={"d2QuestionCard d2QuizQuestionCard batch8LearningStage " + (hitPulse === "enemy" ? "d2HitFlash" : "") + ((question as any)?.isGolden ? " d2GoldenQuestionCard" : "") + (isGoldenBoss ? " d2GoldenBossCard" : "") } style={{ minHeight: 0, height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
