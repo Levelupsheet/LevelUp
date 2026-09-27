@@ -9948,3 +9948,67 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     bottom:-5px!important;
   }
 }
+
+
+/* 2026-09-27 approved preview geometry.
+   Player: red orb 10% smaller, raised/centered in frame, 2px portrait seam.
+   Enemy: complete orb assembly 15% smaller with 2px portrait seam.
+   Powerups: rectangular artwork footprint matching the metal sockets. */
+@media (min-width:901px){
+  .batch8DesktopQuizGrid .batch8PlayerRail > .playerOrbComposite{
+    height:169px!important;
+    flex-basis:169px!important;
+    margin:0 auto 2px!important;
+  }
+  .batch8DesktopQuizGrid .playerOrbFrameAsset{
+    top:30px!important;
+  }
+  .batch8DesktopQuizGrid .playerOrbBlood{
+    width:59px!important;
+    height:59px!important;
+    left:55.5px!important;
+    top:59px!important;
+  }
+
+  .batch8DesktopQuizGrid .batch8EnemyRail{
+    padding-top:42px!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail > :first-child{
+    width:136px!important;
+    max-width:136px!important;
+    height:136px!important;
+    min-height:136px!important;
+    flex:0 0 136px!important;
+    margin:0 auto 2px!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyCard{
+    width:136px!important;
+    max-width:136px!important;
+    height:136px!important;
+    min-height:136px!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyEnergyOrbShell{
+    transform:scale(.85)!important;
+    transform-origin:center!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail .modelPanel{
+    margin-top:0!important;
+  }
+
+  .batch8DesktopQuizGrid .playerPowerupSlot{
+    left:30px!important;
+    width:44px!important;
+    height:50px!important;
+  }
+  .batch8DesktopQuizGrid .playerPowerupSlot.slot1{top:15px!important}
+  .batch8DesktopQuizGrid .playerPowerupSlot.slot2{top:76px!important}
+  .batch8DesktopQuizGrid .playerPowerupSlot.slot3{top:137px!important}
+  .batch8DesktopQuizGrid .playerPowerupSlot.slot4{top:198px!important}
+  .batch8DesktopQuizGrid .playerPowerupSlot img{
+    width:40px!important;
+    height:46px!important;
+    max-width:40px!important;
+    max-height:46px!important;
+    object-fit:fill!important;
+  }
+}
