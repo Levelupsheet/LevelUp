@@ -987,7 +987,12 @@ const showExpandedExplanation = useMemo(() => {
 
   const isEnemyHitVideo = hitPulse === "enemy" && Boolean(media?.enemyHitSrc);
   const isPlayerHitVideo = hitPulse === "player" && Boolean(media?.playerHitSrc);
-  const playerVideo = hitPulse === "enemy" ? media?.playerAttackSrc || media?.playerIdleSrc : hitPulse === "player" ? media?.playerHitSrc || media?.playerIdleSrc : media?.playerIdleSrc;
+  const playerVideo = hitPulse === "enemy"
+    ? media?.playerAttackSrc || media?.playerIdleSrc
+    : hitPulse === "player"
+      ? media?.playerHitSrc || media?.playerIdleSrc
+      : media?.playerIdleSrc;
+  const playerVideoKey = hitPulse === "player" ? `player-hit:${media?.playerHitSrc || ""}` : hitPulse === "enemy" ? `player-attack:${media?.playerAttackSrc || ""}` : `player-idle:${media?.playerIdleSrc || ""}`;
   const enemyVideo = hitPulse === "enemy" ? media?.enemyHitSrc || media?.enemyIdleSrc : media?.enemyIdleSrc;
 
   function handleManualSubmit() {
@@ -1181,7 +1186,7 @@ const showExpandedExplanation = useMemo(() => {
               <div className={hitPulse === "player" ? "d2Shake" : ""}>
                 <D2LifeOrb value={state.playerHP} name={playerName} />
               </div>
-              <ModelPanel title="" src={playerVideo} loop={!isPlayerHitVideo} onEnded={isPlayerHitVideo ? () => setHitPulse(null) : undefined} height="clamp(180px, 22vh, 280px)" damageText={damageFloat.player || null} damageTone="player" />
+              <ModelPanel key={playerVideoKey} title="" src={playerVideo} loop={!isPlayerHitVideo} onEnded={isPlayerHitVideo ? () => setHitPulse(null) : undefined} height="clamp(180px, 22vh, 280px)" damageText={damageFloat.player || null} damageTone="player" />
             </div>
 
             <div className={"d2QuestionCard d2QuizQuestionCard batch8LearningStage " + (hitPulse === "enemy" ? "d2HitFlash" : "") + ((question as any)?.isGolden ? " d2GoldenQuestionCard" : "") + (isGoldenBoss ? " d2GoldenBossCard" : "") } style={{ minHeight: 0, height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
@@ -1529,7 +1534,7 @@ const showExpandedExplanation = useMemo(() => {
                 <D2LifeOrb value={state.playerHP} name={playerName} />
               </div>
               <div style={{ marginTop: 10 }}>
-                <ModelPanel title="" src={playerVideo} loop={!isPlayerHitVideo} onEnded={isPlayerHitVideo ? () => setHitPulse(null) : undefined} height="clamp(180px, 22vh, 280px)" damageText={damageFloat.player || null} damageTone="player" />
+                <ModelPanel key={playerVideoKey} title="" src={playerVideo} loop={!isPlayerHitVideo} onEnded={isPlayerHitVideo ? () => setHitPulse(null) : undefined} height="clamp(180px, 22vh, 280px)" damageText={damageFloat.player || null} damageTone="player" />
               </div>
             </div>
           </div>
