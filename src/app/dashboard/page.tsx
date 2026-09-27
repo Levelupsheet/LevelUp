@@ -990,8 +990,8 @@ async function analyzeResumeStage12() {
           </div>
 
           <div className="dashboardPvpShortcut" style={{ marginTop: 10 }}>
-            <button className="secondaryBtn gdActionRed dashboardPvpRed" style={{ width: "100%" }} type="button" onClick={() => (window.location.href = "/pvp")}>
-              <img className="dashboardPvpRedAsset" src="/ui/grimdark/button-red.png?v=20260927-layerfix" alt="" aria-hidden="true" />
+            <button className="secondaryBtn gdActionBlue dashboardPvpBlue" style={{ width: "100%" }} type="button" onClick={() => (window.location.href = "/pvp")}>
+              <img className="dashboardPvpBlueAsset" src="/ui/grimdark/button-blue.png?v=20260927-pvpblue" alt="" aria-hidden="true" />
               <span className="dashboardButtonAssetLabel">Enter PvP Arena</span>
             </button>
           </div>
