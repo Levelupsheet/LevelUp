@@ -5956,3 +5956,71 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
   .gdActionOrange,.gdActionBlue,.gdActionRed{min-height:48px !important;padding:9px 18px !important;}
   .gdActionCompact{min-height:38px !important;padding:6px 14px !important;}
 }
+
+
+/* Native Grimdark artwork: dashboard portrait rarity frame, header ribbon, close control. */
+.dashboardGrimdarkPortrait.dashboardPlayerOnly{
+  position:relative !important;
+  overflow:visible !important;
+  border:0 !important;
+  border-radius:0 !important;
+  box-shadow:none !important;
+  background:transparent !important;
+  padding:8px !important;
+}
+.dashboardGrimdarkPortrait.dashboardPlayerOnly video{
+  position:relative;
+  z-index:1;
+  width:100%;
+  height:100%;
+  display:block;
+  object-fit:cover;
+  border:0 !important;
+  border-radius:0 !important;
+  box-shadow:none !important;
+}
+.dashboardCharacterRarityFrame{
+  position:absolute;
+  z-index:3;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:fill;
+  pointer-events:none;
+  user-select:none;
+}
+.dashboardGrimdarkHero{position:relative !important;isolation:isolate;}
+.dashboardHeaderRibbon{
+  position:absolute;
+  z-index:-1;
+  left:50%;
+  top:50%;
+  width:min(58%,526px);
+  height:calc(100% - 8px);
+  transform:translate(-50%,-50%);
+  object-fit:fill;
+  pointer-events:none;
+  opacity:.94;
+}
+.gdCloseButton{
+  width:47px !important;
+  min-width:47px !important;
+  height:47px !important;
+  min-height:47px !important;
+  padding:0 !important;
+  border:0 !important;
+  border-radius:0 !important;
+  background:transparent url('/ui/grimdark/close-button.png') center/100% 100% no-repeat !important;
+  box-shadow:none !important;
+  color:transparent !important;
+  font-size:0 !important;
+  line-height:0 !important;
+}
+.gdCloseButton span{display:none !important;}
+.gdCloseButton:hover{filter:brightness(1.15) saturate(1.08);}
+.gdCloseButton:active{transform:translateY(1px);filter:brightness(.92);}
+.gdCloseButton:focus-visible{outline:2px solid #dfa65c !important;outline-offset:2px !important;}
+@media(max-width:860px){
+ .dashboardHeaderRibbon{width:min(88%,420px);height:calc(100% - 6px);}
+ .gdCloseButton{width:42px !important;min-width:42px !important;height:42px !important;min-height:42px !important;}
+}

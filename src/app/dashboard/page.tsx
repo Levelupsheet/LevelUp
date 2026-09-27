@@ -753,7 +753,7 @@ async function analyzeResumeStage12() {
                 <b style={{ fontSize: 18 }}>Start leveling</b>
                 <div><small className="luHint">Choose what you want to work on right now.</small></div>
               </div>
-              <button className="secondaryBtn gdActionRed gdActionCompact" type="button" onClick={() => setShowLaunchModal(false)}>EXIT</button>
+              <button className="secondaryBtn gdCloseButton" type="button" aria-label="Close" title="Close" onClick={() => setShowLaunchModal(false)}><span aria-hidden="true">×</span></button>
             </div>
 
             <div className="luModalBody">
@@ -856,7 +856,7 @@ async function analyzeResumeStage12() {
                 <div><small className="luHint">This personalizes your learning path. You can change it later.</small></div>
               </div>
               {positionChangeMode && (
-                <button className="secondaryBtn positionModalExit gdActionRed gdActionCompact" type="button" onClick={() => setShowPositionModal(false)}>EXIT</button>
+                <button className="secondaryBtn positionModalExit gdCloseButton" type="button" onClick={() => setShowPositionModal(false)}>EXIT</button>
               )}
             </div>
 
@@ -961,7 +961,7 @@ async function analyzeResumeStage12() {
               setPositionChangeMode(true);
               setShowPositionModal(true);
             }}>
-              <span className="dashboardGrimdarkPortrait dashboardPlayerOnly"><video src="/video/helpdesk-wizard-idle.mp4" autoPlay loop muted playsInline disablePictureInPicture controlsList="nodownload noremoteplayback" aria-label="Help Desk Wizard player" /></span>
+              <span className="dashboardGrimdarkPortrait dashboardPlayerOnly"><video src="/video/helpdesk-wizard-idle.mp4" autoPlay loop muted playsInline disablePictureInPicture controlsList="nodownload noremoteplayback" aria-label="Help Desk Wizard player" /><img className="dashboardCharacterRarityFrame" src="/ui/grimdark/character-rarity-border-4.png" alt="" aria-hidden="true" /></span>
             </button>
           ) : user?.startingPosition === "DESKTOP_TECHNICIAN" ? (
             <button className="dashboardSelectedPlayer dashboardSelectedPlayerButton" type="button" aria-label="Change selected player: Desktop Barbarian" onClick={() => {
@@ -969,7 +969,7 @@ async function analyzeResumeStage12() {
               setPositionChangeMode(true);
               setShowPositionModal(true);
             }}>
-              <span className="dashboardGrimdarkPortrait dashboardPlayerOnly"><video src="/video/desktop-barbarian-idle.mp4" autoPlay loop muted playsInline disablePictureInPicture controlsList="nodownload noremoteplayback" aria-label="Desktop Barbarian player" /></span>
+              <span className="dashboardGrimdarkPortrait dashboardPlayerOnly"><video src="/video/desktop-barbarian-idle.mp4" autoPlay loop muted playsInline disablePictureInPicture controlsList="nodownload noremoteplayback" aria-label="Desktop Barbarian player" /><img className="dashboardCharacterRarityFrame" src="/ui/grimdark/character-rarity-border-4.png" alt="" aria-hidden="true" /></span>
             </button>
           ) : null}
 
@@ -1083,7 +1083,7 @@ async function analyzeResumeStage12() {
         </aside>
 
         <section className="maincol dashboardMain dashboardGrimdarkMain">
-          <div className="topbar dashboardHero dashboardGrimdarkHero">
+          <div className="topbar dashboardHero dashboardGrimdarkHero"><img className="dashboardHeaderRibbon" src="/ui/grimdark/header-ribbon.png" alt="" aria-hidden="true" />
             <div style={{ flex: 1, minWidth: 260 }}>
               <div style={{ fontSize: 18, opacity: 0.82, textAlign: "center" }}>Welcome back</div>
               <div style={{ marginTop: 4, fontWeight: 900, fontSize: 34, lineHeight: 1.02, textAlign: "center", letterSpacing: 0.2, textShadow: "0 0 18px rgba(255,255,255,0.14), 0 0 28px rgba(96,188,255,0.10)" }}>
@@ -1296,7 +1296,7 @@ async function analyzeResumeStage12() {
                   setNotes([]);
                   try { if (userId) { clearActivities(userId); setActivity([]); } } catch {}
                 }}>Clear all</button>
-                <button className="secondaryBtn gdActionRed gdActionCompact" type="button" onClick={() => setNotificationsOpen(false)}>EXIT</button>
+                <button className="secondaryBtn gdCloseButton" type="button" aria-label="Close" title="Close" onClick={() => setNotificationsOpen(false)}><span aria-hidden="true">×</span></button>
               </div>
             </div>
             <div className="luModalBody">
@@ -1324,7 +1324,7 @@ async function analyzeResumeStage12() {
                 <b style={{ fontSize: 18 }}>PowerUps and Claims</b>
                 <div><small className="luHint">Purchase reusable powerups and claim your daily token bonus.</small></div>
               </div>
-              <button className="secondaryBtn gdActionRed gdActionCompact" type="button" onClick={() => setPowerupsOpen(false)}>EXIT</button>
+              <button className="secondaryBtn gdCloseButton" type="button" aria-label="Close" title="Close" onClick={() => setPowerupsOpen(false)}><span aria-hidden="true">×</span></button>
             </div>
             <div className="luModalBody">
               <div className="card" style={{ marginBottom: 12, borderColor: "rgba(93,168,255,0.22)" }}>
