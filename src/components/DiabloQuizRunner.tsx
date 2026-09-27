@@ -1216,10 +1216,30 @@ const showExpandedExplanation = useMemo(() => {
         {!isMobileLayout ? (
           <div className="d2InterviewGrid d2QuizGrid stage8CompactGrid batch8DesktopQuizGrid" style={{ height: "100%", alignItems: "stretch", minWidth: 0, minHeight: 0, overflow: "hidden" }}>
             <div className="quizPlayerRail batch8CombatRail batch8PlayerRail" style={{ display: "grid", gap: 10, alignContent: "start", minHeight: 0 }}>
-              <div className={hitPulse === "player" ? "d2Shake" : ""}>
-                <D2LifeOrb value={state.playerHP} name={playerName} />
+              <div className={"playerOrbComposite " + (hitPulse === "player" ? "d2Shake" : "")} aria-label={`${playerName} health ${state.playerHP}%`}>
+                <img className="playerOrbFrameAsset" src="/ui/grimdark/flow_main_panel_player.png" alt="" aria-hidden="true" />
+                <div className="playerOrbBlood">
+                  <img src="/ui/blood-orb.webp" alt="" aria-hidden="true" />
+                </div>
               </div>
               <ModelPanel key={playerVideoKey} title="" src={playerVideo} forceReload={hitPulse === "player"} loop={!isPlayerHitVideo} onEnded={isPlayerHitVideo ? () => setHitPulse(null) : undefined} height="clamp(180px, 22vh, 280px)" damageText={damageFloat.player || null} damageTone="player" />
+              <div className="playerPowerupRack" aria-label="Available powerups">
+                <img className="playerPowerupRackAsset" src="/ui/grimdark/flow_main_panel_powerup1.png" alt="" aria-hidden="true" />
+                <div className="playerPowerupSlots">
+                  {[
+                    { key: "shield", qty: stage9Inventory.shield, src: "/ui/grimdark/flow_skill3_001.png", label: "Shield" },
+                    { key: "fury", qty: stage9Inventory.fury + powerups.furyUses, src: "/ui/grimdark/flow_skill1_001.png", label: "Fury" },
+                    { key: "xpSurge", qty: stage9Inventory.xpSurge, src: "/ui/grimdark/flow_skill6_001.png", label: "Time Slow" },
+                    { key: "hintDiscount", qty: stage9Inventory.hintDiscount, src: "/ui/grimdark/flow_skill7_001.png", label: "Hint" },
+                    { key: "extraLife", qty: stage9Inventory.extraLife, src: "/ui/grimdark/flow_skill8_001.png", label: "Extra Life" },
+                  ].filter((item) => item.qty > 0).slice(0, 4).map((item, index) => (
+                    <div className={`playerPowerupSlot slot${index + 1}`} key={item.key} title={`${item.label} x${item.qty}`}>
+                      <img src={item.src} alt={item.label} />
+                      {item.qty > 1 ? <span className="playerPowerupQty">x{item.qty}</span> : null}
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
 
             <div className={"d2QuestionCard d2QuizQuestionCard batch8LearningStage " + (hitPulse === "enemy" ? "d2HitFlash" : "") + ((question as any)?.isGolden ? " d2GoldenQuestionCard" : "") + (isGoldenBoss ? " d2GoldenBossCard" : "") } style={{ minHeight: 0, height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
