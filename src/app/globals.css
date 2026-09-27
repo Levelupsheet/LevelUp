@@ -5795,3 +5795,24 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .dashboardGrimdarkSidebar .dashboardSelectedPlayerButton,
 .dashboardGrimdarkSidebar .dashboardPlayerOnly{border:none!important;border-color:transparent!important;border-width:0!important;border-style:none!important;border-radius:0!important;outline:none!important;box-shadow:none!important}
 .dashboardGrimdarkSidebar .dashboardSelectedPlayerButton{overflow:visible!important}
+
+/* Sidebar asset reset 2026-09-27: contained skins only; never paint the sidebar itself. */
+.dashboardGrimdarkSidebar{background-image:none!important}
+.dashboardGrimdarkSidebar button.dashboardAssetButton{
+  position:relative!important;isolation:isolate!important;overflow:hidden!important;
+  height:58px!important;min-height:58px!important;background:transparent!important;
+}
+.dashboardGrimdarkSidebar .dashboardButtonSkin{
+  position:absolute!important;z-index:0!important;inset:0!important;display:block!important;
+  width:100%!important;height:58px!important;max-height:58px!important;
+  background-position:center!important;background-repeat:no-repeat!important;background-size:100% 100%!important;
+  pointer-events:none!important;
+}
+.dashboardGrimdarkSidebar .dashboardButtonSkinOrange{background-image:url('/ui/grimdark/button-orange.png?v=20260927i')!important}
+.dashboardGrimdarkSidebar .dashboardButtonSkinBlue{background-image:url('/ui/grimdark/button-blue.png?v=20260927i')!important}
+.dashboardGrimdarkSidebar .dashboardButtonAssetLabel{position:relative!important;z-index:1!important}
+.dashboardGrimdarkSidebar .dashboardButtonAssetImage{display:none!important}
+.dashboardGrimdarkSidebar .dashboardSelectedPlayerButton,
+.dashboardGrimdarkSidebar .dashboardPlayerOnly{
+  border:0!important;border-image:none!important;border-radius:0!important;outline:0!important;box-shadow:none!important;background:transparent!important;
+}
