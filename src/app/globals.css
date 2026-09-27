@@ -7496,3 +7496,81 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
       inset 0 0 0 1px rgba(222,153,63,.12)!important;
   }
 }
+
+
+/* 2026-09-27 player HUD + completion-screen refinement. */
+@media (min-width:901px){
+  /* Center the smaller blood orb in the circular player holder. */
+  .batch8DesktopQuizGrid .batch8PlayerRail > div:first-child{
+    transform:translate(-10px,3px)!important;
+    margin-bottom:12px!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail .d2OrbWrap,
+  .batch8DesktopQuizGrid .batch8PlayerRail .d2OrbFrame{
+    width:108px!important;
+    height:108px!important;
+    min-width:108px!important;
+    min-height:108px!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail .d2AssetBloodOrb{
+    inset:10%!important;
+  }
+
+  /* Keep the full dashboard-style gold edge visible on all four portrait sides. */
+  .batch8DesktopQuizGrid .batch8PlayerRail > .card{
+    width:158px!important;
+    max-width:calc(100% - 12px)!important;
+    justify-self:center!important;
+    overflow:visible!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail > .card > div{
+    width:100%!important;
+    box-sizing:border-box!important;
+    overflow:hidden!important;
+    border:1px solid #b46b1f!important;
+    border-radius:0!important;
+    outline:1px solid rgba(53,25,6,.95)!important;
+    outline-offset:2px!important;
+    box-shadow:inset 0 0 0 1px rgba(238,172,74,.14)!important;
+  }
+}
+
+/* Result art gets its own clear space; score/readiness content begins below it. */
+.practiceRunSummaryShell{
+  position:relative!important;
+  padding-top:14px!important;
+}
+.practiceSummaryClose{
+  position:sticky!important;
+  top:10px!important;
+  z-index:30!important;
+  float:right!important;
+  margin:0 4px -44px 0!important;
+}
+.practiceRunResultHero{
+  position:relative!important;
+  min-height:0!important;
+  height:clamp(230px,34vh,360px)!important;
+  margin:0 auto 20px!important;
+  overflow:hidden!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+}
+.practiceRunResultArt{
+  position:relative!important;
+  inset:auto!important;
+  display:block!important;
+  width:min(100%,900px)!important;
+  height:100%!important;
+  object-fit:contain!important;
+}
+.practiceRunResultOverlay{display:none!important}
+.practiceRunSyncLine{
+  clear:both!important;
+  margin-top:4px!important;
+}
+@media(max-width:900px){
+  .practiceRunResultHero{height:clamp(190px,30vh,280px)!important}
+  .practiceSummaryClose{top:6px!important}
+}
