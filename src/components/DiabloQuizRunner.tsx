@@ -566,7 +566,7 @@ export default function DiabloQuizRunner(props: {
   const [powerups, setPowerups] = useState<Stage7PowerupState>({ shieldActive: false, furyActive: false, shieldUses: 0, furyUses: 0 });
   const [stage9Inventory, setStage9Inventory] = useState<{ shield: number; fury: number; restore: number; xpSurge: number; hintDiscount: number; extraLife: number }>({ shield: 0, fury: 0, restore: 0, xpSurge: 0, hintDiscount: 0, extraLife: 0 });
   const userIdRef = useRef<string>("");
-  const consumedInventoryRef = useRef<{ shield: number; fury: number; xpSurge: number }>({ shield: 0, fury: 0, xpSurge: 0 });
+  const consumedInventoryRef = useRef<{ shield: number; fury: number; restore: number; xpSurge: number }>({ shield: 0, fury: 0, restore: 0, xpSurge: 0 });
   const [stage8History, setStage8History] = useState<Stage8QuestionResult[]>([]);
   const [xpBoostRemaining, setXpBoostRemaining] = useState(0);
   const [microRewardFlash, setMicroRewardFlash] = useState<string | null>(null);
