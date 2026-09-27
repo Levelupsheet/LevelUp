@@ -6787,3 +6787,49 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
   .d2QuizShell .modalTitle,.practiceGameOuterTitle > b{width:82%!important;font-size:clamp(14px,4.5vw,20px)!important}
   .d2QuizShell .modalHead .d2ExitBtn,.practiceGameOuterHeader .practiceGameExit{right:8px!important}
 }
+
+
+/* Player HUD: use the dedicated cut flow-panel artwork as the orb/frame assembly. */
+@media (min-width:901px){
+  .batch8DesktopQuizGrid .batch8PlayerRail{
+    position:relative!important;
+    overflow:visible!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail::before{
+    content:""!important;
+    display:block!important;
+    position:absolute!important;
+    z-index:1!important;
+    pointer-events:none!important;
+    top:-22px!important;
+    left:50%!important;
+    width:clamp(190px,16vw,270px)!important;
+    height:clamp(500px,58vh,690px)!important;
+    transform:translateX(-50%)!important;
+    background:url('/ui/grimdark/flow_main_panel_cut.png?v=20260927-playercut') top center/contain no-repeat!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail > *{
+    position:relative!important;
+    z-index:2!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail > div:first-child{
+    height:clamp(170px,15vw,225px)!important;
+    min-height:170px!important;
+    display:grid!important;
+    place-items:center!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail .d2OrbWrap,
+  .batch8DesktopQuizGrid .batch8PlayerRail .d2OrbFrame{
+    width:clamp(126px,10.8vw,174px)!important;
+    height:clamp(126px,10.8vw,174px)!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail .d2AssetBloodOrb{
+    inset:4%!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail .d2UnitFrameAsset{
+    display:none!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail .card{
+    margin-top:18px!important;
+  }
+}
