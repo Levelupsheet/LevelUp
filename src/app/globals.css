@@ -7741,3 +7741,43 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
   .practiceGameModal--summary .luModalBody{max-height:calc(92vh - 66px)!important}
   .practiceGameModal--summary .practiceRunResultHero{width:94%!important;min-height:300px!important}
 }
+
+
+/* 2026-09-27 correction: energy_bar_002bg is the unanswered question-slot artwork. */
+.batch8LearningStage .quizQuestionSegment,
+.batch8LearningStage .quizQuestionSegment.correct,
+.batch8LearningStage .quizQuestionSegment.wrong,
+.batch8LearningStage .quizQuestionSegment.partial{
+  background:transparent url('/ui/grimdark/energy_bar_002bg.png?v=20260927-slotbg') center/100% 100% no-repeat!important;
+  border:0!important;
+  outline:0!important;
+  box-shadow:none!important;
+  border-radius:0!important;
+}
+
+/* Keep the entire player portrait/video visible inside the HUD frame instead of cropping it. */
+@media (min-width:901px){
+  .batch8DesktopQuizGrid .batch8PlayerRail > .card,
+  .batch8DesktopQuizGrid .batch8EnemyRail > .card{
+    width:158px!important;
+    height:158px!important;
+    overflow:hidden!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail > .card > div,
+  .batch8DesktopQuizGrid .batch8EnemyRail > .card > div{
+    width:100%!important;
+    height:100%!important;
+    overflow:hidden!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail > .card video,
+  .batch8DesktopQuizGrid .batch8PlayerRail > .card img,
+  .batch8DesktopQuizGrid .batch8EnemyRail > .card video,
+  .batch8DesktopQuizGrid .batch8EnemyRail > .card img{
+    width:100%!important;
+    height:100%!important;
+    max-width:100%!important;
+    max-height:100%!important;
+    object-fit:contain!important;
+    object-position:center!important;
+  }
+}
