@@ -7454,3 +7454,45 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
   border-color:rgba(105,59,25,.62)!important;
   box-shadow:none!important;
 }
+
+
+/* 2026-09-27 player rail alignment pass */
+@media (min-width:901px){
+  /* Slightly smaller blood orb and move it into the holder socket. */
+  .batch8DesktopQuizGrid .batch8PlayerRail > div:first-child{
+    display:flex!important;
+    justify-content:center!important;
+    width:100%!important;
+    transform:translate(7px,8px)!important;
+    margin-bottom:10px!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail .d2OrbWrap,
+  .batch8DesktopQuizGrid .batch8PlayerRail .d2OrbFrame{
+    width:116px!important;
+    height:116px!important;
+    min-width:116px!important;
+    min-height:116px!important;
+    margin:0 auto!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail .d2AssetBloodOrb{
+    inset:10%!important;
+  }
+
+  /* Player portrait: match the dashboard's thin antique-gold portrait edge. */
+  .batch8DesktopQuizGrid .batch8PlayerRail > .card{
+    padding:0!important;
+    margin-top:12px!important;
+    background:transparent!important;
+    border:0!important;
+    border-radius:0!important;
+    box-shadow:none!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail > .card > div{
+    border:1px solid #9a5a19!important;
+    border-radius:0!important;
+    background:#050505!important;
+    box-shadow:
+      0 0 0 1px #1a0c03,
+      inset 0 0 0 1px rgba(222,153,63,.12)!important;
+  }
+}
