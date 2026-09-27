@@ -8350,3 +8350,53 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     height:38px!important;
   }
 }
+
+
+/* 2026-09-27 final purchased quiz-control assets + HUD micro-alignment */
+.d2QuizQuestionCard .d2ChoiceBtn.answerCorrect,
+.d2QuizQuestionCard .d2ChoiceBtn.answerCorrect:hover,
+.d2QuizQuestionCard .d2ChoiceBtn.answerCorrect:disabled{
+  background-color:transparent!important;
+  background-image:url('/ui/grimdark/core_standard_button_blue_001.png?v=20260927-correct')!important;
+  background-repeat:no-repeat!important;
+  background-position:center!important;
+  background-size:100% 100%!important;
+  filter:none!important;
+  opacity:1!important;
+}
+.d2QuizQuestionCard .quizHintRow > .d2Btn{
+  width:92%!important;
+  max-width:239px!important;
+  min-height:35px!important;
+  height:35px!important;
+  justify-self:center!important;
+  padding:4px 10px!important;
+  font-size:12px!important;
+}
+.d2QuizQuestionCard .stage8ActionDock .grimdarkPrimaryAction{
+  background-color:transparent!important;
+  background-image:url('/ui/grimdark/core_toggle_switch_on_001.png?v=20260927-submit-on')!important;
+  background-repeat:no-repeat!important;
+  background-position:center!important;
+  background-size:100% 100%!important;
+  border:0!important;
+  box-shadow:none!important;
+}
+.d2QuizQuestionCard .stage8ActionDock .grimdarkPrimaryAction:disabled{
+  background-color:transparent!important;
+  background-image:url('/ui/grimdark/core_toggle_switch_off_001.png?v=20260927-submit-off')!important;
+  background-repeat:no-repeat!important;
+  background-position:center!important;
+  background-size:100% 100%!important;
+  border:0!important;
+  box-shadow:none!important;
+  opacity:1!important;
+}
+@media (min-width:901px){
+  .batch8DesktopQuizGrid .batch8PlayerRail .d2OrbWrap,
+  .batch8DesktopQuizGrid .batch8PlayerRail .d2OrbFrame{
+    width:91px!important;
+    height:91px!important;
+    transform:translate(-2px,1px)!important;
+  }
+}
