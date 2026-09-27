@@ -9563,3 +9563,140 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     z-index:4!important;
   }
 }
+
+
+/* 2026-09-27 normalized player combat rail.
+   Composite orb, portrait and rack now use normal document flow.
+   This intentionally supersedes the earlier experimental offset patches. */
+@media (min-width:901px){
+  .batch8DesktopQuizGrid .batch8PlayerRail{
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:center!important;
+    justify-content:flex-start!important;
+    gap:0!important;
+    padding-top:62px!important;
+    overflow:visible!important;
+  }
+
+  .batch8DesktopQuizGrid .batch8PlayerRail > .playerOrbComposite{
+    position:relative!important;
+    width:178px!important;
+    height:145px!important;
+    flex:0 0 145px!important;
+    margin:0 auto 4px!important;
+    transform:none!important;
+    inset:auto!important;
+    overflow:visible!important;
+    z-index:4!important;
+  }
+  .playerOrbFrameAsset{
+    position:absolute!important;
+    inset:0!important;
+    width:178px!important;
+    height:145px!important;
+    object-fit:fill!important;
+    display:block!important;
+    pointer-events:none!important;
+  }
+  .playerOrbBlood{
+    position:absolute!important;
+    width:91px!important;
+    height:91px!important;
+    left:43px!important;
+    top:39px!important;
+    border-radius:50%!important;
+    overflow:hidden!important;
+    z-index:2!important;
+    pointer-events:none!important;
+  }
+  .playerOrbBlood img{
+    display:block!important;
+    width:100%!important;
+    height:100%!important;
+    object-fit:cover!important;
+  }
+
+  .batch8DesktopQuizGrid .batch8PlayerRail > .card{
+    width:170px!important;
+    max-width:170px!important;
+    height:auto!important;
+    min-height:0!important;
+    flex:0 0 auto!important;
+    margin:0 auto 2px!important;
+    padding:0!important;
+    position:relative!important;
+    inset:auto!important;
+    transform:none!important;
+    align-self:center!important;
+    z-index:4!important;
+  }
+
+  /* Disable every legacy pseudo-element rack now that the rack is real DOM. */
+  .batch8DesktopQuizGrid .batch8PlayerRail::after{
+    content:none!important;
+    display:none!important;
+    background:none!important;
+  }
+
+  .batch8DesktopQuizGrid .batch8PlayerRail > .playerPowerupRack{
+    position:relative!important;
+    width:108px!important;
+    height:276px!important;
+    min-height:276px!important;
+    flex:0 0 276px!important;
+    margin:0 auto!important;
+    inset:auto!important;
+    transform:none!important;
+    align-self:center!important;
+    z-index:4!important;
+    overflow:visible!important;
+  }
+  .playerPowerupRackAsset{
+    position:absolute!important;
+    inset:0!important;
+    width:100%!important;
+    height:100%!important;
+    object-fit:fill!important;
+    display:block!important;
+    pointer-events:none!important;
+  }
+  .playerPowerupSlots{
+    position:absolute!important;
+    inset:0!important;
+    z-index:2!important;
+    pointer-events:none!important;
+  }
+  .playerPowerupSlot{
+    position:absolute!important;
+    left:25px!important;
+    width:58px!important;
+    height:58px!important;
+    display:grid!important;
+    place-items:center!important;
+  }
+  .playerPowerupSlot.slot1{top:13px!important}
+  .playerPowerupSlot.slot2{top:76px!important}
+  .playerPowerupSlot.slot3{top:139px!important}
+  .playerPowerupSlot.slot4{top:202px!important}
+  .playerPowerupSlot img{
+    display:block!important;
+    width:52px!important;
+    height:52px!important;
+    object-fit:contain!important;
+  }
+  .playerPowerupQty{
+    position:absolute!important;
+    right:0!important;
+    bottom:0!important;
+    min-width:18px!important;
+    height:18px!important;
+    padding:0 3px!important;
+    border-radius:9px!important;
+    background:rgba(0,0,0,.88)!important;
+    border:1px solid rgba(224,142,50,.75)!important;
+    color:#fff0c2!important;
+    font:700 10px/16px Arial,sans-serif!important;
+    text-align:center!important;
+  }
+}
