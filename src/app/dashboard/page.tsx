@@ -954,7 +954,7 @@ async function analyzeResumeStage12() {
               setPositionChangeMode(true);
               setShowPositionModal(true);
             }}>
-              <span className="dashboardGrimdarkPortrait dashboardPlayerOnly"><img className="dashboardCharacterTitleFrame" src="/ui/grimdark/character-rarity-border-4-transparent.png?v=20260927c" alt="" aria-hidden="true" /><video src="/video/helpdesk-wizard-idle.mp4" autoPlay loop muted playsInline disablePictureInPicture controlsList="nodownload noremoteplayback" aria-label="Help Desk Wizard player" /></span>
+              <span className="dashboardGrimdarkPortrait dashboardPlayerOnly"><video src="/video/helpdesk-wizard-idle.mp4" autoPlay loop muted playsInline disablePictureInPicture controlsList="nodownload noremoteplayback" aria-label="Help Desk Wizard player" /></span>
             </button>
           ) : user?.startingPosition === "DESKTOP_TECHNICIAN" ? (
             <button className="dashboardSelectedPlayer dashboardSelectedPlayerButton" type="button" aria-label="Change selected player: Desktop Barbarian" onClick={() => {
@@ -962,25 +962,25 @@ async function analyzeResumeStage12() {
               setPositionChangeMode(true);
               setShowPositionModal(true);
             }}>
-              <span className="dashboardGrimdarkPortrait dashboardPlayerOnly"><img className="dashboardCharacterTitleFrame" src="/ui/grimdark/character-rarity-border-4-transparent.png?v=20260927c" alt="" aria-hidden="true" /><video src="/video/desktop-barbarian-idle.mp4" autoPlay loop muted playsInline disablePictureInPicture controlsList="nodownload noremoteplayback" aria-label="Desktop Barbarian player" /></span>
+              <span className="dashboardGrimdarkPortrait dashboardPlayerOnly"><video src="/video/desktop-barbarian-idle.mp4" autoPlay loop muted playsInline disablePictureInPicture controlsList="nodownload noremoteplayback" aria-label="Desktop Barbarian player" /></span>
             </button>
           ) : null}
 
           <button className="dashboardSidebarStart dashboardAssetButton dashboardAssetButtonOrange" style={{ width: "100%", marginTop: 8, opacity: hasFreeStartCooldown ? 0.7 : 1 }} onClick={() => !hasFreeStartCooldown && setShowLaunchModal(true)} disabled={hasFreeStartCooldown} title={hasFreeStartCooldown ? `Free tier cooldown: ${freeStartCooldownLabel}` : undefined}>
-            <img className="dashboardButtonSkinImage" src="/ui/grimdark/button-orange.png?v=20260927j" alt="" aria-hidden="true" /><span className="dashboardButtonAssetLabel">{hasFreeStartCooldown ? `Start Now! (${freeStartCooldownLabel})` : "Start Now!"}</span></button>
+            <span className="dashboardButtonAssetLabel">{hasFreeStartCooldown ? `Start Now! (${freeStartCooldownLabel})` : "Start Now!"}</span></button>
 
           <div className="dashboardBattleShortcuts" style={{ marginTop: 10, display: "grid", gap: 10 }}>
             {hrBattleUnlocked ? (
               <button className="dashboardAssetButton dashboardAssetButtonOrange" style={{ width: "100%" }} onClick={() => setMockInterviewOpen(true)}>
-                <img className="dashboardButtonSkinImage" src="/ui/grimdark/button-orange.png?v=20260927j" alt="" aria-hidden="true" /><span className="dashboardButtonAssetLabel">{hrPassed ? "Start HR Battle →" : "Start HR Battle →"}</span></button>
+                <span className="dashboardButtonAssetLabel">{hrPassed ? "Start HR Battle →" : "Start HR Battle →"}</span></button>
             ) : (
               <button className="dashboardAssetButton dashboardAssetButtonOrange" style={{ width: "100%", opacity: 0.65, cursor: "not-allowed" }} disabled title="HR battle unlocks automatically when you qualify.">
-                Begin Boss Battle 🔒
+                <span className="dashboardButtonAssetLabel">Begin Boss Battle 🔒</span>
               </button>
             )}
             {((localLevel || 1) >= 5 || hasTechReady) ? (
               <button className="dashboardAssetButton dashboardAssetButtonBlue" style={{ width: "100%" }} type="button" onClick={() => setMockInterviewOpen(true)}>
-                <img className="dashboardButtonSkinImage" src="/ui/grimdark/button-blue.png?v=20260927j" alt="" aria-hidden="true" /><span className="dashboardButtonAssetLabel">Start Tech Battle →</span></button>
+                <span className="dashboardButtonAssetLabel">Start Tech Battle →</span></button>
             ) : null}
             {hasFreeStartCooldown && <small style={{ display: "block", marginTop: 0, color: "#f5d37b" }}>Free users can start another session in {freeStartCooldownLabel}.</small>}
           </div>
@@ -1088,7 +1088,7 @@ async function analyzeResumeStage12() {
             {hasTechReady ? (
               <button className="primary dashboardNextButton gdActionBlue" type="button" onClick={() => setMockInterviewOpen(true)}>Start Tech Battle →</button>
             ) : hrBattleUnlocked && !hrPassed ? (
-              <button className="dashboardNextButton dashboardAssetButton dashboardAssetButtonOrange dashboardNextAssetButton" type="button" onClick={() => setMockInterviewOpen(true)}><img className="dashboardButtonSkinImage" src="/ui/grimdark/button-orange.png?v=20260927j" alt="" aria-hidden="true" /><span className="dashboardButtonAssetLabel">Start HR Battle →</span></button>
+              <button className="dashboardNextButton dashboardAssetButton dashboardAssetButtonOrange dashboardNextAssetButton" type="button" onClick={() => setMockInterviewOpen(true)}><span className="dashboardButtonAssetLabel">Start HR Battle →</span></button>
             ) : (
               <button className="gold dashboardNextButton gdActionOrange" type="button" onClick={() => !hasFreeStartCooldown && setShowLaunchModal(true)} disabled={hasFreeStartCooldown}>
                 {hasFreeStartCooldown ? `Available in ${freeStartCooldownLabel}` : "Continue training →"}
