@@ -5739,3 +5739,31 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
   }
   .dashboardGrimdarkSidebar .dashboardCharacterTitleFrame{z-index:5!important;pointer-events:none!important}
 }
+
+/* Final sidebar asset cleanup: orange primary actions, blue tech action, native portrait frame only. */
+.dashboardGrimdarkSidebar .dashboardSelectedPlayer,
+.dashboardGrimdarkSidebar .dashboardSelectedPlayerButton,
+.dashboardGrimdarkSidebar .dashboardGrimdarkPortrait.dashboardPlayerOnly{
+  border:0!important;border-image:none!important;outline:0!important;border-radius:0!important;
+  box-shadow:none!important;background:transparent!important;
+}
+.dashboardGrimdarkSidebar .dashboardSelectedPlayer::before,
+.dashboardGrimdarkSidebar .dashboardSelectedPlayer::after,
+.dashboardGrimdarkSidebar .dashboardSelectedPlayerButton::before,
+.dashboardGrimdarkSidebar .dashboardSelectedPlayerButton::after,
+.dashboardGrimdarkSidebar .dashboardPlayerOnly::before,
+.dashboardGrimdarkSidebar .dashboardPlayerOnly::after{content:none!important;display:none!important}
+.dashboardGrimdarkSidebar .dashboardAssetButton,
+.dashboardGrimdarkSidebar .dashboardBattleShortcuts>.dashboardAssetButton{
+  all:unset!important;box-sizing:border-box!important;display:flex!important;align-items:center!important;justify-content:center!important;
+  width:100%!important;height:58px!important;min-height:58px!important;cursor:pointer!important;
+  background-repeat:no-repeat!important;background-position:center!important;background-size:100% 100%!important;
+  color:#f8ecd6!important;font-family:Cinzel,Georgia,serif!important;font-weight:800!important;text-align:center!important;text-shadow:0 2px 2px #000!important;
+}
+.dashboardGrimdarkSidebar .dashboardSidebarStart.dashboardAssetButton,
+.dashboardGrimdarkSidebar .dashboardAssetButtonOrange{
+  background-image:url('/ui/grimdark/button-orange.png?v=20260927f')!important;
+}
+.dashboardGrimdarkSidebar .dashboardAssetButtonBlue{
+  background-image:url('/ui/grimdark/button-blue.png?v=20260927f')!important;
+}
