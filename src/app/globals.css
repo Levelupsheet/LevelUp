@@ -9565,9 +9565,8 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 }
 
 
-/* 2026-09-27 normalized player combat rail.
-   Composite orb, portrait and rack now use normal document flow.
-   This intentionally supersedes the earlier experimental offset patches. */
+/* 2026-09-27 canonical desktop combat rails.
+   One authoritative player-orb/frame implementation; no legacy stacking. */
 @media (min-width:901px){
   .batch8DesktopQuizGrid .batch8PlayerRail{
     display:flex!important;
@@ -9575,51 +9574,84 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     align-items:center!important;
     justify-content:flex-start!important;
     gap:0!important;
-    padding-top:62px!important;
+    padding-top:18px!important;
+    width:184px!important;
+    max-width:184px!important;
+    justify-self:center!important;
     overflow:visible!important;
   }
-
   .batch8DesktopQuizGrid .batch8PlayerRail > .playerOrbComposite{
     position:relative!important;
-    width:178px!important;
-    height:145px!important;
-    flex:0 0 145px!important;
-    margin:0 auto 4px!important;
-    transform:none!important;
+    width:170px!important;
+    height:169px!important;
+    flex:0 0 169px!important;
+    margin:0 auto 2px!important;
     inset:auto!important;
+    transform:none!important;
     overflow:visible!important;
     z-index:4!important;
+    background:none!important;
+    border:0!important;
+    box-shadow:none!important;
+    filter:none!important;
   }
-  .playerOrbFrameAsset{
+  .batch8DesktopQuizGrid .batch8PlayerRail > .playerOrbComposite::before,
+  .batch8DesktopQuizGrid .batch8PlayerRail > .playerOrbComposite::after{
+    content:none!important;
+    display:none!important;
+  }
+  .batch8DesktopQuizGrid .playerOrbFrameAsset{
     position:absolute!important;
-    inset:0!important;
-    width:178px!important;
-    height:145px!important;
+    left:0!important;
+    top:30px!important;
+    width:170px!important;
+    height:139px!important;
     object-fit:fill!important;
     display:block!important;
+    opacity:1!important;
     pointer-events:none!important;
+    filter:none!important;
+    box-shadow:none!important;
   }
-  .playerOrbBlood{
+  .batch8DesktopQuizGrid .playerOrbBlood{
     position:absolute!important;
-    width:91px!important;
-    height:91px!important;
-    left:43px!important;
-    top:39px!important;
+    width:42px!important;
+    height:42px!important;
+    left:65px!important;
+    top:51px!important;
     border-radius:50%!important;
     overflow:hidden!important;
     z-index:2!important;
     pointer-events:none!important;
+    clip-path:none!important;
   }
-  .playerOrbBlood img{
+  .batch8DesktopQuizGrid .playerOrbBlood::before,
+  .batch8DesktopQuizGrid .playerOrbBlood::after{
+    content:none!important;
+    display:none!important;
+  }
+  .batch8DesktopQuizGrid .playerOrbBloodFill{
+    position:absolute!important;
+    left:0!important;
+    right:0!important;
+    bottom:0!important;
+    overflow:hidden!important;
+    transition:height .35s ease!important;
+  }
+  .batch8DesktopQuizGrid .playerOrbBloodFill img{
+    position:absolute!important;
+    left:0!important;
+    bottom:0!important;
     display:block!important;
-    width:100%!important;
-    height:100%!important;
+    width:42px!important;
+    height:42px!important;
+    max-width:none!important;
+    max-height:none!important;
     object-fit:cover!important;
   }
-
   .batch8DesktopQuizGrid .batch8PlayerRail > .card{
-    width:170px!important;
-    max-width:170px!important;
+    width:166px!important;
+    max-width:166px!important;
     height:auto!important;
     min-height:0!important;
     flex:0 0 auto!important;
@@ -9631,20 +9663,17 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     align-self:center!important;
     z-index:4!important;
   }
-
-  /* Disable every legacy pseudo-element rack now that the rack is real DOM. */
   .batch8DesktopQuizGrid .batch8PlayerRail::after{
     content:none!important;
     display:none!important;
     background:none!important;
   }
-
   .batch8DesktopQuizGrid .batch8PlayerRail > .playerPowerupRack{
     position:relative!important;
-    width:108px!important;
-    height:276px!important;
-    min-height:276px!important;
-    flex:0 0 276px!important;
+    width:104px!important;
+    height:266px!important;
+    min-height:266px!important;
+    flex:0 0 266px!important;
     margin:0 auto!important;
     inset:auto!important;
     transform:none!important;
@@ -9652,7 +9681,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     z-index:4!important;
     overflow:visible!important;
   }
-  .playerPowerupRackAsset{
+  .batch8DesktopQuizGrid .playerPowerupRackAsset{
     position:absolute!important;
     inset:0!important;
     width:100%!important;
@@ -9661,34 +9690,49 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     display:block!important;
     pointer-events:none!important;
   }
-  .playerPowerupSlots{
+  .batch8DesktopQuizGrid .playerPowerupSlots{
     position:absolute!important;
     inset:0!important;
     z-index:2!important;
-    pointer-events:none!important;
+    pointer-events:auto!important;
   }
-  .playerPowerupSlot{
+  .batch8DesktopQuizGrid .playerPowerupSlot{
     position:absolute!important;
-    left:25px!important;
-    width:58px!important;
-    height:58px!important;
+    left:30px!important;
+    width:44px!important;
+    height:50px!important;
     display:grid!important;
     place-items:center!important;
+    appearance:none!important;
+    padding:0!important;
+    margin:0!important;
+    border:0!important;
+    outline:0!important;
+    background:transparent!important;
+    cursor:pointer!important;
   }
-  .playerPowerupSlot.slot1{top:13px!important}
-  .playerPowerupSlot.slot2{top:76px!important}
-  .playerPowerupSlot.slot3{top:139px!important}
-  .playerPowerupSlot.slot4{top:202px!important}
-  .playerPowerupSlot img{
+  .batch8DesktopQuizGrid .playerPowerupSlot.slot1{top:15px!important}
+  .batch8DesktopQuizGrid .playerPowerupSlot.slot2{top:76px!important}
+  .batch8DesktopQuizGrid .playerPowerupSlot.slot3{top:137px!important}
+  .batch8DesktopQuizGrid .playerPowerupSlot.slot4{top:198px!important}
+  .batch8DesktopQuizGrid .playerPowerupSlot img{
     display:block!important;
-    width:52px!important;
-    height:52px!important;
-    object-fit:contain!important;
+    width:40px!important;
+    height:46px!important;
+    max-width:40px!important;
+    max-height:46px!important;
+    object-fit:fill!important;
+    transition:filter .15s ease,transform .15s ease!important;
   }
-  .playerPowerupQty{
+  .batch8DesktopQuizGrid .playerPowerupSlot:not(:disabled):hover img,
+  .batch8DesktopQuizGrid .playerPowerupSlot:not(:disabled):focus-visible img{
+    filter:brightness(1.2) drop-shadow(0 0 6px rgba(239,145,48,.7))!important;
+    transform:scale(1.05)!important;
+  }
+  .batch8DesktopQuizGrid .playerPowerupQty{
     position:absolute!important;
-    right:0!important;
-    bottom:0!important;
+    right:-5px!important;
+    bottom:-5px!important;
     min-width:18px!important;
     height:18px!important;
     padding:0 3px!important;
@@ -9757,221 +9801,13 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 }
 
 
-/* 2026-09-27 screenshot calibration after normalized player rail.
-   Tighten the left stack and keep it clear of the center question panel. */
+
+
+/* Canonical desktop enemy rail spacing. */
 @media (min-width:901px){
-  .batch8DesktopQuizGrid .batch8PlayerRail{
-    padding-top:18px!important;
-    width:184px!important;
-    max-width:184px!important;
-    justify-self:center!important;
-  }
-
-  .batch8DesktopQuizGrid .batch8PlayerRail > .playerOrbComposite{
-    width:170px!important;
-    height:139px!important;
-    flex-basis:139px!important;
-    margin:0 auto 4px!important;
-  }
-  .batch8DesktopQuizGrid .playerOrbFrameAsset{
-    width:170px!important;
-    height:139px!important;
-  }
-  .batch8DesktopQuizGrid .playerOrbBlood{
-    width:88px!important;
-    height:88px!important;
-    left:41px!important;
-    top:37px!important;
-  }
-
-  .batch8DesktopQuizGrid .batch8PlayerRail > .card{
-    width:166px!important;
-    max-width:166px!important;
-    margin:0 auto 2px!important;
-  }
-
-  .batch8DesktopQuizGrid .batch8PlayerRail > .playerPowerupRack{
-    width:104px!important;
-    height:266px!important;
-    min-height:266px!important;
-    flex-basis:266px!important;
-  }
-
-  /* Recalibrate dynamic slots to the slightly smaller rack. */
-  .batch8DesktopQuizGrid .playerPowerupSlot{
-    left:24px!important;
-    width:56px!important;
-    height:56px!important;
-  }
-  .batch8DesktopQuizGrid .playerPowerupSlot.slot1{top:12px!important}
-  .batch8DesktopQuizGrid .playerPowerupSlot.slot2{top:73px!important}
-  .batch8DesktopQuizGrid .playerPowerupSlot.slot3{top:134px!important}
-  .batch8DesktopQuizGrid .playerPowerupSlot.slot4{top:195px!important}
-  .batch8DesktopQuizGrid .playerPowerupSlot img{
-    width:50px!important;
-    height:50px!important;
-  }
-
-  /* Information artwork should read as a compact utility control, not a large
-     fifth answer/control element. */
-  .d2QuizQuestionCard .sessionInfoIconButton{
-    width:58px!important;
-    height:44px!important;
-    flex:0 0 58px!important;
-    margin-left:4px!important;
-  }
-}
-
-
-/* 2026-09-27 final live calibration: compact info control, centered orb,
-   lower orb assembly, and interactive rack slots. */
-@media (min-width:901px){
-  .d2QuizQuestionCard .sessionInfoIconButton{
-    width:44px!important;
-    height:33px!important;
-    flex:0 0 44px!important;
-  }
-
-  /* Lower only the orb assembly toward the portrait while preserving a clean
-     4px visual seam. The rail remains normal-flow. */
-  .batch8DesktopQuizGrid .batch8PlayerRail > .playerOrbComposite{
-    width:170px!important;
-    height:171px!important;
-    flex-basis:171px!important;
-    margin:0 auto 4px!important;
-  }
-  .batch8DesktopQuizGrid .playerOrbFrameAsset{
-    width:170px!important;
-    height:139px!important;
-    top:32px!important;
-    left:0!important;
-    object-fit:fill!important;
-  }
-  /* Smaller and centered in the actual circular well. */
-  .batch8DesktopQuizGrid .playerOrbBlood{
-    width:78px!important;
-    height:78px!important;
-    left:46px!important;
-    top:76px!important;
-  }
-
-  .batch8DesktopQuizGrid .playerPowerupSlots{
-    pointer-events:auto!important;
-  }
-  .batch8DesktopQuizGrid .playerPowerupSlot{
-    appearance:none!important;
-    -webkit-appearance:none!important;
-    padding:0!important;
-    margin:0!important;
-    border:0!important;
-    outline:0!important;
-    background:transparent!important;
-    cursor:pointer!important;
-    pointer-events:auto!important;
-    border-radius:0!important;
-  }
-  .batch8DesktopQuizGrid .playerPowerupSlot:not(:disabled):hover img,
-  .batch8DesktopQuizGrid .playerPowerupSlot:not(:disabled):focus-visible img{
-    filter:brightness(1.2) drop-shadow(0 0 6px rgba(239,145,48,.7))!important;
-    transform:scale(1.05)!important;
-  }
-  .batch8DesktopQuizGrid .playerPowerupSlot:disabled{
-    cursor:default!important;
-  }
-  .batch8DesktopQuizGrid .playerPowerupSlot img{
-    transition:filter .15s ease,transform .15s ease!important;
-  }
-}
-
-
-/* 2026-09-27 live screenshot: blood orb only — 15% smaller and raised.
-   Decorative banner/frame remains fixed. */
-@media (min-width:901px){
-  .batch8DesktopQuizGrid .playerOrbBlood{
-    width:66px!important;
-    height:66px!important;
-    left:52px!important;
-    top:65px!important;
-  }
-}
-
-
-/* 2026-09-27 powerup rack: fit purchased artwork inside the metal socket. */
-@media (min-width:901px){
-  .batch8DesktopQuizGrid .playerPowerupSlot{
-    left:28px!important;
-    width:48px!important;
-    height:48px!important;
-  }
-  .batch8DesktopQuizGrid .playerPowerupSlot.slot1{top:16px!important}
-  .batch8DesktopQuizGrid .playerPowerupSlot.slot2{top:77px!important}
-  .batch8DesktopQuizGrid .playerPowerupSlot.slot3{top:138px!important}
-  .batch8DesktopQuizGrid .playerPowerupSlot.slot4{top:199px!important}
-  .batch8DesktopQuizGrid .playerPowerupSlot img{
-    width:44px!important;
-    height:44px!important;
-    object-fit:contain!important;
-  }
-  .batch8DesktopQuizGrid .playerPowerupQty{
-    right:-2px!important;
-    bottom:-2px!important;
-  }
-}
-
-
-/* 2026-09-27 live screenshot correction.
-   Move ONLY the decorative player orb frame down; keep the blood orb fixed.
-   Shrink powerup artwork further so the metal socket border remains visible. */
-@media (min-width:901px){
-  .batch8DesktopQuizGrid .playerOrbFrameAsset{
-    top:48px!important;
-  }
-
-  .batch8DesktopQuizGrid .playerPowerupSlot{
-    left:31px!important;
-    width:42px!important;
-    height:42px!important;
-  }
-  .batch8DesktopQuizGrid .playerPowerupSlot.slot1{top:19px!important}
-  .batch8DesktopQuizGrid .playerPowerupSlot.slot2{top:80px!important}
-  .batch8DesktopQuizGrid .playerPowerupSlot.slot3{top:141px!important}
-  .batch8DesktopQuizGrid .playerPowerupSlot.slot4{top:202px!important}
-  .batch8DesktopQuizGrid .playerPowerupSlot img{
-    width:36px!important;
-    height:36px!important;
-    max-width:36px!important;
-    max-height:36px!important;
-    object-fit:contain!important;
-  }
-  .batch8DesktopQuizGrid .playerPowerupQty{
-    right:-5px!important;
-    bottom:-5px!important;
-  }
-}
-
-
-/* 2026-09-27 approved preview geometry.
-   Player: red orb 10% smaller, raised/centered in frame, 2px portrait seam.
-   Enemy: complete orb assembly 15% smaller with 2px portrait seam.
-   Powerups: rectangular artwork footprint matching the metal sockets. */
-@media (min-width:901px){
-  .batch8DesktopQuizGrid .batch8PlayerRail > .playerOrbComposite{
-    height:169px!important;
-    flex-basis:169px!important;
-    margin:0 auto 2px!important;
-  }
-  .batch8DesktopQuizGrid .playerOrbFrameAsset{
-    top:30px!important;
-  }
-  .batch8DesktopQuizGrid .playerOrbBlood{
-    width:59px!important;
-    height:59px!important;
-    left:55.5px!important;
-    top:59px!important;
-  }
-
   .batch8DesktopQuizGrid .batch8EnemyRail{
     padding-top:42px!important;
+    gap:2px!important;
   }
   .batch8DesktopQuizGrid .batch8EnemyRail > :first-child{
     width:136px!important;
@@ -9979,7 +9815,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     height:136px!important;
     min-height:136px!important;
     flex:0 0 136px!important;
-    margin:0 auto 2px!important;
+    margin:0 auto!important;
   }
   .batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyCard{
     width:136px!important;
@@ -9991,152 +9827,8 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     transform:scale(.85)!important;
     transform-origin:center!important;
   }
-  .batch8DesktopQuizGrid .batch8EnemyRail .modelPanel{
-    margin-top:0!important;
-  }
-
-  .batch8DesktopQuizGrid .playerPowerupSlot{
-    left:30px!important;
-    width:44px!important;
-    height:50px!important;
-  }
-  .batch8DesktopQuizGrid .playerPowerupSlot.slot1{top:15px!important}
-  .batch8DesktopQuizGrid .playerPowerupSlot.slot2{top:76px!important}
-  .batch8DesktopQuizGrid .playerPowerupSlot.slot3{top:137px!important}
-  .batch8DesktopQuizGrid .playerPowerupSlot.slot4{top:198px!important}
-  .batch8DesktopQuizGrid .playerPowerupSlot img{
-    width:40px!important;
-    height:46px!important;
-    max-width:40px!important;
-    max-height:46px!important;
-    object-fit:fill!important;
-  }
-}
-
-
-/* 2026-09-27 cleanup from live build:
-   suppress every legacy player-orb decoration and render exactly one frame asset.
-   Reduce blood orb another 10% while preserving the approved 2px stack gap. */
-@media (min-width:901px){
-  .batch8DesktopQuizGrid .batch8PlayerRail > .playerOrbComposite{
-    background:none!important;
-    background-image:none!important;
-    border:0!important;
-    box-shadow:none!important;
-    filter:none!important;
-    overflow:visible!important;
-  }
-  .batch8DesktopQuizGrid .batch8PlayerRail > .playerOrbComposite::before,
-  .batch8DesktopQuizGrid .batch8PlayerRail > .playerOrbComposite::after{
-    content:none!important;
-    display:none!important;
-    background:none!important;
-    background-image:none!important;
-  }
-  .batch8DesktopQuizGrid .playerOrbFrameAsset{
-    display:block!important;
-    opacity:1!important;
-    filter:none!important;
-    box-shadow:none!important;
-  }
-  .batch8DesktopQuizGrid .playerOrbBlood{
-    width:53px!important;
-    height:53px!important;
-    left:58.5px!important;
-    top:62px!important;
-  }
-  .batch8DesktopQuizGrid .playerOrbBlood::before,
-  .batch8DesktopQuizGrid .playerOrbBlood::after{
-    content:none!important;
-    display:none!important;
-  }
-}
-
-
-/* 2026-09-27 player orb final correction from live assassin screenshot.
-   Keep one frame, shrink the blood orb substantially and center it inside
-   the circular well without moving portrait/rack. */
-@media (min-width:901px){
-  .batch8DesktopQuizGrid .batch8PlayerRail > .playerOrbComposite{
-    margin-bottom:2px!important;
-  }
-  .batch8DesktopQuizGrid .playerOrbFrameAsset{
-    top:30px!important;
-  }
-  .batch8DesktopQuizGrid .playerOrbBlood{
-    width:48px!important;
-    height:48px!important;
-    left:61px!important;
-    top:55px!important;
-    border-radius:50%!important;
-    overflow:hidden!important;
-  }
-}
-
-
-/* 2026-09-27 localized rail refinement from 23:03 live build.
-   Do not move either rail/frame/portrait globally. */
-@media (min-width:901px){
-  /* Player: fit blood orb within the existing dark circular well. */
-  .batch8DesktopQuizGrid .playerOrbBlood{
-    width:42px!important;
-    height:42px!important;
-    left:65px!important;
-    top:51px!important;
-  }
-
-  /* Enemy: remove the remaining grid gap and keep a 2px seam from orb to portrait. */
-  .batch8DesktopQuizGrid .batch8EnemyRail{
-    gap:2px!important;
-  }
-  .batch8DesktopQuizGrid .batch8EnemyRail > :first-child{
-    margin:0 auto!important;
-  }
   .batch8DesktopQuizGrid .batch8EnemyRail > .modelPanel{
     margin:0 auto!important;
   }
-  .batch8DesktopQuizGrid .quizEnemyNameBelow{
-    margin-top:0!important;
-  }
-}
-
-
-/* Player blood orb HP visualization.
-   Keep the approved orb geometry fixed while the visible blood level falls
-   with state.playerHP. */
-@media (min-width:901px){
-  .batch8DesktopQuizGrid .playerOrbBlood{
-    clip-path:inset(calc((100 - var(--player-hp, 100)) * 1%) 0 0 0 round 50%)!important;
-    transition:clip-path .35s ease!important;
-  }
-}
-
-
-/* 2026-09-27 final HP-orb behavior.
-   The circular orb never clips/moves; only an internal bottom-anchored fill
-   drains. The orb artwork stays fixed behind the fill viewport. */
-@media (min-width:901px){
-  .batch8DesktopQuizGrid .playerOrbBlood{
-    clip-path:none!important;
-    overflow:hidden!important;
-    border-radius:50%!important;
-  }
-  .batch8DesktopQuizGrid .playerOrbBloodFill{
-    position:absolute!important;
-    left:0!important;
-    right:0!important;
-    bottom:0!important;
-    overflow:hidden!important;
-    transition:height .35s ease!important;
-  }
-  .batch8DesktopQuizGrid .playerOrbBloodFill img{
-    position:absolute!important;
-    left:0!important;
-    bottom:0!important;
-    width:42px!important;
-    height:42px!important;
-    max-width:none!important;
-    max-height:none!important;
-    object-fit:cover!important;
-  }
+  .batch8DesktopQuizGrid .quizEnemyNameBelow{margin-top:0!important}
 }
