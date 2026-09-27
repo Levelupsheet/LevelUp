@@ -5624,3 +5624,57 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .dashboardGrimdarkShell .featureCard,.dashboardGrimdarkShell .dashboardProgressCard,.dashboardGrimdarkShell .dashboardCoachCard>div>div,.dashboardGrimdarkShell .progressionSnapshot{background-color:#0b0b0a!important;background-image:url('/ui/grimdark/inner-panel.png')!important;background-size:100% 100%!important;background-repeat:no-repeat!important;border-color:transparent!important;border-radius:0!important;box-shadow:none!important}
 
 @media(max-width:860px){.dashboardGrimdarkShell{border-width:10px!important;border-image-width:10px!important}.dashboardGrimdarkSidebar{border-right:0!important;border-bottom:1px solid #4c3424!important}.dashboardGrimdarkShell .dashboardGrimdarkSidebar,.dashboardGrimdarkShell .dashboardGrimdarkPanel,.dashboardGrimdarkShell .dashboardPlanCard,.dashboardGrimdarkShell .dashboardGameCard,.dashboardGrimdarkShell .dashboardNextAction,.dashboardGrimdarkShell .card,.dashboardGrimdarkHero{border-width:5px!important;border-image-width:5px!important}.dashboardGrimdarkSidebar .dashboardPlayerOnly{height:280px!important;min-height:280px!important}.dashboardGrimdarkHero .dashboardHeaderRibbon{width:92%!important;height:88px!important}.gdActionOrange,.gdActionBlue,.gdActionRed{min-height:48px!important;padding:9px 18px!important}.gdCloseButton{width:42px!important;min-width:42px!important;height:42px!important;min-height:42px!important}}
+
+
+/* Dashboard sidebar final asset binding: isolate from legacy .primary/.gold button rules. */
+.dashboardGrimdarkSidebar .dashboardSidebarStart,
+.dashboardGrimdarkSidebar .dashboardBattleShortcuts > button{
+  appearance:none!important;
+  -webkit-appearance:none!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  width:100%!important;
+  min-height:58px!important;
+  height:58px!important;
+  margin:0!important;
+  padding:8px 22px!important;
+  border:0!important;
+  border-image:none!important;
+  border-radius:0!important;
+  background-color:transparent!important;
+  background-position:center!important;
+  background-repeat:no-repeat!important;
+  background-size:100% 100%!important;
+  box-shadow:none!important;
+  color:#f8ecd6!important;
+  font-family:Cinzel,Georgia,serif!important;
+  font-weight:800!important;
+  text-shadow:0 2px 2px #000!important;
+}
+.dashboardGrimdarkSidebar .dashboardSidebarStart{
+  margin-top:10px!important;
+  background-image:url('/ui/grimdark/button-red.png')!important;
+}
+.dashboardGrimdarkSidebar .dashboardBattleShortcuts > button.gdActionOrange{
+  background-image:url('/ui/grimdark/button-orange.png')!important;
+}
+.dashboardGrimdarkSidebar .dashboardBattleShortcuts > button.gdActionBlue{
+  background-image:url('/ui/grimdark/button-blue.png')!important;
+}
+.dashboardGrimdarkSidebar .dashboardPlayerOnly{
+  height:320px!important;
+  min-height:320px!important;
+  padding:24px 16px 18px!important;
+}
+.dashboardGrimdarkSidebar .dashboardPlayerOnly video{
+  width:100%!important;
+  height:100%!important;
+  object-fit:cover!important;
+}
+.dashboardGrimdarkSidebar .dashboardCharacterTitleFrame{
+  inset:0!important;
+  width:100%!important;
+  height:100%!important;
+  object-fit:fill!important;
+}
