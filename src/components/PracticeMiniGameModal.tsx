@@ -133,7 +133,9 @@ export default function PracticeMiniGameModal(props: {
   }
 
   function finishRun(summary: DiabloQuizRunSummary & { awardedXp?: number }) {
-    const accuracy = summary.totalQuestions > 0 ? summary.correctCount / summary.totalQuestions : 0;\n    const resolvedOutcome: "victory" | "defeat" = summary.outcome === "defeat" || accuracy < 0.5 ? "defeat" : "victory";\n    setFinalScore({ correct: summary.correctCount, total: summary.totalQuestions, xp: summary.awardedXp ?? summary.xpEarned, timeLeft: summary.timeLeft, bestStreak: summary.bestStreak, outcome: resolvedOutcome, playerHP: summary.playerHP });
+    const accuracy = summary.totalQuestions > 0 ? summary.correctCount / summary.totalQuestions : 0;
+    const resolvedOutcome: "victory" | "defeat" = summary.outcome === "defeat" || accuracy < 0.5 ? "defeat" : "victory";
+    setFinalScore({ correct: summary.correctCount, total: summary.totalQuestions, xp: summary.awardedXp ?? summary.xpEarned, timeLeft: summary.timeLeft, bestStreak: summary.bestStreak, outcome: resolvedOutcome, playerHP: summary.playerHP });
     setSessionMastery(summary.masteryByDomain || {});
     setPreviousLearningPath(learningPath);
     setStep("summary");
