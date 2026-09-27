@@ -9844,3 +9844,15 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
   }
   .batch8DesktopQuizGrid .quizEnemyNameBelow{margin-top:0!important}
 }
+
+
+/* 2026-09-27 orb alignment after single-frame cleanup.
+   Center the fixed HP orb in the surviving circular well. */
+@media (min-width:901px){
+  .batch8DesktopQuizGrid .playerOrbBlood{
+    width:42px!important;
+    height:42px!important;
+    left:64px!important;
+    top:72px!important;
+  }
+}
