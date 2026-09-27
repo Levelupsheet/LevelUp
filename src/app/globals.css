@@ -6121,3 +6121,12 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
   user-select:none;
 }
 .dashboardSelectedPlayer .dashboardCharacterRarityFrame{display:none !important;}
+
+
+/* Dashboard action art mapping: Start Now = red, HR Battle = orange. */
+.dashboardGrimdarkSidebar .dashboardSidebarStart.gdActionRed{
+  background-image:url('/ui/grimdark/button-red.png') !important;
+}
+.dashboardGrimdarkSidebar .dashboardBattleShortcuts .gdActionOrange{
+  background-image:url('/ui/grimdark/button-orange.png') !important;
+}
