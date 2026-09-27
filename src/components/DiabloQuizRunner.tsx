@@ -1341,11 +1341,14 @@ const showExpandedExplanation = useMemo(() => {
                   )}
                 </>
               ) : (
-                <div className={"card combatRunSummary " + (outcome === "victory" ? "victory" : outcome === "defeat" ? "defeat" : "complete")}>
-                  <div className="dashboardEyebrow">SESSION COMPLETE</div>
-                  <div className="combatRunOutcome">{outcome === "victory" ? "Victory" : outcome === "defeat" ? "Defeat" : "Run complete"}</div>
-                  <div className="combatRunStats"><span><small>Score</small><b>{state.correctCount}/{combatQuestions.length}</b></span><span><small>XP earned</small><b>+{displayedXp}</b></span><span><small>Best streak</small><b>{bestStreak}</b></span></div>
-                  {hintXpSpent > 0 ? <div className="muted combatRunHintCost">Hints used: {hintsUsedCount} • XP spent: {hintXpSpent}</div> : null}
+                <div className={"card combatRunSummary gameFlowResultPanel " + (outcome === "victory" ? "victory" : outcome === "defeat" ? "defeat" : "complete")}>
+                  <img className="gameFlowResultArt" src={outcome === "defeat" ? "/ui/grimdark/flow_game_flow_death_panel_001_001.png" : "/ui/grimdark/flow_game_flow_victory_panel_001_001.png"} alt="" aria-hidden />
+                  <div className="gameFlowResultContent">
+                    <div className="dashboardEyebrow">SESSION COMPLETE</div>
+                    <div className="combatRunOutcome">{outcome === "victory" ? "Victory" : outcome === "defeat" ? "Defeat" : "Session Complete"}</div>
+                    <div className="combatRunStats"><span><small>Score</small><b>{state.correctCount}/{combatQuestions.length}</b></span><span><small>XP earned</small><b>+{displayedXp}</b></span><span><small>Best streak</small><b>{bestStreak}</b></span><span><small>Player HP</small><b>{Math.max(0, Math.round(state.playerHP))}</b></span></div>
+                    {hintXpSpent > 0 ? <div className="muted combatRunHintCost">Hints used: {hintsUsedCount} • XP spent: {hintXpSpent}</div> : null}
+                  </div>
                 </div>
               )}
             </div>
@@ -1502,10 +1505,13 @@ const showExpandedExplanation = useMemo(() => {
                   )}
                 </>
               ) : (
-                <div className={"card combatRunSummary mobile " + (outcome === "victory" ? "victory" : outcome === "defeat" ? "defeat" : "complete")}>
-                  <div className="dashboardEyebrow">SESSION COMPLETE</div>
-                  <div className="combatRunOutcome">{outcome === "victory" ? "Victory" : outcome === "defeat" ? "Defeat" : "Run complete"}</div>
-                  <div className="combatRunStats"><span><small>Score</small><b>{state.correctCount}/{combatQuestions.length}</b></span><span><small>XP</small><b>+{displayedXp}</b></span><span><small>Best streak</small><b>{bestStreak}</b></span></div>
+                <div className={"card combatRunSummary mobile gameFlowResultPanel " + (outcome === "victory" ? "victory" : outcome === "defeat" ? "defeat" : "complete")}>
+                  <img className="gameFlowResultArt" src={outcome === "defeat" ? "/ui/grimdark/flow_game_flow_death_panel_001_001.png" : "/ui/grimdark/flow_game_flow_victory_panel_001_001.png"} alt="" aria-hidden />
+                  <div className="gameFlowResultContent">
+                    <div className="dashboardEyebrow">SESSION COMPLETE</div>
+                    <div className="combatRunOutcome">{outcome === "victory" ? "Victory" : outcome === "defeat" ? "Defeat" : "Session Complete"}</div>
+                    <div className="combatRunStats"><span><small>Score</small><b>{state.correctCount}/{combatQuestions.length}</b></span><span><small>XP</small><b>+{displayedXp}</b></span><span><small>Best streak</small><b>{bestStreak}</b></span><span><small>Player HP</small><b>{Math.max(0, Math.round(state.playerHP))}</b></span></div>
+                  </div>
                 </div>
               )}
             </div>
