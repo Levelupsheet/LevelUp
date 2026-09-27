@@ -6024,3 +6024,67 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
  .dashboardHeaderRibbon{width:min(88%,420px);height:calc(100% - 6px);}
  .gdCloseButton{width:42px !important;min-width:42px !important;height:42px !important;min-height:42px !important;}
 }
+
+
+/* Dashboard Grimdark asset corrections. */
+.dashboardSelectedPlayer.dashboardSelectedPlayerButton{
+  padding:0 !important;border:0 !important;background:transparent !important;
+  box-shadow:none !important;overflow:visible !important;
+}
+.dashboardSelectedPlayer .dashboardGrimdarkPortrait.dashboardPlayerOnly{
+  display:block !important;
+  width:100% !important;
+  aspect-ratio:1 / 1.05 !important;
+  height:auto !important;
+  padding:12px !important;
+  box-sizing:border-box !important;
+}
+.dashboardSelectedPlayer .dashboardGrimdarkPortrait.dashboardPlayerOnly video{
+  width:100% !important;height:100% !important;object-fit:cover !important;
+  clip-path:inset(3% round 2px);
+}
+.dashboardSelectedPlayer .dashboardCharacterRarityFrame{
+  inset:0 !important;width:100% !important;height:100% !important;
+  object-fit:fill !important;filter:drop-shadow(0 5px 8px rgba(0,0,0,.8));
+}
+.dashboardGrimdarkHero{
+  overflow:visible !important;
+  border:0 !important;
+  background:transparent !important;
+  box-shadow:none !important;
+}
+.dashboardGrimdarkHero::before{
+  content:"";
+  position:absolute;
+  z-index:-2;
+  inset:0;
+  background:linear-gradient(180deg,#151b22,#0b0f13);
+}
+.dashboardHeaderRibbon{
+  z-index:-1 !important;
+  left:50% !important;
+  top:50% !important;
+  width:calc(100% - 18px) !important;
+  height:calc(100% - 10px) !important;
+  transform:translate(-50%,-50%) !important;
+  object-fit:fill !important;
+  opacity:1 !important;
+}
+.gdDashboardWideAction{
+  min-height:56px !important;
+  background-size:100% 100% !important;
+  background-repeat:no-repeat !important;
+  background-position:center !important;
+  color:#fff4d6 !important;
+  text-shadow:0 2px 2px #000,0 0 5px #000 !important;
+}
+.dashboardGrimdarkHero .gdDashboardHeroAction{
+  min-width:180px !important;
+  min-height:54px !important;
+  background-size:100% 100% !important;
+  color:#fff4d6 !important;
+  text-shadow:0 2px 2px #000,0 0 5px #000 !important;
+}
+@media(max-width:860px){
+  .dashboardHeaderRibbon{width:calc(100% - 8px) !important;height:calc(100% - 6px) !important;}
+}
