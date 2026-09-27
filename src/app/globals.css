@@ -9821,3 +9821,64 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     margin-left:4px!important;
   }
 }
+
+
+/* 2026-09-27 final live calibration: compact info control, centered orb,
+   lower orb assembly, and interactive rack slots. */
+@media (min-width:901px){
+  .d2QuizQuestionCard .sessionInfoIconButton{
+    width:44px!important;
+    height:33px!important;
+    flex:0 0 44px!important;
+  }
+
+  /* Lower only the orb assembly toward the portrait while preserving a clean
+     4px visual seam. The rail remains normal-flow. */
+  .batch8DesktopQuizGrid .batch8PlayerRail > .playerOrbComposite{
+    width:170px!important;
+    height:171px!important;
+    flex-basis:171px!important;
+    margin:0 auto 4px!important;
+  }
+  .batch8DesktopQuizGrid .playerOrbFrameAsset{
+    width:170px!important;
+    height:139px!important;
+    top:32px!important;
+    left:0!important;
+    object-fit:fill!important;
+  }
+  /* Smaller and centered in the actual circular well. */
+  .batch8DesktopQuizGrid .playerOrbBlood{
+    width:78px!important;
+    height:78px!important;
+    left:46px!important;
+    top:76px!important;
+  }
+
+  .batch8DesktopQuizGrid .playerPowerupSlots{
+    pointer-events:auto!important;
+  }
+  .batch8DesktopQuizGrid .playerPowerupSlot{
+    appearance:none!important;
+    -webkit-appearance:none!important;
+    padding:0!important;
+    margin:0!important;
+    border:0!important;
+    outline:0!important;
+    background:transparent!important;
+    cursor:pointer!important;
+    pointer-events:auto!important;
+    border-radius:0!important;
+  }
+  .batch8DesktopQuizGrid .playerPowerupSlot:not(:disabled):hover img,
+  .batch8DesktopQuizGrid .playerPowerupSlot:not(:disabled):focus-visible img{
+    filter:brightness(1.2) drop-shadow(0 0 6px rgba(239,145,48,.7))!important;
+    transform:scale(1.05)!important;
+  }
+  .batch8DesktopQuizGrid .playerPowerupSlot:disabled{
+    cursor:default!important;
+  }
+  .batch8DesktopQuizGrid .playerPowerupSlot img{
+    transition:filter .15s ease,transform .15s ease!important;
+  }
+}
