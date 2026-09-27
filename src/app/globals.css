@@ -5767,3 +5767,23 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .dashboardGrimdarkSidebar .dashboardAssetButtonBlue{
   background-image:url('/ui/grimdark/button-blue.png?v=20260927f')!important;
 }
+
+/* Dashboard sidebar v2: direct IMG-style asset backgrounds with selectors independent of legacy classes. */
+.dashboardGrimdarkSidebar button.dashboardAssetButton{
+  appearance:none!important;-webkit-appearance:none!important;
+  display:flex!important;position:relative!important;align-items:center!important;justify-content:center!important;
+  width:100%!important;height:58px!important;min-height:58px!important;margin:0!important;padding:0 18px!important;
+  border:0!important;border-radius:0!important;outline:0!important;box-shadow:none!important;
+  background-color:transparent!important;background-repeat:no-repeat!important;background-position:50% 50%!important;background-size:100% 100%!important;
+  color:#f8ecd6!important;font-family:Cinzel,Georgia,serif!important;font-size:15px!important;font-weight:800!important;line-height:1!important;
+  text-shadow:0 2px 2px #000!important;cursor:pointer!important;
+}
+.dashboardGrimdarkSidebar button.dashboardAssetButtonOrange{background-image:url("/ui/grimdark/button-orange.png?v=20260927g")!important}
+.dashboardGrimdarkSidebar button.dashboardAssetButtonBlue{background-image:url("/ui/grimdark/button-blue.png?v=20260927g")!important}
+.dashboardGrimdarkSidebar button.dashboardSelectedPlayerButton{
+  appearance:none!important;-webkit-appearance:none!important;border:0!important;border-radius:0!important;outline:0!important;
+  box-shadow:none!important;background:none!important;padding:0!important;margin:0!important;
+}
+.dashboardGrimdarkSidebar button.dashboardSelectedPlayerButton>.dashboardPlayerOnly{
+  border:0!important;border-radius:0!important;outline:0!important;box-shadow:none!important;background:none!important;
+}
