@@ -1239,8 +1239,10 @@ const showExpandedExplanation = useMemo(() => {
             <div className="quizPlayerRail batch8CombatRail batch8PlayerRail" style={{ display: "grid", gap: 10, alignContent: "start", minHeight: 0 }}>
               <div className={"playerOrbComposite " + (hitPulse === "player" ? "d2Shake" : "")} aria-label={`${playerName} health ${state.playerHP}%`}>
                 <img className="playerOrbFrameAsset" src="/ui/grimdark/flow_main_panel_player.png" alt="" aria-hidden="true" />
-                <div className="playerOrbBlood" style={{ "--player-hp": Math.max(0, Math.min(100, state.playerHP)) } as React.CSSProperties}>
-                  <img src="/ui/blood-orb.webp" alt="" aria-hidden="true" />
+                <div className="playerOrbBlood" aria-hidden="true">
+                  <div className="playerOrbBloodFill" style={{ height: `${Math.max(0, Math.min(100, state.playerHP))}%` }}>
+                    <img src="/ui/blood-orb.webp" alt="" />
+                  </div>
                 </div>
               </div>
               <ModelPanel key={playerVideoKey} title="" src={playerVideo} forceReload={hitPulse === "player"} loop={!isPlayerHitVideo} onEnded={isPlayerHitVideo ? () => setHitPulse(null) : undefined} height="clamp(180px, 22vh, 280px)" damageText={damageFloat.player || null} damageTone="player" />
