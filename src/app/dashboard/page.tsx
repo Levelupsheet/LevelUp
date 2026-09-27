@@ -968,6 +968,14 @@ async function analyzeResumeStage12() {
             }}>
               <span className="dashboardGrimdarkPortrait dashboardPlayerOnly"><img className="dashboardCharacterTitleFrame" src="/ui/grimdark/character-rarity-border-4-transparent.png?v=20260927k" alt="" aria-hidden="true" /><video src="/video/desktop-barbarian-idle.mp4" autoPlay loop muted playsInline disablePictureInPicture controlsList="nodownload noremoteplayback" aria-label="Desktop Barbarian player" /></span>
             </button>
+          ) : user?.startingPosition === "CLOUD_ENGINEER" ? (
+            <button className="dashboardSelectedPlayer dashboardSelectedPlayerButton" type="button" aria-label="Change selected player: Cloud Assassin" onClick={() => {
+              setPendingPos(user.startingPosition);
+              setPositionChangeMode(true);
+              setShowPositionModal(true);
+            }}>
+              <span className="dashboardGrimdarkPortrait dashboardPlayerOnly"><img className="dashboardCharacterTitleFrame" src="/ui/grimdark/character-rarity-border-4-transparent.png?v=20260927k" alt="" aria-hidden="true" /><video src="/video/T2V diablo 4 assassin Idle.mp4" autoPlay loop muted playsInline disablePictureInPicture controlsList="nodownload noremoteplayback" aria-label="Cloud Assassin player" /></span>
+            </button>
           ) : null}
 
           <button className="dashboardAssetButton dashboardAssetButtonBlue dashboardToggleAction dashboardStartNowButton" style={{ width: "100%", marginTop: 8, opacity: hasFreeStartCooldown ? 0.7 : 1 }} onClick={() => !hasFreeStartCooldown && setShowLaunchModal(true)} disabled={hasFreeStartCooldown} title={hasFreeStartCooldown ? `Free tier cooldown: ${freeStartCooldownLabel}` : undefined}>
