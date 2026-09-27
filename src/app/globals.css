@@ -9282,3 +9282,63 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     margin:0!important;
   }
 }
+
+
+/* 2026-09-27 repair left rail stack after powerup flip */
+@media (min-width:901px){
+  .batch8DesktopQuizGrid .batch8PlayerRail{
+    padding-top:0!important;
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:center!important;
+    justify-content:flex-start!important;
+    gap:0!important;
+  }
+
+  /* move the complete orb/frame down so it directly precedes the portrait */
+  .batch8DesktopQuizGrid .batch8PlayerRail > :first-child{
+    width:178px!important;
+    height:178px!important;
+    min-height:178px!important;
+    flex:0 0 178px!important;
+    margin:150px auto 0!important;
+    position:relative!important;
+    inset:auto!important;
+    transform:none!important;
+    overflow:visible!important;
+  }
+
+  .batch8DesktopQuizGrid .batch8PlayerRail .modelPanel{
+    width:170px!important;
+    max-width:170px!important;
+    margin:0 auto!important;
+    position:relative!important;
+    z-index:2!important;
+  }
+
+  /* restore rack to normal document flow, flip artwork only, and keep it visible */
+  .batch8DesktopQuizGrid .batch8PlayerRail::after{
+    content:""!important;
+    display:block!important;
+    position:relative!important;
+    inset:auto!important;
+    left:auto!important;
+    top:auto!important;
+    width:108px!important;
+    height:276px!important;
+    min-height:276px!important;
+    flex:0 0 276px!important;
+    margin:0 auto!important;
+    align-self:center!important;
+    background-image:url('/ui/grimdark/flow_main_panel_powerup1.png?v=20260927-repaired-flip')!important;
+    background-repeat:no-repeat!important;
+    background-position:center!important;
+    background-size:contain!important;
+    transform:scaleY(-1)!important;
+    transform-origin:center!important;
+    visibility:visible!important;
+    opacity:1!important;
+    z-index:3!important;
+    pointer-events:none!important;
+  }
+}
