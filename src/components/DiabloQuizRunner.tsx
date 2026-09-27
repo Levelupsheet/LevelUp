@@ -1183,7 +1183,7 @@ const showExpandedExplanation = useMemo(() => {
                   {goldenEntryFlash ? <div className="badge" style={{ marginBottom: 10, borderColor: "rgba(255,215,64,0.55)", color: "#ffe28a", background: "rgba(255,215,64,0.10)" }}>{goldenEntryFlash}</div> : null}
                   <div className="stageHeaderRow">
                     <div>
-                      <div className="stageLabelPill">Stage {sessionStage} • {metaLeft || "Combat Quiz"}</div>
+                      <div className="stageLabelPill stageLabelArtwork">Stage {sessionStage} • {metaLeft || "Combat Quiz"}</div>
                     </div>
                     <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap", justifyContent: "flex-end" }}>
                       {timed ? (
