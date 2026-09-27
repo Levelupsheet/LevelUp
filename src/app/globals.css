@@ -9519,3 +9519,28 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     top:5px!important;
   }
 }
+
+
+/* 2026-09-27 final orb/portrait separation.
+   Preserve portrait -> powerup seam. Orb/frame gets a guaranteed 4px layout gap. */
+@media (min-width:901px){
+  .batch8DesktopQuizGrid .batch8PlayerRail{
+    padding-top:52px!important;
+  }
+
+  /* The prior -58px correction still let the oversized decorative frame
+     cross the portrait. Back it off by 20px and add an explicit 4px seam. */
+  .batch8DesktopQuizGrid .batch8PlayerRail > .card{
+    margin:-38px auto 1px!important;
+  }
+
+  .batch8DesktopQuizGrid .batch8PlayerRail > :first-child{
+    margin-bottom:4px!important;
+  }
+
+  /* Keep the orb centered within the banner/frame. */
+  .batch8DesktopQuizGrid .batch8PlayerRail > :first-child .d2OrbWrap{
+    left:8px!important;
+    top:5px!important;
+  }
+}
