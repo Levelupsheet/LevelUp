@@ -6090,3 +6090,28 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .dashboardMain .dashboardNextAssetButton{position:relative!important;overflow:hidden!important;isolation:isolate!important;background:none!important;min-height:58px!important;min-width:260px!important;border:0!important;padding:0 28px!important}
 .dashboardMain .dashboardNextAssetButton .dashboardButtonAssetImage{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;display:block!important;object-fit:fill!important;z-index:0!important;pointer-events:none!important;opacity:1!important;visibility:visible!important}
 .dashboardMain .dashboardNextAssetButton .dashboardButtonAssetLabel{position:relative!important;z-index:2!important}
+
+
+/* Quiz player rail cleanup — 2026-09-27
+   Remove legacy orange CSS framing from the player HUD only. */
+@media (min-width:901px){
+  .batch8PlayerRail,
+  .batch8PlayerRail .card,
+  .batch8PlayerRail .d2ModelPanel,
+  .batch8PlayerRail .d2OrbWrap,
+  .batch8PlayerRail .d2OrbFrame,
+  .batch8PlayerRail video{
+    border:0!important;
+    border-color:transparent!important;
+    border-image:none!important;
+    outline:0!important;
+    box-shadow:none!important;
+  }
+  .batch8PlayerRail{
+    background:transparent!important;
+  }
+  .batch8PlayerRail .card,
+  .batch8PlayerRail .d2ModelPanel{
+    background:transparent!important;
+  }
+}
