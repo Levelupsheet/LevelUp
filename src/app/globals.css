@@ -9639,25 +9639,28 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     content:none!important;
     display:none!important;
   }
-  .batch8DesktopQuizGrid .playerOrbBloodFill{
+  .batch8DesktopQuizGrid .playerOrbBloodBase,
+  .batch8DesktopQuizGrid .playerOrbBloodMask,
+  .batch8DesktopQuizGrid .playerOrbBloodMask img{
     position:absolute!important;
-    left:0!important;
-    right:0!important;
-    bottom:0!important;
-    overflow:hidden!important;
-    transition:height .35s ease!important;
-  }
-  .batch8DesktopQuizGrid .playerOrbBloodFill img{
-    position:absolute!important;
-    left:0!important;
-    bottom:0!important;
+    inset:0!important;
+    width:100%!important;
+    height:100%!important;
     display:block!important;
-    width:42px!important;
-    height:42px!important;
-    max-width:none!important;
-    max-height:none!important;
     object-fit:cover!important;
   }
+  .batch8DesktopQuizGrid .playerOrbBloodBase{
+    opacity:.22!important;
+    filter:saturate(.7) brightness(.55)!important;
+  }
+  .batch8DesktopQuizGrid .playerOrbBloodMask{
+    overflow:hidden!important;
+    transition:clip-path .35s ease!important;
+  }
+  .batch8DesktopQuizGrid .playerOrbBloodMask img{
+    opacity:1!important;
+  }
+
   .batch8DesktopQuizGrid .batch8PlayerRail > .card{
     width:166px!important;
     max-width:166px!important;
