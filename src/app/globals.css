@@ -9544,3 +9544,22 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     top:5px!important;
   }
 }
+
+
+/* 2026-09-27 screenshot-calibrated orb placement.
+   The previous margin change moved the portrait, not the visible orb artwork.
+   Keep portrait/powerup fixed and move the complete orb+banner artwork down
+   into the empty space, stopping 4px above the portrait border. */
+@media (min-width:901px){
+  .batch8DesktopQuizGrid .batch8PlayerRail > :first-child{
+    transform:translateY(96px)!important;
+    margin-bottom:4px!important;
+    z-index:3!important;
+  }
+
+  /* Undo the portrait displacement introduced by the prior seam experiment. */
+  .batch8DesktopQuizGrid .batch8PlayerRail > .card{
+    margin:-38px auto 1px!important;
+    z-index:4!important;
+  }
+}
