@@ -961,7 +961,7 @@ async function analyzeResumeStage12() {
               setPositionChangeMode(true);
               setShowPositionModal(true);
             }}>
-              <span className="dashboardGrimdarkPortrait dashboardPlayerOnly"><video src="/video/helpdesk-wizard-idle.mp4" autoPlay loop muted playsInline disablePictureInPicture controlsList="nodownload noremoteplayback" aria-label="Help Desk Wizard player" /><img className="dashboardCharacterRarityFrame" src="/ui/grimdark/character-rarity-border-4.png" alt="" aria-hidden="true" /></span>
+              <span className="dashboardGrimdarkPortrait dashboardPlayerOnly"><img className="dashboardCharacterTitleFrame" src="/ui/grimdark/character-title.png" alt="" aria-hidden="true" /><video src="/video/helpdesk-wizard-idle.mp4" autoPlay loop muted playsInline disablePictureInPicture controlsList="nodownload noremoteplayback" aria-label="Help Desk Wizard player" /><img className="dashboardCharacterRarityFrame" src="/ui/grimdark/character-rarity-border-4.png" alt="" aria-hidden="true" /></span>
             </button>
           ) : user?.startingPosition === "DESKTOP_TECHNICIAN" ? (
             <button className="dashboardSelectedPlayer dashboardSelectedPlayerButton" type="button" aria-label="Change selected player: Desktop Barbarian" onClick={() => {
@@ -969,7 +969,7 @@ async function analyzeResumeStage12() {
               setPositionChangeMode(true);
               setShowPositionModal(true);
             }}>
-              <span className="dashboardGrimdarkPortrait dashboardPlayerOnly"><video src="/video/desktop-barbarian-idle.mp4" autoPlay loop muted playsInline disablePictureInPicture controlsList="nodownload noremoteplayback" aria-label="Desktop Barbarian player" /><img className="dashboardCharacterRarityFrame" src="/ui/grimdark/character-rarity-border-4.png" alt="" aria-hidden="true" /></span>
+              <span className="dashboardGrimdarkPortrait dashboardPlayerOnly"><img className="dashboardCharacterTitleFrame" src="/ui/grimdark/character-title.png" alt="" aria-hidden="true" /><video src="/video/desktop-barbarian-idle.mp4" autoPlay loop muted playsInline disablePictureInPicture controlsList="nodownload noremoteplayback" aria-label="Desktop Barbarian player" /><img className="dashboardCharacterRarityFrame" src="/ui/grimdark/character-rarity-border-4.png" alt="" aria-hidden="true" /></span>
             </button>
           ) : null}
 
@@ -992,9 +992,6 @@ async function analyzeResumeStage12() {
                 Start Tech Battle →
               </button>
             ) : null}
-            <small style={{ display: "block", marginTop: 0, opacity: 0.8 }}>
-              {hrBattleUnlocked ? "HR Battle Eligibility Unlocked!" : "Unlocks at level 5."}
-            </small>
             {hasFreeStartCooldown && <small style={{ display: "block", marginTop: 0, color: "#f5d37b" }}>Free users can start another session in {freeStartCooldownLabel}.</small>}
           </div>
 
@@ -1002,7 +999,6 @@ async function analyzeResumeStage12() {
             <button className="secondaryBtn gdActionBlue" style={{ width: "100%" }} type="button" onClick={() => (window.location.href = "/pvp")}>
               Enter PvP Arena
             </button>
-            <small style={{ display: "block", marginTop: 6, opacity: 0.8 }}>Async PvP challenges, leaderboards, and profile matchups.</small>
           </div>
 
           <hr style={{ margin: "14px 0" }} />
@@ -1099,12 +1095,6 @@ async function analyzeResumeStage12() {
             >
               {hasFreeStartCooldown ? `Start Now! (${freeStartCooldownLabel})` : "Start Now!"}
             </button>
-
-            <div className="kpiRow">
-              
-              {hrBattleUnlocked ? <button className="gold gdActionOrange gdDashboardHeroAction" type="button" onClick={() => setMockInterviewOpen(true)}>Start HR Battle</button> : null}
-              {((localLevel || 1) >= 5 || hasTechReady) ? <button className="primary gdActionBlue" type="button" onClick={() => setMockInterviewOpen(true)}>Start Tech Battle</button> : null}
-            </div>
           </div>
 
           <div className="card dashboardNextAction dashboardGrimdarkPanel">
