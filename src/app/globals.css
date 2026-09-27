@@ -9893,3 +9893,29 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     overflow:hidden!important;
   }
 }
+
+
+/* 2026-09-27 player orb/frame final visual fit.
+   Keep the approved 104px orb; scale the gothic frame around it and anchor
+   the whole orb assembly immediately above the portrait. */
+@media (min-width:901px){
+  .batch8DesktopQuizGrid .batch8PlayerRail > .playerOrbComposite{
+    width:166px!important;
+    height:126px!important;
+    flex:0 0 126px!important;
+    margin:0 auto 2px!important;
+  }
+  .batch8DesktopQuizGrid .playerOrbFrameAsset{
+    left:18px!important;
+    top:0!important;
+    width:130px!important;
+    height:126px!important;
+    object-fit:fill!important;
+  }
+  .batch8DesktopQuizGrid .playerOrbBlood{
+    left:31px!important;
+    top:7px!important;
+    width:104px!important;
+    height:104px!important;
+  }
+}
