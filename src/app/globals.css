@@ -10051,3 +10051,24 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     display:none!important;
   }
 }
+
+
+/* 2026-09-27 player orb final correction from live assassin screenshot.
+   Keep one frame, shrink the blood orb substantially and center it inside
+   the circular well without moving portrait/rack. */
+@media (min-width:901px){
+  .batch8DesktopQuizGrid .batch8PlayerRail > .playerOrbComposite{
+    margin-bottom:2px!important;
+  }
+  .batch8DesktopQuizGrid .playerOrbFrameAsset{
+    top:30px!important;
+  }
+  .batch8DesktopQuizGrid .playerOrbBlood{
+    width:48px!important;
+    height:48px!important;
+    left:61px!important;
+    top:55px!important;
+    border-radius:50%!important;
+    overflow:hidden!important;
+  }
+}
