@@ -5948,3 +5948,14 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     background-image:url('/ui/grimdark/button-blue.png?v=20260927-actions')!important;
   }
 }
+
+
+/* Desktop Start/HR: inherit the proven Tech button renderer, then swap only the bitmap. */
+@media (min-width:861px){
+  .dashboardGrimdarkSidebar button.dashboardAssetButtonBlue.dashboardStartNowButton{
+    background-image:url('/ui/grimdark/button-orange.png?v=20260927-proven')!important;
+  }
+  .dashboardGrimdarkSidebar button.dashboardAssetButtonBlue.dashboardHrBattleButton{
+    background-image:url('/ui/grimdark/button-red.png?v=20260927-proven')!important;
+  }
+}
