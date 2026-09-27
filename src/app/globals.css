@@ -7823,3 +7823,57 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
   margin-top:0!important;
   margin-bottom:4px!important;
 }
+
+
+/* 2026-09-27 HUD fine tuning: keep long teaching feedback readable and fit player art. */
+@media (min-width:901px){
+  .batch8DesktopQuizGrid .batch8PlayerRail .d2OrbWrap,
+  .batch8DesktopQuizGrid .batch8PlayerRail .d2OrbFrame{
+    width:112px!important;
+    height:112px!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail .d2OrbWrap{
+    transform:translate(-7px,-7px)!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail .d2AssetBloodOrb{
+    inset:10%!important;
+  }
+
+  .batch8DesktopQuizGrid .batch8PlayerRail > .card{
+    width:158px!important;
+    height:158px!important;
+    min-height:158px!important;
+    padding:4px!important;
+    box-sizing:border-box!important;
+    overflow:visible!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail > .card > div{
+    overflow:hidden!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail > .card video,
+  .batch8DesktopQuizGrid .batch8PlayerRail > .card img{
+    width:100%!important;
+    height:100%!important;
+    object-fit:contain!important;
+    object-position:center bottom!important;
+    transform:scale(.92)!important;
+    transform-origin:center bottom!important;
+  }
+
+  .batch8LearningStage{
+    overflow:visible!important;
+  }
+  .batch8LearningStage .stage5FeedbackCard,
+  .batch8LearningStage .stage5MergedFeedbackCard,
+  .batch8LearningStage .stage5MergedExplanation{
+    max-height:none!important;
+    height:auto!important;
+    overflow:visible!important;
+  }
+  .batch8LearningStage .stage5FeedbackCard .muted,
+  .batch8LearningStage .stage5MergedExplanation .muted{
+    max-height:none!important;
+    overflow:visible!important;
+    white-space:pre-wrap!important;
+  }
+}
