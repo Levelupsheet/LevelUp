@@ -8541,3 +8541,30 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     z-index:2!important;
   }
 }
+
+
+/* 2026-09-27 screenshot alignment: smaller combat orbs + power-up rail below portrait */
+@media (min-width:901px){
+  /* Player orb: another 5% smaller and a hair farther left. */
+  .batch8DesktopQuizGrid .batch8PlayerRail .d2OrbWrap{
+    transform:translate(-8px,2px) scale(.95)!important;
+    transform-origin:top center!important;
+  }
+
+  /* Enemy orb: another 5% smaller without reintroducing glow. */
+  .batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyCard{
+    transform:scale(.95)!important;
+    transform-origin:top center!important;
+  }
+
+  /* Power-up frame belongs beneath the player portrait, not between orb and portrait. */
+  .batch8DesktopQuizGrid .batch8PlayerRail::after{
+    left:-8px!important;
+    top:440px!important;
+    width:104px!important;
+    height:330px!important;
+    margin:0!important;
+    background:url('/ui/grimdark/flow_main_panel_powerup1.png?v=20260927-belowportrait') top center/contain no-repeat!important;
+    z-index:1!important;
+  }
+}
