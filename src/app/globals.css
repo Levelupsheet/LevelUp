@@ -9417,3 +9417,81 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     z-index:3!important;
   }
 }
+
+
+/* 2026-09-27 post-revert seam correction.
+   Keep the proven DOM structure; only correct the three visible seams. */
+@media (min-width:901px){
+  .batch8DesktopQuizGrid .batch8PlayerRail{
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:center!important;
+    justify-content:flex-start!important;
+    gap:0!important;
+    padding-top:42px!important;
+    overflow:visible!important;
+  }
+
+  /* Orb/frame: centered; do not let its layout box create extra spacing. */
+  .batch8DesktopQuizGrid .batch8PlayerRail > :first-child{
+    width:178px!important;
+    max-width:178px!important;
+    height:178px!important;
+    min-height:178px!important;
+    flex:0 0 178px!important;
+    margin:0 auto!important;
+    position:relative!important;
+    inset:auto!important;
+    transform:none!important;
+    overflow:visible!important;
+    z-index:2!important;
+  }
+
+  /* ModelPanel actually renders as .card. Pull only through the transparent
+     portion of the orb asset, then leave a one-pixel visible seam. */
+  .batch8DesktopQuizGrid .batch8PlayerRail > .card{
+    width:170px!important;
+    max-width:170px!important;
+    min-height:0!important;
+    height:auto!important;
+    padding:0!important;
+    margin:-88px auto 1px!important;
+    position:relative!important;
+    inset:auto!important;
+    align-self:center!important;
+    background:transparent!important;
+    flex:0 0 auto!important;
+    z-index:4!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail > .card > div,
+  .batch8DesktopQuizGrid .batch8PlayerRail > .card video,
+  .batch8DesktopQuizGrid .batch8PlayerRail > .card img{
+    display:block!important;
+    margin:0!important;
+  }
+
+  /* Keep the purchased rack in normal flow. Its PNG also has transparent
+     canvas, so compensate that canvas without overlapping the visible portrait. */
+  .batch8DesktopQuizGrid .batch8PlayerRail::after{
+    content:""!important;
+    display:block!important;
+    width:108px!important;
+    height:276px!important;
+    min-height:276px!important;
+    flex:0 0 276px!important;
+    margin:-34px auto 0!important;
+    position:relative!important;
+    inset:auto!important;
+    align-self:center!important;
+    background-image:url('/ui/grimdark/flow_main_panel_powerup1.png?v=20260927-seam-correction')!important;
+    background-repeat:no-repeat!important;
+    background-position:center!important;
+    background-size:contain!important;
+    transform:scaleY(-1)!important;
+    transform-origin:center!important;
+    visibility:visible!important;
+    opacity:1!important;
+    pointer-events:none!important;
+    z-index:3!important;
+  }
+}
