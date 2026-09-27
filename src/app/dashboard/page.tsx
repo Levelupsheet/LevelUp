@@ -973,13 +973,13 @@ async function analyzeResumeStage12() {
             </button>
           ) : null}
 
-          <button className="primary dashboardSidebarStart dashboardGrimdarkPrimary" style={{ width: "100%", marginTop: 8, opacity: hasFreeStartCooldown ? 0.7 : 1 }} onClick={() => !hasFreeStartCooldown && setShowLaunchModal(true)} disabled={hasFreeStartCooldown} title={hasFreeStartCooldown ? `Free tier cooldown: ${freeStartCooldownLabel}` : undefined}>
+          <button className="primary dashboardSidebarStart dashboardGrimdarkPrimary gdActionOrange" style={{ width: "100%", marginTop: 8, opacity: hasFreeStartCooldown ? 0.7 : 1 }} onClick={() => !hasFreeStartCooldown && setShowLaunchModal(true)} disabled={hasFreeStartCooldown} title={hasFreeStartCooldown ? `Free tier cooldown: ${freeStartCooldownLabel}` : undefined}>
             {hasFreeStartCooldown ? `Start Now! (${freeStartCooldownLabel})` : "Start Now!"}
           </button>
 
           <div className="dashboardBattleShortcuts" style={{ marginTop: 10, display: "grid", gap: 10 }}>
             {hrBattleUnlocked ? (
-              <button className="gold dashboardGrimdarkPrimary" style={{ width: "100%" }} onClick={() => setMockInterviewOpen(true)}>
+              <button className="gold dashboardGrimdarkPrimary gdActionOrange" style={{ width: "100%" }} onClick={() => setMockInterviewOpen(true)}>
                 {hrPassed ? "Start HR Battle →" : "Start HR Battle →"}
               </button>
             ) : (
@@ -988,7 +988,7 @@ async function analyzeResumeStage12() {
               </button>
             )}
             {((localLevel || 1) >= 5 || hasTechReady) ? (
-              <button className="primary dashboardGrimdarkPrimary" style={{ width: "100%" }} type="button" onClick={() => setMockInterviewOpen(true)}>
+              <button className="primary dashboardGrimdarkPrimary gdActionBlue" style={{ width: "100%" }} type="button" onClick={() => setMockInterviewOpen(true)}>
                 Start Tech Battle →
               </button>
             ) : null}
@@ -999,7 +999,7 @@ async function analyzeResumeStage12() {
           </div>
 
           <div className="dashboardPvpShortcut" style={{ marginTop: 10 }}>
-            <button className="secondaryBtn" style={{ width: "100%" }} type="button" onClick={() => (window.location.href = "/pvp")}>
+            <button className="secondaryBtn gdActionBlue" style={{ width: "100%" }} type="button" onClick={() => (window.location.href = "/pvp")}>
               Enter PvP Arena
             </button>
             <small style={{ display: "block", marginTop: 6, opacity: 0.8 }}>Async PvP challenges, leaderboards, and profile matchups.</small>
@@ -1092,7 +1092,7 @@ async function analyzeResumeStage12() {
             </div>
 
             <button
-              className="primary dashboardMobileStartNow"
+              className="primary dashboardMobileStartNow gdActionOrange"
               type="button"
               onClick={() => !hasFreeStartCooldown && setShowLaunchModal(true)}
               disabled={hasFreeStartCooldown}
@@ -1102,8 +1102,8 @@ async function analyzeResumeStage12() {
 
             <div className="kpiRow">
               
-              {hrBattleUnlocked ? <button className="gold" type="button" onClick={() => setMockInterviewOpen(true)}>Start HR Battle</button> : null}
-              {((localLevel || 1) >= 5 || hasTechReady) ? <button className="primary" type="button" onClick={() => setMockInterviewOpen(true)}>Start Tech Battle</button> : null}
+              {hrBattleUnlocked ? <button className="gold gdActionOrange" type="button" onClick={() => setMockInterviewOpen(true)}>Start HR Battle</button> : null}
+              {((localLevel || 1) >= 5 || hasTechReady) ? <button className="primary gdActionBlue" type="button" onClick={() => setMockInterviewOpen(true)}>Start Tech Battle</button> : null}
             </div>
           </div>
 
@@ -1114,11 +1114,11 @@ async function analyzeResumeStage12() {
               <p>{hasTechReady ? "You cleared the HR gate. Put your technical reasoning to the test and keep your career progression moving." : hrBattleUnlocked && !hrPassed ? "You have unlocked the interview track. Complete the HR Battle to move toward the technical interview." : "Keep your momentum moving with the next training session. Your XP, mastery, and unlock progress update as you complete challenges."}</p>
             </div>
             {hasTechReady ? (
-              <button className="primary dashboardNextButton" type="button" onClick={() => setMockInterviewOpen(true)}>Start Tech Battle →</button>
+              <button className="primary dashboardNextButton gdActionBlue" type="button" onClick={() => setMockInterviewOpen(true)}>Start Tech Battle →</button>
             ) : hrBattleUnlocked && !hrPassed ? (
-              <button className="gold dashboardNextButton" type="button" onClick={() => setMockInterviewOpen(true)}>Start HR Battle →</button>
+              <button className="gold dashboardNextButton gdActionOrange" type="button" onClick={() => setMockInterviewOpen(true)}>Start HR Battle →</button>
             ) : (
-              <button className="gold dashboardNextButton" type="button" onClick={() => !hasFreeStartCooldown && setShowLaunchModal(true)} disabled={hasFreeStartCooldown}>
+              <button className="gold dashboardNextButton gdActionOrange" type="button" onClick={() => !hasFreeStartCooldown && setShowLaunchModal(true)} disabled={hasFreeStartCooldown}>
                 {hasFreeStartCooldown ? `Available in ${freeStartCooldownLabel}` : "Continue training →"}
               </button>
             )}
@@ -1217,7 +1217,7 @@ async function analyzeResumeStage12() {
         {!(stage12Status?.profile?.coaching?.nextActions || []).length ? <small style={{ opacity: 0.78 }}>No recommendations yet.</small> : null}
       </div>
       <div style={{ marginTop: 10, opacity: 0.76 }}><small>{stage12Status?.analyzedAt ? `Last analyzed ${new Date(stage12Status.analyzedAt).toLocaleString()}` : "Original resume file is not retained long term."}</small></div>
-      <a className="secondaryBtn dashboardCoachCta" href="/coach">Open AI Coach →</a>
+      <a className="secondaryBtn dashboardCoachCta gdActionBlue" href="/coach">Open AI Coach →</a>
     </div>
   </div>
 </div>
