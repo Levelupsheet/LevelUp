@@ -7242,3 +7242,19 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
   background:linear-gradient(180deg,#101516,#080b0c)!important;
   border-color:#9a531c!important;
 }
+
+
+/* Enemy identity belongs with the portrait/video, not inside the energy orb. */
+.quizEnemyNameBelow{
+  margin-top:-5px;
+  padding:7px 8px 5px;
+  text-align:center;
+  font-family:Georgia,"Times New Roman",serif;
+  font-size:13px;
+  font-weight:800;
+  letter-spacing:.07em;
+  color:#e8dcc4;
+  text-transform:uppercase;
+  text-shadow:0 2px 4px #000;
+  border-top:1px solid rgba(139,75,26,.55);
+}
