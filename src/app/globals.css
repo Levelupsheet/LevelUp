@@ -8568,3 +8568,31 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     z-index:1!important;
   }
 }
+
+
+/* 2026-09-27 action buttons: Submit and Clear use the same purchased toggle treatment */
+.d2QuizQuestionCard .stage8ActionDock{
+  justify-content:center!important;
+  gap:14px!important;
+}
+.d2QuizQuestionCard .stage8ActionDock > button{
+  width:150px!important;
+  min-width:150px!important;
+  max-width:150px!important;
+  height:42px!important;
+  min-height:42px!important;
+  padding:0!important;
+  background-color:transparent!important;
+  background-image:url('/ui/grimdark/core_toggle_switch_on_001.png?v=20260927-actions3')!important;
+  background-repeat:no-repeat!important;
+  background-position:center!important;
+  background-size:contain!important;
+  border:0!important;
+  outline:0!important;
+  box-shadow:none!important;
+  border-radius:0!important;
+}
+.d2QuizQuestionCard .stage8ActionDock > button:disabled{
+  background-image:url('/ui/grimdark/core_toggle_switch_off_001.png?v=20260927-actions3')!important;
+  opacity:1!important;
+}
