@@ -232,7 +232,7 @@ export default function GameEngine(props: Props) {
   const playerMedia = activePosition === "CLOUD_ENGINEER"
     ? { playerIdleSrc: "/video/T2V diablo 4 assassin Idle.mp4", playerAttackSrc: "/video/I2V diablo 4 assassin attack.mp4", playerHitSrc: "/video/T2V diablo 4 assassin damage.mp4" }
     : activePosition === "DESKTOP_TECHNICIAN"
-      ? { playerIdleSrc: "/video/desktop-barbarian-idle.mp4", playerAttackSrc: "/video/desktop-barbarian-attack.mp4", playerHitSrc: "/video/desktop-barbarian-hit.mp4" }
+      ? { playerIdleSrc: "/video/desktop-barbarian-idle.mp4", playerAttackSrc: "/video/desktop-barbarian-attack.mp4", playerHitSrc: "/video/desktop-barbarian-hit.mp4?v=20260927b" }
       : { playerIdleSrc: "/video/helpdesk-wizard-idle.mp4", playerAttackSrc: "/video/player-attack.mp4", playerHitSrc: "/video/helpdesk-wizard-hit.mp4" };
 
   if (!questions.length) return <div className="page"><div className="container" style={{ maxWidth: 1120 }}><div className="card" style={{ padding: 18 }}><div style={{ fontWeight: 800, fontSize: 18 }}>No questions available</div><div className="muted" style={{ marginTop: 8 }}>Assign an active question set in Admin.</div><div style={{ marginTop: 14 }}><Link className="btn" href="/admin">Open Admin</Link></div></div></div></div>;
