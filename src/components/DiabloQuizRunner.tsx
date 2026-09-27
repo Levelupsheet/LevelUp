@@ -221,13 +221,11 @@ function renderQuestionInput(args: {
           const isOk = state.locked && index === correctIndex;
           const isBad = state.locked && isSel && index !== correctIndex;
           const extraStyle: React.CSSProperties = {};
-          if (isOk) extraStyle.borderColor = "rgba(46, 204, 113, 0.55)";
-          if (isBad) extraStyle.borderColor = "rgba(255, 90, 90, 0.55)";
           return (
             <button
               key={index}
               type="button"
-              className={"d2ChoiceBtn" + (isSel ? " selected" : "")}
+              className={"d2ChoiceBtn" + (isSel ? " selected" : "") + (isOk ? " answerCorrect" : "") + (isBad ? " answerWrong" : "")}
               onClick={() => onSelectMcq(index)}
               disabled={state.locked}
               style={extraStyle}
@@ -254,12 +252,9 @@ function renderQuestionInput(args: {
             <button
               key={choice}
               type="button"
-              className={"d2ChoiceBtn" + (isSel ? " selected" : "")}
+              className={"d2ChoiceBtn" + (isSel ? " selected" : "") + (isOk ? " answerCorrect" : "") + (isBad ? " answerWrong" : "")}
               onClick={() => onSelectMcq(index)}
               disabled={state.locked}
-              style={{
-                borderColor: isOk ? "rgba(46, 204, 113, 0.55)" : isBad ? "rgba(255, 90, 90, 0.55)" : undefined,
-              }}
             >
               {choice}
             </button>
