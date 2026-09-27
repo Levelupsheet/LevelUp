@@ -986,7 +986,7 @@ async function analyzeResumeStage12() {
           </div>
 
           <div className="dashboardPvpShortcut" style={{ marginTop: 10 }}>
-            <button className="secondaryBtn gdActionBlue" style={{ width: "100%" }} type="button" onClick={() => (window.location.href = "/pvp")}>
+            <button className="secondaryBtn gdActionRed dashboardPvpRed" style={{ width: "100%" }} type="button" onClick={() => (window.location.href = "/pvp")}>
               Enter PvP Arena
             </button>
           </div>
