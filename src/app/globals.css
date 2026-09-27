@@ -6084,3 +6084,9 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .dashboardGrimdarkSidebar .dashboardPvpShortcut .dashboardButtonAssetLabel{position:relative!important;z-index:2!important}
 .dashboardPowerupIconSlot{display:inline-grid!important;place-items:center!important;width:28px!important;height:28px!important;flex:0 0 28px!important}
 .dashboardPowerupIconSlot img{display:block!important;width:28px!important;height:28px!important;object-fit:contain!important}
+
+
+/* Recommended-next HR action uses the same orange forged control as the sidebar. */
+.dashboardMain .dashboardNextAssetButton{position:relative!important;overflow:hidden!important;isolation:isolate!important;background:none!important;min-height:58px!important;min-width:260px!important;border:0!important;padding:0 28px!important}
+.dashboardMain .dashboardNextAssetButton .dashboardButtonAssetImage{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;display:block!important;object-fit:fill!important;z-index:0!important;pointer-events:none!important;opacity:1!important;visibility:visible!important}
+.dashboardMain .dashboardNextAssetButton .dashboardButtonAssetLabel{position:relative!important;z-index:2!important}
