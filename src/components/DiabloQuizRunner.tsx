@@ -639,7 +639,7 @@ export default function DiabloQuizRunner(props: {
           }
           return nextCorrect;
         });
-        if (nextAnswered >= 3) { setStageEnemyHP(currentStageConfig.hp); return 0; }
+        if (nextAnswered >= 3) { return 0; }
         return nextAnswered;
       });
 
@@ -777,7 +777,7 @@ const showExpandedExplanation = useMemo(() => {
 
   useEffect(() => {
     setStageEnemyHP(currentStageConfig?.hp || 90);
-  }, [sessionStage, currentStageConfig]);
+  }, [sessionStage]);
 
   useEffect(() => {
     const data = (question?.data || {}) as Record<string, unknown>;
