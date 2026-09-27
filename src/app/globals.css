@@ -6931,3 +6931,56 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
   .quizQuestionTrack{gap:3px!important;padding:3px!important}
   .quizQuestionSegment{height:24px!important;min-width:8px!important}
 }
+
+
+/* Quiz Background artwork is the question/test content surface. */
+.d2QuestionCard.d2QuizQuestionCard.batch8LearningStage{
+  background-color:#090909!important;
+  background-image:
+    linear-gradient(rgba(5,5,5,.10),rgba(5,5,5,.10)),
+    url('/ui/grimdark/Quiz%20Background.png?v=20260927-quizbg')!important;
+  background-repeat:no-repeat,no-repeat!important;
+  background-position:center,center!important;
+  background-size:100% 100%,100% 100%!important;
+  border:0!important;
+  border-image:none!important;
+  outline:0!important;
+  box-shadow:none!important;
+}
+
+/* Question slots always retain energy_bar_001bg; answered state is a second image layered on top. */
+.quizQuestionSegment{
+  position:relative!important;
+  overflow:hidden!important;
+  background-image:url('/ui/grimdark/energy_bar_001bg.png?v=20260927-persistentbg')!important;
+  background-position:center!important;
+  background-repeat:no-repeat!important;
+  background-size:100% 100%!important;
+  opacity:1!important;
+}
+.quizQuestionSegment.correct,
+.quizQuestionSegment.wrong,
+.quizQuestionSegment.partial{
+  background-image:url('/ui/grimdark/energy_bar_001bg.png?v=20260927-persistentbg')!important;
+}
+.quizQuestionSegmentFill{
+  position:absolute!important;
+  inset:0!important;
+  z-index:1!important;
+  display:block!important;
+  background-position:center!important;
+  background-repeat:no-repeat!important;
+  background-size:100% 100%!important;
+  opacity:0!important;
+  pointer-events:none!important;
+}
+.quizQuestionSegment.correct .quizQuestionSegmentFill{
+  opacity:1!important;
+  background-image:url('/ui/grimdark/energy_bar_001.png?v=20260927-answerfill')!important;
+}
+.quizQuestionSegment.wrong .quizQuestionSegmentFill{
+  opacity:1!important;
+  background-image:url('/ui/grimdark/hud_health_bar_002.png?v=20260927-answerfill')!important;
+}
+.quizQuestionSegment.partial .quizQuestionSegmentFill{opacity:0!important}
+.quizQuestionSegment.current{filter:brightness(1.12)!important}
