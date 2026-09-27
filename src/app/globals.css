@@ -6532,3 +6532,60 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     padding:clamp(26px,3vw,46px)!important;
   }
 }
+
+
+/* Completed-session game-flow artwork and score overlay. */
+.gameFlowResultPanel{
+  position:relative!important;
+  isolation:isolate!important;
+  overflow:hidden!important;
+  min-height:clamp(330px,52vh,620px)!important;
+  padding:0!important;
+  border:0!important;
+  outline:0!important;
+  box-shadow:none!important;
+  background:transparent!important;
+  display:grid!important;
+  place-items:center!important;
+}
+.gameFlowResultArt{
+  position:absolute!important;
+  inset:0!important;
+  z-index:0!important;
+  width:100%!important;
+  height:100%!important;
+  object-fit:contain!important;
+  pointer-events:none!important;
+  user-select:none!important;
+}
+.gameFlowResultContent{
+  position:relative!important;
+  z-index:1!important;
+  width:min(78%,720px)!important;
+  padding:clamp(70px,11vh,120px) clamp(24px,4vw,58px) clamp(55px,8vh,92px)!important;
+  text-align:center!important;
+  text-shadow:0 2px 5px #000,0 0 10px rgba(0,0,0,.9)!important;
+}
+.gameFlowResultPanel .combatRunOutcome{
+  font-size:clamp(34px,5vw,68px)!important;
+  line-height:1!important;
+  margin:8px 0 22px!important;
+  text-transform:uppercase!important;
+}
+.gameFlowResultPanel .combatRunStats{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:10px!important;
+}
+.gameFlowResultPanel .combatRunStats > span{
+  background:rgba(0,0,0,.48)!important;
+  border:1px solid rgba(230,206,151,.28)!important;
+  border-radius:8px!important;
+  padding:10px 8px!important;
+}
+.gameFlowResultPanel .combatRunHintCost{margin-top:12px!important}
+@media(max-width:900px){
+  .gameFlowResultPanel{min-height:390px!important}
+  .gameFlowResultContent{width:84%!important;padding:76px 18px 62px!important}
+  .gameFlowResultPanel .combatRunOutcome{font-size:clamp(30px,10vw,48px)!important}
+}
