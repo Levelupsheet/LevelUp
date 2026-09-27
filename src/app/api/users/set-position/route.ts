@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { prisma } from "../../_lib/prisma";
 
-const POSITION_CHANGE_COST = 300;
+const POSITION_CHANGE_COST = 200;
 
 const Body = z.object({
   userId: z.string().min(1),
@@ -62,7 +62,7 @@ export async function POST(req: Request) {
     });
   } catch (e: any) {
     if (e?.message === "INSUFFICIENT_TOKENS") {
-      return Response.json({ error: "You need 300 tokens to change your player/path." }, { status: 402 });
+      return Response.json({ error: "You need 200 tokens to change your player/path." }, { status: 402 });
     }
     return Response.json({ error: e?.message ?? "Bad request" }, { status: 400 });
   }
