@@ -1128,12 +1128,12 @@ const showExpandedExplanation = useMemo(() => {
   }
 
   async function activateRestore() {
-    if (state.locked || state.playerHP >= rules.playerMaxHP || stage9Inventory.restore <= 0 || !userIdRef.current) return;
+    if (state.locked || state.playerHP >= rules.startHP || stage9Inventory.restore <= 0 || !userIdRef.current) return;
     const res = await fetch("/api/stage9/use-item", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ userId: userIdRef.current, itemId: "health_restore" }) }).then((r) => r.json()).catch(() => null);
     if (res?.ok) {
       consumedInventoryRef.current.restore += 1;
       setStage9Inventory((current) => ({ ...current, restore: Math.max(0, Number(res.remaining ?? current.restore - 1)) }));
-      restorePlayerHP(Math.ceil(rules.playerMaxHP * 0.25));
+      restorePlayerHP(Math.ceil(rules.startHP * 0.25));
       setMicroRewardFlash("❤️ Health restored +25%");
       window.setTimeout(() => setMicroRewardFlash(null), 1800);
     }
@@ -1269,7 +1269,7 @@ const showExpandedExplanation = useMemo(() => {
                   {[
                     { key: "shield", qty: stage9Inventory.shield + powerups.shieldUses, src: "/ui/grimdark/flow_skill3_001.png", label: "Shield", action: activateShield, disabled: state.locked || powerups.shieldActive },
                     { key: "fury", qty: stage9Inventory.fury + powerups.furyUses, src: "/ui/grimdark/flow_skill1_001.png", label: "Fury", action: activateFury, disabled: state.locked || powerups.furyActive },
-                    { key: "restore", qty: stage9Inventory.restore, src: "/ui/grimdark/flow_skill7_001.png", label: "Restore Health", action: activateRestore, disabled: state.locked || state.playerHP >= rules.playerMaxHP },
+                    { key: "restore", qty: stage9Inventory.restore, src: "/ui/grimdark/flow_skill7_001.png", label: "Restore Health", action: activateRestore, disabled: state.locked || state.playerHP >= rules.startHP },
                     { key: "xpSurge", qty: stage9Inventory.xpSurge, src: "/ui/grimdark/flow_skill6_001.png", label: "Time Slow", action: activateXpSurge, disabled: state.locked },
                   ].filter((item) => item.qty > 0).slice(0, 4).map((item, index) => (
                     <button className={`playerPowerupSlot slot${index + 1}`} type="button" key={item.key} title={`Use ${item.label} (x${item.qty})`} aria-label={`Use ${item.label}, ${item.qty} available`} onClick={item.action} disabled={item.disabled}>
