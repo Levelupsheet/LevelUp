@@ -7877,3 +7877,87 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     white-space:pre-wrap!important;
   }
 }
+
+
+/* 2026-09-27 HUD correction from live screenshots:
+   use purchased slot artwork for the active question and balance both side HUDs. */
+.batch8LearningStage .quizQuestionSegment.current,
+.batch8LearningStage .quizQuestionSegment.current.correct,
+.batch8LearningStage .quizQuestionSegment.current.wrong,
+.batch8LearningStage .quizQuestionSegment.current.partial{
+  background-color:transparent!important;
+  background-image:url('/ui/grimdark/energy_bar_002bg.png?v=20260927-current-slot-fix')!important;
+  background-repeat:no-repeat!important;
+  background-position:center!important;
+  background-size:100% 100%!important;
+  outline:0!important;
+  border:0!important;
+  box-shadow:none!important;
+  filter:none!important;
+}
+.batch8LearningStage .quizQuestionSegment.current:not(.correct):not(.wrong):not(.partial) .quizQuestionSegmentFill{
+  opacity:0!important;
+  background:none!important;
+  box-shadow:none!important;
+}
+
+@media (min-width:901px){
+  /* Match the orb sockets more closely and keep both HUD sides visually balanced. */
+  .batch8DesktopQuizGrid .batch8PlayerRail .d2OrbWrap,
+  .batch8DesktopQuizGrid .batch8PlayerRail .d2OrbFrame,
+  .batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyCard{
+    width:100px!important;
+    height:100px!important;
+    min-width:100px!important;
+    min-height:100px!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail > div:first-child{
+    transform:translate(-12px,-9px)!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail .d2OrbWrap{
+    transform:none!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail .d2AssetBloodOrb{
+    inset:11%!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyCard{
+    margin-top:24px!important;
+    margin-bottom:42px!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyCard .d2EnemyEnergyOrbShell{
+    inset:10%!important;
+  }
+
+  /* Equal portrait frames; inset the media so character art is not visually clipped. */
+  .batch8DesktopQuizGrid .batch8PlayerRail > .card,
+  .batch8DesktopQuizGrid .batch8EnemyRail > .card{
+    width:150px!important;
+    height:150px!important;
+    min-height:150px!important;
+    padding:4px!important;
+    overflow:visible!important;
+    box-sizing:border-box!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail > .card > div,
+  .batch8DesktopQuizGrid .batch8EnemyRail > .card > div{
+    width:100%!important;
+    height:100%!important;
+    overflow:hidden!important;
+    box-sizing:border-box!important;
+    border:1px solid #b46b1f!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail > .card video,
+  .batch8DesktopQuizGrid .batch8PlayerRail > .card img,
+  .batch8DesktopQuizGrid .batch8EnemyRail > .card video,
+  .batch8DesktopQuizGrid .batch8EnemyRail > .card img{
+    width:100%!important;
+    height:100%!important;
+    object-fit:contain!important;
+    object-position:center bottom!important;
+    transform:scale(.84)!important;
+    transform-origin:center bottom!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail > .card{
+    transform:translateY(10px)!important;
+  }
+}
