@@ -10012,3 +10012,42 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     object-fit:fill!important;
   }
 }
+
+
+/* 2026-09-27 cleanup from live build:
+   suppress every legacy player-orb decoration and render exactly one frame asset.
+   Reduce blood orb another 10% while preserving the approved 2px stack gap. */
+@media (min-width:901px){
+  .batch8DesktopQuizGrid .batch8PlayerRail > .playerOrbComposite{
+    background:none!important;
+    background-image:none!important;
+    border:0!important;
+    box-shadow:none!important;
+    filter:none!important;
+    overflow:visible!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail > .playerOrbComposite::before,
+  .batch8DesktopQuizGrid .batch8PlayerRail > .playerOrbComposite::after{
+    content:none!important;
+    display:none!important;
+    background:none!important;
+    background-image:none!important;
+  }
+  .batch8DesktopQuizGrid .playerOrbFrameAsset{
+    display:block!important;
+    opacity:1!important;
+    filter:none!important;
+    box-shadow:none!important;
+  }
+  .batch8DesktopQuizGrid .playerOrbBlood{
+    width:53px!important;
+    height:53px!important;
+    left:58.5px!important;
+    top:62px!important;
+  }
+  .batch8DesktopQuizGrid .playerOrbBlood::before,
+  .batch8DesktopQuizGrid .playerOrbBlood::after{
+    content:none!important;
+    display:none!important;
+  }
+}
