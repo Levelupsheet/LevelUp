@@ -7781,3 +7781,45 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     object-position:center!important;
   }
 }
+
+
+/* 2026-09-27 final HUD/summary fit corrections. */
+.batch8LearningStage .quizQuestionSegment.current{
+  outline:0!important;
+  border:0!important;
+  box-shadow:none!important;
+  filter:none!important;
+}
+@media (min-width:901px){
+  .batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyCard{
+    width:94px!important;
+    height:94px!important;
+    min-width:94px!important;
+    min-height:94px!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyCard .d2EnemyEnergyOrbShell{
+    inset:7%!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail > .card{
+    margin-top:14px!important;
+  }
+}
+.practiceGameModal--summary{
+  max-height:96vh!important;
+}
+.practiceGameModal--summary .luModalBody{
+  max-height:none!important;
+  overflow:hidden!important;
+}
+.practiceGameModal--summary .practiceRunSummaryShell{
+  transform:scale(.88)!important;
+  transform-origin:top center!important;
+  width:113.64%!important;
+  margin-left:-6.82%!important;
+  padding:8px!important;
+}
+.practiceGameModal--summary .practiceRunResultHero{
+  min-height:clamp(190px,31vw,310px)!important;
+  margin-top:0!important;
+  margin-bottom:4px!important;
+}
