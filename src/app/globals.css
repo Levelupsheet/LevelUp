@@ -9894,3 +9894,26 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     top:65px!important;
   }
 }
+
+
+/* 2026-09-27 powerup rack: fit purchased artwork inside the metal socket. */
+@media (min-width:901px){
+  .batch8DesktopQuizGrid .playerPowerupSlot{
+    left:28px!important;
+    width:48px!important;
+    height:48px!important;
+  }
+  .batch8DesktopQuizGrid .playerPowerupSlot.slot1{top:16px!important}
+  .batch8DesktopQuizGrid .playerPowerupSlot.slot2{top:77px!important}
+  .batch8DesktopQuizGrid .playerPowerupSlot.slot3{top:138px!important}
+  .batch8DesktopQuizGrid .playerPowerupSlot.slot4{top:199px!important}
+  .batch8DesktopQuizGrid .playerPowerupSlot img{
+    width:44px!important;
+    height:44px!important;
+    object-fit:contain!important;
+  }
+  .batch8DesktopQuizGrid .playerPowerupQty{
+    right:-2px!important;
+    bottom:-2px!important;
+  }
+}
