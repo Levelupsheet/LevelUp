@@ -1084,6 +1084,18 @@ const showExpandedExplanation = useMemo(() => {
     });
   }
 
+  useEffect(() => {
+    // Question-scoped combat consumables never carry into the next question.
+    if (shieldQuestionRef.current !== null && shieldQuestionRef.current !== state.idx) {
+      shieldQuestionRef.current = null;
+      setPowerups((current) => current.shieldActive ? { ...current, shieldActive: false } : current);
+    }
+    if (furyQuestionRef.current !== null && furyQuestionRef.current !== state.idx) {
+      furyQuestionRef.current = null;
+      setPowerups((current) => current.furyActive ? { ...current, furyActive: false } : current);
+    }
+  }, [state.idx]);
+
   async function activateShield() {
     if (powerups.shieldActive || state.locked) return;
     shieldQuestionRef.current = state.idx;
