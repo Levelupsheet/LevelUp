@@ -9882,3 +9882,15 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     transition:filter .15s ease,transform .15s ease!important;
   }
 }
+
+
+/* 2026-09-27 live screenshot: blood orb only — 15% smaller and raised.
+   Decorative banner/frame remains fixed. */
+@media (min-width:901px){
+  .batch8DesktopQuizGrid .playerOrbBlood{
+    width:66px!important;
+    height:66px!important;
+    left:52px!important;
+    top:65px!important;
+  }
+}
