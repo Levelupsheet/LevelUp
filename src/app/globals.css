@@ -9755,3 +9755,69 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .dashboardPowerupIconSlot{
   overflow:hidden!important;
 }
+
+
+/* 2026-09-27 screenshot calibration after normalized player rail.
+   Tighten the left stack and keep it clear of the center question panel. */
+@media (min-width:901px){
+  .batch8DesktopQuizGrid .batch8PlayerRail{
+    padding-top:18px!important;
+    width:184px!important;
+    max-width:184px!important;
+    justify-self:center!important;
+  }
+
+  .batch8DesktopQuizGrid .batch8PlayerRail > .playerOrbComposite{
+    width:170px!important;
+    height:139px!important;
+    flex-basis:139px!important;
+    margin:0 auto 4px!important;
+  }
+  .batch8DesktopQuizGrid .playerOrbFrameAsset{
+    width:170px!important;
+    height:139px!important;
+  }
+  .batch8DesktopQuizGrid .playerOrbBlood{
+    width:88px!important;
+    height:88px!important;
+    left:41px!important;
+    top:37px!important;
+  }
+
+  .batch8DesktopQuizGrid .batch8PlayerRail > .card{
+    width:166px!important;
+    max-width:166px!important;
+    margin:0 auto 2px!important;
+  }
+
+  .batch8DesktopQuizGrid .batch8PlayerRail > .playerPowerupRack{
+    width:104px!important;
+    height:266px!important;
+    min-height:266px!important;
+    flex-basis:266px!important;
+  }
+
+  /* Recalibrate dynamic slots to the slightly smaller rack. */
+  .batch8DesktopQuizGrid .playerPowerupSlot{
+    left:24px!important;
+    width:56px!important;
+    height:56px!important;
+  }
+  .batch8DesktopQuizGrid .playerPowerupSlot.slot1{top:12px!important}
+  .batch8DesktopQuizGrid .playerPowerupSlot.slot2{top:73px!important}
+  .batch8DesktopQuizGrid .playerPowerupSlot.slot3{top:134px!important}
+  .batch8DesktopQuizGrid .playerPowerupSlot.slot4{top:195px!important}
+  .batch8DesktopQuizGrid .playerPowerupSlot img{
+    width:50px!important;
+    height:50px!important;
+  }
+
+  /* Information artwork should read as a compact utility control, not a large
+     fifth answer/control element. */
+  .d2QuizQuestionCard .sessionInfoIconButton{
+    width:58px!important;
+    height:44px!important;
+    flex:0 0 58px!important;
+    margin-left:4px!important;
+  }
+}
