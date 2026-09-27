@@ -5816,3 +5816,39 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .dashboardGrimdarkSidebar .dashboardPlayerOnly{
   border:0!important;border-image:none!important;border-radius:0!important;outline:0!important;box-shadow:none!important;background:transparent!important;
 }
+
+/* Dashboard visual correction: direct purchased PNG elements, constrained to their controls. */
+.dashboardGrimdarkSidebar .dashboardButtonSkinImage,
+.dashboardNextAction .dashboardButtonSkinImage{
+  position:absolute!important;inset:0!important;display:block!important;
+  width:100%!important;height:58px!important;min-height:58px!important;max-height:58px!important;
+  object-fit:fill!important;object-position:center!important;z-index:0!important;pointer-events:none!important;
+}
+.dashboardGrimdarkSidebar button.dashboardAssetButton,
+.dashboardNextAction button.dashboardNextAssetButton{
+  position:relative!important;isolation:isolate!important;overflow:hidden!important;
+  width:100%!important;height:58px!important;min-height:58px!important;max-height:58px!important;
+  padding:0 20px!important;border:0!important;border-image:none!important;border-radius:0!important;
+  outline:0!important;box-shadow:none!important;background:none!important;
+}
+.dashboardNextAction button.dashboardNextAssetButton{width:210px!important;flex:0 0 210px!important}
+.dashboardGrimdarkSidebar .dashboardButtonAssetLabel,
+.dashboardNextAction .dashboardButtonAssetLabel{position:relative!important;z-index:2!important}
+.dashboardGrimdarkSidebar .dashboardButtonSkin{display:none!important}
+
+/* Remove the remaining CSS portrait outline; the gold PNG frame is the only portrait border. */
+.dashboardGrimdarkSidebar .dashboardSelectedPlayer,
+.dashboardGrimdarkSidebar .dashboardSelectedPlayerButton,
+.dashboardGrimdarkSidebar .dashboardGrimdarkPortrait,
+.dashboardGrimdarkSidebar .dashboardPlayerOnly{
+  border:0!important;border-width:0!important;border-style:none!important;border-color:transparent!important;
+  border-image:none!important;border-radius:0!important;outline:0!important;box-shadow:none!important;background:none!important;
+}
+
+/* Keep the welcome ribbon in its own hero only, never over the sidebar portrait. */
+.dashboardGrimdarkHero{position:relative!important}
+.dashboardGrimdarkHero .dashboardHeaderRibbon{
+  position:absolute!important;left:50%!important;top:50%!important;transform:translate(-50%,-50%)!important;
+  z-index:0!important;max-width:78%!important;pointer-events:none!important;
+}
+.dashboardGrimdarkHero>div{position:relative!important;z-index:2!important}
