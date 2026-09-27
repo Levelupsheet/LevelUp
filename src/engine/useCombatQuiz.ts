@@ -382,8 +382,8 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
 
   const restorePlayerHP = useCallback((amount: number) => {
     if (!amount) return;
-    setState((s) => ({ ...s, playerHP: clamp(s.playerHP + Math.floor(amount), 0, rules.playerMaxHP) }));
-  }, [rules.playerMaxHP]);
+    setState((s) => ({ ...s, playerHP: clamp(s.playerHP + Math.floor(amount), 0, rules.startHP) }));
+  }, [rules.startHP]);
 
   const reset = useCallback(() => {
     stopTimer();
