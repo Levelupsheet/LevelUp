@@ -130,6 +130,8 @@ function ModelPanel(props: { title: string; src?: string; mirrored?: boolean; lo
             loop={loop}
             muted
             playsInline
+            disablePictureInPicture
+            controlsList="nodownload noremoteplayback nopictureinpicture"
             preload="metadata"
             onEnded={onEnded}
             style={{ display: "block", width: "100%", height, objectFit: "cover", transform: mirrored ? "scaleX(-1)" : undefined }}
