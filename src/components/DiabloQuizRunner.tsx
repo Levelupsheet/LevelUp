@@ -572,6 +572,7 @@ export default function DiabloQuizRunner(props: {
   const timeSlowActiveRef = useRef(false);
 
   const finishedOnceRef = useRef(false);
+  const feedbackRevealRef = useRef<HTMLDivElement | null>(null);
   const [finishFeedbackPending, setFinishFeedbackPending] = useState(false);
 
   const maxStages = useMemo(() => inferMaxStages(title, combatQuestions.length), [title, combatQuestions.length]);
@@ -618,6 +619,9 @@ export default function DiabloQuizRunner(props: {
         setDamageFloat({ player: `-${currentStageConfig.playerDamage} HP` });
       }
       window.setTimeout(() => setDamageFloat({}), 2200);
+      window.setTimeout(() => {
+        feedbackRevealRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }, 140);
 
       setStageAnswered((answered) => {
         const nextAnswered = answered + 1;
@@ -1332,7 +1336,7 @@ const showExpandedExplanation = useMemo(() => {
 
                   {state.locked && (
                     <div style={{ marginTop: 12, display: "grid", gap: 10 }}>
-                      <div className="card stage5FeedbackCard stage5MergedFeedbackCard adaptiveTeachingCard" style={{ padding: 12, background: (question as any)?.isGolden ? "rgba(255,215,64,0.08)" : "rgba(255,255,255,0.04)", borderColor: (question as any)?.isGolden ? "rgba(255,215,64,0.35)" : undefined }}>
+                      <div ref={feedbackRevealRef} className="card stage5FeedbackCard stage5MergedFeedbackCard adaptiveTeachingCard" style={{ padding: 12, background: (question as any)?.isGolden ? "rgba(255,215,64,0.08)" : "rgba(255,255,255,0.04)", borderColor: (question as any)?.isGolden ? "rgba(255,215,64,0.35)" : undefined }}>
                         <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
                           <div style={{ fontWeight: 950 }}>{state.lastWasCorrect ? "✅ Correct" : partialPercent > 0 ? "🟨 Partial credit" : "❌ Not quite"}</div>
                           <div className="stage5ScorePill">{partialPercent}% accuracy</div>
