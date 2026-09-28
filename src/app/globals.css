@@ -9919,3 +9919,39 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     height:104px!important;
   }
 }
+
+
+/* 2026-09-27 remove legacy first-child translate and make orb assembly
+   a true flex sibling of the portrait. Leaves room above for a future title. */
+@media (min-width:901px){
+  .batch8DesktopQuizGrid .batch8PlayerRail > .playerOrbComposite:first-child{
+    width:174px!important;
+    height:154px!important;
+    flex:0 0 154px!important;
+    margin:0 auto 2px!important;
+    transform:none!important;
+    inset:auto!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail > .playerOrbComposite:first-child .playerOrbFrameAsset{
+    left:7px!important;
+    top:0!important;
+    width:160px!important;
+    height:154px!important;
+    object-fit:fill!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail > .playerOrbComposite:first-child .playerOrbBlood{
+    left:23px!important;
+    top:10px!important;
+    width:128px!important;
+    height:128px!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail > .playerOrbComposite:first-child .playerOrbBloodBase,
+  .batch8DesktopQuizGrid .batch8PlayerRail > .playerOrbComposite:first-child .playerOrbBloodMask,
+  .batch8DesktopQuizGrid .batch8PlayerRail > .playerOrbComposite:first-child .playerOrbBloodMask img{
+    width:128px!important;
+    height:128px!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail > .playerOrbComposite:first-child + .card{
+    margin:0 auto 2px!important;
+  }
+}
