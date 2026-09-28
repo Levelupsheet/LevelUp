@@ -10481,3 +10481,71 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     object-fit:contain!important;
   }
 }
+
+
+/* 2026-09-28 PvP Arena full dark-fantasy surface pass */
+.pvpGamePage{
+  --pvp-panel:linear-gradient(180deg,rgba(27,23,19,.97),rgba(7,8,10,.99));
+  min-height:100vh;
+  background:radial-gradient(circle at 50% 0,rgba(92,45,21,.16),transparent 34%),#070809!important;
+  color:#eee5d4;
+  font-family:Georgia,"Times New Roman",serif;
+}
+.pvpGamePage .pvpHubInner{max-width:1280px!important;padding-top:22px!important;padding-bottom:42px!important}
+.pvpGamePage .pvpHubHero,
+.pvpGamePage .pvpSetupGrid>.card,
+.pvpGamePage .pvpChallengeGrid>.card,
+.pvpGamePage .pvpDuelSummary{
+  position:relative;
+  border:1px solid rgba(151,96,45,.46)!important;
+  border-radius:0!important;
+  background:var(--pvp-panel)!important;
+  box-shadow:inset 0 0 34px rgba(0,0,0,.64),0 12px 28px rgba(0,0,0,.42)!important;
+}
+.pvpGamePage .pvpHubHero{
+  padding:28px 32px!important;
+  background-image:linear-gradient(rgba(8,8,8,.40),rgba(8,8,8,.68)),url('/ui/grimdark/character_popup_window_bg_001.png')!important;
+  background-size:100% 100%!important;
+  background-repeat:no-repeat!important;
+}
+.pvpGamePage h1,.pvpGamePage h2,.pvpGamePage h3,.pvpGamePage h4{
+  font-family:Georgia,"Times New Roman",serif!important;
+  color:#f5ead5!important;
+  text-shadow:0 2px 3px #000;
+}
+.pvpGamePage .pvpHubHero h1{font-size:clamp(30px,4vw,48px)!important;letter-spacing:.055em;text-transform:uppercase}
+.pvpGamePage .gameHubSectionLabel{
+  margin:24px 0 10px!important;
+  padding:9px 16px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:12px!important;
+  border-top:1px solid rgba(186,116,48,.36)!important;
+  border-bottom:1px solid rgba(186,116,48,.24)!important;
+  background:linear-gradient(90deg,rgba(100,49,18,.28),rgba(0,0,0,.18),transparent)!important;
+}
+.pvpGamePage .gameHubSectionLabel span{font-weight:900;letter-spacing:.12em;color:#f1c177}
+.pvpGamePage .gameHubSectionLabel small{color:#b9ad9b}
+.pvpGamePage .pvpSetupGrid{display:grid!important;grid-template-columns:minmax(0,1.35fr) minmax(300px,.65fr)!important;gap:14px!important}
+.pvpGamePage .pvpChallengeGrid{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:14px!important}
+.pvpGamePage .featureCard{
+  border:1px solid rgba(145,95,48,.30)!important;
+  border-radius:0!important;
+  background:linear-gradient(180deg,rgba(26,25,22,.92),rgba(9,10,12,.96))!important;
+  box-shadow:inset 0 0 20px rgba(0,0,0,.42)!important;
+}
+.pvpGamePage button.featureCard{color:#eee5d4!important;transition:filter .15s ease,border-color .15s ease,transform .15s ease}
+.pvpGamePage button.featureCard:hover{filter:brightness(1.15);transform:translateY(-1px);border-color:rgba(225,150,69,.62)!important}
+.pvpGamePage button.featureCard[style*="255, 214, 102"]{background:linear-gradient(180deg,rgba(48,28,20,.96),rgba(17,11,10,.98))!important}
+.pvpGamePage .pvpRivalIntel{margin-top:14px!important}
+.pvpGamePage .pvpRivalStatsGrid>div{background:rgba(5,6,8,.66)!important;border-color:rgba(184,120,56,.25)!important}
+.pvpGamePage .badge{border-color:rgba(185,119,53,.46)!important;background:rgba(7,8,9,.78)!important;color:#ead7b5!important}
+.pvpGamePage .pvpDuelSummary{margin-top:22px!important;padding:22px!important}
+.pvpGamePage .pvpDuelSummaryHead{display:flex!important;justify-content:space-between!important;gap:14px!important;align-items:center!important;flex-wrap:wrap!important}
+.pvpGamePage .pvpResultGrid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:14px!important;margin-top:16px!important}
+.pvpGamePage .gameHubState{padding:16px!important;margin-top:10px!important;border:1px dashed rgba(177,113,50,.32)!important;background:rgba(5,6,7,.48)!important;text-align:center!important}
+@media(max-width:900px){
+ .pvpGamePage .pvpSetupGrid,.pvpGamePage .pvpChallengeGrid,.pvpGamePage .pvpResultGrid{grid-template-columns:1fr!important}
+ .pvpGamePage .gameHubSectionLabel{align-items:flex-start!important;flex-direction:column!important}
+}
