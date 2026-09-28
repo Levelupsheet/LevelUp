@@ -31,9 +31,9 @@ export default function TestNowPage() {
             <h2 style={{ marginTop: 0 }}>Choose Test Now Training</h2>
             <p className="muted">Run a normal adaptive test or concentrate the session on your weakest measured domain.</p>
             <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap", marginTop: 18 }}>
-              <button className="btn" onClick={() => setTrainingMode("STANDARD")}>STANDARD TEST</button>
-              <button className="btn" onClick={() => setTrainingMode("WEAK_DOMAIN")}>WEAK DOMAIN TRAINING</button>
-              <button className="btn" onClick={() => setTrainingMode("MISSED_QUESTIONS")}>MISSED QUESTION REVIEW</button>
+              <button className="btn gdActionOrange" onClick={() => setTrainingMode("STANDARD")}>STANDARD TEST</button>
+              <button className="btn gdActionBlue" onClick={() => setTrainingMode("WEAK_DOMAIN")}>WEAK DOMAIN TRAINING</button>
+              <button className="btn gdActionBlue" onClick={() => setTrainingMode("MISSED_QUESTIONS")}>MISSED QUESTION REVIEW</button>
             </div>
           </div>
         </div>
