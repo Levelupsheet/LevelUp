@@ -3,7 +3,7 @@ export default function ProgressBar({ value, max }: { value: number; max: number
   return (
     <div>
       <div className="progressBar" aria-label="progress">
-        <div className="progressFill" style={{ width: `${pct}%` }} />
+        <div className="progressFill" style={{ width: `${pct}%`, transition: "width 900ms cubic-bezier(.2,.8,.2,1)" }} />
       </div>
       <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 6 }}>
         <small>{pct}%</small>
