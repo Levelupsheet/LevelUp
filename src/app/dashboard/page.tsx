@@ -1209,7 +1209,7 @@ async function analyzeResumeStage12() {
           </div>
         </a>
       ))}
-    </div>
+    </div></div>
   </div>
 ) : null}
 
