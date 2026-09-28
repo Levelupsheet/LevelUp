@@ -10156,3 +10156,45 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
   font-family:Georgia,"Times New Roman",serif;
   letter-spacing:.02em;
 }
+
+
+/* 2026-09-28 combat orb parity: preserve the approved enemy geometry exactly,
+   remove residual blue glow, and mirror that footprint for the player frame/orb. */
+@media (min-width:901px){
+  .batch8DesktopQuizGrid .batch8EnemyRail > :first-child,
+  .batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyCard,
+  .batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyEnergyOrbShell,
+  .batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyEnergyOrb,
+  .batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyEnergyDrain,
+  .batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyEnergyFlash{
+    box-shadow:none!important;
+    filter:none!important;
+    text-shadow:none!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyEnergyOrbShell{
+    background:transparent!important;
+  }
+
+  .batch8DesktopQuizGrid .batch8PlayerRail > .playerOrbComposite:first-child{
+    width:160px!important;
+    max-width:160px!important;
+    height:154px!important;
+    min-height:154px!important;
+    flex:0 0 154px!important;
+    margin:0 auto 2px!important;
+    transform:none!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail > .playerOrbComposite:first-child .playerOrbFrameAsset{
+    left:0!important;
+    top:0!important;
+    width:160px!important;
+    height:154px!important;
+    object-fit:fill!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail > .playerOrbComposite:first-child .playerOrbBlood{
+    left:34px!important;
+    top:28px!important;
+    width:93px!important;
+    height:93px!important;
+  }
+}
