@@ -24,6 +24,7 @@ export default function AdminInsightsPage() {
   const [data, setData] = useState<Payload | null>(null);
   const [learningRows, setLearningRows] = useState<LearningRow[]>([]);
   const [overallMastery, setOverallMastery] = useState<number>(0);
+  const [learningProgress, setLearningProgress] = useState<any>(null);
   const [stage12Status, setStage12Status] = useState<Stage12Status | null>(null);
   const [stage12File, setStage12File] = useState<File | null>(null);
   const [stage12Message, setStage12Message] = useState<string | null>(null);
@@ -42,10 +43,12 @@ export default function AdminInsightsPage() {
         setLearningRows(rows);
         const overall = Number(payload?.profile?.overallMastery ?? (rows.length ? rows.reduce((sum: number, row: any) => sum + Number(row?.mastery || 0), 0) / rows.length : 0));
         setOverallMastery(Number.isFinite(overall) ? overall : 0);
+        setLearningProgress(payload?.learningProgress || null);
       })
       .catch(() => {
         setLearningRows([]);
         setOverallMastery(0);
+        setLearningProgress(null);
       });
 
     fetch('/api/stage12/status?userId=' + encodeURIComponent((typeof window !== 'undefined' && (localStorage.getItem('lu_active_user_id') || localStorage.getItem('activeUserId'))) || 'demo-user'), { cache: 'no-store' })
@@ -99,6 +102,22 @@ export default function AdminInsightsPage() {
           <div className="featureCard" style={{ padding: 14 }}><small>Completion rate</small><div style={{ fontWeight: 900, fontSize: 24 }}>{data?.summary?.completionRate || 0}%</div></div>
         </div>
 
+
+        <div className="card" style={{ padding: 18, marginTop: 16, borderColor: 'rgba(255,196,107,0.28)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
+            <div>
+              <h3 style={{ margin: 0 }}>Learning Progress</h3>
+              <div style={{ marginTop: 6, opacity: 0.82 }}><small>Adaptive learning turns missed questions and weak domains into targeted training.</small></div>
+            </div>
+            <a className="secondaryBtn" href="/test-now">Train weaknesses</a>
+          </div>
+          <div style={{ marginTop: 14, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: 10 }}>
+            <div className="featureCard" style={{ padding: 12 }}><small>Weakest domain</small><div style={{ fontWeight: 900, fontSize: 21 }}>{learningProgress?.weakestDomain || 'Building profile'}</div><small>{Number(learningProgress?.weakestDomainMastery || 0).toFixed(1)}% mastery</small></div>
+            <div className="featureCard" style={{ padding: 12 }}><small>Questions to master</small><div style={{ fontWeight: 900, fontSize: 24 }}>{Number(learningProgress?.questionsToMaster || 0)}</div><small>Active missed-question review</small></div>
+            <div className="featureCard" style={{ padding: 12 }}><small>Recovered questions</small><div style={{ fontWeight: 900, fontSize: 24 }}>{Number(learningProgress?.masteredMissedCount || 0)}</div><small>Mastered after repeated success</small></div>
+            <div className="featureCard" style={{ padding: 12 }}><small>Overall mastery</small><div style={{ fontWeight: 900, fontSize: 24 }}>{overallMastery.toFixed(1)}%</div><small>Across tracked domains</small></div>
+          </div>
+        </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1.05fr .95fr', gap: 16, marginTop: 16 }}>
           <div className="card" style={{ padding: 18 }}>
