@@ -81,7 +81,7 @@ export default function AdminInsightsPage() {
   }
 
   return (
-    <main className="page">
+    <main className="page insightsGamePage">
       <div className="container" style={{ maxWidth: 1180, paddingTop: 24, paddingBottom: 32 }}>
         <div className="card" style={{ padding: 18 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
