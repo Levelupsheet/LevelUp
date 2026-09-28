@@ -36,13 +36,13 @@ export default function RewardsPage() {
   const inventoryCount = economy?.inventory?.reduce((sum, item) => sum + Number(item.quantity || 0), 0) || 0;
   return (
     <main className="luPage rewardsHubPage">
-      <div className="luTopRow rewardsHubHero">
+      <div className="luTopRow rewardsHubHero paidAssetHero">
         <div>
           <h1 className="luH1" style={{ margin: 0 }}>Rewards</h1>
           <div className="muted" style={{ marginTop: 6 }}>What you can win from loot boxes.</div>
           {ent ? <div className="muted" style={{ marginTop: 6 }}>Active track: <b>{ent.rewardsTrack}</b> • Loot luck {ent.lootLuck.toFixed(2)}x • XP boost {ent.xpMultiplier.toFixed(2)}x</div> : null}
         </div>
-        <Link href="/dashboard" className="btn">← Back to dashboard</Link>
+        <Link href="/dashboard" className="btn gdActionBlue">← Back to dashboard</Link>
       </div>
 
       <div className="rewardEconomySnapshot">
@@ -63,7 +63,7 @@ export default function RewardsPage() {
               <div style={{ fontWeight: 800, fontSize: 16 }}>{ent.tier} reward track</div>
               <div className="muted" style={{ marginTop: 6 }}>Your current plan changes loot odds, XP acceleration, and premium reward eligibility.</div>
             </div>
-            <a href="/start#pricing" className="btn">Manage Plan</a>
+            <a href="/start#pricing" className="btn gdActionBlue">Manage Plan</a>
           </div>
           <ul style={{ marginTop: 10, paddingLeft: 18 }}>
             {ent.perks.map((i) => <li key={i} style={{ marginTop: 6 }}>{i}</li>)}
