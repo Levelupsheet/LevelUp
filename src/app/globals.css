@@ -10110,3 +10110,49 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
   filter:brightness(1.18)!important;
   box-shadow:inset 0 0 16px rgba(80,150,225,.2),0 0 10px rgba(80,150,225,.16)!important;
 }
+
+
+/* 2026-09-28 screenshot pass: selected setup choices use the red game state. */
+.gdTrackChoice.gdTrackChoiceActive,
+.gdTrackChoice.active{
+  background-image:url("/ui/grimdark/button-red.png")!important;
+  background-size:100% 100%!important;
+  background-repeat:no-repeat!important;
+  background-position:center!important;
+  border-color:rgba(238,91,48,.68)!important;
+  box-shadow:0 0 12px rgba(175,45,20,.24)!important;
+}
+
+/* Keep the countdown beside the stage plaque instead of covering its lettering. */
+@media (min-width:901px){
+  .d2QuizQuestionCard .stageHeaderRow{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) auto!important;
+    align-items:start!important;
+    column-gap:18px!important;
+  }
+  .d2QuizQuestionCard .stageHeaderRow > div:last-child{
+    position:relative!important;
+    inset:auto!important;
+    transform:none!important;
+    z-index:3!important;
+  }
+  .d2QuizQuestionCard .quizCountdownTimer{
+    position:relative!important;
+    inset:auto!important;
+    transform:none!important;
+    margin:0!important;
+  }
+}
+
+/* Shared dark-fantasy surface language for non-combat learning pages. */
+.learningGamePage .card,
+.insightsGamePage .card{
+  background:linear-gradient(180deg,rgba(25,22,20,.96),rgba(8,9,11,.98))!important;
+  border:1px solid rgba(154,105,58,.42)!important;
+  box-shadow:inset 0 0 28px rgba(0,0,0,.48),0 8px 24px rgba(0,0,0,.28)!important;
+}
+.insightsGamePage h1,.insightsGamePage h2,.insightsGamePage h3{
+  font-family:Georgia,"Times New Roman",serif;
+  letter-spacing:.02em;
+}
