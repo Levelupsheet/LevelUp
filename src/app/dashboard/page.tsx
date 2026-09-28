@@ -1061,33 +1061,7 @@ async function analyzeResumeStage12() {
             </div>
           </div>
 
-          <div className="card leaderboardMiniCard dashboardGameCard leaderboard dashboardUtilityCard">
-            <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
-              <div>
-                <div className="dashboardUtilityEyebrow">WEEKLY COMPETITION</div><div style={{ fontWeight: 900, fontSize: 16 }}>Top candidates</div><small style={{opacity:.72}}>XP earned from completed sessions in the last 7 days.</small>
-              </div>
-              <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                <span className="badge" style={{ minHeight: 34, padding: "6px 12px", background: "rgba(255,214,102,0.12)", borderColor: "rgba(255,214,102,0.28)" }}>Weekly XP</span>
-                <a className="secondaryBtn gdActionBlue gdActionCompact" href="/leaderboard" style={{ textDecoration: "none", padding: "8px 14px", minHeight: 38 }}>Open</a>
-              </div>
-            </div>
-            <div style={{ marginTop: 12, display: "grid", gap: 10 }}>
-              {(stage10Leaderboards?.weekly || []).slice(0, 2).map((row, idx) => (
-                <a key={`sb_lb_${row.userId}`} href={`/profile/${encodeURIComponent(row.userId)}`} className="leaderboardMiniRow" style={{ ...(leaderboardTone(idx) as any), textDecoration: "none", color: "inherit", display: "grid", gridTemplateColumns: "36px minmax(0,1fr) auto", gap: 9, alignItems: "center", padding: 10, borderRadius: 14, border: "1px solid rgba(255,255,255,0.10)" }}>
-                  <div className="badge leaderboardMiniRank" style={{ width: 30, height: 30, display: "inline-flex", alignItems: "center", justifyContent: "center" }}>{idx + 1}</div>
-                  <div style={{ minWidth: 0 }}>
-                    <div style={{ fontWeight: 900, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{row.displayName}</div>
-                    <div style={{ opacity: 0.78, marginTop: 4 }}><small>{row.rank || levelTitleFromLevel(Number(row.level || 1))} • Lvl {row.level || 1}</small></div>
-                  </div>
-                  <div style={{ textAlign: "right" }}>
-                    <div style={{ fontWeight: 900, fontSize: 14 }}>{row.xp || 0} XP</div>
-                    <div style={{ opacity: 0.78, marginTop: 4 }}><small>Tap to view</small></div>
-                  </div>
-                </a>
-              ))}
-              {!stage10Leaderboards?.weekly?.length ? <small style={{ opacity: 0.78 }}>Leaderboard populates from live sessions.</small> : null}
-            </div>
-          </div>
+
 
         </aside>
 
@@ -1143,8 +1117,8 @@ async function analyzeResumeStage12() {
 <div className="card" style={{ marginBottom: 14, borderColor: "rgba(255,196,107,0.24)" }}>
   <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
     <div>
-      <h3 style={{ margin: 0 }}>Momentum & Insights</h3>
-      <div><small>Daily return streak • quick overview</small></div>
+      <h3 style={{ margin: 0 }}>Insights</h3>
+      <div><small>Adaptive learning • mastery • activity</small></div>
     </div>
     <span className="badge">Tomorrow bonus: +{dailyStreak.tomorrowBonusTokens} tokens</span>
   </div>
@@ -1154,17 +1128,36 @@ async function analyzeResumeStage12() {
       <div style={{ fontWeight: 900, fontSize: 22 }}>{dailyStreak.streakDays} day{dailyStreak.streakDays === 1 ? "" : "s"}</div>
     </div>
     <div className="featureCard">
-      <div><small>Momentum state</small></div>
-      <div style={{ fontWeight: 900, fontSize: 22 }}>{dailyStreak.momentumLabel}</div>
-    </div>
-    <div className="featureCard">
       <div><small>Learning progress</small></div>
       <div style={{ fontWeight: 900, fontSize: 20 }}>{learningProgress?.weakestDomain || "Building profile"}</div>
       <div style={{ marginTop: 4 }}><small>{Number(learningProgress?.questionsToMaster || 0)} questions to master • {Number(learningProgress?.weakestDomainMastery || 0).toFixed(1)}% weakest-domain mastery</small></div>
       <div style={{ marginTop: 8 }}><a href="/admin/insights" style={{ color: "inherit", textDecoration: "none", fontWeight: 800 }}>Open learning insights →</a></div>
     </div>
   </div>
-  <div style={{ marginTop: 10, opacity: 0.86 }}><small>Store, spend, and persistent streak bonuses can now be layered on top of your Stage 8 momentum systems.</small></div>
+  <div style={{ marginTop: 10, opacity: 0.86 }}><small>Your adaptive profile updates as you train, review missed questions, and strengthen weak domains.</small></div>
+</div>
+
+<div className="card dashboardLeaderboardMain" style={{ marginBottom: 14 }}>
+  <div style={{ display:"flex", justifyContent:"space-between", gap:12, alignItems:"center", flexWrap:"wrap" }}>
+    <div>
+      <div className="dashboardUtilityEyebrow">WEEKLY COMPETITION</div>
+      <h3 style={{ margin:"2px 0 0" }}>Leaderboard</h3>
+      <small>XP earned from completed sessions in the last 7 days.</small>
+    </div>
+    <a className="secondaryBtn gdActionBlue gdActionCompact" href="/leaderboard" style={{ textDecoration:"none" }}>OPEN LEADERBOARD</a>
+  </div>
+  <div className="dashboardLeaderboardMarquee" style={{ marginTop:12, overflow:"hidden" }}>
+    <div className="dashboardLeaderboardTrack">
+      {(stage10Leaderboards?.weekly || []).slice(0, 10).map((row, idx) => (
+        <a key={`main_lb_${row.userId}`} href={`/profile/${encodeURIComponent(row.userId)}`} className="leaderboardMiniRow dashboardLeaderboardPlayer" style={{ ...(leaderboardTone(idx) as any), textDecoration:"none", color:"inherit" }}>
+          <span className="badge leaderboardMiniRank">{idx + 1}</span>
+          <span className="dashboardLeaderboardIdentity"><b>{row.displayName}</b><small>{row.rank || levelTitleFromLevel(Number(row.level || 1))} • Lvl {row.level || 1}</small></span>
+          <b>{row.xp || 0} XP</b>
+        </a>
+      ))}
+      {!stage10Leaderboards?.weekly?.length ? <small>Leaderboard populates from live sessions.</small> : null}
+    </div>
+  </div>
 </div>
 
 
