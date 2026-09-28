@@ -9995,3 +9995,21 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     height:109px!important;
   }
 }
+
+
+/* 2026-09-27 approved geometry: reduce only the HP orb another 15%.
+   Frame, portrait, rack, and vertical docking remain untouched. */
+@media (min-width:901px){
+  .batch8DesktopQuizGrid .batch8PlayerRail > .playerOrbComposite:first-child .playerOrbBlood{
+    left:41px!important;
+    top:28px!important;
+    width:93px!important;
+    height:93px!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail > .playerOrbComposite:first-child .playerOrbBloodBase,
+  .batch8DesktopQuizGrid .batch8PlayerRail > .playerOrbComposite:first-child .playerOrbBloodMask,
+  .batch8DesktopQuizGrid .batch8PlayerRail > .playerOrbComposite:first-child .playerOrbBloodMask img{
+    width:93px!important;
+    height:93px!important;
+  }
+}
