@@ -32,9 +32,9 @@ export default function PracticePage() {
   }
 
   return (
-    <main className="practiceWorkspace page">
+    <main className="practiceWorkspace page paidAssetPage practiceAssetPage">
       <div className="container practiceWorkspaceInner">
-        <section className="card practiceMainCard">
+        <section className="card practiceMainCard paidAssetHero">
           <div className="dashboardEyebrow">SKILL PRACTICE</div>
           <h1>Practice IT Support</h1>
           <p className="practiceIntro">Work through a real-world support prompt. Structure your answer around checks, tools, actions, and expected outcomes.</p>
@@ -57,12 +57,12 @@ export default function PracticePage() {
           <label style={{ display: "block", marginTop: 12 }}>Your answer</label>
           <textarea rows={8} value={answer} onChange={(e) => setAnswer(e.target.value)} placeholder="Answer in steps. Tools, checks, expected outcomes." />
           <div style={{ display: "flex", gap: 10, marginTop: 12, alignItems: "center", flexWrap: "wrap" }}>
-            <button disabled={!canSubmit || loading} onClick={submit}>{loading ? "Submitting..." : "Submit Answer"}</button>
+            <button className="gdActionOrange" disabled={!canSubmit || loading} onClick={submit}>{loading ? "Submitting..." : "Submit Answer"}</button>
             <a href="/dashboard">Dashboard</a>
             <small>{!canSubmit ? "Tip: write at least a few sentences so grading is meaningful." : " "}</small>
           </div>
         </section>
-        <aside className="card practiceSnapshot">
+        <aside className="card practiceSnapshot paidAssetPanel">
           <h2>Snapshot</h2>
           {snapshot ? (
             <>
