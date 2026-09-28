@@ -22,6 +22,7 @@ export default function PracticeMiniGameModal(props: {
   const [step, setStep] = useState<"setup" | "quiz" | "summary" | "boss">("setup");
   const [path, setPath] = useState<PositionPath>(defaultPath ?? "HELPDESK_SUPPORT");
   const [cert, setCert] = useState<CertTrack>("A_PLUS");
+  const [testMode, setTestMode] = useState<"STANDARD" | "WEAK_DOMAIN" | "MISSED_QUESTIONS">("STANDARD");
   const [testBank, setTestBank] = useState<"GENERAL" | "IDENTITY" | "NETWORKING" | "SECURITY" | "COMPUTE" | "STORAGE" | "AZURE" | "AWS" | "WINDOWS">("GENERAL");
   const [finalScore, setFinalScore] = useState<{ correct: number; total: number; xp: number; timeLeft?: number; bestStreak?: number; outcome?: "victory" | "defeat" | "complete" | null; playerHP?: number }>({ correct: 0, total: 0, xp: 0, outcome: null });
   const [learningPath, setLearningPath] = useState<any | null>(null);
@@ -170,7 +171,12 @@ export default function PracticeMiniGameModal(props: {
             <div className="card practiceGameSetupCard" style={{ padding: 14 }}>
               {kind === "position" && <div style={{ display: "grid", gap: 10 }}><div style={{ fontWeight: 800 }}>Choose your path</div><div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>{([ ["HELPDESK_SUPPORT", "Helpdesk"], ["DESKTOP_TECHNICIAN", "Desktop"], ["CLOUD_ENGINEER", "Cloud"] ] as const).map(([k, label]) => <button key={k} className={"trackBtn gdActionBlue gdTrackChoice" + (path === k ? " active gdTrackChoiceActive" : "")} type="button" onClick={() => setPath(k)}>{label}</button>)}</div><small className="luHint">12 questions • 4 stages • 3 questions per stage</small></div>}
               {kind === "cert" && <div style={{ display: "grid", gap: 10 }}><div style={{ fontWeight: 800 }}>Choose a certification pack</div><div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>{([ ["A_PLUS", "A+"], ["SECURITY_PLUS", "Security+"], ["AZ_900", "AZ-900"], ["AWS", "AWS"], ["AZURE", "Azure"] ] as const).map(([k, label]) => <button key={k} className={"trackBtn gdActionBlue gdTrackChoice" + (cert === k ? " active gdTrackChoiceActive" : "")} type="button" onClick={() => setCert(k)}>{label}</button>)}</div><small className="luHint">12 questions • 4 stages • 3 questions per stage</small></div>}
-              {kind === "test" && <div style={{ display: "grid", gap: 10 }}><div style={{ fontWeight: 800 }}>Choose a question bank</div><div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>{([ ["GENERAL", "Mixed"], ["IDENTITY", "Identity"], ["NETWORKING", "Networking"], ["SECURITY", "Security"], ["COMPUTE", "Compute"], ["STORAGE", "Storage"], ["AZURE", "Azure"], ["AWS", "AWS"], ["WINDOWS", "Windows"] ] as const).map(([k, label]) => <button key={k} className={"trackBtn gdActionBlue gdTrackChoice" + (testBank === k ? " active gdTrackChoiceActive" : "")} type="button" onClick={() => setTestBank(k)}>{label}</button>)}</div><small className="luHint">15 questions • unseen questions first • the selected bank resets after you have seen its full pool</small></div>}
+              {kind === "test" && <div style={{ display: "grid", gap: 14 }}>
+                <div style={{ fontWeight: 800 }}>Choose training mode</div>
+                <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                  {([["STANDARD","Standard Test"],["WEAK_DOMAIN","Weak Domain Training"],["MISSED_QUESTIONS","Missed Question Review"]] as const).map(([k,label]) => <button key={k} className={"trackBtn gdActionBlue gdTrackChoice" + (testMode === k ? " active gdTrackChoiceActive" : "")} type="button" onClick={() => setTestMode(k)}>{label}</button>)}
+                </div>
+                <div style={{ fontWeight: 800, marginTop: 4 }}>Choose a question bank</div><div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>{([ ["GENERAL", "Mixed"], ["IDENTITY", "Identity"], ["NETWORKING", "Networking"], ["SECURITY", "Security"], ["COMPUTE", "Compute"], ["STORAGE", "Storage"], ["AZURE", "Azure"], ["AWS", "AWS"], ["WINDOWS", "Windows"] ] as const).map(([k, label]) => <button key={k} className={"trackBtn gdActionBlue gdTrackChoice" + (testBank === k ? " active gdTrackChoiceActive" : "")} type="button" onClick={() => setTestBank(k)}>{label}</button>)}</div><small className="luHint">15 questions • unseen questions first • the selected bank resets after you have seen its full pool</small></div>}
               <div className="practiceGameStartRow" style={{ display: "flex", justifyContent: "flex-end", marginTop: 14 }}><button className="primaryBtn gdActionOrange practiceGameStartButton" type="button" onClick={() => setStep("quiz")}>Start →</button></div>
             </div>
           )}
@@ -185,6 +191,7 @@ export default function PracticeMiniGameModal(props: {
               playerPosition={playerPosition ?? defaultPath}
               certExam={kind === "cert" ? cert : undefined}
               bankDomain={kind === "test" && testBank !== "GENERAL" ? testBank : undefined}
+              trainingMode={kind === "test" ? testMode : "STANDARD"}
               exitLabel="EXIT"
               onExit={onClose}
               metaLeft={kind === "position" ? `Path: ${path.replaceAll("_", " ")}` : kind === "cert" ? `Exam: ${cert.replaceAll("_", " ")}` : `Bank: ${testBank === "GENERAL" ? "Mixed" : testBank}` }
