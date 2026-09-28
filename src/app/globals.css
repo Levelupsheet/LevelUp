@@ -9973,3 +9973,25 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     z-index:4!important;
   }
 }
+
+
+/* 2026-09-27 final screenshot adjustment:
+   back the orb assembly off the portrait and reduce only the blood orb 15%. */
+@media (min-width:901px){
+  .batch8DesktopQuizGrid .batch8PlayerRail > .playerOrbComposite:first-child{
+    transform:translateY(-10px)!important;
+    margin:0 auto -54px!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail > .playerOrbComposite:first-child .playerOrbBlood{
+    left:33px!important;
+    top:20px!important;
+    width:109px!important;
+    height:109px!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail > .playerOrbComposite:first-child .playerOrbBloodBase,
+  .batch8DesktopQuizGrid .batch8PlayerRail > .playerOrbComposite:first-child .playerOrbBloodMask,
+  .batch8DesktopQuizGrid .batch8PlayerRail > .playerOrbComposite:first-child .playerOrbBloodMask img{
+    width:109px!important;
+    height:109px!important;
+  }
+}
