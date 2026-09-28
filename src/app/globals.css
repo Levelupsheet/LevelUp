@@ -9955,3 +9955,21 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     margin:0 auto 2px!important;
   }
 }
+
+
+/* 2026-09-27 screenshot correction: eliminate the remaining visual dead-space.
+   The composite box itself was still reserving 154px even though the visible
+   frame artwork occupies only its upper portion. Dock the visible assembly
+   to the portrait with a controlled negative seam while preserving title room above. */
+@media (min-width:901px){
+  .batch8DesktopQuizGrid .batch8PlayerRail > .playerOrbComposite:first-child{
+    margin:0 auto -54px!important;
+    transform:translateY(48px)!important;
+    z-index:5!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail > .playerOrbComposite:first-child + .card{
+    margin:0 auto 2px!important;
+    position:relative!important;
+    z-index:4!important;
+  }
+}
