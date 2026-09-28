@@ -10273,3 +10273,26 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 @media(prefers-reduced-motion:reduce){.dashboardLeaderboardTrack,.dashboardSweepTrack{animation:none!important}}
 
 .pvpRivalStatsGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:10px}.pvpRivalStatsGrid>div{display:grid;gap:3px;padding:9px;border:1px solid rgba(255,196,107,.18);background:rgba(10,10,10,.55)}.pvpRivalStatsGrid small{opacity:.72}.pvpRivalStatsGrid b{font-family:Georgia,"Times New Roman",serif}@media(max-width:700px){.pvpRivalStatsGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* Dashboard leaderboard overlays: viewport-centered ARPG popups */
+.modalBackdrop{position:fixed!important;inset:0!important;z-index:1400!important;display:grid!important;place-items:center!important;padding:24px!important;background:rgba(2,3,5,.76)!important;backdrop-filter:blur(3px)}
+.dashboardLeaderboardModal,.dashboardPlayerStatsModal{position:relative!important;margin:0!important;background-color:#0a0b0d!important;background-image:linear-gradient(rgba(5,7,9,.20),rgba(5,7,9,.30)),url('/ui/grimdark/popup_popup_confirm_001_001.png')!important;background-size:100% 100%!important;background-repeat:no-repeat!important;background-position:center!important;border:0!important;border-radius:0!important;box-shadow:0 24px 70px rgba(0,0,0,.72)!important}
+.dashboardLeaderboardModal{width:min(820px,calc(100vw - 40px))!important;max-height:min(760px,86vh)!important;padding:46px 54px!important}
+.dashboardPlayerStatsModal{width:min(760px,calc(100vw - 40px))!important;max-height:86vh!important;overflow:auto!important;padding:46px 54px!important}
+@media(max-width:700px){.modalBackdrop{padding:10px!important}.dashboardLeaderboardModal,.dashboardPlayerStatsModal{width:calc(100vw - 20px)!important;padding:32px 24px!important}}
+
+/* New ARPG progression bar assets */
+.dashboardProgressGameCard .progressBar{position:relative;height:24px!important;border:0!important;border-radius:0!important;overflow:hidden!important;background:transparent url('/ui/grimdark/flow_game_flow_loading_background_001.png') center/100% 100% no-repeat!important;padding:5px 8px!important;box-sizing:border-box}
+.dashboardProgressGameCard .progressFill{height:100%!important;border-radius:0!important;background:linear-gradient(90deg,rgba(86,142,102,.95),rgba(146,132,30,.95))!important}
+.dashboardProgressGameCard .progressBar:after{content:"";position:absolute;inset:0;pointer-events:none;background:url('/ui/grimdark/flow_game_flow_loading_frame_001.png') center/100% 100% no-repeat}
+
+/* Reward surfaces and supplied gold resource icons */
+.rewardsHubPage,.sweepstakesPage{--reward-panel:url('/ui/grimdark/popup_popup_reward_bg_001.png')}
+.rewardsHubPage .luCard,.rewardsHubPage .rewardEconomySnapshot>div,.sweepstakesPage .glass,.sweepstakesPage .featureCard{background-color:#0b0b0a!important;background-image:var(--reward-panel)!important;background-size:100% 100%!important;background-repeat:no-repeat!important;border-color:transparent!important}
+.rewardPathCard{position:relative;padding-top:54px!important}
+.rewardPathCard:before{content:"";position:absolute;top:12px;left:16px;width:34px;height:34px;background:center/contain no-repeat}
+.rewardPathTier1:before{background-image:url('/ui/grimdark/icon_res_gold_1_001.png')}
+.rewardPathTier2:before{background-image:url('/ui/grimdark/icon_res_gold_2_001.png')}
+.rewardPathTier3:before{background-image:url('/ui/grimdark/icon_res_gold_3_001.png')}
+.rewardPathTier4:before{background-image:url('/ui/grimdark/icon_res_gold_4_001.png')}
+.rewardPathTier5:before{background-image:url('/ui/grimdark/icon_res_gold_5_001.png')}
