@@ -25,6 +25,7 @@ type Props = {
   playerPosition?: string | null;
   certExam?: string | null;
   bankDomain?: string | null;
+  trainingMode?: "STANDARD" | "WEAK_DOMAIN";
   enemyName?: string;
   questionCount?: number;
   questionsOverride?: DiabloQuestion[] | null;
@@ -71,7 +72,7 @@ function mapQuestion(q: any, idx: number): DiabloQuestion {
 }
 
 export default function GameEngine(props: Props) {
-  const { lane, title, subtitle, timed = false, exitHref = "/dashboard", exitLabel = "Close", onExit, metaLeft, metaRight, startingPosition, playerPosition, certExam, bankDomain, enemyName = "Lagger", questionCount, questionsOverride, rulesOverride, onComplete, encounterType = questionsOverride?.length ? "boss" : "standard" } = props;
+  const { lane, title, subtitle, timed = false, exitHref = "/dashboard", exitLabel = "Close", onExit, metaLeft, metaRight, startingPosition, playerPosition, certExam, bankDomain, trainingMode = "STANDARD", enemyName = "Lagger", questionCount, questionsOverride, rulesOverride, onComplete, encounterType = questionsOverride?.length ? "boss" : "standard" } = props;
   const [loading, setLoading] = useState(true);
   const [questions, setQuestions] = useState<DiabloQuestion[]>([]);
   const [setLabel, setSetLabel] = useState<string>(subtitle || title);
@@ -113,7 +114,7 @@ export default function GameEngine(props: Props) {
     const res = await fetch("/api/test-now/session", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ userId, questionCount: effectiveCount, bankDomain }),
+      body: JSON.stringify({ userId, questionCount: effectiveCount, bankDomain, trainingMode }),
       cache: "no-store" as any,
     });
     const json = await res.json().catch(() => null);
@@ -123,12 +124,13 @@ export default function GameEngine(props: Props) {
       setQuestions(mapped);
       setSessionId(String(json?.session?.id || ""));
       setInitialState(json?.session?.state || null);
-      setSetLabel(json?.session?.goldenSpawned ? `${title} · Active Session` : `${title} · Active Session`);
+      const focus = String(json?.session?.state?.focusDomain || "").replace(/_/g, " ");
+      setSetLabel(trainingMode === "WEAK_DOMAIN" ? `${title} · Weak Domain${focus ? `: ${focus}` : ""}` : `${title} · Active Session`);
     } else {
       setQuestions(FALLBACK_BY_LANE.TEST_NOW);
       setSetLabel(`${title} · Sample`);
     }
-  }, [effectiveCount, title, bankDomain]);
+  }, [effectiveCount, title, bankDomain, trainingMode]);
 
   const load = useCallback(async () => {
     setLoading(true);
