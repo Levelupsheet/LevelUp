@@ -1119,33 +1119,24 @@ async function analyzeResumeStage12() {
             )}
           </div>
 
-          <div className="card dashboardPlanCard" style={{ marginBottom: 14, borderColor: normalizedTier === "FREE" ? "rgba(255,196,107,0.25)" : "rgba(93,168,255,0.24)" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+          <div className="card dashboardPlanCard dashboardProgressGameCard progressionSnapshot" style={{ marginBottom: 14, padding: 16 }}>
+            <div className="progressionSnapshotHead">
               <div>
-                <h3 style={{ margin: 0 }}>Plan perks</h3>
-                <div><small style={{ opacity: 0.9 }}>{entitlements?.label || tierLabel} plan • Adaptive depth: <b>{entitlements?.adaptiveDepth || "standard"}</b> • Reward track: <b>{entitlements?.rewardsTrack || "core"}</b></small></div>
+                <span className="progressionEyebrow">YOUR PROGRESSION</span>
+                <div className="progressionLevel">{levelTitleFromLevel(localLevel)} <b>Level {localLevel}</b></div>
               </div>
-              {nextPlanLabel ? <a href="/start#pricing" className="secondaryBtn gdActionOrange" style={{ textDecoration: 'none' }}>Upgrade to {nextPlanLabel}</a> : <span className="badge">Top tier unlocked</span>}
+              <small className="progressionTier" style={{ ...(tierBadgeStyle as any) }}>{tierLabel}</small>
             </div>
-            <div style={{ marginTop: 12, display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 10 }}>
-              <div className="featureCard">
-                <div><small>XP boost</small></div>
-                <div style={{ fontWeight: 900, fontSize: 22 }}>{Number(entitlements?.xpMultiplier || 1).toFixed(2)}x</div>
-              </div>
-              <div className="featureCard">
-                <div><small>Loot luck</small></div>
-                <div style={{ fontWeight: 900, fontSize: 22 }}>{Number(entitlements?.lootLuck || 1).toFixed(2)}x</div>
-              </div>
-              <div className="featureCard">
-                <div><small>Interview sims / day</small></div>
-                <div style={{ fontWeight: 900, fontSize: 22 }}>{Number(entitlements?.interviewSimulationsPerDay || 2)}</div>
-              </div>
-              <div className="featureCard">
-                <div><small>Analytics</small></div>
-                <div style={{ fontWeight: 900, fontSize: 22 }}>{entitlements?.advancedAnalytics ? "Advanced" : "Core"}</div>
-              </div>
+            <div className="progressionXpRow">
+              <b>{xpIntoLevel} / {levelMax} XP</b>
+              <span>{Math.max(0, levelMax - xpIntoLevel)} to next level</span>
             </div>
-            <div style={{ marginTop: 10, opacity: 0.86 }}><small>{entitlements?.upgradeCta || "Upgrade to unlock more systems."}</small></div>
+            <ProgressBar value={Number.isFinite(xpIntoLevel) ? xpIntoLevel : 0} max={levelMax} />
+            <div className="progressionSignals">
+              <div><small>MASTERY</small><b>{Math.round(overallMastery)}%</b></div>
+              <div><small>STREAK</small><b>{dailyStreak.currentStreak}d</b></div>
+              <div><small>TOKENS</small><b>{tokenBalance}</b></div>
+            </div>
           </div>
 
           
