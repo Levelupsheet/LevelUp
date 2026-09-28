@@ -168,9 +168,9 @@ export default function PracticeMiniGameModal(props: {
         <div className="luModalBody">
           {step === "setup" && (
             <div className="card practiceGameSetupCard" style={{ padding: 14 }}>
-              {kind === "position" && <div style={{ display: "grid", gap: 10 }}><div style={{ fontWeight: 800 }}>Choose your path</div><div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>{([ ["HELPDESK_SUPPORT", "Helpdesk"], ["DESKTOP_TECHNICIAN", "Desktop"], ["CLOUD_ENGINEER", "Cloud"] ] as const).map(([k, label]) => <button key={k} className={"trackBtn" + (path === k ? " active" : "")} type="button" onClick={() => setPath(k)}>{label}</button>)}</div><small className="luHint">12 questions • 4 stages • 3 questions per stage</small></div>}
-              {kind === "cert" && <div style={{ display: "grid", gap: 10 }}><div style={{ fontWeight: 800 }}>Choose a certification pack</div><div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>{([ ["A_PLUS", "A+"], ["SECURITY_PLUS", "Security+"], ["AZ_900", "AZ-900"], ["AWS", "AWS"], ["AZURE", "Azure"] ] as const).map(([k, label]) => <button key={k} className={"trackBtn" + (cert === k ? " active" : "")} type="button" onClick={() => setCert(k)}>{label}</button>)}</div><small className="luHint">12 questions • 4 stages • 3 questions per stage</small></div>}
-              {kind === "test" && <div style={{ display: "grid", gap: 10 }}><div style={{ fontWeight: 800 }}>Choose a question bank</div><div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>{([ ["GENERAL", "Mixed"], ["IDENTITY", "Identity"], ["NETWORKING", "Networking"], ["SECURITY", "Security"], ["COMPUTE", "Compute"], ["STORAGE", "Storage"], ["AZURE", "Azure"], ["AWS", "AWS"], ["WINDOWS", "Windows"] ] as const).map(([k, label]) => <button key={k} className={"trackBtn" + (testBank === k ? " active" : "")} type="button" onClick={() => setTestBank(k)}>{label}</button>)}</div><small className="luHint">15 questions • unseen questions first • the selected bank resets after you have seen its full pool</small></div>}
+              {kind === "position" && <div style={{ display: "grid", gap: 10 }}><div style={{ fontWeight: 800 }}>Choose your path</div><div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>{([ ["HELPDESK_SUPPORT", "Helpdesk"], ["DESKTOP_TECHNICIAN", "Desktop"], ["CLOUD_ENGINEER", "Cloud"] ] as const).map(([k, label]) => <button key={k} className={"trackBtn gdActionBlue gdTrackChoice" + (path === k ? " active gdTrackChoiceActive" : "")} type="button" onClick={() => setPath(k)}>{label}</button>)}</div><small className="luHint">12 questions • 4 stages • 3 questions per stage</small></div>}
+              {kind === "cert" && <div style={{ display: "grid", gap: 10 }}><div style={{ fontWeight: 800 }}>Choose a certification pack</div><div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>{([ ["A_PLUS", "A+"], ["SECURITY_PLUS", "Security+"], ["AZ_900", "AZ-900"], ["AWS", "AWS"], ["AZURE", "Azure"] ] as const).map(([k, label]) => <button key={k} className={"trackBtn gdActionBlue gdTrackChoice" + (cert === k ? " active gdTrackChoiceActive" : "")} type="button" onClick={() => setCert(k)}>{label}</button>)}</div><small className="luHint">12 questions • 4 stages • 3 questions per stage</small></div>}
+              {kind === "test" && <div style={{ display: "grid", gap: 10 }}><div style={{ fontWeight: 800 }}>Choose a question bank</div><div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>{([ ["GENERAL", "Mixed"], ["IDENTITY", "Identity"], ["NETWORKING", "Networking"], ["SECURITY", "Security"], ["COMPUTE", "Compute"], ["STORAGE", "Storage"], ["AZURE", "Azure"], ["AWS", "AWS"], ["WINDOWS", "Windows"] ] as const).map(([k, label]) => <button key={k} className={"trackBtn gdActionBlue gdTrackChoice" + (testBank === k ? " active gdTrackChoiceActive" : "")} type="button" onClick={() => setTestBank(k)}>{label}</button>)}</div><small className="luHint">15 questions • unseen questions first • the selected bank resets after you have seen its full pool</small></div>}
               <div className="practiceGameStartRow" style={{ display: "flex", justifyContent: "flex-end", marginTop: 14 }}><button className="primaryBtn gdActionOrange practiceGameStartButton" type="button" onClick={() => setStep("quiz")}>Start →</button></div>
             </div>
           )}
@@ -239,7 +239,7 @@ export default function PracticeMiniGameModal(props: {
                     <div className="stage7BossSummaryTitle">{bossMeta.introTitle}</div>
                     <div className="muted stage7BossSummaryCopy">A rare bonus boss battle rolled for this run. Clear it once for bonus XP. After the fight, this run is complete.</div>
                     <div style={{ marginTop: 10, display: "flex", gap: 10, flexWrap: "wrap" }}>
-                      <button className="primaryBtn" type="button" onClick={() => { setBossConsumed(true); setStep("boss"); }} disabled={!bossReady || bossLoading}>{bossLoading ? "Preparing…" : `Start ${bossMeta.bossLabel}`}</button>
+                      <button className="primaryBtn gdActionOrange" type="button" onClick={() => { setBossConsumed(true); setStep("boss"); }} disabled={!bossReady || bossLoading}>{bossLoading ? "Preparing…" : `Start ${bossMeta.bossLabel}`}</button>
                     </div>
                   </div>
                 ) : null}
@@ -270,8 +270,8 @@ export default function PracticeMiniGameModal(props: {
                 </div>
               </div>
               <div className="practiceSummaryActions">
-                {!bossReward ? <button className="primaryBtn" type="button" onClick={() => setStep("setup")}>Try again</button> : null}
-                <button className="primaryBtn" type="button" onClick={onClose}>{bossReward ? "Finish" : "Done"}</button>
+                {!bossReward ? <button className="primaryBtn gdActionOrange" type="button" onClick={() => setStep("setup")}>Try again</button> : null}
+                <button className="primaryBtn gdActionBlue" type="button" onClick={onClose}>{bossReward ? "Finish" : "Done"}</button>
               </div>
             </div>
           )})()}
