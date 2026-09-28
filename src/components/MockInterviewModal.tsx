@@ -185,7 +185,7 @@ export default function MockInterviewModal(props: { open: boolean; onClose: () =
               <div className="dashboardEyebrow">INTERVIEW BATTLES</div><b className="interviewBattleTitle">Career Readiness Arena</b>
               <div><small className="luHint">Choose a track, clear the technical battle, then advance to the next interview stage.</small></div>
             </div>
-            <button className="secondaryBtn interviewBattleClose" type="button" onClick={onClose} aria-label="Close interview battles">✕</button>
+            <button className="secondaryBtn gdCloseButton interviewBattleClose" type="button" onClick={onClose} aria-label="Close interview battles">✕</button>
           </div>
         )}
 
@@ -197,7 +197,7 @@ export default function MockInterviewModal(props: { open: boolean; onClose: () =
                 <div className="muted">Clear the first battle to unlock the advanced interview stage for that track.</div>
                 <div className="trackGrid" style={{ marginTop: 14 }}>
                   {(Object.entries(TRACK_META) as [Track, { title: string; subtitle: string }][]) .map(([id, meta]) => (
-                    <button key={id} className={"trackBtn" + (track === id ? " active" : "")} onClick={() => setTrack(id)}>
+                    <button key={id} className={"trackBtn gdActionBlue gdTrackChoice" + (track === id ? " active gdTrackChoiceActive" : "")} onClick={() => setTrack(id)}>
                       <div style={{ fontWeight: 800 }}>{meta.title}</div>
                       <div className="muted" style={{ fontSize: 12 }}>{meta.subtitle}</div>
                       {track === id ? <div className="badge" style={{ position: "absolute", top: 10, right: 10 }}>Selected</div> : null}
@@ -217,8 +217,8 @@ export default function MockInterviewModal(props: { open: boolean; onClose: () =
                   </div>
                 </div>
                 <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 14 }}>
-                  <button className="btn primary" disabled={cooldownActive} onClick={() => start(1)}>{cooldownActive ? "Battle cooling down" : "Start Now →"}</button>
-                  <button className="btn" disabled={!passedStage1 || cooldownActive} onClick={() => start(2)} title={cooldownActive ? "Complete other training while this battle resets." : passedStage1 ? "" : "Pass the first battle to unlock"}>Start Advanced Battle</button>
+                  <button className="btn primary gdActionOrange" disabled={cooldownActive} onClick={() => start(1)}>{cooldownActive ? "Battle cooling down" : "Start Now →"}</button>
+                  <button className="btn gdActionBlue" disabled={!passedStage1 || cooldownActive} onClick={() => start(2)} title={cooldownActive ? "Complete other training while this battle resets." : passedStage1 ? "" : "Pass the first battle to unlock"}>Start Advanced Battle</button>
                 </div>
                 <div style={{ marginTop: 10 }}>
                   {cooldownActive ? <span className="badge">✓ Track cleared. Next attempt available in about {Math.max(1, Math.ceil((cooldownUntil - now) / 3600000))}h — explore Training or Certifications while it resets.</span> : passedStage1 ? <span className="badge">✓ Advanced battle unlocked for this track</span> : <span className="badge">Clear the first battle to unlock the advanced interview stage.</span>}
@@ -256,11 +256,11 @@ export default function MockInterviewModal(props: { open: boolean; onClose: () =
                 <div><small>Track</small><strong>{TRACK_META[track].title}</strong></div>
               </div>
               <div className="interviewBattleSummaryActions">
-                {(lastSummary?.outcome === "victory" || lastSummary?.enemyHP === 0) && stage === 1 ? <button className="btn primary" onClick={() => start(2)}>Continue to advanced battle →</button> : null}
-                <button className="btn" onClick={() => setStep("setup")}>{stage === 2 && (lastSummary?.outcome === "victory" || lastSummary?.enemyHP === 0) ? "Back to battle menu" : "Choose another battle"}</button>
-                {stage === 2 && (lastSummary?.outcome === "victory" || lastSummary?.enemyHP === 0) ? <a className="btn" href="/training">Explore other training →</a> : null}
-                <a className="secondaryBtn" href="/coach">Open AI Coach</a>
-                <button className="btn" onClick={onClose}>Return to dashboard</button>
+                {(lastSummary?.outcome === "victory" || lastSummary?.enemyHP === 0) && stage === 1 ? <button className="btn primary gdActionOrange" onClick={() => start(2)}>Continue to advanced battle →</button> : null}
+                <button className="btn gdActionBlue" onClick={() => setStep("setup")}>{stage === 2 && (lastSummary?.outcome === "victory" || lastSummary?.enemyHP === 0) ? "Back to battle menu" : "Choose another battle"}</button>
+                {stage === 2 && (lastSummary?.outcome === "victory" || lastSummary?.enemyHP === 0) ? <a className="btn gdActionBlue" href="/training">Explore other training →</a> : null}
+                <a className="secondaryBtn gdActionBlue" href="/coach">Open AI Coach</a>
+                <button className="btn gdActionRed" onClick={onClose}>Return to dashboard</button>
               </div>
             </div>
           )}
