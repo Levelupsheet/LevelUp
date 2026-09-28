@@ -243,7 +243,7 @@ export default function PvpPage() {
   const duelQuestions = useMemo(() => toDiabloQuestions(activeChallenge?.questions || []), [activeChallenge?.questions]);
 
   return (
-    <main className="page pvpHubPage">
+    <main className="page pvpHubPage pvpGamePage">
       <div className="container pvpHubInner">
         <div className="card pvpHubHero">
           <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
@@ -254,8 +254,8 @@ export default function PvpPage() {
               </div>
             </div>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              <a className="secondaryBtn" href="/leaderboard">Leaderboard</a>
-              <a className="secondaryBtn" href="/dashboard">Dashboard</a>
+              
+              <a className="secondaryBtn gdActionBlue" href="/dashboard">Dashboard</a>
             </div>
           </div>
         </div>
@@ -341,12 +341,12 @@ export default function PvpPage() {
                       <div style={{ marginTop: 6, opacity: 0.78 }}><small>{row.questionCount} questions • {new Date(row.createdAt).toLocaleString()}</small></div>
                       <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 10 }}>
                         {canAccept ? (
-                          <button type="button" className="primaryBtn" onClick={() => acceptChallenge(row.id)}>Accept duel</button>
+                          <button type="button" className="primaryBtn gdActionOrange" onClick={() => acceptChallenge(row.id)}>Accept duel</button>
                         ) : null}
                         {canPlay ? (
-                          <button type="button" className="secondaryBtn" onClick={() => openChallenge(row.id, true)}>Open duel</button>
+                          <button type="button" className="secondaryBtn gdActionBlue" onClick={() => openChallenge(row.id, true)}>Open duel</button>
                         ) : null}
-                        <button type="button" className="secondaryBtn" onClick={() => openChallenge(row.id, false)}>View details</button>
+                        <button type="button" className="secondaryBtn gdActionBlue" onClick={() => openChallenge(row.id, false)}>View details</button>
                       </div>
                     </div>
                   );
@@ -372,7 +372,7 @@ export default function PvpPage() {
               <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                 {activeChallenge.resultLabel ? <span className="badge pvpResultBadge">{activeChallenge.resultLabel}</span> : null}
                 {!activeChallenge.youSubmitted ? (
-                  <button type="button" className="primaryBtn" onClick={() => { setDuelOpen(true); answerRef.current = {}; startedAtRef.current = Date.now(); }}>
+                  <button type="button" className="primaryBtn gdActionOrange" onClick={() => { setDuelOpen(true); answerRef.current = {}; startedAtRef.current = Date.now(); }}>
                     Open combat duel
                   </button>
                 ) : null}
