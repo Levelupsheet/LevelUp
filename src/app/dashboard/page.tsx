@@ -771,7 +771,7 @@ async function analyzeResumeStage12() {
               )}
               <div className="luGrid3">
                 <button
-                  className="luRoleCard"
+                  className="luRoleCard gdModalChoice gdModalChoiceOrange"
                   type="button"
                   onClick={() => startLeveledMode("position")}
                 >
@@ -781,7 +781,7 @@ async function analyzeResumeStage12() {
                 </button>
 
                 <button
-                  className="luRoleCard"
+                  className="luRoleCard gdModalChoice gdModalChoiceBlue"
                   type="button"
                   onClick={() => startLeveledMode("cert")}
                 >
@@ -791,7 +791,7 @@ async function analyzeResumeStage12() {
                 </button>
 
                 <button
-                  className="luRoleCard"
+                  className="luRoleCard gdModalChoice gdModalChoiceBlue"
                   type="button"
                   onClick={() => startLeveledMode("test")}
                 >
@@ -906,7 +906,7 @@ async function analyzeResumeStage12() {
               ) : null}
               {positionError ? <div className="positionChangeError">{positionError}</div> : null}
               <button
-                className="primary"
+                className="primary gdActionOrange"
                 disabled={!pendingPos || posSaving || (positionChangeMode && pendingPos === user?.startingPosition)}
                 onClick={() => {
                   setPositionError(null);
