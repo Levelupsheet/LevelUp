@@ -90,7 +90,7 @@ export default function AdminInsightsPage() {
               <div style={{ marginTop: 6, opacity: 0.82 }}><small>Question performance, adaptive mastery, and AI coach guidance from live user data.</small></div>
             </div>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-              <a className="secondaryBtn" href="/dashboard">Dashboard</a>
+              <a className="secondaryBtn gdActionBlue" href="/dashboard">Dashboard</a>
                           </div>
           </div>
         </div>
@@ -109,7 +109,7 @@ export default function AdminInsightsPage() {
               <h3 style={{ margin: 0 }}>Learning Progress</h3>
               <div style={{ marginTop: 6, opacity: 0.82 }}><small>Adaptive learning turns missed questions and weak domains into targeted training.</small></div>
             </div>
-            <a className="secondaryBtn" href="/test-now">Train weaknesses</a>
+            <a className="secondaryBtn gdActionOrange" href="/test-now">Train weaknesses</a>
           </div>
           <div style={{ marginTop: 14, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: 10 }}>
             <div className="featureCard" style={{ padding: 12 }}><small>Weakest domain</small><div style={{ fontWeight: 900, fontSize: 21 }}>{learningProgress?.weakestDomain || 'Building profile'}</div><small>{Number(learningProgress?.weakestDomainMastery || 0).toFixed(1)}% mastery</small></div>
@@ -188,11 +188,11 @@ export default function AdminInsightsPage() {
               <div style={{ marginTop: 6, opacity: 0.82 }}><small>Resume upload, skill-gap mapping, and coaching guidance.</small></div>
             </div>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
-              <label className="secondaryBtn" style={{ cursor: 'pointer' }}>
+              <label className="secondaryBtn gdActionBlue" style={{ cursor: 'pointer' }}>
                 {stage12File ? stage12File.name : 'Choose resume'}
                 <input type="file" accept=".pdf,.docx" style={{ display: 'none' }} onChange={(e) => setStage12File(e.target.files?.[0] || null)} />
               </label>
-              <button className="primaryBtn" type="button" disabled={!stage12File || stage12Uploading} onClick={uploadResume}>
+              <button className="primaryBtn gdActionOrange" type="button" disabled={!stage12File || stage12Uploading} onClick={uploadResume}>
                 {stage12Uploading ? 'Analyzing...' : 'Upload + analyze'}
               </button>
             </div>
