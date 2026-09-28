@@ -10318,3 +10318,27 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyEnergyOrbShell{transform:scale(.72)!important;filter:none!important;box-shadow:none!important;background:transparent!important}
 .batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyEnergyOrb,.batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyEnergyDrain,.batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyEnergyFlash{filter:none!important;box-shadow:none!important}
 }
+
+/* XP bar asset correction: preserve the loading artwork's native proportions instead of stretching it */
+.dashboardProgressGameCard .progressBar{
+  width:min(100%,760px)!important;
+  height:32px!important;
+  padding:6px 16px!important;
+  overflow:hidden!important;
+  background-image:url('/ui/grimdark/flow_game_flow_loading_background_001.png')!important;
+  background-size:100% 32px!important;
+  background-position:left center!important;
+  background-repeat:no-repeat!important;
+}
+.dashboardProgressGameCard .progressFill{
+  height:20px!important;
+  clip-path:none!important;
+  border-radius:0!important;
+}
+.dashboardProgressGameCard .progressBar:after{
+  inset:0!important;
+  background-image:url('/ui/grimdark/flow_game_flow_loading_frame_001.png')!important;
+  background-size:100% 32px!important;
+  background-position:left center!important;
+  background-repeat:no-repeat!important;
+}
