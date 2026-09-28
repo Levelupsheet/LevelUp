@@ -10305,3 +10305,16 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .dashboardProgressGameCard .progressFill{position:relative!important;min-width:0!important;clip-path:polygon(0 18%,96% 18%,100% 50%,96% 82%,0 82%)}
 .dashboardProgressGameCard .progressBar:after{inset:-1px!important;background-size:100% 100%!important}
 @media(prefers-reduced-motion:reduce){.dashboardLeaderboardTrack:has(.dashboardLeaderboardPlayer:nth-of-type(2)){animation:none!important}}
+
+/* Combat HUD lock: timer centered on mastery row; player/enemy orb footprints matched */
+.stage5MetaStrip.quizSecondaryMeta.batch8PrimaryProgress{position:relative!important;display:grid!important;grid-template-columns:1fr auto 1fr!important;align-items:center!important;gap:12px!important}
+.stage5MetaStrip.quizSecondaryMeta.batch8PrimaryProgress>span:first-child{justify-self:start!important}
+.stage5MetaStrip.quizSecondaryMeta.batch8PrimaryProgress>span:last-child{justify-self:end!important}
+.quizCountdownInline{position:relative!important;inset:auto!important;transform:none!important;margin:0!important;justify-self:center!important;min-width:112px!important}
+@media(min-width:901px){
+.batch8DesktopQuizGrid .batch8PlayerRail>.playerOrbComposite:first-child,.batch8DesktopQuizGrid .batch8EnemyRail>:first-child{width:160px!important;max-width:160px!important;height:154px!important;min-height:154px!important;flex:0 0 154px!important;margin:0 auto 2px!important;transform:none!important}
+.batch8DesktopQuizGrid .batch8PlayerRail>.playerOrbComposite:first-child .playerOrbFrameAsset{left:0!important;top:0!important;width:160px!important;height:154px!important;object-fit:fill!important}
+.batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyCard{width:160px!important;height:154px!important;min-height:154px!important;transform:none!important;filter:none!important;background:none!important;box-shadow:none!important}
+.batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyEnergyOrbShell{transform:scale(.72)!important;filter:none!important;box-shadow:none!important;background:transparent!important}
+.batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyEnergyOrb,.batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyEnergyDrain,.batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyEnergyFlash{filter:none!important;box-shadow:none!important}
+}
