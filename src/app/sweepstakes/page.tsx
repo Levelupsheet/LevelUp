@@ -68,7 +68,7 @@ function TermsModal({ campaign, onClose }: { campaign: Campaign | null; onClose:
             <div className="muted" style={{ fontSize: 12 }}>Terms and conditions</div>
             <h3 style={{ margin:'6px 0 0 0' }}>{campaign.title}</h3>
           </div>
-          <button className="secondaryBtn" onClick={onClose}>Close</button>
+          <button className="secondaryBtn gdActionBlue" onClick={onClose}>Close</button>
         </div>
         <div className="featureCard" style={{ marginTop: 14 }}>
           <div style={{ whiteSpace:'pre-wrap', lineHeight:1.6 }}>{campaign.rulesText || 'Rules will be published here for the live drawing.'}</div>
@@ -192,7 +192,7 @@ function SweepstakesModal({ campaign, user, onClose, onEntered }: { campaign: Ca
               <div className="muted" style={{ fontSize: 12 }}>Sweepstakes details</div>
               <h2 style={{ margin:'6px 0 0 0' }}>{campaign.title}</h2>
             </div>
-            <button className="secondaryBtn" onClick={onClose}>Close</button>
+            <button className="secondaryBtn gdActionBlue" onClick={onClose}>Close</button>
           </div>
 
           <div style={{ display:'grid', gridTemplateColumns:'1.15fr 1fr', gap:18, marginTop:16 }} className="sweepModalGrid">
@@ -217,19 +217,19 @@ function SweepstakesModal({ campaign, user, onClose, onEntered }: { campaign: Ca
                 ) : null}
                 <div style={{ marginTop: 16, display:'flex', gap:10, flexWrap:'wrap' }}>
                   {campaign.allowTokenEntry ? (
-                    <button className="gold" onClick={enterTokens} disabled={!canAfford} title={!canAfford ? 'Not enough tokens' : undefined}>
+                    <button className="gold gdActionOrange" onClick={enterTokens} disabled={!canAfford} title={!canAfford ? 'Not enough tokens' : undefined}>
                       {confirmingEntry ? 'Confirm entry' : 'Enter with tokens'}
                     </button>
                   ) : null}
-                  <button className="secondaryBtn" onClick={() => setShowTerms(true)}>Terms</button>
+                  <button className="secondaryBtn gdActionBlue" onClick={() => setShowTerms(true)}>Terms</button>
                 </div>
                 {confirmingEntry ? (
                   <div className="featureCard" style={{ marginTop: 12, borderColor:'rgba(255,215,90,.28)' }}>
                     <b>Confirm entry</b>
                     <div className="muted" style={{ marginTop: 8 }}>This entry costs <b>{tokenCost}</b> tokens. Current balance: <b>{balance}</b>. After entry: <b>{nextBalance}</b>.</div>
                     <div style={{ display:'flex', gap:10, marginTop:12 }}>
-                      <button className="gold" onClick={enterTokens}>Confirm</button>
-                      <button className="secondaryBtn" onClick={() => setConfirmingEntry(false)}>Cancel</button>
+                      <button className="gold gdActionOrange" onClick={enterTokens}>Confirm</button>
+                      <button className="secondaryBtn gdActionBlue" onClick={() => setConfirmingEntry(false)}>Cancel</button>
                     </div>
                   </div>
                 ) : null}
@@ -328,8 +328,8 @@ export default function SweepstakesPage() {
             <h1 style={{ margin: 0 }}>Sign in required</h1>
             <p className="muted" style={{ marginTop: 10 }}>Please sign in through the dashboard before viewing or entering sweepstakes drawings.</p>
             <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
-              <Link className="gold" href="/dashboard">Go to Dashboard →</Link>
-              <Link className="secondaryBtn" href="/start">Back to Start</Link>
+              <Link className="gold gdActionOrange" href="/dashboard">Go to Dashboard →</Link>
+              <Link className="secondaryBtn gdActionBlue" href="/start">Back to Start</Link>
             </div>
           </div>
         </div>
@@ -352,8 +352,8 @@ export default function SweepstakesPage() {
                 </div>
               </div>
               <div style={{ display:'flex', gap:10, flexWrap:'wrap' }}>
-                <Link className="secondaryBtn" href="/start">Back to Start</Link>
-                <Link className="gold" href="/dashboard">Go to Dashboard →</Link>
+                <Link className="secondaryBtn gdActionBlue" href="/start">Back to Start</Link>
+                <Link className="gold gdActionOrange" href="/dashboard">Go to Dashboard →</Link>
               </div>
             </div>
 
@@ -372,7 +372,7 @@ export default function SweepstakesPage() {
                 <div style={{ display:'grid', gap:10, marginTop:12 }}>
                   {data.user.wins.map((win:any) => <div key={win.campaignId} style={{ display:'flex',justifyContent:'space-between',gap:12,alignItems:'center',flexWrap:'wrap',padding:12,border:'1px solid rgba(255,215,90,.3)',borderRadius:14,background:'rgba(255,255,255,.035)' }}>
                     <div><b style={{color:'#ffe58a'}}>{win.title}</b><div className="muted">{win.prizePoolLabel || 'Sweepstakes prize'}{win.drawnAt ? ` • Won ${new Date(win.drawnAt).toLocaleDateString()}` : ''}</div></div>
-                    {win.claimStatus ? <span className="badge">✓ Claim {String(win.claimStatus).toLowerCase()}</span> : <button className="gold" onClick={()=>{setClaimingWin(win);setClaimStatus('');}}>Claim prize →</button>}
+                    {win.claimStatus ? <span className="badge">✓ Claim {String(win.claimStatus).toLowerCase()}</span> : <button className="gold gdActionOrange" onClick={()=>{setClaimingWin(win);setClaimStatus('');}}>Claim prize →</button>}
                   </div>)}
                 </div>
               </div>
@@ -422,7 +422,7 @@ export default function SweepstakesPage() {
       <SweepstakesModal campaign={selected} user={data?.user} onClose={() => { setSelected(null); try { const params = new URLSearchParams(window.location.search); params.delete('campaign'); const next = params.toString(); window.history.replaceState({}, '', next ? `/sweepstakes?${next}` : '/sweepstakes'); } catch {} }} onEntered={() => { setSelected(null); load(); }} />
           {claimingWin ? <div style={{position:'fixed',inset:0,zIndex:1300,background:'rgba(2,6,16,.9)',display:'grid',placeItems:'center',padding:20}} onClick={()=>setClaimingWin(null)}>
             <form className="glass" style={{width:'min(720px,96vw)',maxHeight:'90vh',overflow:'auto',padding:20}} onClick={(e)=>e.stopPropagation()} onSubmit={async(e)=>{e.preventDefault();setClaimStatus('Submitting…');const res=await fetch('/api/sweepstakes/claim',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({...claimForm,campaignId:claimingWin.campaignId})});const json=await res.json().catch(()=>({}));if(res.ok&&json?.ok){setClaimStatus('Claim submitted securely to LevelUp Pro support.');await load();setTimeout(()=>setClaimingWin(null),900);}else setClaimStatus(json?.error||'Could not submit claim.');}}>
-              <div style={{display:'flex',justifyContent:'space-between',gap:10}}><div><div className="muted">Prize fulfillment</div><h2 style={{margin:'4px 0'}}>Claim {claimingWin.title}</h2></div><button type="button" className="secondaryBtn" onClick={()=>setClaimingWin(null)}>Close</button></div>
+              <div style={{display:'flex',justifyContent:'space-between',gap:10}}><div><div className="muted">Prize fulfillment</div><h2 style={{margin:'4px 0'}}>Claim {claimingWin.title}</h2></div><button type="button" className="secondaryBtn gdActionBlue" onClick={()=>setClaimingWin(null)}>Close</button></div>
               <p className="muted">Provide only the contact and delivery information needed for prize fulfillment. This information is visible to authorized LevelUp Pro administrators.</p>
               <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
                 <label>Full name<input required value={claimForm.fullName} onChange={e=>setClaimForm((s:any)=>({...s,fullName:e.target.value}))}/></label>
@@ -436,7 +436,7 @@ export default function SweepstakesPage() {
                 <label>City<input value={claimForm.city} onChange={e=>setClaimForm((s:any)=>({...s,city:e.target.value}))}/></label><label>State / region<input value={claimForm.region} onChange={e=>setClaimForm((s:any)=>({...s,region:e.target.value}))}/></label><label>Postal code<input value={claimForm.postalCode} onChange={e=>setClaimForm((s:any)=>({...s,postalCode:e.target.value}))}/></label>
               </div>
               <label style={{display:'block',marginTop:10}}>Fulfillment notes (optional)<textarea rows={3} value={claimForm.notes} onChange={e=>setClaimForm((s:any)=>({...s,notes:e.target.value}))}/></label>
-              <div style={{display:'flex',gap:10,alignItems:'center',marginTop:14}}><button className="gold" type="submit">Submit prize claim</button><span className="muted">{claimStatus}</span></div>
+              <div style={{display:'flex',gap:10,alignItems:'center',marginTop:14}}><button className="gold gdActionOrange" type="submit">Submit prize claim</button><span className="muted">{claimStatus}</span></div>
             </form>
           </div> : null}
     </main>
