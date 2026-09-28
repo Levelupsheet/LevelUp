@@ -1108,7 +1108,7 @@ async function analyzeResumeStage12() {
             <ProgressBar value={Number.isFinite(xpIntoLevel) ? xpIntoLevel : 0} max={levelMax} />
             <div className="progressionSignals">
               <div><small>MASTERY</small><b>{Math.round(overallMastery)}%</b></div>
-              <div><small>STREAK</small><b>{dailyStreak.currentStreak}d</b></div>
+              <div><small>STREAK</small><b>{dailyStreak.streakDays}d</b></div>
               <div><small>TOKENS</small><b>{tokenBalance}</b></div>
             </div>
           </div>
