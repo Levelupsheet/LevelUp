@@ -1185,29 +1185,7 @@ async function analyzeResumeStage12() {
   </div>
 ) : null}
 
-          <div className="card" style={{ marginTop: 14 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
-              <div>
-                <h3 style={{ margin: 0 }}>Career Matches</h3>
-                <div><small>{(localLevel || 1) >= 7 ? "Open roles appear when a mastery domain reaches 40%+." : "Reach level 7 to unlock career matches based on your mastery."}</small></div>
-              </div>
-              <span className="badge" style={{ color: "#f8d36a", borderColor: "rgba(248,211,106,0.28)" }}>AI-guided</span>
-            </div>
-            <div className="careerMatchGrid" style={{ marginTop: 14 }}>
-              {recommendedRoles.length ? recommendedRoles.map((role) => (
-                <a key={role.id} className="careerMatchTile" href={role.url} target="_blank" rel="noreferrer" style={{ textDecoration: 'none', color: 'inherit' }}>
-                  <div className="careerMatchTitle">{role.title}</div>
-                  <div className="careerMatchMeta">{role.description}</div>
-                  <div className="careerMatchMeta" style={{ marginTop: 8 }}><b>{role.domain}</b>{role.location ? ` • ${role.location}` : ''}{role.salary ? ` • ${role.salary}` : ''}</div>
-                </a>
-              )) : (
-                <div className="careerMatchTile">
-                  <div className="careerMatchTitle">Career matches locked</div>
-                  <div className="careerMatchMeta">Continue leveling and build a domain above 40% mastery to reveal tailored job links here.</div>
-                </div>
-              )}
-            </div>
-          </div>
+
 
           
         </section>
