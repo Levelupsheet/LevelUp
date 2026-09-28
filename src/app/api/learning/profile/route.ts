@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getRequestUserId } from "@/app/api/_lib/authUser";
 import { inferDomainFromQuestion, type LearningProfileSnapshot } from "@/lib/learningProfile";
 import { buildPersonalizedLearningPath } from "@/lib/learningPath";
+import { getMissedQuestionReview } from "@/lib/adaptiveEngine";
 
 const TARGET_DOMAINS = ["IDENTITY", "NETWORKING", "SECURITY", "AWS", "AZURE", "WINDOWS"] as const;
 
@@ -131,13 +132,24 @@ export async function GET(req: Request) {
     };
 
     const learningPath = await buildPersonalizedLearningPath(userId).catch(() => null);
+    const missedReview = await getMissedQuestionReview(userId).catch(() => ({ questionIds: new Set<string>(), stats: new Map<string, { misses: number; recoveryCorrect: number }>() }));
+    const activeMissed = Array.from(missedReview.questionIds);
+    const masteredMissedCount = Array.from(missedReview.stats.values()).filter((row) => row.misses > 0 && row.recoveryCorrect >= 3).length;
+    const weakest = [...masteryRows].sort((a, b) => a.mastery - b.mastery)[0] || null;
+    const learningProgress = {
+      weakestDomain: weakest?.domain || null,
+      weakestDomainMastery: weakest ? Number(weakest.mastery || 0) : 0,
+      questionsToMaster: activeMissed.length,
+      masteredMissedCount,
+      masteryThreshold: 3,
+    };
     const predictedWeakness = (learningPath?.subdomainWeakness || []).slice(0, 3).map((row: any) => ({
       domain: row.domain,
       subdomain: row.subdomain,
       predictedRisk: row.mastery <= 40 ? "HIGH" : row.mastery <= 60 ? "MEDIUM" : "LOW",
     }));
 
-    return NextResponse.json({ ok: true, profile: snapshot, learningPath, predictedWeakness });
+    return NextResponse.json({ ok: true, profile: snapshot, learningPath, predictedWeakness, learningProgress });
   } catch (error: any) {
     return NextResponse.json({ error: error?.message || "Failed to load learning profile" }, { status: 500 });
   }
