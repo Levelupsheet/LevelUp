@@ -5,26 +5,26 @@ export default function CertificationsCatalog() {
     { title: "AZ-900", tag: "CLOUD", body: "Azure fundamentals, cloud concepts, core services, security, governance, pricing, and support." },
   ];
   return (
-    <main className="learningCatalog page">
+    <main className="learningCatalog page paidAssetPage certificationsAssetPage">
       <div className="container learningCatalogInner">
-        <section className="card learningHero">
+        <section className="card learningHero paidAssetHero">
           <div>
             <div className="dashboardEyebrow">CERTIFICATION PRACTICE</div>
             <h1>Turn knowledge into exam readiness.</h1>
             <p>Practice certification domains inside the same LevelUp progression system and use results to identify what to study next.</p>
           </div>
-          <a href="/dashboard" className="learningPrimaryLink">Start from Dashboard →</a>
+          <a href="/dashboard" className="learningPrimaryLink gdActionOrange">Start from Dashboard →</a>
         </section>
         <section className="learningTrackGrid">
           {tracks.map((track) => (
-            <article className="card learningTrackCard" key={track.title}>
+            <article className="card learningTrackCard paidAssetPanel" key={track.title}>
               <span className="badge">{track.tag}</span>
               <h2>{track.title}</h2>
               <p>{track.body}</p>
             </article>
           ))}
         </section>
-        <section className="card learningFlowCard">
+        <section className="card learningFlowCard paidAssetPanel">
           <div><b>Practice</b><span>Work through certification-focused questions and scenarios.</span></div>
           <div><b>Measure</b><span>Track mastery and performance as you answer.</span></div>
           <div><b>Review</b><span>Use explanations and domain feedback to close gaps.</span></div>
