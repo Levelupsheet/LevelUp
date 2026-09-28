@@ -39,7 +39,7 @@ export default function PositionTrainingPage() {
   }, [router]);
 
   return (
-    <div className="page">
+    <div className="page paidAssetPage positionTrainingAssetPage">
       <div className="container" style={{ maxWidth: 1280 }}>
         <GameEngine lane="TRAINING" startingPosition={startingPosition} title="Position Training" subtitle={`Role-based training • ${startingPosition.replaceAll("_", " ")}`} metaLeft={`Path: ${startingPosition.replaceAll("_", " ")}`} exitHref="/dashboard" exitLabel="Close" />
       </div>
