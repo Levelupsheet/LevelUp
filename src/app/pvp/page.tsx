@@ -4,7 +4,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import DiabloQuizRunner, { type DiabloQuestion, type DiabloQuizRunSummary } from "@/components/DiabloQuizRunner";
 
-type LeaderRow = { userId: string; displayName: string; xp?: number; level?: number; rank?: string };
+type LeaderRow = { userId: string; displayName: string; xp?: number; level?: number; rank?: string };\ntype RivalPerformance = { accuracy:number; overallMastery:number; completedSessions:number; activeDays:number; strongestDomain:{domain:string;mastery:number}|null; interviewWins:number; interviewSessions:number };
 type PvpChallengeView = {
   id: string;
   createdAt: string;
@@ -73,7 +73,7 @@ function toDiabloQuestions(rows: PvpChallengeView["questions"]): DiabloQuestion[
 export default function PvpPage() {
   const [activeUser, setActiveUser] = useState<{ id: string; displayName: string }>({ id: "", displayName: "" });
   const [leaders, setLeaders] = useState<LeaderRow[]>([]);
-  const [selectedRival, setSelectedRival] = useState<LeaderRow | null>(null);
+  const [selectedRival, setSelectedRival] = useState<LeaderRow | null>(null);\n  const [rivalStats, setRivalStats] = useState<RivalPerformance | null>(null);
   const [incoming, setIncoming] = useState<PvpChallengeView[]>([]);
   const [outgoing, setOutgoing] = useState<PvpChallengeView[]>([]);
   const [completed, setCompleted] = useState<PvpChallengeView[]>([]);
@@ -279,7 +279,7 @@ export default function PvpPage() {
                   key={row.userId}
                   className="featureCard"
                   type="button"
-                  onClick={() => setSelectedRival(row)}
+                  onClick={async () => { setSelectedRival(row); setRivalStats(null); const res = await fetch(`/api/stage10/profile/${encodeURIComponent(row.userId)}`, { cache: "no-store" }); if (res.ok) { const json = await res.json(); setRivalStats(json?.performance || null); } }}
                   style={{
                     padding: 12,
                     display: "flex",
@@ -297,7 +297,7 @@ export default function PvpPage() {
                 </button>
               ))}
             </div>
-            <button className="primaryBtn" type="button" style={{ marginTop: 14 }} disabled={!selectedRival || creating || !userId} onClick={createChallenge}>
+            {selectedRival && rivalStats ? <div className="featureCard pvpRivalIntel" style={{ padding: 14, marginTop: 14 }}><b>Rival intelligence</b><div className="pvpRivalStatsGrid"><div><small>ACCURACY</small><b>{rivalStats.accuracy}%</b></div><div><small>MASTERY</small><b>{rivalStats.overallMastery}%</b></div><div><small>SESSIONS</small><b>{rivalStats.completedSessions}</b></div><div><small>ACTIVE DAYS</small><b>{rivalStats.activeDays}</b></div><div><small>STRONGEST</small><b>{rivalStats.strongestDomain?.domain || "—"}</b></div><div><small>INTERVIEW WINS</small><b>{rivalStats.interviewWins}/{rivalStats.interviewSessions}</b></div></div></div> : null}\n            <button className="primaryBtn gdActionOrange" type="button" style={{ marginTop: 14 }} disabled={!selectedRival || creating || !userId} onClick={createChallenge}>
               {creating ? "Creating duel..." : selectedRival ? `Challenge ${selectedRival.displayName}` : "Create async PvP challenge"}
             </button>
           </div>
