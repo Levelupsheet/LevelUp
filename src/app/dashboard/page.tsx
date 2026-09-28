@@ -183,6 +183,8 @@ export default function Dashboard() {
   const [buyingItemId, setBuyingItemId] = useState<string | null>(null);
   const [stage9Message, setStage9Message] = useState<string | null>(null);
   const [stage10Leaderboards, setStage10Leaderboards] = useState<Stage10Leaderboards | null>(null);
+  const [leaderboardOpen, setLeaderboardOpen] = useState(false);
+  const [selectedLeaderboardPlayer, setSelectedLeaderboardPlayer] = useState<Stage10LeaderboardRow | null>(null);
 
 const [stage12Status, setStage12Status] = useState<Stage12Status | null>(null);
 const [stage12Uploading, setStage12Uploading] = useState(false);
@@ -855,6 +857,16 @@ async function analyzeResumeStage12() {
         }}
       />
 
+      {leaderboardOpen ? <div className="modalBackdrop" onMouseDown={() => setLeaderboardOpen(false)}><div className="card dashboardLeaderboardModal" onMouseDown={(e) => e.stopPropagation()}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:12}}><div><div className="dashboardUtilityEyebrow">WEEKLY COMPETITION</div><h2 style={{margin:"2px 0"}}>Leaderboard</h2><small>XP earned from completed sessions in the last 7 days.</small></div><button className="secondaryBtn gdActionRed" type="button" onClick={() => setLeaderboardOpen(false)}>CLOSE</button></div>
+        <div style={{display:"grid",gap:10,marginTop:16}}>{(stage10Leaderboards?.weekly || []).slice(0,20).map((row,idx)=><button key={`modal_lb_${row.userId}`} type="button" onClick={()=>setSelectedLeaderboardPlayer(row)} className="leaderboardMiniRow dashboardLeaderboardPlayer dashboardLeaderboardModalRow" style={{...(leaderboardTone(idx) as any),color:"inherit",textAlign:"left"}}><span className="badge leaderboardMiniRank">{idx+1}</span><span className="dashboardLeaderboardIdentity"><b>{row.displayName}</b><small>{row.rank || levelTitleFromLevel(Number(row.level || 1))} • Lvl {row.level || 1}</small></span><b>{row.xp || 0} XP</b></button>)}</div>
+      </div></div> : null}
+      {selectedLeaderboardPlayer ? <div className="modalBackdrop" onMouseDown={() => setSelectedLeaderboardPlayer(null)}><div className="card dashboardPlayerStatsModal" onMouseDown={(e)=>e.stopPropagation()}>
+        <div style={{display:"flex",justifyContent:"space-between",gap:12,alignItems:"center"}}><div><div className="dashboardUtilityEyebrow">PLAYER PROFILE</div><h2 style={{margin:"2px 0"}}>{selectedLeaderboardPlayer.displayName}</h2></div><button className="secondaryBtn gdActionRed" type="button" onClick={()=>setSelectedLeaderboardPlayer(null)}>CLOSE</button></div>
+        <div className="playerStatsHero"><div><small>RANK</small><b>{selectedLeaderboardPlayer.rank || levelTitleFromLevel(Number(selectedLeaderboardPlayer.level || 1))}</b></div><div><small>LEVEL</small><b>{selectedLeaderboardPlayer.level || 1}</b></div><div><small>WEEKLY XP</small><b>{selectedLeaderboardPlayer.xp || 0}</b></div><div><small>BOSS WINS</small><b>{stage10Leaderboards?.bossWins?.find(x=>x.userId===selectedLeaderboardPlayer.userId)?.wins || 0}</b></div></div>
+        <div className="playerStatsDetail"><b>Performance snapshot</b><small>Weekly XP shows recent training activity. Level reflects total progression, while boss wins show completed high-level battle performance.</small></div>
+      </div></div> : null}
+
       {showPositionModal && (
         <div className="luModalOverlay">
           <div className="luModal" role="dialog" aria-modal="true" aria-label="Choose starting position">
@@ -1016,28 +1028,6 @@ async function analyzeResumeStage12() {
 
           <hr style={{ margin: "14px 0" }} />
 
-          <h4 className="dashboardProgressHeading" style={{ margin: "0 0 8px 0" }}>Progress</h4>
-
-          <div className="card dashboardProgressCard dashboardProgressGameCard progressionSnapshot" style={{ padding: 12 }}>
-            <div className="progressionSnapshotHead">
-              <div>
-                <span className="progressionEyebrow">YOUR PROGRESSION</span>
-                <div className="progressionLevel">{levelTitleFromLevel(localLevel)} <b>Level {localLevel}</b></div>
-              </div>
-              <small className="progressionTier" style={{ ...(tierBadgeStyle as any) }}>{tierLabel}</small>
-            </div>
-            <div className="progressionXpRow">
-              <span><b>{Number.isFinite(xpIntoLevel) ? xpIntoLevel : 0}</b> / {levelMax} XP</span>
-              <span>{Math.max(0, levelMax - (Number.isFinite(xpIntoLevel) ? xpIntoLevel : 0))} to next level</span>
-            </div>
-            <ProgressBar value={Number.isFinite(xpIntoLevel) ? xpIntoLevel : 0} max={levelMax} />
-            <div className="progressionSignals">
-              <span><small>Mastery</small><b>{Math.round(Number(overallMastery || 0))}%</b></span>
-              <span><small>Streak</small><b>{dailyStreak.streakDays}d</b></span>
-              <span><small>Tokens</small><b>{Number.isFinite(tokenBalance) ? tokenBalance : 0}</b></span>
-            </div>
-          </div>
-
           <div className={"dashboardBattleStatus dashboardProgressionGate " + (((localLevel || 1) >= 5 || elig?.eligible) ? "unlocked" : "locked")}>
             <span className="dashboardBattleStatusDot" />
             <div><b>{techPassed ? "Boss Battle complete" : ((localLevel || 1) >= 5 || elig?.eligible) ? "Boss Battle unlocked" : "Boss Battle locked"}</b><small>{techPassed ? `Technical battle cleared${techLatest?.scoreAvg != null ? ` • Score ${Number(techLatest.scoreAvg).toFixed(1)}` : ""}. Keep training while your skills are fresh.` : ((localLevel || 1) >= 5 || elig?.eligible) ? "You meet the current progression gate." : "Reach Level 5 or qualify through mastery to unlock."}</small></div>
@@ -1144,16 +1134,16 @@ async function analyzeResumeStage12() {
       <h3 style={{ margin:"2px 0 0" }}>Leaderboard</h3>
       <small>XP earned from completed sessions in the last 7 days.</small>
     </div>
-    <a className="secondaryBtn gdActionBlue gdActionCompact" href="/leaderboard" style={{ textDecoration:"none" }}>OPEN LEADERBOARD</a>
+    <button className="secondaryBtn gdActionBlue gdActionCompact" type="button" onClick={() => setLeaderboardOpen(true)}>EXPAND LEADERBOARD</button>
   </div>
   <div className="dashboardLeaderboardMarquee" style={{ marginTop:12, overflow:"hidden" }}>
     <div className="dashboardLeaderboardTrack">
       {(stage10Leaderboards?.weekly || []).slice(0, 10).map((row, idx) => (
-        <a key={`main_lb_${row.userId}`} href={`/profile/${encodeURIComponent(row.userId)}`} className="leaderboardMiniRow dashboardLeaderboardPlayer" style={{ ...(leaderboardTone(idx) as any), textDecoration:"none", color:"inherit" }}>
+        <button key={`main_lb_${row.userId}`} type="button" onClick={() => setSelectedLeaderboardPlayer(row)} className="leaderboardMiniRow dashboardLeaderboardPlayer" style={{ ...(leaderboardTone(idx) as any), color:"inherit", textAlign:"left" }}>
           <span className="badge leaderboardMiniRank">{idx + 1}</span>
           <span className="dashboardLeaderboardIdentity"><b>{row.displayName}</b><small>{row.rank || levelTitleFromLevel(Number(row.level || 1))} • Lvl {row.level || 1}</small></span>
           <b>{row.xp || 0} XP</b>
-        </a>
+        </button>
       ))}
       {!stage10Leaderboards?.weekly?.length ? <small>Leaderboard populates from live sessions.</small> : null}
     </div>
@@ -1175,7 +1165,7 @@ async function analyzeResumeStage12() {
         <div><small>Currently open drawings. Your entry count is shown on each campaign.</small></div>
       </div>
     </div>
-    <div style={{ marginTop: 12, display:'grid', gap:12 }}>
+    <div className="dashboardSweepMarquee" style={{ marginTop: 12, overflow:"hidden" }}><div className="dashboardSweepTrack">
       {activeSweepCampaigns.map((c: any) => (
         <a key={`sweep_${c.id}`} href={`/sweepstakes?campaign=${encodeURIComponent(String(c.id))}`} className="sweepEntryTile" style={{ textDecoration: 'none', color: 'inherit' }}>
           <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
