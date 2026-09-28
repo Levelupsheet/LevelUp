@@ -25,7 +25,7 @@ type Props = {
   playerPosition?: string | null;
   certExam?: string | null;
   bankDomain?: string | null;
-  trainingMode?: "STANDARD" | "WEAK_DOMAIN";
+  trainingMode?: "STANDARD" | "WEAK_DOMAIN" | "MISSED_QUESTIONS";
   enemyName?: string;
   questionCount?: number;
   questionsOverride?: DiabloQuestion[] | null;
@@ -125,7 +125,7 @@ export default function GameEngine(props: Props) {
       setSessionId(String(json?.session?.id || ""));
       setInitialState(json?.session?.state || null);
       const focus = String(json?.session?.state?.focusDomain || "").replace(/_/g, " ");
-      setSetLabel(trainingMode === "WEAK_DOMAIN" ? `${title} · Weak Domain${focus ? `: ${focus}` : ""}` : `${title} · Active Session`);
+      setSetLabel(trainingMode === "WEAK_DOMAIN" ? `${title} · Weak Domain${focus ? `: ${focus}` : ""}` : trainingMode === "MISSED_QUESTIONS" ? `${title} · Missed Question Review` : `${title} · Active Session`);
     } else {
       setQuestions(FALLBACK_BY_LANE.TEST_NOW);
       setSetLabel(`${title} · Sample`);
