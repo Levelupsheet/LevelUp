@@ -10068,3 +10068,26 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     margin:0 auto!important;
   }
 }
+
+
+/* 2026-09-27 baseline-safe combat rail lock.
+   Keep the approved 7fa33c0 orb/portrait geometry untouched.
+   When answer feedback expands the center panel, pin both complete side rails
+   to the top of the quiz body so the orb + frame move as one unit and cannot
+   be scrolled/cropped independently from their portraits. */
+@media (min-width:901px){
+  .batch8DesktopQuizGrid .batch8PlayerRail,
+  .batch8DesktopQuizGrid .batch8EnemyRail{
+    position:sticky!important;
+    top:0!important;
+    align-self:start!important;
+    overflow:visible!important;
+    z-index:6!important;
+  }
+
+  .batch8DesktopQuizGrid .batch8PlayerRail > .playerOrbComposite:first-child,
+  .batch8DesktopQuizGrid .batch8EnemyRail > :first-child{
+    flex-shrink:0!important;
+    overflow:visible!important;
+  }
+}
