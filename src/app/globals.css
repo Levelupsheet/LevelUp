@@ -10091,3 +10091,22 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     overflow:visible!important;
   }
 }
+
+
+/* 2026-09-28 shared ARPG action treatment for dashboard/setup modals.
+   Intentionally scoped away from combat HUD geometry. */
+.gdModalChoice{
+  position:relative;
+  border:1px solid rgba(130,170,220,.28)!important;
+  background:linear-gradient(180deg,rgba(23,42,67,.94),rgba(8,15,27,.96))!important;
+  box-shadow:inset 0 0 18px rgba(0,0,0,.55),0 6px 18px rgba(0,0,0,.28)!important;
+  transition:filter .15s ease,transform .15s ease,border-color .15s ease!important;
+}
+.gdModalChoice:hover{filter:brightness(1.16);transform:translateY(-1px)}
+.gdModalChoiceOrange{border-color:rgba(232,151,63,.52)!important}
+.gdModalChoiceBlue{border-color:rgba(78,151,222,.5)!important}
+.gdTrackChoice{min-height:38px!important}
+.gdTrackChoiceActive{
+  filter:brightness(1.18)!important;
+  box-shadow:inset 0 0 16px rgba(80,150,225,.2),0 0 10px rgba(80,150,225,.16)!important;
+}
