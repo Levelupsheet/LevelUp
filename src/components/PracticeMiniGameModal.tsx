@@ -182,12 +182,26 @@ export default function PracticeMiniGameModal(props: {
                 </div>
                 <div className="muted">15 questions • unseen questions first • adaptive modes use your personal learning history</div>
               </div>}
-              {kind === "cert" ? cert : undefined}
+              <div style={{ marginTop: 14, display: "flex", justifyContent: "flex-end" }}>
+                <button className="primaryBtn gdActionOrange" type="button" onClick={() => setStep("quiz")}>START →</button>
+              </div>
+            </div>
+          )}
+
+          {step === "quiz" && (
+            <GameEngine
+              lane={lane}
+              title={title}
+              subtitle={subtitle}
+              timed={kind === "test"}
+              startingPosition={kind === "position" ? path : undefined}
+              playerPosition={playerPosition ?? defaultPath}
+              certExam={kind === "cert" ? cert : undefined}
               bankDomain={kind === "test" && testBank !== "GENERAL" ? testBank : undefined}
               trainingMode={kind === "test" ? testMode : "STANDARD"}
               exitLabel="EXIT"
               onExit={onClose}
-              metaLeft={kind === "position" ? `Path: ${path.replaceAll("_", " ")}` : kind === "cert" ? `Exam: ${cert.replaceAll("_", " ")}` : `Bank: ${testBank === "GENERAL" ? "Mixed" : testBank}` }
+              metaLeft={kind === "position" ? `Path: ${path.replaceAll("_", " ")}` : kind === "cert" ? `Exam: ${cert.replaceAll("_", " ")}` : `Bank: ${testBank === "GENERAL" ? "Mixed" : testBank}`}
               questionCount={kind === "test" ? 15 : 12}
               onComplete={finishRun as any}
             />
