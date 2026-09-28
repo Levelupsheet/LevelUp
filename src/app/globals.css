@@ -10013,3 +10013,58 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     height:93px!important;
   }
 }
+
+
+/* 2026-09-27 lock combat side rails against explanation-state clipping.
+   Rails stay top-anchored; only the center question panel may grow. */
+@media (min-width:901px){
+  .batch8DesktopQuizGrid{
+    align-items:start!important;
+    overflow:visible!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail,
+  .batch8DesktopQuizGrid .batch8EnemyRail{
+    align-self:start!important;
+    height:max-content!important;
+    min-height:0!important;
+    overflow:visible!important;
+    position:relative!important;
+  }
+
+  /* Player orb/frame remains the approved geometry and is never cropped by
+     the rail when feedback/explanation expands the center column. */
+  .batch8DesktopQuizGrid .batch8PlayerRail > .playerOrbComposite:first-child{
+    overflow:visible!important;
+    flex-shrink:0!important;
+  }
+
+  /* Match enemy HUD proportions to the player HUD: same 160px frame footprint,
+     compact orb within it, then a 2px seam into the enemy portrait. */
+  .batch8DesktopQuizGrid .batch8EnemyRail{
+    padding-top:52px!important;
+    gap:2px!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail > :first-child{
+    width:160px!important;
+    max-width:160px!important;
+    height:154px!important;
+    min-height:154px!important;
+    flex:0 0 154px!important;
+    margin:0 auto!important;
+    overflow:visible!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyCard{
+    width:160px!important;
+    max-width:160px!important;
+    height:154px!important;
+    min-height:154px!important;
+    overflow:visible!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyEnergyOrbShell{
+    transform:scale(.72)!important;
+    transform-origin:center!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail > .modelPanel{
+    margin:0 auto!important;
+  }
+}
