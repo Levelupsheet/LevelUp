@@ -4,7 +4,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import DiabloQuizRunner, { type DiabloQuestion, type DiabloQuizRunSummary } from "@/components/DiabloQuizRunner";
 
-type LeaderRow = { userId: string; displayName: string; xp?: number; level?: number; rank?: string };\ntype RivalPerformance = { accuracy:number; overallMastery:number; completedSessions:number; activeDays:number; strongestDomain:{domain:string;mastery:number}|null; interviewWins:number; interviewSessions:number };
+type LeaderRow = { userId: string; displayName: string; xp?: number; level?: number; rank?: string };
+type RivalPerformance = { accuracy:number; overallMastery:number; completedSessions:number; activeDays:number; strongestDomain:{domain:string;mastery:number}|null; interviewWins:number; interviewSessions:number };
 type PvpChallengeView = {
   id: string;
   createdAt: string;
@@ -73,7 +74,8 @@ function toDiabloQuestions(rows: PvpChallengeView["questions"]): DiabloQuestion[
 export default function PvpPage() {
   const [activeUser, setActiveUser] = useState<{ id: string; displayName: string }>({ id: "", displayName: "" });
   const [leaders, setLeaders] = useState<LeaderRow[]>([]);
-  const [selectedRival, setSelectedRival] = useState<LeaderRow | null>(null);\n  const [rivalStats, setRivalStats] = useState<RivalPerformance | null>(null);
+  const [selectedRival, setSelectedRival] = useState<LeaderRow | null>(null);
+  const [rivalStats, setRivalStats] = useState<RivalPerformance | null>(null);
   const [incoming, setIncoming] = useState<PvpChallengeView[]>([]);
   const [outgoing, setOutgoing] = useState<PvpChallengeView[]>([]);
   const [completed, setCompleted] = useState<PvpChallengeView[]>([]);
