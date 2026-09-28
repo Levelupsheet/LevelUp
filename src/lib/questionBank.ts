@@ -187,6 +187,7 @@ export async function buildQuestionBankSelection(args: {
   bankDomain?: string | null;
   userId?: string | null;
   sessionState?: { wrongStreak?: number; inRecovery?: boolean; typeCounts?: Record<string, number> } | null;
+  weakDomainTraining?: boolean;
 }) {
   const bank = await loadActiveBank({ lane: args.lane, startingPosition: args.startingPosition, certExam: args.certExam, bankDomain: args.bankDomain });
   const excludeSet = new Set((args.excludeIds || []).map((v) => String(v)));
@@ -195,8 +196,15 @@ export async function buildQuestionBankSelection(args: {
   // Keep an active exposure cycle strictly unseen-first. If only a partial
   // unseen remainder is left, finish that remainder instead of mixing already-seen
   // questions back into the same session. The following session starts a fresh cycle.
-  const sourcePool = cycle.questions;
   const learning = await getLearningContext(args.userId);
+  // Weak Domain Training deliberately narrows Test Now to the learner's weakest
+  // measured domain. Unlike the normal unseen cycle, remediation may revisit
+  // previously seen questions because repeated practice is the point of this mode.
+  const weakDomain = String(learning.weakestDomain || "general").toLowerCase();
+  const weakPool = args.weakDomainTraining
+    ? candidatePool.filter((q) => String(q.domainId || "general").toLowerCase() === weakDomain)
+    : [];
+  const sourcePool = args.weakDomainTraining && weakPool.length ? weakPool : cycle.questions;
   const calibrationMap = await getQuestionCalibrationMap(sourcePool.map((q) => String(q.id)));
   const blueprint = buildSessionBlueprint(args.questionCount, learning.weakestTargetDifficulty);
   const planned = weightedAdaptiveQuestionPlan({
@@ -217,5 +225,7 @@ export async function buildQuestionBankSelection(args: {
     blueprint,
     calibrationMap,
     exposureCycle: { reset: cycle.cycleReset, previouslySeen: cycle.seenCount, availableUnseen: cycle.questions.length, bankSize: candidatePool.length },
+    trainingMode: args.weakDomainTraining ? "WEAK_DOMAIN" : "STANDARD",
+    focusDomain: args.weakDomainTraining ? weakDomain : null,
   };
 }
