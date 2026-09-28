@@ -10549,3 +10549,115 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
  .pvpGamePage .pvpSetupGrid,.pvpGamePage .pvpChallengeGrid,.pvpGamePage .pvpResultGrid{grid-template-columns:1fr!important}
  .pvpGamePage .gameHubSectionLabel{align-items:flex-start!important;flex-direction:column!important}
 }
+
+
+/* Paid asset application shell — shared across user-facing catalog/setup pages */
+.paidAssetPage{
+  min-height:100vh;
+  color:#eee5d4;
+  font-family:Georgia,"Times New Roman",serif;
+  background:
+    radial-gradient(circle at 50% 0,rgba(98,51,24,.16),transparent 34%),
+    linear-gradient(180deg,#08090a,#050607)!important;
+}
+.paidAssetPage h1,.paidAssetPage h2,.paidAssetPage h3,.rewardsHubPage h1,.rewardsHubPage h2,.sweepstakesPage h1,.sweepstakesPage h2{
+  font-family:Georgia,"Times New Roman",serif!important;
+  color:#f4ead7;
+  text-shadow:0 2px 3px #000;
+}
+.paidAssetHero{
+  position:relative;
+  border:0!important;
+  border-radius:0!important;
+  background-color:#111!important;
+  background-image:linear-gradient(rgba(8,8,8,.18),rgba(8,8,8,.36)),url('/ui/grimdark/character_popup_window_bg_001.png')!important;
+  background-size:100% 100%!important;
+  background-repeat:no-repeat!important;
+  box-shadow:0 14px 30px rgba(0,0,0,.42)!important;
+  padding:28px 34px!important;
+}
+.paidAssetPanel{
+  border:0!important;
+  border-radius:0!important;
+  background-color:#0c0d0e!important;
+  background-image:url('/ui/grimdark/core-inner-panel.png')!important;
+  background-size:100% 100%!important;
+  background-repeat:no-repeat!important;
+  box-shadow:inset 0 0 28px rgba(0,0,0,.44)!important;
+  padding:24px!important;
+}
+.paidAssetPage .dashboardEyebrow,.rewardsHubPage .gameHubSectionLabel>span,.sweepstakesPage .gameHubSectionLabel>span{
+  color:#f2c369!important;
+  letter-spacing:.12em!important;
+  font-weight:900!important;
+}
+.trainingAssetPage .learningTrackCard,.certificationsAssetPage .learningTrackCard,.careerAssetPage .careerPathCard{
+  min-height:210px;
+  transition:filter .15s ease,transform .15s ease;
+}
+.trainingAssetPage .learningTrackCard:hover,.certificationsAssetPage .learningTrackCard:hover,.careerAssetPage .careerPathCard:hover{
+  filter:brightness(1.12);
+  transform:translateY(-2px);
+}
+.trainingAssetPage .learningFlowCard,.certificationsAssetPage .learningFlowCard{margin-top:16px}
+.practiceAssetPage select,.practiceAssetPage textarea{
+  border:1px solid rgba(172,109,49,.42)!important;
+  border-radius:0!important;
+  background:rgba(5,6,7,.82)!important;
+  color:#eee5d4!important;
+  box-shadow:inset 0 0 16px rgba(0,0,0,.46)!important;
+}
+.practiceAssetPage label{color:#e5c18d;font-weight:700}
+.testNowAssetPage .testNowSetupPanel{
+  margin-top:8vh;
+  background-image:linear-gradient(rgba(8,8,8,.18),rgba(8,8,8,.32)),url('/ui/grimdark/popup_popup_confirm_001_001.png')!important;
+  padding:54px 64px!important;
+}
+.rewardsHubPage{
+  font-family:Georgia,"Times New Roman",serif!important;
+  background:radial-gradient(circle at 50% 0,rgba(102,59,22,.14),transparent 35%),#070809!important;
+}
+.rewardsHubPage .rewardsHubHero{
+  background-image:linear-gradient(rgba(5,5,5,.18),rgba(5,5,5,.30)),url('/ui/grimdark/popup_popup_reward_bg_001.png')!important;
+  background-size:100% 100%!important;
+  border:0!important;
+}
+.rewardsHubPage .rewardsTierCard{
+  border:0!important;
+  border-radius:0!important;
+  background-image:url('/ui/grimdark/popup_popup_reward_bg_001.png')!important;
+  background-size:100% 100%!important;
+  background-color:#0b0b0b!important;
+  min-height:250px;
+}
+.rewardsHubPage .rewardEconomySnapshot>div{
+  border:0!important;
+  border-radius:0!important;
+  background-image:url('/ui/grimdark/core-inner-panel.png')!important;
+  background-size:100% 100%!important;
+}
+.sweepstakesPage{
+  font-family:Georgia,"Times New Roman",serif!important;
+  background:radial-gradient(circle at 50% 0,rgba(100,58,22,.14),transparent 35%),#070809!important;
+}
+.sweepstakesPage .glass,.sweepstakesPage .featureCard{
+  border-radius:0!important;
+  border-color:transparent!important;
+  background-color:#0b0b0b!important;
+  background-image:url('/ui/grimdark/popup_popup_reward_bg_001.png')!important;
+  background-size:100% 100%!important;
+  background-repeat:no-repeat!important;
+}
+.sweepstakesPage .pillTab{
+  border:0!important;
+  border-radius:0!important;
+  background:url('/ui/grimdark/core-tab-inactive.png') center/100% 100% no-repeat!important;
+}
+.sweepstakesPage .pillTab.active{
+  background-image:url('/ui/grimdark/core-tab-active.png')!important;
+}
+.careerAssetPage .careerPathActions .gold{background-image:url('/ui/grimdark/button-orange.png')!important}
+@media(max-width:700px){
+  .paidAssetHero,.paidAssetPanel{padding:20px!important}
+  .testNowAssetPage .testNowSetupPanel{padding:34px 22px!important}
+}
