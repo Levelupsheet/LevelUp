@@ -218,6 +218,42 @@ export async function getAdaptiveLearningContext(userId?: string | null) {
   };
 }
 
+export async function getMissedQuestionReview(userId?: string | null) {
+  const safeUserId = String(userId || "").trim();
+  if (!safeUserId) return { questionIds: new Set<string>(), stats: new Map<string, { misses: number; recoveryCorrect: number }>() };
+  await ensureAdaptiveLearningTables();
+  const rows = await (prisma as any).$queryRawUnsafe(
+    `SELECT "questionId","isCorrect","seenAt"
+       FROM "QuestionExposure"
+      WHERE "userId" = $1 AND "isCorrect" IS NOT NULL
+      ORDER BY "seenAt" ASC`,
+    safeUserId
+  ).catch(() => []);
+
+  const stats = new Map<string, { misses: number; recoveryCorrect: number }>();
+  for (const row of (rows || []) as any[]) {
+    const id = String(row?.questionId || "").trim();
+    if (!id) continue;
+    const current = stats.get(id) || { misses: 0, recoveryCorrect: 0 };
+    if (row?.isCorrect === true) {
+      if (current.misses > 0) current.recoveryCorrect += 1;
+    } else {
+      current.misses += 1;
+      // A new miss reopens remediation. Require three later correct exposures
+      // before the question leaves the active missed-question review pool.
+      current.recoveryCorrect = 0;
+    }
+    stats.set(id, current);
+  }
+
+  const questionIds = new Set(
+    Array.from(stats.entries())
+      .filter(([, value]) => value.misses > 0 && value.recoveryCorrect < 3)
+      .map(([id]) => id)
+  );
+  return { questionIds, stats };
+}
+
 export function isQuestionUnlocked(question: RuntimeQuestion, learning: Awaited<ReturnType<typeof getAdaptiveLearningContext>>) {
   const q = normalizeRuntimeQuestion(question);
   if (q.lifecycleStatus === "RETIRED" || q.lifecycleStatus === "ARCHIVED") return false;
