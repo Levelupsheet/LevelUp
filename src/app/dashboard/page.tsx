@@ -1112,25 +1112,7 @@ async function analyzeResumeStage12() {
             )}
           </div>
 
-          <div className="card dashboardPlanCard dashboardProgressGameCard progressionSnapshot" style={{ marginBottom: 14, padding: 16 }}>
-            <div className="progressionSnapshotHead">
-              <div>
-                <span className="progressionEyebrow">YOUR PROGRESSION</span>
-                <div className="progressionLevel">{levelTitleFromLevel(localLevel)} <b>Level {localLevel}</b></div>
-              </div>
-              <small className="progressionTier" style={{ ...(tierBadgeStyle as any) }}>{tierLabel}</small>
-            </div>
-            <div className="progressionXpRow">
-              <b>{xpIntoLevel} / {levelMax} XP</b>
-              <span>{Math.max(0, levelMax - xpIntoLevel)} to next level</span>
-            </div>
-            <ProgressBar value={Number.isFinite(xpIntoLevel) ? xpIntoLevel : 0} max={levelMax} />
-            <div className="progressionSignals">
-              <div><small>MASTERY</small><b>{Math.round(overallMastery)}%</b></div>
-              <div><small>STREAK</small><b>{dailyStreak.streakDays}d</b></div>
-              <div><small>TOKENS</small><b>{tokenBalance}</b></div>
-            </div>
-          </div>
+          
 
           
 <div className="card" style={{ marginBottom: 14, borderColor: "rgba(255,196,107,0.24)" }}>
