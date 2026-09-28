@@ -10245,3 +10245,29 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 @media (prefers-reduced-motion:reduce){
   .dashboardLeaderboardTrack{animation:none!important}
 }
+
+
+/* 2026-09-28 dashboard carousel + leaderboard modal refinement */
+.dashboardLeaderboardMarquee{position:relative}
+.dashboardLeaderboardTrack{
+  animation:dashboardLeaderboardCards 24s linear infinite!important;
+  will-change:transform;
+}
+@keyframes dashboardLeaderboardCards{
+  from{transform:translateX(0)}
+  to{transform:translateX(-55%)}
+}
+.dashboardLeaderboardPlayer{font:inherit;cursor:pointer}
+.dashboardLeaderboardModal{width:min(760px,calc(100vw - 32px));max-height:78vh;overflow:auto;padding:20px}
+.dashboardLeaderboardModalRow{width:100%;grid-template-columns:42px minmax(0,1fr) auto}
+.dashboardPlayerStatsModal{width:min(620px,calc(100vw - 32px));padding:20px}
+.playerStatsHero{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:16px}
+.playerStatsHero>div{display:grid;gap:5px;padding:14px;border:1px solid rgba(255,196,107,.24);background:rgba(15,14,13,.86)}
+.playerStatsHero small{opacity:.72}.playerStatsHero b{font-size:20px}
+.playerStatsDetail{display:grid;gap:6px;margin-top:12px;padding:14px;border:1px solid rgba(255,196,107,.18)}
+.dashboardSweepTrack{display:flex;gap:12px;width:max-content;min-width:100%;animation:dashboardSweepCards 28s linear infinite;will-change:transform}
+.dashboardSweepMarquee:hover .dashboardSweepTrack{animation-play-state:paused}
+.dashboardSweepTrack .sweepEntryTile{flex:0 0 min(520px,75vw)}
+@keyframes dashboardSweepCards{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@media(max-width:700px){.playerStatsHero{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(prefers-reduced-motion:reduce){.dashboardLeaderboardTrack,.dashboardSweepTrack{animation:none!important}}
