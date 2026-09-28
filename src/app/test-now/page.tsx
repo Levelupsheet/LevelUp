@@ -25,9 +25,9 @@ export default function TestNowPage() {
 
   if (!trainingMode) {
     return (
-      <div className="page">
+      <div className="page paidAssetPage testNowAssetPage">
         <div className="container" style={{ maxWidth: 760 }}>
-          <div className="card" style={{ padding: 22, textAlign: "center" }}>
+          <div className="card paidAssetHero testNowSetupPanel" style={{ padding: 22, textAlign: "center" }}>
             <h2 style={{ marginTop: 0 }}>Choose Test Now Training</h2>
             <p className="muted">Run a normal adaptive test or concentrate the session on your weakest measured domain.</p>
             <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap", marginTop: 18 }}>
