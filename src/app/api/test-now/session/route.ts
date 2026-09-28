@@ -135,7 +135,7 @@ async function buildNewSession(userId: string, questionCount = 10, bankDomain?: 
         questionCount: finalQuestions.length,
         goldenSpawned: Boolean(goldenQuestionId),
         currentIndex: 0,
-        stateJson: { idx: 0, playerHP: 100, enemyHP: 100, correctCount: 0, xpEarned: 0, tier: 1, mastery: {}, timeLeft: 25, lastWasCorrect: null, feedback: null, locked: false, selected: null, finished: false, wrongStreak: 0, inRecovery: false, blueprint: bank.blueprint || [], typeCounts: Object.fromEntries((bank.selectedQuestions || []).reduce((acc: Map<string, number>, q: any) => { const t = String(q?.type || "multiple_choice").toLowerCase(); acc.set(t, (acc.get(t) || 0) + 1); return acc; }, new Map())), },
+        stateJson: { idx: 0, playerHP: 100, enemyHP: 100, correctCount: 0, xpEarned: 0, tier: 1, mastery: {}, timeLeft: 25, lastWasCorrect: null, feedback: null, locked: false, selected: null, finished: false, wrongStreak: 0, inRecovery: false, trainingMode: bank.trainingMode || "STANDARD", focusDomain: bank.focusDomain || null, blueprint: bank.blueprint || [], typeCounts: Object.fromEntries((bank.selectedQuestions || []).reduce((acc: Map<string, number>, q: any) => { const t = String(q?.type || "multiple_choice").toLowerCase(); acc.set(t, (acc.get(t) || 0) + 1); return acc; }, new Map())), },
       },
     });
     for (let i = 0; i < finalQuestions.length; i += 1) {
