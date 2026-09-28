@@ -10296,3 +10296,12 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 .rewardPathTier3:before{background-image:url('/ui/grimdark/icon_res_gold_3_001.png')}
 .rewardPathTier4:before{background-image:url('/ui/grimdark/icon_res_gold_4_001.png')}
 .rewardPathTier5:before{background-image:url('/ui/grimdark/icon_res_gold_5_001.png')}
+
+/* Dashboard polish: keep short leaderboards visible and fit XP loading assets */
+.dashboardLeaderboardTrack{animation:none!important;transform:none!important;justify-content:flex-start!important}
+.dashboardLeaderboardTrack:has(.dashboardLeaderboardPlayer:nth-of-type(2)){animation:dashboardLeaderboardCards 24s linear infinite!important}
+.dashboardLeaderboardMain .dashboardLeaderboardMarquee{min-height:74px}
+.dashboardProgressGameCard .progressBar{height:28px!important;padding:6px 18px!important;overflow:visible!important;background-size:100% 100%!important}
+.dashboardProgressGameCard .progressFill{position:relative!important;min-width:0!important;clip-path:polygon(0 18%,96% 18%,100% 50%,96% 82%,0 82%)}
+.dashboardProgressGameCard .progressBar:after{inset:-1px!important;background-size:100% 100%!important}
+@media(prefers-reduced-motion:reduce){.dashboardLeaderboardTrack:has(.dashboardLeaderboardPlayer:nth-of-type(2)){animation:none!important}}
