@@ -174,22 +174,15 @@ export default function PracticeMiniGameModal(props: {
               {kind === "test" && <div style={{ display: "grid", gap: 14 }}>
                 <div style={{ fontWeight: 800 }}>Choose training mode</div>
                 <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-                  {([["STANDARD","Standard Test"],["WEAK_DOMAIN","Weak Domain Training"],["MISSED_QUESTIONS","Missed Question Review"]] as const).map(([k,label]) => <button key={k} className={"trackBtn gdActionBlue gdTrackChoice" + (testMode === k ? " active gdTrackChoiceActive" : "")} type="button" onClick={() => setTestMode(k)}>{label}</button>)}
+                  {([["STANDARD","Standard"],["MISSED_QUESTIONS","Missed Questions"],["WEAK_DOMAIN","Weak Domains"]] as const).map(([k,label]) => <button key={k} className={"trackBtn gdActionBlue gdTrackChoice" + (testMode === k ? " active gdTrackChoiceActive" : "")} type="button" onClick={() => setTestMode(k)}>{label}</button>)}
                 </div>
-                <div style={{ fontWeight: 800, marginTop: 4 }}>Choose a question bank</div><div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>{([ ["GENERAL", "Mixed"], ["IDENTITY", "Identity"], ["NETWORKING", "Networking"], ["SECURITY", "Security"], ["COMPUTE", "Compute"], ["STORAGE", "Storage"], ["AZURE", "Azure"], ["AWS", "AWS"], ["WINDOWS", "Windows"] ] as const).map(([k, label]) => <button key={k} className={"trackBtn gdActionBlue gdTrackChoice" + (testBank === k ? " active gdTrackChoiceActive" : "")} type="button" onClick={() => setTestBank(k)}>{label}</button>)}</div><small className="luHint">15 questions • unseen questions first • the selected bank resets after you have seen its full pool</small></div>}
-              <div className="practiceGameStartRow" style={{ display: "flex", justifyContent: "flex-end", marginTop: 14 }}><button className="primaryBtn gdActionOrange practiceGameStartButton" type="button" onClick={() => setStep("quiz")}>Start →</button></div>
-            </div>
-          )}
-
-          {step === "quiz" && (
-            <GameEngine
-              lane={lane}
-              title={title}
-              subtitle={subtitle}
-              timed={kind === "test"}
-              startingPosition={kind === "position" ? path : undefined}
-              playerPosition={playerPosition ?? defaultPath}
-              certExam={kind === "cert" ? cert : undefined}
+                <div style={{ fontWeight: 800, marginTop: 4 }}>Choose a question bank</div>
+                <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                  {([["GENERAL","Mixed"],["AWS","AWS"],["AZURE","Azure"],["SECURITY","Security+"]] as const).map(([k,label]) => <button key={k} className={"trackBtn gdActionBlue gdTrackChoice" + (testBank === k ? " active gdTrackChoiceActive" : "")} type="button" onClick={() => setTestBank(k)}>{label}</button>)}
+                </div>
+                <div className="muted">15 questions • unseen questions first • adaptive modes use your personal learning history</div>
+              </div>}
+              {kind === "cert" ? cert : undefined}
               bankDomain={kind === "test" && testBank !== "GENERAL" ? testBank : undefined}
               trainingMode={kind === "test" ? testMode : "STANDARD"}
               exitLabel="EXIT"
