@@ -10342,3 +10342,142 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
   background-position:left center!important;
   background-repeat:no-repeat!important;
 }
+
+
+/* 2026-09-28 screenshot correction: combat rail parity and unclipped question panel */
+@media (min-width:901px){
+  /* Keep the purchased question background fully visible at its top edge. */
+  .d2QuizBody{overflow:visible!important;}
+  .batch8DesktopQuizGrid{
+    overflow:visible!important;
+    padding-top:12px!important;
+  }
+  .d2QuizQuestionCard{
+    overflow:visible!important;
+    background-position:center top!important;
+  }
+
+  /* Information medallion: 30% smaller without reserving the old footprint. */
+  .sessionInfoIconButton{
+    width:50px!important;
+    height:38px!important;
+    flex:0 0 50px!important;
+  }
+
+  /* Player and enemy HUDs use the same 160x154 orb footprint and hairline seams. */
+  .batch8DesktopQuizGrid .batch8PlayerRail,
+  .batch8DesktopQuizGrid .batch8EnemyRail{
+    padding-top:0!important;
+    gap:2px!important;
+    background:transparent!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail > .playerOrbComposite:first-child,
+  .batch8DesktopQuizGrid .batch8EnemyRail > .d2EnemyCard:first-child{
+    width:160px!important;
+    max-width:160px!important;
+    height:154px!important;
+    min-height:154px!important;
+    flex:0 0 154px!important;
+    margin:0 auto 2px!important;
+    padding:0!important;
+    transform:none!important;
+    background:transparent!important;
+    border:0!important;
+    box-shadow:none!important;
+    filter:none!important;
+    overflow:visible!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyEnergyOrbShell{
+    position:absolute!important;
+    inset:0!important;
+    width:160px!important;
+    height:154px!important;
+    transform:none!important;
+    background:transparent!important;
+    border:0!important;
+    box-shadow:none!important;
+    filter:none!important;
+    overflow:visible!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyEnergyOrb{
+    position:absolute!important;
+    inset:0!important;
+    width:160px!important;
+    height:154px!important;
+    max-width:none!important;
+    object-fit:contain!important;
+    background:transparent!important;
+    border:0!important;
+    box-shadow:none!important;
+    filter:none!important;
+    opacity:1!important;
+  }
+  /* Drain/flash overlays were producing the CSS blue cast over the purchased orb. */
+  .batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyEnergyDrain,
+  .batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyEnergyFlash{
+    display:none!important;
+    background:transparent!important;
+    box-shadow:none!important;
+    filter:none!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyOrbValue{
+    inset:0!important;
+    width:160px!important;
+    height:154px!important;
+  }
+
+  /* Portraits: identical rail footprint and no legacy black CSS card behind enemy. */
+  .batch8DesktopQuizGrid .batch8PlayerRail > .modelPanel,
+  .batch8DesktopQuizGrid .batch8EnemyRail > .modelPanel{
+    width:160px!important;
+    height:170px!important;
+    min-width:160px!important;
+    min-height:170px!important;
+    margin:0 auto 2px!important;
+    padding:0!important;
+    border:0!important;
+    border-radius:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+    overflow:hidden!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail > .modelPanel > div,
+  .batch8DesktopQuizGrid .batch8EnemyRail > .modelPanel > div{
+    width:160px!important;
+    height:170px!important;
+    margin:0!important;
+    border-radius:0!important;
+    background:transparent!important;
+    border:1px solid rgba(169,105,35,.75)!important;
+    box-sizing:border-box!important;
+    overflow:hidden!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail > .modelPanel video,
+  .batch8DesktopQuizGrid .batch8EnemyRail > .modelPanel video,
+  .batch8DesktopQuizGrid .batch8PlayerRail > .modelPanel img,
+  .batch8DesktopQuizGrid .batch8EnemyRail > .modelPanel img{
+    width:160px!important;
+    height:170px!important;
+    object-fit:cover!important;
+    border:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+    filter:none!important;
+  }
+  .batch8DesktopQuizGrid .quizEnemyNameBelow{
+    width:160px!important;
+    margin:-2px auto 0!important;
+    padding:8px 2px!important;
+    background:transparent!important;
+    border:0!important;
+    box-shadow:none!important;
+    text-align:center!important;
+  }
+
+  /* Potion art is diagonal by design; rotate it into the narrow rack slot. */
+  .batch8DesktopQuizGrid .playerPowerupSlot[aria-label^="Use Restore Health"] img{
+    transform:rotate(22deg) scale(.82)!important;
+    transform-origin:center!important;
+    object-fit:contain!important;
+  }
+}
