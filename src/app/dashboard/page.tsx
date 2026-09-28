@@ -170,6 +170,7 @@ export default function Dashboard() {
   const [lootOpen, setLootOpen] = useState(false);
   const [learningRows, setLearningRows] = useState<LearningRow[]>([]);
   const [overallMastery, setOverallMastery] = useState<number>(0);
+  const [learningProgress, setLearningProgress] = useState<any>(null);
   const [careerMatches, setCareerMatches] = useState<CareerMatchRow[]>([]);
   const [sweepSummary, setSweepSummary] = useState<SweepstakesSummary | null>(null);
   const [subscriptionTier, setSubscriptionTier] = useState<string>("FREE");
@@ -366,6 +367,7 @@ useEffect(() => {
           setLearningRows(rows);
           const overall = Number(lpData?.profile?.overallMastery ?? (rows.length ? rows.reduce((sum, row) => sum + Number((row as any)?.mastery || 0), 0) / rows.length : 0));
           setOverallMastery(overall);
+          setLearningProgress(lpData?.learningProgress || null);
           try {
             const domains = rows.filter((r: any) => Number(r?.mastery || 0) >= 40).map((r: any) => String(r.domain || '').toUpperCase());
             const params = new URLSearchParams();
@@ -1165,8 +1167,10 @@ async function analyzeResumeStage12() {
       <div style={{ fontWeight: 900, fontSize: 22 }}>{dailyStreak.momentumLabel}</div>
     </div>
     <div className="featureCard">
-      <div><small>Insights</small></div>
-      <div style={{ fontWeight: 900, fontSize: 20 }}><a href="/admin/insights" style={{ color: "inherit", textDecoration: "none" }}>Open insights →</a></div>
+      <div><small>Learning progress</small></div>
+      <div style={{ fontWeight: 900, fontSize: 20 }}>{learningProgress?.weakestDomain || "Building profile"}</div>
+      <div style={{ marginTop: 4 }}><small>{Number(learningProgress?.questionsToMaster || 0)} questions to master • {Number(learningProgress?.weakestDomainMastery || 0).toFixed(1)}% weakest-domain mastery</small></div>
+      <div style={{ marginTop: 8 }}><a href="/admin/insights" style={{ color: "inherit", textDecoration: "none", fontWeight: 800 }}>Open learning insights →</a></div>
     </div>
   </div>
   <div style={{ marginTop: 10, opacity: 0.86 }}><small>Store, spend, and persistent streak bonuses can now be layered on top of your Stage 8 momentum systems.</small></div>
