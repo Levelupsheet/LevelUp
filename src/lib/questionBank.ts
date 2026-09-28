@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { inferDomainFromQuestion } from "@/lib/learningProfile";
-import { getAdaptiveLearningContext, getQuestionCalibrationMap, weightedAdaptiveQuestionPlan } from "@/lib/adaptiveEngine";
+import { getAdaptiveLearningContext, getMissedQuestionReview, getQuestionCalibrationMap, weightedAdaptiveQuestionPlan } from "@/lib/adaptiveEngine";
 import { buildSessionBlueprint } from "@/lib/bankRules";
 import { normalizeDifficultyLevel, shuffleQuestionPayload } from "@/lib/questionTransforms";
 import { normalizeQuestionType } from "@/lib/questionTypes";
@@ -188,6 +188,7 @@ export async function buildQuestionBankSelection(args: {
   userId?: string | null;
   sessionState?: { wrongStreak?: number; inRecovery?: boolean; typeCounts?: Record<string, number> } | null;
   weakDomainTraining?: boolean;
+  missedQuestionTraining?: boolean;
 }) {
   const bank = await loadActiveBank({ lane: args.lane, startingPosition: args.startingPosition, certExam: args.certExam, bankDomain: args.bankDomain });
   const excludeSet = new Set((args.excludeIds || []).map((v) => String(v)));
@@ -197,6 +198,7 @@ export async function buildQuestionBankSelection(args: {
   // unseen remainder is left, finish that remainder instead of mixing already-seen
   // questions back into the same session. The following session starts a fresh cycle.
   const learning = await getLearningContext(args.userId);
+  const missedReview = args.missedQuestionTraining ? await getMissedQuestionReview(args.userId) : null;
   // Weak Domain Training deliberately narrows Test Now to the learner's weakest
   // measured domain. Unlike the normal unseen cycle, remediation may revisit
   // previously seen questions because repeated practice is the point of this mode.
@@ -204,7 +206,14 @@ export async function buildQuestionBankSelection(args: {
   const weakPool = args.weakDomainTraining
     ? candidatePool.filter((q) => String(q.domainId || "general").toLowerCase() === weakDomain)
     : [];
-  const sourcePool = args.weakDomainTraining && weakPool.length ? weakPool : cycle.questions;
+  const missedPool = args.missedQuestionTraining && missedReview
+    ? candidatePool.filter((q) => missedReview.questionIds.has(String(q.id)))
+    : [];
+  const sourcePool = args.missedQuestionTraining && missedPool.length
+    ? missedPool
+    : args.weakDomainTraining && weakPool.length
+      ? weakPool
+      : cycle.questions;
   const calibrationMap = await getQuestionCalibrationMap(sourcePool.map((q) => String(q.id)));
   const blueprint = buildSessionBlueprint(args.questionCount, learning.weakestTargetDifficulty);
   const planned = weightedAdaptiveQuestionPlan({
@@ -225,7 +234,8 @@ export async function buildQuestionBankSelection(args: {
     blueprint,
     calibrationMap,
     exposureCycle: { reset: cycle.cycleReset, previouslySeen: cycle.seenCount, availableUnseen: cycle.questions.length, bankSize: candidatePool.length },
-    trainingMode: args.weakDomainTraining ? "WEAK_DOMAIN" : "STANDARD",
+    trainingMode: args.missedQuestionTraining ? "MISSED_QUESTIONS" : args.weakDomainTraining ? "WEAK_DOMAIN" : "STANDARD",
     focusDomain: args.weakDomainTraining ? weakDomain : null,
+    missedQuestionCount: missedPool.length,
   };
 }
