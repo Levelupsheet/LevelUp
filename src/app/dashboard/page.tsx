@@ -1183,42 +1183,6 @@ async function analyzeResumeStage12() {
 
 
 
-<div className="card dashboardCoachCard">
-  <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
-    <div>
-      <h3 style={{ margin: 0 }}>AI Coach</h3>
-      <div style={{ marginTop: 6, opacity: 0.84 }}><small>Resume insights now live on the Insights page. Your dashboard keeps a quick summary only.</small></div>
-    </div>
-  </div>
-
-  <div className="dashboardCoachGrid">
-    <div className="featureCard">
-      <div><small>AI summary</small></div>
-      <div style={{ marginTop: 8, fontWeight: 800, fontSize: 20 }}>{stage12Status?.profile?.targetRole || "Career path pending"}</div>
-      <div style={{ marginTop: 8, opacity: 0.88 }}>
-        <small>{stage12Status?.profile?.coaching?.summary || "Upload a PDF or DOCX resume from the Insights page to generate skill gaps and coaching guidance."}</small>
-      </div>
-      <div style={{ marginTop: 10, display: "flex", gap: 8, flexWrap: "wrap" }}>
-        {(stage12Status?.profile?.inferredDomains || []).slice(0, 3).map((row) => (
-          <span key={`s12_dm_${row.domain}`} className="badge">{row.domain} · {row.score}</span>
-        ))}
-        {!stage12Status?.profile?.inferredDomains?.length ? <span className="badge">No domain signals yet</span> : null}
-      </div>
-    </div>
-    <div className="featureCard">
-      <div style={{ fontWeight: 800 }}>Coach next actions</div>
-      <div style={{ marginTop: 8, display: "grid", gap: 8 }}>
-        {(stage12Status?.profile?.coaching?.nextActions || []).slice(0, 2).map((row, idx) => (
-          <div key={`s12_action_${idx}`}><small>• {row}</small></div>
-        ))}
-        {!(stage12Status?.profile?.coaching?.nextActions || []).length ? <small style={{ opacity: 0.78 }}>No recommendations yet.</small> : null}
-      </div>
-      <div style={{ marginTop: 10, opacity: 0.76 }}><small>{stage12Status?.analyzedAt ? `Last analyzed ${new Date(stage12Status.analyzedAt).toLocaleString()}` : "Original resume file is not retained long term."}</small></div>
-      <a className="secondaryBtn dashboardCoachCta gdActionBlue" href="/coach">Open AI Coach →</a>
-    </div>
-  </div>
-</div>
-
 {activeSweepCampaigns.length ? (
   <div className="card sweepGoldCard" style={{ marginTop: 14, borderColor: 'rgba(255,215,90,.28)', boxShadow: '0 0 0 1px rgba(255,215,90,.08) inset' }}>
     <div style={{ display:'flex', justifyContent:'space-between', gap:12, alignItems:'center', flexWrap:'wrap' }}>
