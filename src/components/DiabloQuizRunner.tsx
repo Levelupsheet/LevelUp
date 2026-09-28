@@ -1269,7 +1269,7 @@ const showExpandedExplanation = useMemo(() => {
                   {[
                     { key: "shield", qty: stage9Inventory.shield + powerups.shieldUses, src: "/ui/grimdark/flow_skill3_001.png", label: "Shield", action: activateShield, disabled: state.locked || powerups.shieldActive },
                     { key: "fury", qty: stage9Inventory.fury + powerups.furyUses, src: "/ui/grimdark/flow_skill1_001.png", label: "Fury", action: activateFury, disabled: state.locked || powerups.furyActive },
-                    { key: "restore", qty: stage9Inventory.restore, src: "/ui/grimdark/flow_skill7_001.png", label: "Restore Health", action: activateRestore, disabled: state.locked || state.playerHP >= (rules?.startHP ?? 100) },
+                    { key: "restore", qty: stage9Inventory.restore, src: "/ui/grimdark/flow_icon_buff_items_001.png", label: "Restore Health", action: activateRestore, disabled: state.locked || state.playerHP >= (rules?.startHP ?? 100) },
                     { key: "xpSurge", qty: stage9Inventory.xpSurge, src: "/ui/grimdark/flow_skill6_001.png", label: "Time Slow", action: activateXpSurge, disabled: state.locked },
                   ].filter((item) => item.qty > 0).slice(0, 4).map((item, index) => (
                     <button className={`playerPowerupSlot slot${index + 1}`} type="button" key={item.key} title={`Use ${item.label} (x${item.qty})`} aria-label={`Use ${item.label}, ${item.qty} available`} onClick={item.action} disabled={item.disabled}>
@@ -1295,16 +1295,7 @@ const showExpandedExplanation = useMemo(() => {
                       <div className="stageLabelPill stageLabelArtwork">Stage {sessionStage} • {metaLeft || "Combat Quiz"}</div>
                     </div>
                     <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap", justifyContent: "flex-end" }}>
-                      {timed ? (
-                        <span
-                          className={`quizCountdownTimer ${state.timeLeft <= 5 ? "critical" : state.timeLeft <= 10 ? "warning" : "safe"}`}
-                          aria-label={`${Math.max(0, state.timeLeft)} seconds remaining`}
-                        >
-                          <span className="quizCountdownIcon">⏱</span>
-                          <span className="quizCountdownValue">{state.timeLeft <= 0 ? "TIME'S UP" : Math.max(0, state.timeLeft)}</span>
-                          {state.timeLeft > 0 ? <span className="quizCountdownUnit">SEC</span> : null}
-                        </span>
-                      ) : null}
+
                       <span className="badge">{labelForType(questionType)}</span>
                     </div>
                   </div>
@@ -1328,6 +1319,7 @@ const showExpandedExplanation = useMemo(() => {
 
                   <div className="stage5MetaStrip quizSecondaryMeta batch8PrimaryProgress">
                     <span className="badge">Mastery {masteryPercent}%</span>
+                    {timed ? <span className={`quizCountdownTimer quizCountdownInline ${state.timeLeft <= 5 ? "critical" : state.timeLeft <= 10 ? "warning" : "safe"}`} aria-label={`${Math.max(0, state.timeLeft)} seconds remaining`}><span className="quizCountdownIcon">⏱</span><span className="quizCountdownValue">{state.timeLeft <= 0 ? "TIME'S UP" : Math.max(0, state.timeLeft)}</span>{state.timeLeft > 0 ? <span className="quizCountdownUnit">SEC</span> : null}</span> : null}
                     <span className="badge">Streak {streak}</span>
                     {partialPercent > 0 && state.locked ? <span className="badge">Partial {partialPercent}%</span> : null}
                   </div>
