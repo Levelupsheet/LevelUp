@@ -18,6 +18,8 @@ type Stage9InventoryRow = { itemType: string; itemRef: string | null; quantity: 
 type Stage9Status = { streakDays: number; lastClaimDate: string | null; claimableToday: boolean; dailyBonusTokens: number; momentumLabel: string; nextHook: string; walletTokens: number; inventory: Stage9InventoryRow[]; store: Stage9StoreItem[]; };
 type Stage10LeaderboardRow = { userId: string; displayName: string; xp?: number; level?: number; rank?: string; domain?: string; wins?: number };
 type Stage10Leaderboards = { weekly: Stage10LeaderboardRow[]; byDomain: Stage10LeaderboardRow[]; bossWins: Stage10LeaderboardRow[]; domain?: string | null };
+type PlayerPerformance = { completedSessions:number; totalQuestionsAnswered:number; correctAnswers:number; accuracy:number; overallMastery:number; avgResponseMs:number; activeDays:number; estimatedTrainingMinutes:number; memberSince:string; strongestDomain:{domain:string;mastery:number}|null; weakestDomain:{domain:string;mastery:number}|null; interviewSessions:number; interviewWins:number; interviewAverageScore:number };
+type PlayerProfileStats = { performance?: PlayerPerformance };
 
 type Stage12Profile = {
   analyzedAt: string;
@@ -185,6 +187,20 @@ export default function Dashboard() {
   const [stage10Leaderboards, setStage10Leaderboards] = useState<Stage10Leaderboards | null>(null);
   const [leaderboardOpen, setLeaderboardOpen] = useState(false);
   const [selectedLeaderboardPlayer, setSelectedLeaderboardPlayer] = useState<Stage10LeaderboardRow | null>(null);
+  const [selectedPlayerStats, setSelectedPlayerStats] = useState<PlayerProfileStats | null>(null);
+  const [playerStatsLoading, setPlayerStatsLoading] = useState(false);
+
+  async function openPlayerStats(row: Stage10LeaderboardRow) {
+    setSelectedLeaderboardPlayer(row);
+    setSelectedPlayerStats(null);
+    setPlayerStatsLoading(true);
+    try {
+      const res = await fetch(`/api/stage10/profile/${encodeURIComponent(row.userId)}`, { cache: "no-store" });
+      if (res.ok) setSelectedPlayerStats(await res.json());
+    } finally {
+      setPlayerStatsLoading(false);
+    }
+  }
 
 const [stage12Status, setStage12Status] = useState<Stage12Status | null>(null);
 const [stage12Uploading, setStage12Uploading] = useState(false);
@@ -859,12 +875,24 @@ async function analyzeResumeStage12() {
 
       {leaderboardOpen ? <div className="modalBackdrop" onMouseDown={() => setLeaderboardOpen(false)}><div className="card dashboardLeaderboardModal" onMouseDown={(e) => e.stopPropagation()}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:12}}><div><div className="dashboardUtilityEyebrow">WEEKLY COMPETITION</div><h2 style={{margin:"2px 0"}}>Leaderboard</h2><small>XP earned from completed sessions in the last 7 days.</small></div><button className="secondaryBtn gdActionRed" type="button" onClick={() => setLeaderboardOpen(false)}>CLOSE</button></div>
-        <div style={{display:"grid",gap:10,marginTop:16}}>{(stage10Leaderboards?.weekly || []).slice(0,20).map((row,idx)=><button key={`modal_lb_${row.userId}`} type="button" onClick={()=>setSelectedLeaderboardPlayer(row)} className="leaderboardMiniRow dashboardLeaderboardPlayer dashboardLeaderboardModalRow" style={{...(leaderboardTone(idx) as any),color:"inherit",textAlign:"left"}}><span className="badge leaderboardMiniRank">{idx+1}</span><span className="dashboardLeaderboardIdentity"><b>{row.displayName}</b><small>{row.rank || levelTitleFromLevel(Number(row.level || 1))} • Lvl {row.level || 1}</small></span><b>{row.xp || 0} XP</b></button>)}</div>
+        <div style={{display:"grid",gap:10,marginTop:16}}>{(stage10Leaderboards?.weekly || []).slice(0,20).map((row,idx)=><button key={`modal_lb_${row.userId}`} type="button" onClick={()=>openPlayerStats(row)} className="leaderboardMiniRow dashboardLeaderboardPlayer dashboardLeaderboardModalRow" style={{...(leaderboardTone(idx) as any),color:"inherit",textAlign:"left"}}><span className="badge leaderboardMiniRank">{idx+1}</span><span className="dashboardLeaderboardIdentity"><b>{row.displayName}</b><small>{row.rank || levelTitleFromLevel(Number(row.level || 1))} • Lvl {row.level || 1}</small></span><b>{row.xp || 0} XP</b></button>)}</div>
       </div></div> : null}
       {selectedLeaderboardPlayer ? <div className="modalBackdrop" onMouseDown={() => setSelectedLeaderboardPlayer(null)}><div className="card dashboardPlayerStatsModal" onMouseDown={(e)=>e.stopPropagation()}>
         <div style={{display:"flex",justifyContent:"space-between",gap:12,alignItems:"center"}}><div><div className="dashboardUtilityEyebrow">PLAYER PROFILE</div><h2 style={{margin:"2px 0"}}>{selectedLeaderboardPlayer.displayName}</h2></div><button className="secondaryBtn gdActionRed" type="button" onClick={()=>setSelectedLeaderboardPlayer(null)}>CLOSE</button></div>
         <div className="playerStatsHero"><div><small>RANK</small><b>{selectedLeaderboardPlayer.rank || levelTitleFromLevel(Number(selectedLeaderboardPlayer.level || 1))}</b></div><div><small>LEVEL</small><b>{selectedLeaderboardPlayer.level || 1}</b></div><div><small>WEEKLY XP</small><b>{selectedLeaderboardPlayer.xp || 0}</b></div><div><small>BOSS WINS</small><b>{stage10Leaderboards?.bossWins?.find(x=>x.userId===selectedLeaderboardPlayer.userId)?.wins || 0}</b></div></div>
-        <div className="playerStatsDetail"><b>Performance snapshot</b><small>Weekly XP shows recent training activity. Level reflects total progression, while boss wins show completed high-level battle performance.</small></div>
+        {playerStatsLoading ? <div className="playerStatsDetail"><b>Loading performance…</b></div> : selectedPlayerStats?.performance ? <>
+          <div className="playerStatsHero playerStatsPerformance">
+            <div><small>ACCURACY</small><b>{selectedPlayerStats.performance.accuracy}%</b></div>
+            <div><small>MASTERY</small><b>{selectedPlayerStats.performance.overallMastery}%</b></div>
+            <div><small>SESSIONS</small><b>{selectedPlayerStats.performance.completedSessions}</b></div>
+            <div><small>QUESTIONS</small><b>{selectedPlayerStats.performance.totalQuestionsAnswered}</b></div>
+            <div><small>ACTIVE DAYS</small><b>{selectedPlayerStats.performance.activeDays}</b></div>
+            <div><small>TRAINING TIME</small><b>{Math.floor(selectedPlayerStats.performance.estimatedTrainingMinutes/60)}h {selectedPlayerStats.performance.estimatedTrainingMinutes%60}m</b></div>
+            <div><small>AVG RESPONSE</small><b>{selectedPlayerStats.performance.avgResponseMs ? (selectedPlayerStats.performance.avgResponseMs/1000).toFixed(1)+"s" : "—"}</b></div>
+            <div><small>INTERVIEW WINS</small><b>{selectedPlayerStats.performance.interviewWins}/{selectedPlayerStats.performance.interviewSessions}</b></div>
+          </div>
+          <div className="playerStatsDetail"><b>Domain intelligence</b><small>Strongest: {selectedPlayerStats.performance.strongestDomain ? `${selectedPlayerStats.performance.strongestDomain.domain} • ${selectedPlayerStats.performance.strongestDomain.mastery}%` : "Building profile"} &nbsp; | &nbsp; Needs work: {selectedPlayerStats.performance.weakestDomain ? `${selectedPlayerStats.performance.weakestDomain.domain} • ${selectedPlayerStats.performance.weakestDomain.mastery}%` : "Building profile"}</small></div>
+        </> : <div className="playerStatsDetail"><b>Performance data unavailable</b></div>}
       </div></div> : null}
 
       {showPositionModal && (
@@ -1139,7 +1167,7 @@ async function analyzeResumeStage12() {
   <div className="dashboardLeaderboardMarquee" style={{ marginTop:12, overflow:"hidden" }}>
     <div className="dashboardLeaderboardTrack">
       {(stage10Leaderboards?.weekly || []).slice(0, 10).map((row, idx) => (
-        <button key={`main_lb_${row.userId}`} type="button" onClick={() => setSelectedLeaderboardPlayer(row)} className="leaderboardMiniRow dashboardLeaderboardPlayer" style={{ ...(leaderboardTone(idx) as any), color:"inherit", textAlign:"left" }}>
+        <button key={`main_lb_${row.userId}`} type="button" onClick={() => openPlayerStats(row)} className="leaderboardMiniRow dashboardLeaderboardPlayer" style={{ ...(leaderboardTone(idx) as any), color:"inherit", textAlign:"left" }}>
           <span className="badge leaderboardMiniRank">{idx + 1}</span>
           <span className="dashboardLeaderboardIdentity"><b>{row.displayName}</b><small>{row.rank || levelTitleFromLevel(Number(row.level || 1))} • Lvl {row.level || 1}</small></span>
           <b>{row.xp || 0} XP</b>
