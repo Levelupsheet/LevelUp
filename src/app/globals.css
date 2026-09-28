@@ -10271,3 +10271,5 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 @keyframes dashboardSweepCards{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 @media(max-width:700px){.playerStatsHero{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(prefers-reduced-motion:reduce){.dashboardLeaderboardTrack,.dashboardSweepTrack{animation:none!important}}
+
+.pvpRivalStatsGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:10px}.pvpRivalStatsGrid>div{display:grid;gap:3px;padding:9px;border:1px solid rgba(255,196,107,.18);background:rgba(10,10,10,.55)}.pvpRivalStatsGrid small{opacity:.72}.pvpRivalStatsGrid b{font-family:Georgia,"Times New Roman",serif}@media(max-width:700px){.pvpRivalStatsGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
