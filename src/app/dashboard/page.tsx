@@ -110,6 +110,7 @@ function itemIconAsset(itemType?: string | null, itemRef?: string | null) {
   const key = String(itemRef || itemType || "").toLowerCase();
   if (key.includes("fury") || key.includes("attack")) return "/ui/grimdark/flow_skill1_001.png";
   if (key.includes("shield")) return "/ui/grimdark/flow_skill3_001.png";
+  if (key.includes("health") || key.includes("heal") || key.includes("restore")) return "/ui/grimdark/flow_icon_buff_items_001.png";
   if (key.includes("xp") || key.includes("time")) return "/ui/grimdark/flow_skill6_001.png";
   if (key.includes("hint") || key.includes("rune")) return "/ui/grimdark/flow_skill7_001.png";
   if (key.includes("life") || key.includes("boss")) return "/ui/grimdark/flow_skill8_001.png";
