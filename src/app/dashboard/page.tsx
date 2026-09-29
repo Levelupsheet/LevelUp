@@ -1112,6 +1112,30 @@ async function analyzeResumeStage12() {
             )}
           </div>
 
+          <div className="card dashboardPlanCard dashboardProgressGameCard progressionSnapshot">
+            <div className="progressionSnapshotHead">
+              <div>
+                <span className="progressionEyebrow">YOUR PROGRESSION</span>
+                <div className="progressionLevel">{levelTitleFromLevel(localLevel)} <b>Level {localLevel}</b></div>
+              </div>
+              <small className="progressionTier" style={{ ...(tierBadgeStyle as any) }}>{tierLabel}</small>
+            </div>
+            <div className="progressionXpRow">
+              <b>{xpIntoLevel} / {levelMax} XP</b>
+              <span>{Math.max(0, levelMax - xpIntoLevel)} to next level</span>
+            </div>
+            <div className="dashboardAssetXpBar" role="progressbar" aria-valuemin={0} aria-valuemax={levelMax} aria-valuenow={xpIntoLevel}>
+              <img className="dashboardAssetXpBarBg" src="/ui/grimdark/flow_game_flow_loading_background_001.png" alt="" aria-hidden="true" />
+              <div className="dashboardAssetXpBarFill" style={{ width: `${Math.max(0, Math.min(100, (xpIntoLevel / Math.max(1, levelMax)) * 100))}%` }} />
+              <img className="dashboardAssetXpBarFrame" src="/ui/grimdark/flow_game_flow_loading_frame_001.png" alt="" aria-hidden="true" />
+            </div>
+            <div className="progressionSignals">
+              <div><small>MASTERY</small><b>{Math.round(overallMastery)}%</b></div>
+              <div><small>STREAK</small><b>{dailyStreak.streakDays}d</b></div>
+              <div><small>TOKENS</small><b>{tokenBalance}</b></div>
+            </div>
+          </div>
+
           
 
           
