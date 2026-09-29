@@ -10899,3 +10899,41 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
   opacity:1!important;
   z-index:2!important;
 }
+
+
+/* 2026-09-28 combat HUD seam correction: transparent player rail + attached enemy stack. */
+@media(min-width:901px){
+  .batch8DesktopQuizGrid .batch8PlayerRail,
+  .batch8DesktopQuizGrid .batch8PlayerRail > *,
+  .batch8DesktopQuizGrid .batch8PlayerRail > .card,
+  .batch8DesktopQuizGrid .batch8PlayerRail > .card > div,
+  .batch8DesktopQuizGrid .batch8PlayerRail > .modelPanel,
+  .batch8DesktopQuizGrid .batch8PlayerRail > .modelPanel > div,
+  .batch8DesktopQuizGrid .batch8PlayerRail > .playerOrbComposite,
+  .batch8DesktopQuizGrid .batch8PlayerRail > .playerPowerupRack{
+    background-color:transparent!important;
+    box-shadow:none!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail::before,
+  .batch8DesktopQuizGrid .batch8PlayerRail::after,
+  .batch8DesktopQuizGrid .batch8PlayerRail > .card::before,
+  .batch8DesktopQuizGrid .batch8PlayerRail > .card::after{
+    background:transparent!important;
+    box-shadow:none!important;
+  }
+
+  /* Enemy orb and portrait use the same hairline seam as the player side. */
+  .batch8DesktopQuizGrid .batch8EnemyRail{
+    gap:0!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail > .d2EnemyCard:first-child{
+    margin:0 auto 0!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail > .d2EnemyCard:first-child + .modelPanel{
+    margin:-1px auto 0!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail > .modelPanel + .quizEnemyNameBelow,
+  .batch8DesktopQuizGrid .batch8EnemyRail .quizEnemyNameBelow{
+    margin:-1px auto 0!important;
+  }
+}
