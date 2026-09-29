@@ -10877,3 +10877,25 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
   .sweepstakesAssetPage{background-size:100% 100%!important}
   .sweepstakesAssetPage .sweepstakesAssetWrap{padding:44px 20px 48px!important}
 }
+
+
+/* 2026-09-28 XP bar background visibility fix: keep the purchased background visible behind the fill. */
+.dashboardProgressGameCard .dashboardAssetXpBar{
+  background:transparent!important;
+  isolation:isolate!important;
+}
+.dashboardProgressGameCard .dashboardAssetXpBarBg{
+  display:block!important;
+  visibility:visible!important;
+  opacity:1!important;
+  z-index:0!important;
+}
+.dashboardProgressGameCard .dashboardAssetXpBarFill{
+  z-index:1!important;
+}
+.dashboardProgressGameCard .dashboardAssetXpBarFrame{
+  display:block!important;
+  visibility:visible!important;
+  opacity:1!important;
+  z-index:2!important;
+}
