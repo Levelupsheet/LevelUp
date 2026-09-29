@@ -11363,3 +11363,18 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     transform:translate(-6px,6px)!important;
   }
 }
+
+
+/* 2026-09-29 enemy HUD seam: frame/orb appearance is approved; remove only the
+   vertical layout gap between that 154px assembly and the portrait. */
+@media(min-width:901px){
+  .batch8DesktopQuizGrid .batch8EnemyRail{
+    gap:0!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail > .d2EnemyCard:first-child{
+    margin:0 auto -1px!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail > .d2EnemyCard:first-child + .modelPanel{
+    margin:0 auto 2px!important;
+  }
+}
