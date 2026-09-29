@@ -11307,3 +11307,59 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     margin:-2px auto 0!important;
   }
 }
+
+
+/* 2026-09-29 enemy frame regression fix.
+   Restore the actual 966fa8d frame mechanism: the frame is the 160x154 d2EnemyCard
+   footprint and the energy shell is scaled inside it. Do not synthesize a pseudo frame. */
+@media(min-width:901px){
+  .batch8DesktopQuizGrid .batch8EnemyRail > .d2EnemyCard:first-child::before,
+  .batch8DesktopQuizGrid .batch8EnemyRail > .d2EnemyCard:first-child::after{
+    content:none!important;
+    display:none!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail > .d2EnemyCard:first-child,
+  .batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyCard{
+    width:160px!important;
+    max-width:160px!important;
+    height:154px!important;
+    min-height:154px!important;
+    flex:0 0 154px!important;
+    margin:0 auto 2px!important;
+    overflow:visible!important;
+    background:transparent url('/ui/grimdark/flow_main_panel_enemy.png') center/160px 154px no-repeat!important;
+    border:0!important;
+    box-shadow:none!important;
+    filter:none!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyEnergyOrbShell{
+    position:absolute!important;
+    inset:0!important;
+    width:160px!important;
+    height:154px!important;
+    transform:scale(.72)!important;
+    transform-origin:center!important;
+    overflow:visible!important;
+    background:transparent!important;
+    border:0!important;
+    box-shadow:none!important;
+    filter:none!important;
+  }
+  /* User-requested delta from the approved layout: orb 6px left / 6px down. */
+  .batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyEnergyOrb{
+    position:absolute!important;
+    inset:0!important;
+    width:160px!important;
+    height:154px!important;
+    transform:translate(-6px,6px)!important;
+    object-fit:contain!important;
+    filter:none!important;
+    box-shadow:none!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyOrbValue{
+    inset:0!important;
+    width:160px!important;
+    height:154px!important;
+    transform:translate(-6px,6px)!important;
+  }
+}
