@@ -11045,3 +11045,27 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
   z-index:1!important;
 }
 .dashboardProgressGameCard .dashboardAssetXpBarFrame{z-index:3!important}
+
+
+/* 2026-09-28 enemy orb alignment: preserve the now-correct connected frame/portrait geometry; center only the orb artwork. */
+@media(min-width:901px){
+  .batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyEnergyOrb{
+    left:18px!important;
+    top:-3px!important;
+    width:124px!important;
+    height:119px!important;
+    right:auto!important;
+    bottom:auto!important;
+    transform:none!important;
+    object-fit:contain!important;
+    object-position:center center!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyOrbValue{
+    left:18px!important;
+    top:-3px!important;
+    width:124px!important;
+    height:119px!important;
+    right:auto!important;
+    bottom:auto!important;
+  }
+}
