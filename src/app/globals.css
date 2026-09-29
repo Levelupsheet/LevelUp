@@ -10661,3 +10661,100 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
   .paidAssetHero,.paidAssetPanel{padding:20px!important}
   .testNowAssetPage .testNowSetupPanel{padding:34px 22px!important}
 }
+
+
+/* Rewards + Sweepstakes paid-asset correction pass */
+.rewardsHubPage{
+  max-width:1280px!important;
+  padding:26px 18px 48px!important;
+}
+.rewardsHubPage .rewardsHubHero{
+  min-height:180px;
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) auto!important;
+  align-items:center!important;
+  gap:22px!important;
+  padding:30px 42px!important;
+  background-image:linear-gradient(90deg,rgba(7,7,7,.16),rgba(7,7,7,.28)),url('/ui/grimdark/popup_popup_reward_bg_001.png')!important;
+  background-size:100% 100%!important;
+}
+.rewardsHubPage .rewardsHubHero .btn{width:auto!important;min-width:220px!important;align-self:center!important}
+.rewardsHubPage .rewardEconomySnapshot>div{
+  min-height:104px;
+  padding:20px 22px!important;
+  display:flex!important;
+  flex-direction:column!important;
+  justify-content:center!important;
+  background-image:url('/ui/grimdark/core-inner-panel.png')!important;
+}
+.rewardsHubPage .rewardEconomyFlow{
+  border:0!important;
+  border-radius:0!important;
+  padding:16px!important;
+  background:url('/ui/grimdark/core-inner-panel.png') center/100% 100% no-repeat!important;
+}
+.rewardsHubPage .rewardsTrackAsset{
+  min-height:210px;
+  border:0!important;
+  border-radius:0!important;
+  background:linear-gradient(rgba(8,8,8,.12),rgba(8,8,8,.20)),url('/ui/grimdark/popup_popup_reward_bg_001.png') center/100% 100% no-repeat!important;
+}
+.rewardsHubPage .rewardsTierCard{
+  position:relative;
+  min-height:300px!important;
+  padding:34px 24px 26px!important;
+  overflow:hidden;
+  background:linear-gradient(rgba(8,8,8,.10),rgba(8,8,8,.24)),url('/ui/grimdark/popup_popup_reward_bg_001.png') center/100% 100% no-repeat!important;
+}
+.rewardsHubPage .rewardsTierCard:before{
+  content:"";
+  position:absolute;
+  top:13px;left:16px;
+  width:38px;height:38px;
+  background-position:center;background-repeat:no-repeat;background-size:contain;
+  pointer-events:none;
+}
+.rewardsHubPage .rewardPathTier1:before{background-image:url('/ui/grimdark/icon_res_gold_1_001.png')}
+.rewardsHubPage .rewardPathTier2:before{background-image:url('/ui/grimdark/icon_res_gold_2_001.png')}
+.rewardsHubPage .rewardPathTier3:before{background-image:url('/ui/grimdark/icon_res_gold_3_001.png')}
+.rewardsHubPage .rewardPathTier4:before{background-image:url('/ui/grimdark/icon_res_gold_4_001.png')}
+.rewardsHubPage .rewardPathTier5:before{background-image:url('/ui/grimdark/icon_res_gold_5_001.png')}
+.rewardsHubPage .rewardsTierCard>div:first-child{padding-left:42px}
+
+.sweepstakesAssetPage{
+  font-family:Georgia,"Times New Roman",serif!important;
+  background:radial-gradient(circle at 50% 0,rgba(94,50,20,.15),transparent 34%),#070809!important;
+}
+.sweepstakesAssetPage .sweepstakesAssetWrap{max-width:1280px!important;margin:0 auto!important}
+.sweepstakesAssetPage .sweepstakesHeroAsset{
+  border:0!important;
+  border-radius:0!important;
+  padding:42px 46px!important;
+  background:linear-gradient(rgba(6,6,6,.12),rgba(6,6,6,.26)),url('/ui/grimdark/popup_popup_reward_bg_001.png') center/100% 100% no-repeat!important;
+  box-shadow:0 18px 40px rgba(0,0,0,.42)!important;
+}
+.sweepstakesAssetPage .sweepstakesHeroAsset h1{font-family:Georgia,"Times New Roman",serif!important;color:#f4ead7!important;text-shadow:0 2px 3px #000}
+.sweepstakesAssetPage .sweepstakesBalanceAsset,
+.sweepstakesAssetPage .sweepstakesWinsAsset,
+.sweepstakesAssetPage .sweepstakesCampaignAsset{
+  border:0!important;
+  border-radius:0!important;
+  background:linear-gradient(rgba(8,8,8,.08),rgba(8,8,8,.20)),url('/ui/grimdark/popup_popup_reward_bg_001.png') center/100% 100% no-repeat!important;
+  color:#eee5d4!important;
+}
+.sweepstakesAssetPage .sweepstakesBalanceAsset{min-height:120px;padding:24px 28px!important}
+.sweepstakesAssetPage .sweepstakesWinsAsset{padding:28px!important}
+.sweepstakesAssetPage .sweepstakesCampaignAsset{min-height:210px!important;padding:30px 28px!important}
+.sweepstakesAssetPage .grid3{gap:14px!important}
+.sweepstakesAssetPage .sweepstakesPopupAsset{
+  border:0!important;
+  border-radius:0!important;
+  background:linear-gradient(rgba(5,5,5,.12),rgba(5,5,5,.25)),url('/ui/grimdark/popup_popup_confirm_001_001.png') center/100% 100% no-repeat!important;
+  padding:38px!important;
+}
+.sweepstakesAssetPage .badge{font-family:Georgia,"Times New Roman",serif!important}
+@media(max-width:700px){
+ .rewardsHubPage .rewardsHubHero{grid-template-columns:1fr!important;padding:24px!important}
+ .rewardsHubPage .rewardsHubHero .btn{min-width:0!important}
+ .sweepstakesAssetPage .sweepstakesHeroAsset{padding:26px 20px!important}
+}
