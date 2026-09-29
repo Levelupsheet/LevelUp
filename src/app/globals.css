@@ -10937,3 +10937,46 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     margin:-1px auto 0!important;
   }
 }
+
+
+/* 2026-09-28 enemy HUD final scale/seam correction.
+   Keep the rail footprint stable; scale only the orb artwork inside it and pull the portrait up. */
+@media(min-width:901px){
+  .batch8DesktopQuizGrid .batch8EnemyRail > .d2EnemyCard:first-child{
+    width:160px!important;
+    max-width:160px!important;
+    height:112px!important;
+    min-height:112px!important;
+    flex:0 0 112px!important;
+    margin:0 auto!important;
+    padding:0!important;
+    overflow:visible!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyEnergyOrbShell{
+    width:160px!important;
+    height:112px!important;
+    inset:0!important;
+    overflow:visible!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyEnergyOrb{
+    width:124px!important;
+    height:119px!important;
+    left:18px!important;
+    top:-4px!important;
+    right:auto!important;
+    bottom:auto!important;
+    object-fit:contain!important;
+    transform:none!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyOrbValue{
+    width:124px!important;
+    height:119px!important;
+    left:18px!important;
+    top:-4px!important;
+    right:auto!important;
+    bottom:auto!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail > .d2EnemyCard:first-child + .modelPanel{
+    margin:-1px auto 0!important;
+  }
+}
