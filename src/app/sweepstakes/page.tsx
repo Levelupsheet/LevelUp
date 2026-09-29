@@ -62,7 +62,7 @@ function TermsModal({ campaign, onClose }: { campaign: Campaign | null; onClose:
   if (!campaign) return null;
   return (
     <div style={{ position:'fixed', inset:0, background:'rgba(2,6,16,.88)', display:'grid', placeItems:'center', zIndex:1100, padding:20 }} onClick={onClose}>
-      <div className="glass" style={{ width:'min(840px, 96vw)', maxHeight:'88vh', overflow:'auto', padding:20 }} onClick={(e)=>e.stopPropagation()}>
+      <div className="glass sweepstakesPopupAsset" style={{ width:'min(840px, 96vw)', maxHeight:'88vh', overflow:'auto', padding:20 }} onClick={(e)=>e.stopPropagation()}>
         <div style={{ display:'flex', justifyContent:'space-between', gap:10, alignItems:'center' }}>
           <div>
             <div className="muted" style={{ fontSize: 12 }}>Terms and conditions</div>
@@ -186,7 +186,7 @@ function SweepstakesModal({ campaign, user, onClose, onEntered }: { campaign: Ca
   return (
     <>
       <div style={{ position:'fixed', inset:0, background:'rgba(2,6,16,.88)', display:'grid', placeItems:'center', zIndex:1000, padding:20 }} onClick={onClose}>
-        <div className="glass" style={{ width:'min(1040px, 96vw)', maxHeight:'90vh', overflow:'auto', padding:20, boxShadow:'0 30px 100px rgba(0,0,0,.72)', background:'linear-gradient(180deg, rgba(8,12,24,.98), rgba(8,12,24,.96))', border:'1px solid rgba(255,255,255,.08)'  }} onClick={(e)=>e.stopPropagation()}>
+        <div className="glass sweepstakesPopupAsset" style={{ width:'min(1040px, 96vw)', maxHeight:'90vh', overflow:'auto', padding:20, boxShadow:'0 30px 100px rgba(0,0,0,.72)', background:'linear-gradient(180deg, rgba(8,12,24,.98), rgba(8,12,24,.96))', border:'1px solid rgba(255,255,255,.08)'  }} onClick={(e)=>e.stopPropagation()}>
           <div style={{ display:'flex', justifyContent:'space-between', gap:10, alignItems:'center' }}>
             <div>
               <div className="muted" style={{ fontSize: 12 }}>Sweepstakes details</div>
@@ -338,10 +338,8 @@ export default function SweepstakesPage() {
   }
 
   return (
-    <main style={{ minHeight: '100vh' }} className="dashboardBg">
-      <div className="dashWrap" style={{ paddingTop: 96, paddingBottom: 48 }}>
-        <div className="glass" style={{ padding: 20, overflow:'hidden', position:'relative' }}>
-          <div style={{ position:'absolute', inset:0, background:'radial-gradient(circle at top right, rgba(59,130,246,.12), transparent 35%), radial-gradient(circle at bottom left, rgba(251,191,36,.10), transparent 30%)', pointerEvents:'none' }} />
+    <main style={{ minHeight: '100vh' }} className="dashboardBg sweepstakesPage sweepstakesAssetPage">\n      <div className="dashWrap sweepstakesAssetWrap" style={{ paddingTop: 36, paddingBottom: 48 }}>\n        <div className="glass sweepstakesHeroAsset" style={{ padding: 20, overflow:'hidden', position:'relative' }}>
+
           <div style={{ position:'relative' }}>
             <div style={{ display:'flex', justifyContent:'space-between', gap:12, flexWrap:'wrap', alignItems:'center' }}>
               <div>
@@ -357,7 +355,7 @@ export default function SweepstakesPage() {
               </div>
             </div>
 
-            <div className="featureCard" style={{ marginTop:18, display:'flex', justifyContent:'space-between', gap:12, flexWrap:'wrap', alignItems:'center' }}>
+            <div className="featureCard sweepstakesBalanceAsset" style={{ marginTop:18, display:'flex', justifyContent:'space-between', gap:12, flexWrap:'wrap', alignItems:'center' }}>
               <div>
                 <b>Your sweepstakes balance</b>
                 <div className="muted" style={{ marginTop:8, fontSize: 16 }}>Tokens: {Number(data?.user?.tokenBalance || 0)} • Entries this week: {Number(data?.user?.weeklyCount || 0)} / {Number(data?.user?.weeklyLimit || 0)}</div>
@@ -366,7 +364,7 @@ export default function SweepstakesPage() {
             </div>
 
             {Array.isArray(data?.user?.wins) && data.user.wins.length ? (
-              <div className="featureCard" style={{ marginTop:18, borderColor:'rgba(255,215,90,.55)', background:'linear-gradient(135deg,rgba(105,70,7,.32),rgba(255,190,35,.10),rgba(30,22,8,.36))' }}>
+              <div className="featureCard sweepstakesWinsAsset" style={{ marginTop:18 }}>
                 <h3 style={{ margin:'0 0 6px', color:'#ffe58a' }}>🏆 Your sweepstakes wins</h3>
                 <div className="muted">Congratulations! Claim real-world prizes here so LevelUp Pro support can complete fulfillment.</div>
                 <div style={{ display:'grid', gap:10, marginTop:12 }}>
@@ -383,7 +381,7 @@ export default function SweepstakesPage() {
               <div className="muted" style={{ marginBottom: 12 }}>Enter drawings that are currently accepting entries. Closed and completed campaigns are listed separately below.</div>
               <div className="grid3">
                 {active.length ? active.map((c) => (
-                  <button key={c.id} id={`campaign-${c.id}`} type="button" className="featureCard" style={{ textAlign:'left', position:'relative', overflow:'hidden', scrollMarginTop: 120 }} onClick={() => { setSelected(c); try { const params = new URLSearchParams(window.location.search); params.set('campaign', String(c.id)); window.history.replaceState({}, '', `/sweepstakes?${params.toString()}`); } catch {} }}>
+                  <button key={c.id} id={`campaign-${c.id}`} type="button" className="featureCard sweepstakesCampaignAsset" style={{ textAlign:'left', position:'relative', overflow:'hidden', scrollMarginTop: 120 }} onClick={() => { setSelected(c); try { const params = new URLSearchParams(window.location.search); params.set('campaign', String(c.id)); window.history.replaceState({}, '', `/sweepstakes?${params.toString()}`); } catch {} }}>
                     <div style={{ position:'absolute', inset:0, background:'radial-gradient(circle at top right, rgba(251,191,36,.18), transparent 34%)', pointerEvents:'none' }} />
                     <div style={{ position:'relative' }}>
                       <div style={{ display:'flex', justifyContent:'space-between', gap:10, alignItems:'center', flexWrap:'wrap' }}>
@@ -407,7 +405,7 @@ export default function SweepstakesPage() {
               <h3 style={{ marginBottom: 12, fontSize: 24 }}>Past drawings</h3>
               <div className="grid3">
                 {past.length ? past.map((c) => (
-                  <button key={c.id} id={`campaign-${c.id}`} type="button" className="featureCard" style={{ textAlign:'left', scrollMarginTop: 120 }} onClick={() => { setSelected(c); try { const params = new URLSearchParams(window.location.search); params.set('campaign', String(c.id)); window.history.replaceState({}, '', `/sweepstakes?${params.toString()}`); } catch {} }}>
+                  <button key={c.id} id={`campaign-${c.id}`} type="button" className="featureCard sweepstakesCampaignAsset" style={{ textAlign:'left', scrollMarginTop: 120 }} onClick={() => { setSelected(c); try { const params = new URLSearchParams(window.location.search); params.set('campaign', String(c.id)); window.history.replaceState({}, '', `/sweepstakes?${params.toString()}`); } catch {} }}>
                     <b>{c.title}</b>
                     <div className="muted" style={{ marginTop:8 }}>{c.prizePoolLabel || 'Prize drawing'}</div>
                     <div className="muted" style={{ marginTop:6 }}>Winner: {c.winner?.displayName || 'Pending'}</div>
