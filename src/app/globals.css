@@ -10980,3 +10980,68 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     margin:-1px auto 0!important;
   }
 }
+
+
+/* 2026-09-28 screenshot parity: equal portrait geometry, centered player HP orb, visible compact XP frame. */
+@media(min-width:901px){
+  /* Both combat portraits use exactly the same box and media dimensions. */
+  .batch8DesktopQuizGrid .batch8PlayerRail > .modelPanel,
+  .batch8DesktopQuizGrid .batch8EnemyRail > .modelPanel,
+  .batch8DesktopQuizGrid .batch8PlayerRail > .modelPanel > div,
+  .batch8DesktopQuizGrid .batch8EnemyRail > .modelPanel > div{
+    width:160px!important;
+    min-width:160px!important;
+    height:170px!important;
+    min-height:170px!important;
+    box-sizing:border-box!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail > .modelPanel video,
+  .batch8DesktopQuizGrid .batch8PlayerRail > .modelPanel img,
+  .batch8DesktopQuizGrid .batch8EnemyRail > .modelPanel video,
+  .batch8DesktopQuizGrid .batch8EnemyRail > .modelPanel img{
+    width:160px!important;
+    height:170px!important;
+    max-width:160px!important;
+    max-height:170px!important;
+    object-fit:cover!important;
+    box-sizing:border-box!important;
+  }
+
+  /* Center the 93px blood orb in the 160px purchased frame. */
+  .batch8DesktopQuizGrid .batch8PlayerRail > .playerOrbComposite:first-child .playerOrbBlood{
+    left:33.5px!important;
+    top:30.5px!important;
+    width:93px!important;
+    height:93px!important;
+  }
+}
+
+/* Compact dashboard XP: frame/background must remain visible around the fill. */
+.dashboardProgressGameCard .dashboardAssetXpBar{
+  position:relative!important;
+  width:min(40%,304px)!important;
+  height:24px!important;
+  overflow:visible!important;
+}
+.dashboardProgressGameCard .dashboardAssetXpBarBg,
+.dashboardProgressGameCard .dashboardAssetXpBarFrame{
+  position:absolute!important;
+  inset:0!important;
+  width:100%!important;
+  height:24px!important;
+  object-fit:fill!important;
+  display:block!important;
+  visibility:visible!important;
+  opacity:1!important;
+  pointer-events:none!important;
+}
+.dashboardProgressGameCard .dashboardAssetXpBarBg{z-index:0!important}
+.dashboardProgressGameCard .dashboardAssetXpBarFill{
+  position:absolute!important;
+  left:12px!important;
+  top:6px!important;
+  height:12px!important;
+  max-width:calc(100% - 24px)!important;
+  z-index:1!important;
+}
+.dashboardProgressGameCard .dashboardAssetXpBarFrame{z-index:3!important}
