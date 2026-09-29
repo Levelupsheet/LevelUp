@@ -11125,3 +11125,64 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     margin:-1px auto 0!important;
   }
 }
+
+
+/* 2026-09-29 regression repair: use CSS asset layers so the XP frame cannot disappear,
+   and restore the purchased enemy orb frame without changing the connected geometry. */
+.dashboardProgressGameCard .dashboardAssetXpBar{
+  position:relative!important;
+  width:min(40%,304px)!important;
+  height:24px!important;
+  overflow:visible!important;
+  background:url('/ui/grimdark/flow_game_flow_loading_background_001.png') center/100% 100% no-repeat!important;
+}
+.dashboardProgressGameCard .dashboardAssetXpBar::after{
+  content:""!important;
+  display:block!important;
+  position:absolute!important;
+  inset:0!important;
+  z-index:4!important;
+  pointer-events:none!important;
+  background:url('/ui/grimdark/flow_game_flow_loading_frame_001.png') center/100% 100% no-repeat!important;
+}
+.dashboardProgressGameCard .dashboardAssetXpBarBg,
+.dashboardProgressGameCard .dashboardAssetXpBarFrame{
+  display:none!important;
+}
+.dashboardProgressGameCard .dashboardAssetXpBarFill{
+  left:12px!important;
+  top:6px!important;
+  height:12px!important;
+  max-width:calc(100% - 24px)!important;
+  z-index:2!important;
+}
+
+@media(min-width:901px){
+  /* Earlier cleanup hid d2EnemyCard pseudo-elements; those pseudo-elements are the purchased orb frame. */
+  .batch8DesktopQuizGrid .batch8EnemyRail > .d2EnemyCard:first-child::before{
+    content:""!important;
+    display:block!important;
+    position:absolute!important;
+    inset:0!important;
+    z-index:1!important;
+    pointer-events:none!important;
+    background:url('/ui/grimdark/flow_main_panel_enemy.png') center/160px 112px no-repeat!important;
+    box-shadow:none!important;
+    filter:none!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail > .d2EnemyCard:first-child::after{
+    content:none!important;
+    display:none!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail > .d2EnemyCard:first-child{
+    position:relative!important;
+    overflow:visible!important;
+    background:transparent!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyEnergyOrbShell{
+    z-index:2!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail > .d2EnemyCard:first-child + .modelPanel{
+    margin:-1px auto 0!important;
+  }
+}
