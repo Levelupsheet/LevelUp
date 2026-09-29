@@ -10793,3 +10793,87 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
 @media(max-width:900px){
   .dashboardProgressGameCard .dashboardAssetXpBar{width:100%}
 }
+
+
+/* 2026-09-28 dashboard/rewards correction: compact XP art and one reward backdrop per page. */
+.dashboardProgressGameCard .dashboardAssetXpBar{
+  width:min(40%,304px)!important;
+  height:13px!important;
+  margin:8px auto 0 0!important;
+}
+.dashboardProgressGameCard .dashboardAssetXpBarBg,
+.dashboardProgressGameCard .dashboardAssetXpBarFrame{
+  width:100%!important;
+  height:13px!important;
+  object-fit:fill!important;
+}
+.dashboardProgressGameCard .dashboardAssetXpBarFill{
+  left:6px!important;
+  top:3px!important;
+  height:8px!important;
+  max-width:calc(100% - 12px)!important;
+}
+@media(max-width:700px){
+  .dashboardProgressGameCard .dashboardAssetXpBar{width:min(60%,304px)!important}
+}
+
+/* The purchased reward popup is the single page frame, not a repeated card texture. */
+.rewardsHubPage,
+.sweepstakesAssetPage{
+  position:relative!important;
+  background-color:#070809!important;
+  background-image:url('/ui/grimdark/popup_popup_reward_bg_001.png')!important;
+  background-position:center top!important;
+  background-size:100% 100%!important;
+  background-repeat:no-repeat!important;
+}
+.rewardsHubPage{
+  max-width:1280px!important;
+  min-height:calc(100vh - 32px)!important;
+  padding:58px 48px 64px!important;
+}
+.rewardsHubPage .rewardsHubHero,
+.rewardsHubPage .rewardsTrackAsset,
+.rewardsHubPage .rewardsTierCard,
+.rewardsHubPage .luCard,
+.rewardsHubPage .rewardEconomySnapshot>div,
+.rewardsHubPage .rewardEconomyFlow{
+  background-image:none!important;
+}
+.rewardsHubPage .rewardsHubHero,
+.rewardsHubPage .rewardsTrackAsset,
+.rewardsHubPage .rewardsTierCard{
+  background-color:rgba(5,6,7,.72)!important;
+  border:1px solid rgba(214,165,90,.14)!important;
+}
+.rewardsHubPage .rewardEconomySnapshot>div,
+.rewardsHubPage .rewardEconomyFlow{
+  background:rgba(4,5,6,.72)!important;
+  border:1px solid rgba(214,165,90,.10)!important;
+}
+.sweepstakesAssetPage{
+  min-height:100vh!important;
+  background-size:min(1280px,calc(100% - 36px)) 100%!important;
+}
+.sweepstakesAssetPage .sweepstakesAssetWrap{
+  max-width:1180px!important;
+  padding:72px 46px 70px!important;
+}
+.sweepstakesAssetPage .glass,
+.sweepstakesAssetPage .featureCard,
+.sweepstakesAssetPage .sweepstakesHeroAsset,
+.sweepstakesAssetPage .sweepstakesBalanceAsset,
+.sweepstakesAssetPage .sweepstakesWinsAsset,
+.sweepstakesAssetPage .sweepstakesCampaignAsset{
+  background-image:none!important;
+  background-color:rgba(5,6,7,.72)!important;
+  border:1px solid rgba(214,165,90,.12)!important;
+}
+.sweepstakesAssetPage .sweepstakesPopupAsset{
+  background:linear-gradient(rgba(5,5,5,.12),rgba(5,5,5,.25)),url('/ui/grimdark/popup_popup_confirm_001_001.png') center/100% 100% no-repeat!important;
+}
+@media(max-width:700px){
+  .rewardsHubPage{padding:38px 22px 46px!important}
+  .sweepstakesAssetPage{background-size:100% 100%!important}
+  .sweepstakesAssetPage .sweepstakesAssetWrap{padding:44px 20px 48px!important}
+}
