@@ -11069,3 +11069,59 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     bottom:auto!important;
   }
 }
+
+
+/* 2026-09-28 combat rail fill pass: remove the remaining legacy black card surfaces
+   and let the enemy portrait assembly occupy the rail width without breaking the connected seam. */
+@media(min-width:901px){
+  .batch8DesktopQuizGrid .batch8PlayerRail,
+  .batch8DesktopQuizGrid .batch8EnemyRail{
+    background:none!important;
+    background-color:transparent!important;
+    box-shadow:none!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail::before,
+  .batch8DesktopQuizGrid .batch8PlayerRail::after,
+  .batch8DesktopQuizGrid .batch8EnemyRail::before,
+  .batch8DesktopQuizGrid .batch8EnemyRail::after{
+    content:none!important;
+    display:none!important;
+    background:none!important;
+  }
+  .batch8DesktopQuizGrid .batch8PlayerRail > .card,
+  .batch8DesktopQuizGrid .batch8EnemyRail > .card,
+  .batch8DesktopQuizGrid .batch8EnemyRail > .modelPanel,
+  .batch8DesktopQuizGrid .batch8EnemyRail > .modelPanel > div,
+  .batch8DesktopQuizGrid .batch8EnemyRail .quizEnemyNameBelow{
+    background:none!important;
+    background-color:transparent!important;
+    box-shadow:none!important;
+  }
+
+  /* Enemy portrait/frame fills the available side-rail width like the player stack. */
+  .batch8DesktopQuizGrid .batch8EnemyRail > .modelPanel{
+    width:100%!important;
+    max-width:190px!important;
+    height:190px!important;
+    min-height:190px!important;
+    margin:-1px auto 0!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail > .modelPanel > div{
+    width:100%!important;
+    height:190px!important;
+    min-height:190px!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail > .modelPanel video,
+  .batch8DesktopQuizGrid .batch8EnemyRail > .modelPanel img{
+    width:100%!important;
+    max-width:none!important;
+    height:190px!important;
+    max-height:190px!important;
+    object-fit:cover!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail .quizEnemyNameBelow{
+    width:100%!important;
+    max-width:190px!important;
+    margin:-1px auto 0!important;
+  }
+}
