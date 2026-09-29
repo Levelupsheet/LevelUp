@@ -11186,3 +11186,124 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     margin:-1px auto 0!important;
   }
 }
+
+
+/* 2026-09-29 restore the approved 966fa8d enemy HUD geometry.
+   Only requested delta: energy orb 6px left + 6px down.
+   Enemy portrait/media matches the player portrait exactly. */
+@media(min-width:901px){
+  .batch8DesktopQuizGrid .batch8EnemyRail{
+    gap:2px!important;
+    background:transparent!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail > .d2EnemyCard:first-child{
+    position:relative!important;
+    width:160px!important;
+    max-width:160px!important;
+    height:154px!important;
+    min-height:154px!important;
+    flex:0 0 154px!important;
+    margin:0 auto 2px!important;
+    padding:0!important;
+    transform:none!important;
+    background:transparent!important;
+    border:0!important;
+    box-shadow:none!important;
+    filter:none!important;
+    overflow:visible!important;
+  }
+  /* Remove the later synthetic frame override; use the original 966fa8d card/frame rendering. */
+  .batch8DesktopQuizGrid .batch8EnemyRail > .d2EnemyCard:first-child::before,
+  .batch8DesktopQuizGrid .batch8EnemyRail > .d2EnemyCard:first-child::after{
+    content:revert!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyEnergyOrbShell{
+    position:absolute!important;
+    inset:0!important;
+    width:160px!important;
+    height:154px!important;
+    transform:none!important;
+    overflow:visible!important;
+    background:transparent!important;
+    border:0!important;
+    box-shadow:none!important;
+    filter:none!important;
+    z-index:auto!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyEnergyOrb{
+    position:absolute!important;
+    inset:auto!important;
+    left:-6px!important;
+    top:6px!important;
+    width:160px!important;
+    height:154px!important;
+    max-width:none!important;
+    object-fit:contain!important;
+    transform:none!important;
+    background:transparent!important;
+    border:0!important;
+    box-shadow:none!important;
+    filter:none!important;
+    opacity:1!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyOrbValue{
+    inset:auto!important;
+    left:-6px!important;
+    top:6px!important;
+    width:160px!important;
+    height:154px!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyEnergyDrain,
+  .batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyEnergyFlash{
+    display:none!important;
+  }
+
+  .batch8DesktopQuizGrid .batch8EnemyRail > .modelPanel{
+    width:160px!important;
+    min-width:160px!important;
+    max-width:160px!important;
+    height:170px!important;
+    min-height:170px!important;
+    max-height:170px!important;
+    margin:0 auto 2px!important;
+    padding:0!important;
+    overflow:hidden!important;
+    background:transparent!important;
+    border:0!important;
+    box-shadow:none!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail > .modelPanel > div{
+    width:160px!important;
+    min-width:160px!important;
+    max-width:160px!important;
+    height:170px!important;
+    min-height:170px!important;
+    max-height:170px!important;
+    margin:0!important;
+    box-sizing:border-box!important;
+    overflow:hidden!important;
+    background:transparent!important;
+    border:1px solid rgba(169,105,35,.75)!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail > .modelPanel video,
+  .batch8DesktopQuizGrid .batch8EnemyRail > .modelPanel img{
+    width:160px!important;
+    min-width:160px!important;
+    max-width:160px!important;
+    height:170px!important;
+    min-height:170px!important;
+    max-height:170px!important;
+    object-fit:cover!important;
+    object-position:center!important;
+    display:block!important;
+    border:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+    filter:none!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail .quizEnemyNameBelow{
+    width:160px!important;
+    max-width:160px!important;
+    margin:-2px auto 0!important;
+  }
+}
