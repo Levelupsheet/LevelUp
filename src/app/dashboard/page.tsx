@@ -118,7 +118,7 @@ function itemIconAsset(itemType?: string | null, itemRef?: string | null) {
 }
 
 function itemIcon(itemType?: string | null, itemRef?: string | null) {
-  return <img className="powerupItemArtwork" src={itemIconAsset(itemType, itemRef)} alt="" aria-hidden="true" />;
+  return <img className="powerupItemArtwork" src={itemIconAsset(itemType, itemRef)} alt="" aria-hidden="true" loading="eager" decoding="async" />;
 }
 
 function itemLabel(itemType?: string | null, itemRef?: string | null) {
@@ -150,6 +150,7 @@ export default function Dashboard() {
   const [showLaunchModal, setShowLaunchModal] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [powerupsOpen, setPowerupsOpen] = useState(false);
+  const powerupAssetsPreloadedRef = useRef(false);
   const [positionTrainingOpen, setPositionTrainingOpen] = useState(false);
   const [certPracticeOpen, setCertPracticeOpen] = useState(false);
   const [testNowOpen, setTestNowOpen] = useState(false);
@@ -208,6 +209,24 @@ const [stage12Uploading, setStage12Uploading] = useState(false);
 const [stage12File, setStage12File] = useState<File | null>(null);
 const [stage12Message, setStage12Message] = useState<string | null>(null);
 
+
+  useEffect(() => {
+    if (powerupAssetsPreloadedRef.current) return;
+    powerupAssetsPreloadedRef.current = true;
+    [
+      "/ui/grimdark/flow_skill1_001.png",
+      "/ui/grimdark/flow_skill2_001.png",
+      "/ui/grimdark/flow_skill3_001.png",
+      "/ui/grimdark/flow_icon_buff_items_001.png",
+      "/ui/grimdark/flow_skill6_001.png",
+      "/ui/grimdark/flow_skill7_001.png",
+      "/ui/grimdark/flow_skill8_001.png",
+    ].forEach((src) => {
+      const img = new Image();
+      img.decoding = "async";
+      img.src = src;
+    });
+  }, []);
 
   // Level-up detection (notification-only; user opens vault when ready)
   const prevLevelRef = useRef<number>(0);
