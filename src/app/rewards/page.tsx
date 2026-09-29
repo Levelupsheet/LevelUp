@@ -57,7 +57,7 @@ export default function RewardsPage() {
       </div>
 
       {ent ? (
-        <div className="luCard" style={{ padding: 14, marginBottom: 14 }}>
+        <div className="luCard rewardsTrackAsset" style={{ padding: 22, marginBottom: 14 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap', alignItems: 'center' }}>
             <div>
               <div style={{ fontWeight: 800, fontSize: 16 }}>{ent.tier} reward track</div>
