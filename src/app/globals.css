@@ -11401,3 +11401,29 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     display:none!important;
   }
 }
+
+
+/* 2026-10-01 enemy drain geometry fix.
+   The drain percentage is correct, but the rectangular overlay was not clipped to the orb.
+   Clip the shell itself to the circular energy well while leaving the purchased frame outside it. */
+@media(min-width:901px){
+  .batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyEnergyOrbShell{
+    border-radius:50%!important;
+    overflow:hidden!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyEnergyDrain{
+    left:0!important;
+    right:0!important;
+    width:100%!important;
+    border-radius:0!important;
+    background:rgba(0,0,0,.90)!important;
+    clip-path:none!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyEnergyOrb{
+    border-radius:50%!important;
+  }
+  .batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyOrbValue{
+    z-index:4!important;
+    pointer-events:none!important;
+  }
+}
