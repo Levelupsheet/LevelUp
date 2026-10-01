@@ -11378,3 +11378,26 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     margin:0 auto 2px!important;
   }
 }
+
+
+/* 2026-10-01 restore enemy HP drain after visual HUD cleanup.
+   Keep the approved orb/frame geometry and blue-tint removal; restore only the dark drain mask. */
+@media(min-width:901px){
+  .batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyEnergyDrain{
+    position:absolute!important;
+    top:0!important;
+    left:0!important;
+    right:0!important;
+    display:block!important;
+    background:rgba(0,0,0,.90)!important;
+    transition:height 420ms ease!important;
+    pointer-events:none!important;
+    z-index:2!important;
+    filter:none!important;
+    box-shadow:none!important;
+  }
+  /* Flash stays disabled because it was the source of the unwanted blue/bright tint. */
+  .batch8DesktopQuizGrid .batch8EnemyRail .d2EnemyEnergyFlash{
+    display:none!important;
+  }
+}
