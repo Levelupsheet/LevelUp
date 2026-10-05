@@ -11705,3 +11705,95 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     box-shadow:none!important;
   }
 }
+
+
+/* 2026-10-05 enemy HUD finishing pass.
+   The blue energy image is currently hidden by the player-orb base/mask cascade.
+   Render it as the visible base, tighten name-to-portrait seam, and make enemy media fill its frame. */
+@media(min-width:901px){
+  .batch8DesktopQuizGrid .enemyCloneRail .enemyOrbEnergy{
+    left:39px!important;
+    top:54px!important;
+    width:92px!important;
+    height:92px!important;
+    border-radius:50%!important;
+    overflow:hidden!important;
+    z-index:3!important;
+  }
+  .batch8DesktopQuizGrid .enemyCloneRail .enemyOrbEnergyBase{
+    display:block!important;
+    visibility:visible!important;
+    opacity:1!important;
+    position:absolute!important;
+    inset:0!important;
+    width:92px!important;
+    height:92px!important;
+    object-fit:cover!important;
+    border-radius:50%!important;
+    filter:none!important;
+  }
+  .batch8DesktopQuizGrid .enemyCloneRail .enemyOrbEnergyMask{
+    display:block!important;
+    visibility:visible!important;
+    opacity:1!important;
+    position:absolute!important;
+    inset:0!important;
+    width:92px!important;
+    height:92px!important;
+    overflow:hidden!important;
+    border-radius:50%!important;
+    transition:clip-path .35s ease!important;
+  }
+  .batch8DesktopQuizGrid .enemyCloneRail .enemyOrbEnergyMask img{
+    display:block!important;
+    visibility:visible!important;
+    opacity:1!important;
+    width:92px!important;
+    height:92px!important;
+    object-fit:cover!important;
+    filter:none!important;
+  }
+  .batch8DesktopQuizGrid .enemyCloneRail .enemyCloneOrbValue{
+    left:39px!important;
+    top:54px!important;
+    width:92px!important;
+    height:92px!important;
+    font-size:11px!important;
+    z-index:5!important;
+  }
+
+  .batch8DesktopQuizGrid .enemyCloneRail .quizEnemyNameBetween{
+    width:166px!important;
+    min-height:22px!important;
+    margin:-1px auto -1px!important;
+    padding:2px 2px 3px!important;
+  }
+  .batch8DesktopQuizGrid .enemyCloneRail .quizEnemyNameBetween + .card{
+    margin:0 auto 2px!important;
+  }
+
+  .batch8DesktopQuizGrid .enemyCloneRail > .card,
+  .batch8DesktopQuizGrid .enemyCloneRail > .card > div{
+    width:166px!important;
+    min-width:166px!important;
+    max-width:166px!important;
+    height:180px!important;
+    min-height:180px!important;
+    max-height:180px!important;
+    box-sizing:border-box!important;
+    overflow:hidden!important;
+  }
+  .batch8DesktopQuizGrid .enemyCloneRail > .card video,
+  .batch8DesktopQuizGrid .enemyCloneRail > .card img{
+    width:100%!important;
+    min-width:100%!important;
+    max-width:100%!important;
+    height:100%!important;
+    min-height:100%!important;
+    max-height:100%!important;
+    object-fit:cover!important;
+    object-position:center center!important;
+    display:block!important;
+    margin:0!important;
+  }
+}
