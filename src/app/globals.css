@@ -11951,3 +11951,83 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     height:99px!important;
   }
 }
+
+
+/* 2026-10-05 mobile enemy HUD visibility pass.
+   Keep the desktop baseline untouched; give the mobile orb + portrait enough
+   height to show their full artwork instead of clipping their lower halves. */
+@media(max-width:900px){
+  .mobileEnemyCardTop{
+    padding:8px!important;
+    overflow:visible!important;
+  }
+  .mobileEnemyHud{
+    grid-template-columns:minmax(0,1fr) 128px!important;
+    gap:8px!important;
+    align-items:center!important;
+    height:128px!important;
+    min-height:128px!important;
+    overflow:visible!important;
+  }
+  .mobileEnemyHealth{
+    height:128px!important;
+    max-height:128px!important;
+    min-height:128px!important;
+    overflow:visible!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+  }
+  .mobileEnemyPortrait{
+    width:128px!important;
+    height:116px!important;
+    min-height:116px!important;
+    overflow:hidden!important;
+    border-radius:10px!important;
+  }
+  .mobileEnemyPortrait .card{
+    width:128px!important;
+    max-width:128px!important;
+    height:116px!important;
+    min-height:116px!important;
+    padding:2px!important;
+    margin:0!important;
+    overflow:hidden!important;
+    box-sizing:border-box!important;
+  }
+  .mobileEnemyPortrait .card > div{
+    width:100%!important;
+    height:100%!important;
+    min-height:0!important;
+    overflow:hidden!important;
+  }
+  .mobileEnemyPortrait video,
+  .mobileEnemyPortrait img{
+    width:100%!important;
+    max-width:100%!important;
+    height:100%!important;
+    max-height:100%!important;
+    object-fit:cover!important;
+    object-position:center center!important;
+    display:block!important;
+  }
+}
+@media(max-width:430px){
+  .mobileEnemyHud{
+    grid-template-columns:minmax(0,1fr) 116px!important;
+    height:118px!important;
+    min-height:118px!important;
+  }
+  .mobileEnemyHealth{
+    height:118px!important;
+    max-height:118px!important;
+    min-height:118px!important;
+  }
+  .mobileEnemyPortrait,
+  .mobileEnemyPortrait .card{
+    width:116px!important;
+    max-width:116px!important;
+    height:106px!important;
+    min-height:106px!important;
+  }
+}
