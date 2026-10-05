@@ -1466,6 +1466,7 @@ const showExpandedExplanation = useMemo(() => {
                 </div>
                 <div className="enemyCloneOrbValue">{Math.max(0, Math.round(stageEnemyHP))} / {currentStageConfig.hp}<br />{Math.round((stageEnemyHP / Math.max(1, currentStageConfig.hp)) * 100)}%</div>
               </div>
+              <div className="quizEnemyNameBetween">{currentStageEnemyName.toUpperCase().slice(0, 18)}</div>
               <ModelPanel title="" src={enemyVideo} loop={!isEnemyHitVideo} onEnded={isEnemyHitVideo ? () => setHitPulse(null) : undefined} height="clamp(180px, 22vh, 280px)" damageText={damageFloat.enemy || null} damageTone="enemy" />
               <div className="playerPowerupRack enemyPowerupRack" aria-label={`${currentStageEnemyName} powerups`}>
                 <img className="playerPowerupRackAsset" src="/ui/grimdark/flow_main_panel_powerup1.png" alt="" aria-hidden="true" />
@@ -1481,7 +1482,6 @@ const showExpandedExplanation = useMemo(() => {
                   })}
                 </div>
               </div>
-              <div className="quizEnemyNameBelow">{currentStageEnemyName.toUpperCase().slice(0, 18)}</div>
             </div>
           </div>
         ) : (
