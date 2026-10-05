@@ -11854,3 +11854,52 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     object-fit:cover!important;
   }
 }
+
+
+/* 2026-10-05 enemy clone: energy-orb.webp has different intrinsic artwork than
+   blood-orb.webp. Keep the proven player HUD geometry but explicitly size/render
+   the energy artwork in the same 128px orb well. */
+@media(min-width:901px){
+  .batch8DesktopQuizGrid .enemyExactPlayerClone > .playerOrbComposite:first-child .playerOrbBlood{
+    left:23px!important;
+    top:10px!important;
+    width:128px!important;
+    height:128px!important;
+    opacity:1!important;
+    visibility:visible!important;
+    z-index:10!important;
+  }
+  .batch8DesktopQuizGrid .enemyExactPlayerClone > .playerOrbComposite:first-child .playerOrbBloodBase,
+  .batch8DesktopQuizGrid .enemyExactPlayerClone > .playerOrbComposite:first-child .playerOrbBloodMask,
+  .batch8DesktopQuizGrid .enemyExactPlayerClone > .playerOrbComposite:first-child .playerOrbBloodMask img{
+    display:block!important;
+    visibility:visible!important;
+    width:128px!important;
+    height:128px!important;
+    opacity:1!important;
+    filter:none!important;
+    transform:none!important;
+  }
+  .batch8DesktopQuizGrid .enemyExactPlayerClone > .playerOrbComposite:first-child .playerOrbBloodBase,
+  .batch8DesktopQuizGrid .enemyExactPlayerClone > .playerOrbComposite:first-child .playerOrbBloodMask img{
+    object-fit:contain!important;
+    object-position:center!important;
+  }
+  .batch8DesktopQuizGrid .enemyExactPlayerClone .enemyCloneNamePlate{
+    width:166px!important;
+    margin:-6px auto 0!important;
+    padding:3px 2px 0!important;
+    color:#f3e5c5!important;
+    background:transparent!important;
+    border:0!important;
+    box-shadow:none!important;
+    text-align:center!important;
+    font-family:Georgia,"Times New Roman",serif!important;
+    font-size:14px!important;
+    font-weight:900!important;
+    line-height:1.05!important;
+    letter-spacing:.45px!important;
+    text-transform:uppercase!important;
+    text-shadow:0 1px 2px #000!important;
+  }
+}
