@@ -1456,16 +1456,16 @@ const showExpandedExplanation = useMemo(() => {
               <div className={"playerOrbComposite " + (hitPulse === "enemy" ? "d2Shake" : "")} aria-label={`${currentStageEnemyName} health ${stageEnemyHP} of ${currentStageConfig.hp}`}>
                 <img className="playerOrbFrameAsset" src="/ui/grimdark/flow_main_panel_player.png" alt="" aria-hidden="true" />
                 <div className="playerOrbBlood" aria-hidden="true">
-                  <img className="playerOrbBloodBase" src="/ui/blood-orb.webp" alt="" />
+                  <img className="playerOrbBloodBase" src="/ui/energy-orb.webp" alt="" />
                   <div
                     className="playerOrbBloodMask"
                     style={{ clipPath: `inset(${100 - Math.max(0, Math.min(100, (stageEnemyHP / Math.max(1, currentStageConfig.hp)) * 100))}% 0 0 0)` }}
                   >
-                    <img src="/ui/blood-orb.webp" alt="" />
+                    <img src="/ui/energy-orb.webp" alt="" />
                   </div>
                 </div>
               </div>
-              <ModelPanel key={playerVideoKey} title="" src={playerVideo} forceReload={hitPulse === "enemy"} loop={!isPlayerHitVideo} height="clamp(180px, 22vh, 280px)" damageText={damageFloat.enemy || null} damageTone="enemy" />
+              <ModelPanel title="" src={enemyVideo} loop={!isEnemyHitVideo} onEnded={isEnemyHitVideo ? () => setHitPulse(null) : undefined} height="clamp(180px, 22vh, 280px)" damageText={damageFloat.enemy || null} damageTone="enemy" />
               <div className="playerPowerupRack" aria-label="Enemy cloned powerups">
                 <img className="playerPowerupRackAsset" src="/ui/grimdark/flow_main_panel_powerup1.png" alt="" aria-hidden="true" />
                 <div className="playerPowerupSlots">
