@@ -11921,3 +11921,21 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     height:113px!important;
   }
 }
+
+
+/* 2026-10-05 second enemy orb trim: another 12% reduction from 113px,
+   re-centered in the same player orb well and nudged 4px lower ("two hairs"). */
+@media(min-width:901px){
+  .batch8DesktopQuizGrid .enemyExactPlayerClone > .playerOrbComposite:first-child .playerOrbBlood{
+    left:37px!important;
+    top:17px!important;
+    width:99px!important;
+    height:99px!important;
+  }
+  .batch8DesktopQuizGrid .enemyExactPlayerClone > .playerOrbComposite:first-child .playerOrbBloodBase,
+  .batch8DesktopQuizGrid .enemyExactPlayerClone > .playerOrbComposite:first-child .playerOrbBloodMask,
+  .batch8DesktopQuizGrid .enemyExactPlayerClone > .playerOrbComposite:first-child .playerOrbBloodMask img{
+    width:99px!important;
+    height:99px!important;
+  }
+}
