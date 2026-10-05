@@ -11427,3 +11427,124 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     pointer-events:none!important;
   }
 }
+
+
+/* 2026-10-04 enemy HUD rebuild: mirror the proven player HUD on the right.
+   This supersedes all legacy d2EnemyCard drain/frame overrides on desktop. */
+@media(min-width:901px){
+  .batch8DesktopQuizGrid .batch8EnemyRail.enemyCloneRail{
+    padding-top:0!important;
+    gap:2px!important;
+    background:transparent!important;
+  }
+  .batch8DesktopQuizGrid .enemyCloneRail > .enemyOrbComposite:first-child{
+    position:relative!important;
+    width:160px!important;
+    max-width:160px!important;
+    height:154px!important;
+    min-height:154px!important;
+    flex:0 0 154px!important;
+    margin:0 auto 2px!important;
+    padding:0!important;
+    transform:none!important;
+    background:transparent!important;
+    border:0!important;
+    box-shadow:none!important;
+    overflow:visible!important;
+  }
+  .batch8DesktopQuizGrid .enemyCloneRail .enemyOrbFrameAsset{
+    position:absolute!important;
+    left:0!important;
+    top:0!important;
+    width:160px!important;
+    height:154px!important;
+    object-fit:fill!important;
+    pointer-events:none!important;
+  }
+  .batch8DesktopQuizGrid .enemyCloneRail .enemyOrbEnergy{
+    position:absolute!important;
+    left:33.5px!important;
+    top:30.5px!important;
+    width:93px!important;
+    height:93px!important;
+    overflow:hidden!important;
+    border-radius:50%!important;
+  }
+  .batch8DesktopQuizGrid .enemyCloneRail .enemyOrbEnergyBase,
+  .batch8DesktopQuizGrid .enemyCloneRail .enemyOrbEnergyMask,
+  .batch8DesktopQuizGrid .enemyCloneRail .enemyOrbEnergyMask img{
+    position:absolute!important;
+    inset:0!important;
+    width:93px!important;
+    height:93px!important;
+    object-fit:cover!important;
+    border-radius:50%!important;
+  }
+  .batch8DesktopQuizGrid .enemyCloneRail .enemyOrbEnergyBase{opacity:.18!important}
+  .batch8DesktopQuizGrid .enemyCloneRail .enemyOrbEnergyMask{overflow:hidden!important}
+  .batch8DesktopQuizGrid .enemyCloneRail .enemyCloneOrbValue{
+    position:absolute!important;
+    inset:0!important;
+    z-index:5!important;
+    display:grid!important;
+    place-content:center!important;
+    text-align:center!important;
+    color:#eee!important;
+    font-size:12px!important;
+    line-height:1.2!important;
+    pointer-events:none!important;
+    text-shadow:0 1px 3px #000!important;
+  }
+  .batch8DesktopQuizGrid .enemyCloneRail > .modelPanel{
+    width:160px!important;
+    height:170px!important;
+    min-width:160px!important;
+    min-height:170px!important;
+    margin:0 auto 2px!important;
+    padding:0!important;
+    border:0!important;
+    border-radius:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+    overflow:hidden!important;
+  }
+  .batch8DesktopQuizGrid .enemyCloneRail > .modelPanel > div{
+    width:160px!important;
+    height:170px!important;
+    margin:0!important;
+    border-radius:0!important;
+    background:transparent!important;
+    border:1px solid rgba(169,105,35,.75)!important;
+    box-sizing:border-box!important;
+    overflow:hidden!important;
+  }
+  .batch8DesktopQuizGrid .enemyCloneRail > .modelPanel video,
+  .batch8DesktopQuizGrid .enemyCloneRail > .modelPanel img{
+    width:160px!important;
+    height:170px!important;
+    max-width:160px!important;
+    max-height:170px!important;
+    object-fit:cover!important;
+    display:block!important;
+    border:0!important;
+    background:transparent!important;
+  }
+  .batch8DesktopQuizGrid .enemyCloneRail .enemyPowerupRack{
+    width:160px!important;
+    margin:0 auto 2px!important;
+    background:transparent!important;
+  }
+  .batch8DesktopQuizGrid .enemyCloneRail .enemyPowerupSlot{
+    pointer-events:none!important;
+    cursor:default!important;
+  }
+  .batch8DesktopQuizGrid .enemyCloneRail .quizEnemyNameBelow{
+    width:160px!important;
+    margin:-2px auto 0!important;
+    padding:8px 2px!important;
+    text-align:center!important;
+    background:transparent!important;
+    border:0!important;
+    box-shadow:none!important;
+  }
+}
