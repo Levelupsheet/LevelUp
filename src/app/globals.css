@@ -11903,3 +11903,21 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     text-shadow:0 1px 2px #000!important;
   }
 }
+
+
+/* 2026-10-05 final enemy energy-orb fit:
+   12% smaller than the 128px player orb, centered horizontally, +3px down. */
+@media(min-width:901px){
+  .batch8DesktopQuizGrid .enemyExactPlayerClone > .playerOrbComposite:first-child .playerOrbBlood{
+    left:30.5px!important;
+    top:13px!important;
+    width:113px!important;
+    height:113px!important;
+  }
+  .batch8DesktopQuizGrid .enemyExactPlayerClone > .playerOrbComposite:first-child .playerOrbBloodBase,
+  .batch8DesktopQuizGrid .enemyExactPlayerClone > .playerOrbComposite:first-child .playerOrbBloodMask,
+  .batch8DesktopQuizGrid .enemyExactPlayerClone > .playerOrbComposite:first-child .playerOrbBloodMask img{
+    width:113px!important;
+    height:113px!important;
+  }
+}
