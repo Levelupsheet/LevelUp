@@ -1490,7 +1490,20 @@ const showExpandedExplanation = useMemo(() => {
             <div className="mobileCombatCard mobileEnemyCard mobileEnemyCardTop">
               <div className="mobileEnemyHud">
                 <div className="mobileEnemyHealth">
-                  <D2EnemyHealthBar value={stageEnemyHP} max={currentStageConfig.hp} name={currentStageEnemyName.toUpperCase().slice(0, 18)} />
+                  <div className="mobileEnemyOrbClone" aria-label={`${currentStageEnemyName} health ${stageEnemyHP} of ${currentStageConfig.hp}`}>
+                    <img className="mobileEnemyOrbFrame" src="/ui/grimdark/flow_main_panel_player.png" alt="" aria-hidden="true" />
+                    <div className="mobileEnemyOrbEnergy" aria-hidden="true">
+                      <img className="mobileEnemyOrbEnergyBase" src="/ui/grimdark/flow_energy_ball_001.png" alt="" />
+                      <div className="mobileEnemyOrbEnergyMask" style={{ clipPath: `inset(${100 - Math.max(0, Math.min(100, (stageEnemyHP / Math.max(1, currentStageConfig.hp)) * 100))}% 0 0 0)` }}>
+                        <img src="/ui/grimdark/flow_energy_ball_001.png" alt="" />
+                      </div>
+                    </div>
+                    <div className="mobileEnemyOrbValue">
+                      {Math.max(0, Math.floor(stageEnemyHP))} / {Math.max(1, Math.floor(currentStageConfig.hp))}<br />
+                      {Math.max(0, Math.min(100, (stageEnemyHP / Math.max(1, currentStageConfig.hp)) * 100)).toFixed(0)}%
+                    </div>
+                  </div>
+                  <div className="mobileEnemyName">{currentStageEnemyName.toUpperCase().slice(0, 18)}</div>
                 </div>
                 <div className="mobileEnemyPortrait">
                   <ModelPanel title="" src={enemyVideo} loop={!isEnemyHitVideo} onEnded={isEnemyHitVideo ? () => setHitPulse(null) : undefined} height={92} damageText={damageFloat.enemy || null} damageTone="enemy" />
