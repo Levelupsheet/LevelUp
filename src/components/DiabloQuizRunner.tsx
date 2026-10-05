@@ -95,7 +95,8 @@ function stageEnemyName(base: string, stage: number, maxStages: number, encounte
   return `${base}`;
 }
 
-type StageConfig = { name: string; hp: number; playerDamage: number; healChance: number; healMin: number; healMax: number };
+type EnemyPowerupKey = "shield" | "fury" | "restore" | "time";
+type StageConfig = { name: string; hp: number; playerDamage: number; healChance: number; healMin: number; healMax: number; powerups: EnemyPowerupKey[] };
 
 function buildStageConfigs(title: string, maxStages: number, encounterType: "standard" | "boss") : StageConfig[] {
   const upper = String(title || "").toUpperCase();
@@ -113,6 +114,7 @@ function buildStageConfigs(title: string, maxStages: number, encounterType: "sta
       healChance: Math.max(0.12, 0.28 - idx * 0.03),
       healMin: 4,
       healMax: 8 + idx,
+      powerups: ([["shield"], ["fury"], ["shield", "restore"], ["fury", "time"], ["shield", "fury", "restore", "time"]][Math.min(idx, 4)] || ["shield"]) as EnemyPowerupKey[],
     };
   });
 }
@@ -1450,9 +1452,35 @@ const showExpandedExplanation = useMemo(() => {
               )}
             </div>
 
-            <div className="quizEnemyRail batch8CombatRail batch8EnemyRail" style={{ display: "grid", gap: 12, alignContent: "start", alignSelf: "start", height: "fit-content", minHeight: 0 }}>
-              <D2EnemyHealthBar value={stageEnemyHP} max={currentStageConfig.hp} name="" />
-              <ModelPanel compact title="" src={enemyVideo} loop={!isEnemyHitVideo} onEnded={isEnemyHitVideo ? () => setHitPulse(null) : undefined} height="clamp(180px, 22vh, 280px)" damageText={damageFloat.enemy || null} damageTone="enemy" />
+            <div className="quizEnemyRail batch8CombatRail batch8EnemyRail enemyCloneRail" style={{ display: "grid", alignContent: "start", alignSelf: "start", height: "fit-content", minHeight: 0 }}>
+              <div className={"playerOrbComposite enemyOrbComposite " + (hitPulse === "enemy" ? "d2Shake" : "")} aria-label={`${currentStageEnemyName} health ${stageEnemyHP} of ${currentStageConfig.hp}`}>
+                <img className="playerOrbFrameAsset enemyOrbFrameAsset" src="/ui/grimdark/flow_main_panel_enemy.png" alt="" aria-hidden="true" />
+                <div className="playerOrbBlood enemyOrbEnergy" aria-hidden="true">
+                  <img className="playerOrbBloodBase enemyOrbEnergyBase" src="/ui/energy-orb.webp" alt="" />
+                  <div
+                    className="playerOrbBloodMask enemyOrbEnergyMask"
+                    style={{ clipPath: `inset(${100 - Math.max(0, Math.min(100, (stageEnemyHP / Math.max(1, currentStageConfig.hp)) * 100))}% 0 0 0)` }}
+                  >
+                    <img src="/ui/energy-orb.webp" alt="" />
+                  </div>
+                </div>
+                <div className="enemyCloneOrbValue">{Math.max(0, Math.round(stageEnemyHP))} / {currentStageConfig.hp}<br />{Math.round((stageEnemyHP / Math.max(1, currentStageConfig.hp)) * 100)}%</div>
+              </div>
+              <ModelPanel title="" src={enemyVideo} loop={!isEnemyHitVideo} onEnded={isEnemyHitVideo ? () => setHitPulse(null) : undefined} height="clamp(180px, 22vh, 280px)" damageText={damageFloat.enemy || null} damageTone="enemy" />
+              <div className="playerPowerupRack enemyPowerupRack" aria-label={`${currentStageEnemyName} powerups`}>
+                <img className="playerPowerupRackAsset" src="/ui/grimdark/flow_main_panel_powerup1.png" alt="" aria-hidden="true" />
+                <div className="playerPowerupSlots">
+                  {currentStageConfig.powerups.slice(0, 4).map((key, index) => {
+                    const enemyPowerupArt: Record<EnemyPowerupKey, string> = {
+                      shield: "/ui/grimdark/flow_skill3_001.png",
+                      fury: "/ui/grimdark/flow_skill1_001.png",
+                      restore: "/ui/grimdark/flow_icon_buff_items_001.png",
+                      time: "/ui/grimdark/flow_skill6_001.png",
+                    };
+                    return <div className={`playerPowerupSlot enemyPowerupSlot slot${index + 1}`} key={key} aria-label={`${currentStageEnemyName} ${key} powerup`}><img src={enemyPowerupArt[key]} alt="" aria-hidden="true" /></div>;
+                  })}
+                </div>
+              </div>
               <div className="quizEnemyNameBelow">{currentStageEnemyName.toUpperCase().slice(0, 18)}</div>
             </div>
           </div>
