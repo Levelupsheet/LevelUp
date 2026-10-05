@@ -11939,3 +11939,15 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     height:99px!important;
   }
 }
+
+
+/* 2026-10-05 enemy orb vertical alignment only:
+   preserve 99px size and horizontal centering; lower into the frame gap. */
+@media(min-width:901px){
+  .batch8DesktopQuizGrid .enemyExactPlayerClone > .playerOrbComposite:first-child .playerOrbBlood{
+    left:37px!important;
+    top:27px!important;
+    width:99px!important;
+    height:99px!important;
+  }
+}
