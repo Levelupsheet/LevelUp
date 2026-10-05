@@ -11823,3 +11823,34 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     margin-right:auto!important;
   }
 }
+
+
+/* 2026-10-05: right rail keeps the exact player HUD geometry.
+   Only neutralize the legacy blood-orb compositing that makes energy-orb.webp transparent. */
+@media(min-width:901px){
+  .batch8DesktopQuizGrid .enemyExactPlayerClone .playerOrbBlood{
+    background:transparent!important;
+    mix-blend-mode:normal!important;
+    opacity:1!important;
+  }
+  .batch8DesktopQuizGrid .enemyExactPlayerClone .playerOrbBlood::before,
+  .batch8DesktopQuizGrid .enemyExactPlayerClone .playerOrbBlood::after{
+    display:none!important;
+    content:none!important;
+  }
+  .batch8DesktopQuizGrid .enemyExactPlayerClone .playerOrbBloodBase,
+  .batch8DesktopQuizGrid .enemyExactPlayerClone .playerOrbBloodMask,
+  .batch8DesktopQuizGrid .enemyExactPlayerClone .playerOrbBloodMask img{
+    display:block!important;
+    visibility:visible!important;
+    opacity:1!important;
+    filter:none!important;
+    mix-blend-mode:normal!important;
+  }
+  .batch8DesktopQuizGrid .enemyExactPlayerClone .playerOrbBloodBase,
+  .batch8DesktopQuizGrid .enemyExactPlayerClone .playerOrbBloodMask img{
+    width:100%!important;
+    height:100%!important;
+    object-fit:cover!important;
+  }
+}
