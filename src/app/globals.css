@@ -12189,3 +12189,22 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     min-height:98px!important;
   }
 }
+
+
+/* 2026-10-05 desktop enemy drain correction.
+   The energy base must be the dim/empty state; only the clipped mask is full-strength.
+   Earlier parity rules forced BOTH layers to opacity:1, making HP loss invisible. */
+@media(min-width:901px){
+  .batch8DesktopQuizGrid .enemyExactPlayerClone > .playerOrbComposite:first-child .playerOrbBloodBase{
+    opacity:.18!important;
+  }
+  .batch8DesktopQuizGrid .enemyExactPlayerClone > .playerOrbComposite:first-child .playerOrbBloodMask{
+    opacity:1!important;
+    overflow:hidden!important;
+    transition:clip-path .35s ease!important;
+    will-change:clip-path!important;
+  }
+  .batch8DesktopQuizGrid .enemyExactPlayerClone > .playerOrbComposite:first-child .playerOrbBloodMask img{
+    opacity:1!important;
+  }
+}
