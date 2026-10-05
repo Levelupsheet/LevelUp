@@ -11797,3 +11797,29 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     margin:0!important;
   }
 }
+
+
+/* 2026-10-05 hard reset of desktop enemy HUD.
+   enemyExactPlayerClone intentionally has NO enemy-specific child geometry:
+   its orb, portrait and rack inherit the exact same classes/rules as the player HUD. */
+@media(min-width:901px){
+  .batch8DesktopQuizGrid .batch8EnemyRail.enemyExactPlayerClone{
+    gap:10px!important;
+    padding-top:0!important;
+    background:transparent!important;
+  }
+  /* Neutralize every legacy enemy-only selector by ensuring the exact-clone children
+     use the same natural layout behavior as their player-side twins. */
+  .batch8DesktopQuizGrid .enemyExactPlayerClone > .playerOrbComposite{
+    margin-left:auto!important;
+    margin-right:auto!important;
+  }
+  .batch8DesktopQuizGrid .enemyExactPlayerClone > .card{
+    margin-left:auto!important;
+    margin-right:auto!important;
+  }
+  .batch8DesktopQuizGrid .enemyExactPlayerClone > .playerPowerupRack{
+    margin-left:auto!important;
+    margin-right:auto!important;
+  }
+}
