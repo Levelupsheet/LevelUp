@@ -1456,12 +1456,12 @@ const showExpandedExplanation = useMemo(() => {
               <div className={"playerOrbComposite " + (hitPulse === "enemy" ? "d2Shake" : "")} aria-label={`${currentStageEnemyName} health ${stageEnemyHP} of ${currentStageConfig.hp}`}>
                 <img className="playerOrbFrameAsset" src="/ui/grimdark/flow_main_panel_player.png" alt="" aria-hidden="true" />
                 <div className="playerOrbBlood" aria-hidden="true">
-                  <img className="playerOrbBloodBase" src="/ui/energy-orb.webp" alt="" />
+                  <img className="playerOrbBloodBase" src="/ui/grimdark/flow_energy_ball_001.png" alt="" />
                   <div
                     className="playerOrbBloodMask"
                     style={{ clipPath: `inset(${100 - Math.max(0, Math.min(100, (stageEnemyHP / Math.max(1, currentStageConfig.hp)) * 100))}% 0 0 0)` }}
                   >
-                    <img src="/ui/energy-orb.webp" alt="" />
+                    <img src="/ui/grimdark/flow_energy_ball_001.png" alt="" />
                   </div>
                 </div>
               </div>
