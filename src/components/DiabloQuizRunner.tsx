@@ -1452,34 +1452,34 @@ const showExpandedExplanation = useMemo(() => {
               )}
             </div>
 
-            <div className="quizEnemyRail batch8CombatRail batch8EnemyRail enemyCloneRail" style={{ display: "grid", alignContent: "start", alignSelf: "start", height: "fit-content", minHeight: 0 }}>
-              <div className={"playerOrbComposite enemyOrbComposite " + (hitPulse === "enemy" ? "d2Shake" : "")} aria-label={`${currentStageEnemyName} health ${stageEnemyHP} of ${currentStageConfig.hp}`}>
-                <img className="playerOrbFrameAsset enemyOrbFrameAsset" src="/ui/grimdark/flow_main_panel_enemy.png" alt="" aria-hidden="true" />
-                <div className="playerOrbBlood enemyOrbEnergy" aria-hidden="true">
-                  <img className="playerOrbBloodBase enemyOrbEnergyBase" src="/ui/energy-orb.webp" alt="" />
+            <div className="quizEnemyRail batch8CombatRail batch8EnemyRail enemyExactPlayerClone" style={{ display: "grid", gap: 10, alignContent: "start", minHeight: 0 }}>
+              <div className={"playerOrbComposite " + (hitPulse === "enemy" ? "d2Shake" : "")} aria-label={`${currentStageEnemyName} health ${stageEnemyHP} of ${currentStageConfig.hp}`}>
+                <img className="playerOrbFrameAsset" src="/ui/grimdark/flow_main_panel_player.png" alt="" aria-hidden="true" />
+                <div className="playerOrbBlood" aria-hidden="true">
+                  <img className="playerOrbBloodBase" src="/ui/blood-orb.webp" alt="" />
                   <div
-                    className="playerOrbBloodMask enemyOrbEnergyMask"
+                    className="playerOrbBloodMask"
                     style={{ clipPath: `inset(${100 - Math.max(0, Math.min(100, (stageEnemyHP / Math.max(1, currentStageConfig.hp)) * 100))}% 0 0 0)` }}
                   >
-                    <img src="/ui/energy-orb.webp" alt="" />
+                    <img src="/ui/blood-orb.webp" alt="" />
                   </div>
                 </div>
-                <div className="enemyCloneOrbValue">{Math.max(0, Math.round(stageEnemyHP))} / {currentStageConfig.hp}<br />{Math.round((stageEnemyHP / Math.max(1, currentStageConfig.hp)) * 100)}%</div>
               </div>
-              <div className="quizEnemyNameBetween">{currentStageEnemyName.toUpperCase().slice(0, 18)}</div>
-              <ModelPanel title="" src={enemyVideo} loop={!isEnemyHitVideo} onEnded={isEnemyHitVideo ? () => setHitPulse(null) : undefined} height="clamp(180px, 22vh, 280px)" damageText={damageFloat.enemy || null} damageTone="enemy" />
-              <div className="playerPowerupRack enemyPowerupRack" aria-label={`${currentStageEnemyName} powerups`}>
+              <ModelPanel key={playerVideoKey} title="" src={playerVideo} forceReload={hitPulse === "enemy"} loop={!isPlayerHitVideo} height="clamp(180px, 22vh, 280px)" damageText={damageFloat.enemy || null} damageTone="enemy" />
+              <div className="playerPowerupRack" aria-label="Enemy cloned powerups">
                 <img className="playerPowerupRackAsset" src="/ui/grimdark/flow_main_panel_powerup1.png" alt="" aria-hidden="true" />
                 <div className="playerPowerupSlots">
-                  {currentStageConfig.powerups.slice(0, 4).map((key, index) => {
-                    const enemyPowerupArt: Record<EnemyPowerupKey, string> = {
-                      shield: "/ui/grimdark/flow_skill3_001.png",
-                      fury: "/ui/grimdark/flow_skill1_001.png",
-                      restore: "/ui/grimdark/flow_icon_buff_items_001.png",
-                      time: "/ui/grimdark/flow_skill6_001.png",
-                    };
-                    return <div className={`playerPowerupSlot enemyPowerupSlot slot${index + 1}`} key={key} aria-label={`${currentStageEnemyName} ${key} powerup`}><img src={enemyPowerupArt[key]} alt="" aria-hidden="true" /></div>;
-                  })}
+                  {[
+                    { key: "shield", qty: stage9Inventory.shield + powerups.shieldUses, src: "/ui/grimdark/flow_skill3_001.png", label: "Shield" },
+                    { key: "fury", qty: stage9Inventory.fury + powerups.furyUses, src: "/ui/grimdark/flow_skill1_001.png", label: "Fury" },
+                    { key: "restore", qty: stage9Inventory.restore, src: "/ui/grimdark/flow_icon_buff_items_001.png", label: "Restore Health" },
+                    { key: "xpSurge", qty: stage9Inventory.xpSurge, src: "/ui/grimdark/flow_skill6_001.png", label: "Time Slow" },
+                  ].filter((item) => item.qty > 0).slice(0, 4).map((item, index) => (
+                    <div className={`playerPowerupSlot slot${index + 1}`} key={item.key} title={item.label} aria-label={item.label}>
+                      <img src={item.src} alt="" aria-hidden="true" />
+                      {item.qty > 1 ? <span className="playerPowerupQty">x{item.qty}</span> : null}
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
