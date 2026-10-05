@@ -1452,7 +1452,7 @@ const showExpandedExplanation = useMemo(() => {
               )}
             </div>
 
-            <div className="quizEnemyRail batch8CombatRail batch8EnemyRail enemyExactPlayerClone" style={{ display: "grid", gap: 10, alignContent: "start", minHeight: 0 }}>
+            <div className="quizPlayerRail batch8CombatRail batch8PlayerRail enemyExactPlayerClone" style={{ display: "grid", gap: 10, alignContent: "start", minHeight: 0 }}>
               <div className={"playerOrbComposite " + (hitPulse === "enemy" ? "d2Shake" : "")} aria-label={`${currentStageEnemyName} health ${stageEnemyHP} of ${currentStageConfig.hp}`}>
                 <img className="playerOrbFrameAsset" src="/ui/grimdark/flow_main_panel_player.png" alt="" aria-hidden="true" />
                 <div className="playerOrbBlood" aria-hidden="true">
