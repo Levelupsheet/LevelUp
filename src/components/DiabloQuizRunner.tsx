@@ -1482,6 +1482,7 @@ const showExpandedExplanation = useMemo(() => {
                   ))}
                 </div>
               </div>
+              <div className="enemyCloneNamePlate">{currentStageEnemyName.toUpperCase().slice(0, 22)}</div>
             </div>
           </div>
         ) : (
