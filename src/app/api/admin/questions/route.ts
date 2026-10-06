@@ -283,11 +283,38 @@ export async function GET(req: Request) {
     if (summary) {
       const sets = await prisma.questionSet.findMany({
         orderBy: { name: "asc" },
-        select: { id: true, name: true, domain: true, status: true, _count: { select: { questions: true } } },
+        select: {
+          id: true, name: true, domain: true, status: true,
+          questions: { select: { type: true, difficulty: true, testNowEligible: true, isGoldenEligible: true, data: true, subdomain: true } },
+        },
+      });
+      const mapped = sets.map((set: any) => {
+        const questions = Array.isArray(set.questions) ? set.questions : [];
+        const byType: Record<string, number> = {};
+        const byDifficulty: Record<string, number> = { easy: 0, normal: 0, hard: 0 };
+        const bySubdomain: Record<string, number> = {};
+        let bossCount = 0, goldenCount = 0, testNowCount = 0;
+        for (const q of questions) {
+          const type = normalizeQuestionType(q.type);
+          byType[type] = (byType[type] || 0) + 1;
+          const d = Number(q.difficulty || 1);
+          const bucket = d >= 3 ? "hard" : d === 2 ? "normal" : "easy";
+          byDifficulty[bucket] = (byDifficulty[bucket] || 0) + 1;
+          const sub = String(q.subdomain || q?.data?.subdomain || "GENERAL").trim().toUpperCase() || "GENERAL";
+          bySubdomain[sub] = (bySubdomain[sub] || 0) + 1;
+          if (Boolean(q?.data?.bossEligible)) bossCount += 1;
+          if (q.isGoldenEligible) goldenCount += 1;
+          if (q.testNowEligible) testNowCount += 1;
+        }
+        return {
+          id: set.id, name: set.name, domain: set.domain, status: set.status,
+          questionCount: questions.length, bossCount, goldenCount, testNowCount,
+          byType, byDifficulty, bySubdomain,
+        };
       });
       return NextResponse.json({
-        sets: sets.map((set: any) => ({ id: set.id, name: set.name, domain: set.domain, status: set.status, questionCount: set._count?.questions || 0 })),
-        totalQuestions: sets.reduce((sum: number, set: any) => sum + Number(set._count?.questions || 0), 0),
+        sets: mapped,
+        totalQuestions: mapped.reduce((sum: number, set: any) => sum + Number(set.questionCount || 0), 0),
       });
     }
     if (!setId) return NextResponse.json({ error: "setId is required" }, { status: 400 });
