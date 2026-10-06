@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireAdminRequest } from "@/lib/adminAuth";
+import { requireAdminRequest } from "@/app/api/_lib/adminGuard";
 
 const STARTERS = [
   ["Information Technology","Help Desk"],["Information Technology","Desktop Technician"],["Information Technology","Cloud Engineer"],
@@ -16,7 +16,7 @@ export async function GET() {
   return NextResponse.json({ careers: rows, starterSuggestions: STARTERS.map(([industry,careerPath])=>({industry,careerPath})) });
 }
 export async function POST(req: Request) {
-  const auth = await requireAdminRequest(req); if (!auth.ok) return auth.response;
+  const auth = await requireAdminRequest(); if (!auth.ok) return auth.response;
   const body = await req.json();
   const industry = String(body?.industry || "").trim();
   const careerPath = String(body?.careerPath || "").trim();
