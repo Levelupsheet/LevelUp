@@ -20,6 +20,8 @@ export async function POST(req: Request) {
     const setId = String(body?.setId || "");
     const lane = body?.lane as "TEST_NOW" | "TRAINING" | "CERTIFICATIONS" | "INTERVIEW";
     const startingPosition = body?.startingPosition ?? null;
+    const industry = String(body?.industry || "").trim() || null;
+    const careerPath = String(body?.careerPath || "").trim() || null;
     const certExam = body?.certExam ?? null;
     const exclusive = Boolean(body?.exclusive);
     const isActive = body?.isActive === false ? false : true;
@@ -27,15 +29,18 @@ export async function POST(req: Request) {
     if (!setId || !lane) {
       return NextResponse.json({ error: "setId and lane are required" }, { status: 400 });
     }
-    if (lane === "TRAINING" && !startingPosition) {
-      return NextResponse.json({ error: "startingPosition is required for TRAINING" }, { status: 400 });
+    if (lane === "TRAINING" && !careerPath && !startingPosition) {
+      return NextResponse.json({ error: "careerPath is required for TRAINING" }, { status: 400 });
     }
     if (lane === "CERTIFICATIONS" && !certExam) {
       return NextResponse.json({ error: "certExam is required for CERTIFICATIONS" }, { status: 400 });
     }
 
     const whereDeactivate: any = { lane, isActive: true };
-    if (lane === "TRAINING") whereDeactivate.startingPosition = startingPosition;
+    if (lane === "TRAINING") {
+      if (careerPath) { whereDeactivate.industry = industry; whereDeactivate.careerPath = careerPath; }
+      else whereDeactivate.startingPosition = startingPosition;
+    }
     if (lane === "CERTIFICATIONS") whereDeactivate.certExam = certExam;
     if (lane === "TEST_NOW") {
       // nothing extra
@@ -54,7 +59,9 @@ export async function POST(req: Request) {
           setId,
           lane,
           isActive,
-          startingPosition: lane === "TRAINING" ? startingPosition : null,
+          startingPosition: lane === "TRAINING" && !careerPath ? startingPosition : null,
+          industry: lane === "TRAINING" ? industry : null,
+          careerPath: lane === "TRAINING" ? careerPath : null,
           certExam: lane === "CERTIFICATIONS" ? certExam : null,
         },
       });
@@ -64,7 +71,9 @@ export async function POST(req: Request) {
         data: {
           setId,
           lane,
-          startingPosition: lane === "TRAINING" ? startingPosition : null,
+          startingPosition: lane === "TRAINING" && !careerPath ? startingPosition : null,
+          industry: lane === "TRAINING" ? industry : null,
+          careerPath: lane === "TRAINING" ? careerPath : null,
           certExam: lane === "CERTIFICATIONS" ? certExam : null,
           isActive,
         },
