@@ -1021,7 +1021,11 @@ function Toast({ msg }:{ msg: string }){
 export default function AdminPage(){
   const [ok, setOk] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
-  const [tab, setTab] = useState<"questions" | "users" | "local" | "career" | "loot" | "sweepstakes">("questions");
+  const [tab, setTab] = useState<"questions" | "users" | "local" | "career" | "catalog" | "loot" | "sweepstakes">("questions");
+  const [catalogRows, setCatalogRows] = useState<any[]>([]);
+  const [catalogIndustry, setCatalogIndustry] = useState("Healthcare");
+  const [catalogCareer, setCatalogCareer] = useState("CNA");
+  const [catalogMsg, setCatalogMsg] = useState("");
   const [bulkImporting, setBulkImporting] = useState(false);
   const [questionView, setQuestionView] = useState<"manage" | "import" | "publish">("manage");
 
@@ -1274,6 +1278,20 @@ export default function AdminPage(){
     }
   }
 
+  async function loadCareerCatalog() {
+    const res = await fetch("/api/admin/careers", { cache:"no-store" as any });
+    const data = await res.json().catch(()=>null);
+    if (res.ok) setCatalogRows(Array.isArray(data?.careers) ? data.careers : []);
+  }
+  async function addCareerCatalog() {
+    setCatalogMsg("");
+    const res = await fetch("/api/admin/careers", { method:"POST", headers:{"content-type":"application/json"}, body:JSON.stringify({industry:catalogIndustry,careerPath:catalogCareer}) });
+    const data = await res.json().catch(()=>null);
+    if (!res.ok) { setCatalogMsg(data?.error || "Could not add career."); return; }
+    setCatalogMsg(`Added ${catalogIndustry} → ${catalogCareer}`);
+    await loadCareerCatalog();
+  }
+
   async function publishSelectedPool() {
     if (!selectedSet) { setAssignMsg("Step 1: choose the question pool you want to publish."); return; }
     await assignPlacement(publishLane);
@@ -1438,7 +1456,7 @@ export default function AdminPage(){
 
         <div className="row" style={{ alignItems:"center", gap: 10, flexWrap:"wrap", justifyContent:"flex-end" }}>
           <button onClick={() => setTab("questions")} className={tab==="questions" ? "primary" : ""}>DB Question Bank</button>
-          <button onClick={() => setTab("career")} className={tab==="career" ? "primary" : ""}>Career Matches</button>
+          <button onClick={() => { setTab("catalog"); void loadCareerCatalog(); }} className={tab==="catalog" ? "primary" : ""}>Career Catalog</button>
           <button onClick={() => setTab("loot")} className={tab==="loot" ? "primary" : ""}>Economy & Loot</button>
           <button onClick={() => setTab("sweepstakes")} className={tab==="sweepstakes" ? "primary" : ""}>Sweepstakes</button>
           <button onClick={() => setTab("local")} className={tab==="local" ? "primary" : ""}>Local (Prototype)</button>
@@ -1451,6 +1469,31 @@ export default function AdminPage(){
       {err ? (
         <div className="card" style={{ marginTop: 14, borderColor:"rgba(255,80,80,0.35)", background:"rgba(255,80,80,0.08)" }}>
           <b>Error:</b> {err}
+        </div>
+      ) : null}
+
+      {tab === "catalog" ? (
+        <div className="card" style={{ marginTop:14, padding:16 }}>
+          <div style={{ fontWeight:900, fontSize:22 }}>Career Catalog</div>
+          <small>Keep this simple: add the industry, add the career path, then publish question pools to it from DB Question Bank.</small>
+          <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr auto", gap:10, alignItems:"end", marginTop:14 }}>
+            <label style={{ display:"grid", gap:6 }}><small>Industry</small><input value={catalogIndustry} onChange={(e)=>setCatalogIndustry(e.target.value)} placeholder="Healthcare" list="catalog-industries" /></label>
+            <label style={{ display:"grid", gap:6 }}><small>Career path</small><input value={catalogCareer} onChange={(e)=>setCatalogCareer(e.target.value)} placeholder="CNA" /></label>
+            <button className="primary" onClick={addCareerCatalog}>Add Career</button>
+          </div>
+          <datalist id="catalog-industries"><option value="Information Technology"/><option value="Healthcare"/><option value="Transportation"/><option value="Sales"/><option value="Software Development"/><option value="Real Estate"/></datalist>
+          {catalogMsg ? <div style={{ marginTop:10 }}><small>{catalogMsg}</small></div> : null}
+          <div style={{ display:"grid", gap:8, marginTop:16 }}>
+            {Array.from(new Set(catalogRows.map((r:any)=>r.industry))).map((industry:any)=>(
+              <div key={industry} className="card" style={{ padding:12, background:"rgba(255,255,255,.03)" }}>
+                <b>{industry}</b>
+                <div style={{ display:"flex", flexWrap:"wrap", gap:8, marginTop:8 }}>
+                  {catalogRows.filter((r:any)=>r.industry===industry).map((r:any)=><span key={r.id} className="badge">{r.careerPath}</span>)}
+                </div>
+              </div>
+            ))}
+            {!catalogRows.length ? <small>No catalog careers yet. Add the first one above.</small> : null}
+          </div>
         </div>
       ) : null}
 
