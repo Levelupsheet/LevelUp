@@ -29,7 +29,7 @@ export async function POST(req: Request) {
   return NextResponse.json({ok:true,career:row});
 }
 export async function DELETE(req: Request) {
-  const auth = await requireAdminRequest(req); if (!auth.ok) return auth.response;
+  const auth = await requireAdminRequest(); if (!auth.ok) return auth.response;
   const body = await req.json();
   const id = String(body?.id || "");
   if (!id) return NextResponse.json({error:"id required"},{status:400});
