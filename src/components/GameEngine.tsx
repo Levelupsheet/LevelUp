@@ -236,6 +236,11 @@ export default function GameEngine(props: Props) {
 
   if (loading) return <div className="page"><div className="container" style={{ maxWidth: 1280 }}><div className="card" style={{ padding: 18 }}><div style={{ fontWeight: 800, fontSize: 18 }}>Loading {title}…</div><div className="muted" style={{ marginTop: 8 }}>{lane === "TEST_NOW" ? "Restoring or creating your saved Test Now session." : "Pulling randomized questions from your active database set."}</div></div></div></div>;
   const activePosition = playerPosition || String((getActiveUser() as any)?.startingPosition || "HELPDESK_SUPPORT");
+  const careerPlayerName = careerPath
+    ? String(careerPath).trim()
+    : activePosition === "CLOUD_ENGINEER" ? "Cloud Assassin"
+      : activePosition === "DESKTOP_TECHNICIAN" ? "Desktop Barbarian"
+        : "Help Desk Wizard";
   const playerMedia = activePosition === "CLOUD_ENGINEER"
     ? { playerIdleSrc: "/video/T2V diablo 4 assassin Idle.mp4", playerAttackSrc: "/video/I2V diablo 4 assassin attack.mp4", playerHitSrc: "/video/T2V diablo 4 assassin damage.mp4" }
     : activePosition === "DESKTOP_TECHNICIAN"
@@ -244,5 +249,5 @@ export default function GameEngine(props: Props) {
 
   if (!questions.length) return <div className="page"><div className="container" style={{ maxWidth: 1120 }}><div className="card" style={{ padding: 18 }}><div style={{ fontWeight: 800, fontSize: 18 }}>No questions available</div><div className="muted" style={{ marginTop: 8 }}>Assign an active question set in Admin.</div><div style={{ marginTop: 14 }}><Link className="btn" href="/admin">Open Admin</Link></div></div></div></div>;
 
-  return <DiabloQuizRunner title={title} subtitle={setLabel} enemyName={enemyName} questions={questions} timed={timed} metaLeft={metaLeft || `Adaptive lane: ${lane.replaceAll("_", " ")}`} metaRight={metaRight || `${questions.length} questions loaded`} exitHref={exitHref} exitLabel={exitLabel} onExit={onExit} onComplete={handleComplete} onStateChange={saveSessionProgress} onAdvanceQuestion={handleAdvanceQuestion} initialState={initialState} rules={rulesOverride} encounterType={encounterType} media={{ ...playerMedia, enemyIdleSrc: "/video/enemy-idle.mp4", enemyHitSrc: "/video/enemy-damage.mp4", width: 1600, height: 900 }} />;
+  return <DiabloQuizRunner title={title} subtitle={setLabel} enemyName={enemyName} playerDisplayName={careerPlayerName} questions={questions} timed={timed} metaLeft={metaLeft || `Adaptive lane: ${lane.replaceAll("_", " ")}`} metaRight={metaRight || `${questions.length} questions loaded`} exitHref={exitHref} exitLabel={exitLabel} onExit={onExit} onComplete={handleComplete} onStateChange={saveSessionProgress} onAdvanceQuestion={handleAdvanceQuestion} initialState={initialState} rules={rulesOverride} encounterType={encounterType} media={{ ...playerMedia, enemyIdleSrc: "/video/enemy-idle.mp4", enemyHitSrc: "/video/enemy-damage.mp4", width: 1600, height: 900 }} />;
 }
