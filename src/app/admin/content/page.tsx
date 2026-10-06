@@ -53,6 +53,7 @@ type LiveQuestion = {
   isGoldenEligible: boolean;
   goldenWeight: number;
   goldenBonusXp: number;
+  bossEligible?: boolean;
 };
 
 type GoldenTracking = {
@@ -144,7 +145,7 @@ export default function AdminContentStudioPage() {
   const [goldenTracking, setGoldenTracking] = useState<GoldenTracking | null>(null);
   const [reviewPanel, setReviewPanel] = useState<"generated" | "live">("generated");
   const [liveSearch, setLiveSearch] = useState("");
-  const [liveFilter, setLiveFilter] = useState<"all" | "test-now" | "golden">("all");
+  const [liveFilter, setLiveFilter] = useState<"all" | "test-now" | "golden" | "boss">("all");
   const [selectedLiveIds, setSelectedLiveIds] = useState<string[]>([]);
   const [bulkWeight, setBulkWeight] = useState(2);
   const [bulkBonusXp, setBulkBonusXp] = useState(75);
@@ -160,6 +161,7 @@ export default function AdminContentStudioPage() {
     return liveQuestions.filter((q) => {
       if (liveFilter === "test-now" && !q.testNowEligible) return false;
       if (liveFilter === "golden" && !q.isGoldenEligible) return false;
+      if (liveFilter === "boss" && !Boolean(q.bossEligible ?? (q.data as any)?.bossEligible)) return false;
       if (!search) return true;
       return [q.prompt, q.type, ...(q.tags || [])].join(" ").toLowerCase().includes(search);
     });
@@ -792,6 +794,7 @@ export default function AdminContentStudioPage() {
                         <button className={liveFilter === "all" ? "mini-btn active" : "mini-btn"} onClick={() => setLiveFilter("all")}>All</button>
                         <button className={liveFilter === "test-now" ? "mini-btn active" : "mini-btn"} onClick={() => setLiveFilter("test-now")}>Test Now</button>
                         <button className={liveFilter === "golden" ? "mini-btn active" : "mini-btn"} onClick={() => setLiveFilter("golden")}>Golden</button>
+                        <button className={liveFilter === "boss" ? "mini-btn active" : "mini-btn"} onClick={() => setLiveFilter("boss")}>Boss Pool</button>
                       </div>
                       <div style={{ opacity: 0.8, fontSize: 13 }}>{filteredLiveQuestions.length} visible • {selectedLiveIds.length} selected</div>
                     </div>
@@ -806,6 +809,8 @@ export default function AdminContentStudioPage() {
                       <button className="mini-btn" disabled={!selectedLiveIds.length || savingId === "bulk-live"} onClick={() => bulkUpdateLiveQuestions({ testNowEligible: false, isGoldenEligible: false })}>Remove from Test Now</button>
                       <button className="mini-btn" disabled={!selectedLiveIds.length || savingId === "bulk-live"} onClick={() => bulkUpdateLiveQuestions({ isGoldenEligible: true, testNowEligible: true, goldenWeight: bulkWeight, goldenBonusXp: bulkBonusXp })}>Mark golden eligible</button>
                       <button className="mini-btn" disabled={!selectedLiveIds.length || savingId === "bulk-live"} onClick={() => bulkUpdateLiveQuestions({ isGoldenEligible: false })}>Clear golden</button>
+                      <button className="mini-btn" disabled={!selectedLiveIds.length || savingId === "bulk-live"} onClick={() => bulkUpdateLiveQuestions({ bossEligible: true, difficulty: 3 } as any)}>Add to Boss Pool (Hard)</button>
+                      <button className="mini-btn" disabled={!selectedLiveIds.length || savingId === "bulk-live"} onClick={() => bulkUpdateLiveQuestions({ bossEligible: false } as any)}>Remove from Boss Pool</button>
                       <input type="number" min={1} max={10} value={bulkWeight} onChange={(e) => setBulkWeight(Number(e.target.value) || 1)} style={{ ...fieldStyle, minHeight: 40, width: 90 }} />
                       <input type="number" min={0} step={5} value={bulkBonusXp} onChange={(e) => setBulkBonusXp(Number(e.target.value) || 0)} style={{ ...fieldStyle, minHeight: 40, width: 110 }} />
                     </div>
@@ -941,7 +946,16 @@ function LiveQuestionCard({ question, saving, selected, onSelect, onSave }: { qu
 
       <div style={{ display: "flex", gap: 16, flexWrap: "wrap", marginTop: 12, alignItems: "center" }}>
         <ToggleSwitch label="Test Now" checked={question.testNowEligible} onChange={(checked) => onSave(question.id, { testNowEligible: checked, isGoldenEligible: checked ? question.isGoldenEligible : false })} disabled={saving} />
-        <ToggleSwitch label="Golden eligible" checked={question.isGoldenEligible} onChange={(checked) => onSave(question.id, { isGoldenEligible: checked, testNowEligible: checked ? true : question.testNowEligible })} disabled={saving || !question.testNowEligible} />
+        <ToggleSwitch label="Golden eligible" checked={question.isGoldenEligible} onChange={(checked) => onSave(question.id, { isGoldenEligible: checked, testNowEligible: checked ? true : question.testNowEligible, difficulty: checked ? 3 : question.difficulty })} disabled={saving || !question.testNowEligible} />
+        <ToggleSwitch label="Boss pool" checked={Boolean(question.bossEligible ?? (question.data as any)?.bossEligible)} onChange={(checked) => onSave(question.id, { bossEligible: checked, difficulty: checked ? 3 : question.difficulty } as any)} disabled={saving} />
+        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <span style={{ fontSize: 12, opacity: 0.8 }}>Difficulty</span>
+          <select value={question.difficulty} onChange={(e) => onSave(question.id, { difficulty: Number(e.target.value) })} disabled={saving || question.isGoldenEligible} style={{ ...fieldStyle, minHeight: 40, height: 40, width: 92 }}>
+            <option value={1}>Easy</option>
+            <option value={2}>Normal</option>
+            <option value={3}>Hard</option>
+          </select>
+        </div>
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
           <span style={{ fontSize: 12, opacity: 0.8 }}>Weight</span>
           <input type="number" min={1} max={10} value={localWeight} onChange={(e) => setLocalWeight(Number(e.target.value) || 1)} style={{ ...fieldStyle, minHeight: 40, width: 84 }} />
