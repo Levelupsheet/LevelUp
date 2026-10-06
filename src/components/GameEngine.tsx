@@ -22,6 +22,8 @@ type Props = {
   metaLeft?: string;
   metaRight?: string;
   startingPosition?: string | null;
+  industry?: string | null;
+  careerPath?: string | null;
   playerPosition?: string | null;
   certExam?: string | null;
   bankDomain?: string | null;
@@ -72,7 +74,7 @@ function mapQuestion(q: any, idx: number): DiabloQuestion {
 }
 
 export default function GameEngine(props: Props) {
-  const { lane, title, subtitle, timed = false, exitHref = "/dashboard", exitLabel = "Close", onExit, metaLeft, metaRight, startingPosition, playerPosition, certExam, bankDomain, trainingMode = "STANDARD", enemyName = "Lagger", questionCount, questionsOverride, rulesOverride, onComplete, encounterType = questionsOverride?.length ? "boss" : "standard" } = props;
+  const { lane, title, subtitle, timed = false, exitHref = "/dashboard", exitLabel = "Close", onExit, metaLeft, metaRight, startingPosition, industry, careerPath, playerPosition, certExam, bankDomain, trainingMode = "STANDARD", enemyName = "Lagger", questionCount, questionsOverride, rulesOverride, onComplete, encounterType = questionsOverride?.length ? "boss" : "standard" } = props;
   const [loading, setLoading] = useState(true);
   const [questions, setQuestions] = useState<DiabloQuestion[]>([]);
   const [setLabel, setSetLabel] = useState<string>(subtitle || title);
@@ -94,7 +96,10 @@ export default function GameEngine(props: Props) {
     const recentKey = getRecentKey(lane, startingPosition, certExam);
     const excludeIds = readRecentIds(recentKey);
     if (excludeIds.length) search.set("excludeIds", excludeIds.join(","));
-    if (startingPosition) search.set("startingPosition", startingPosition);
+    if (careerPath) {
+      search.set("careerPath", careerPath);
+      if (industry) search.set("industry", industry);
+    } else if (startingPosition) search.set("startingPosition", startingPosition);
     if (certExam) search.set("certExam", certExam);
     const res = await fetch(`/api/content/active?${search.toString()}`, { cache: "no-store" as any });
     const json = await res.json().catch(() => null);
@@ -107,7 +112,7 @@ export default function GameEngine(props: Props) {
       setQuestions(FALLBACK_BY_LANE[lane]);
       setSetLabel(`${title} · Sample`);
     }
-  }, [lane, effectiveCount, startingPosition, certExam, title, subtitle]);
+  }, [lane, effectiveCount, startingPosition, industry, careerPath, certExam, title, subtitle]);
 
   const loadTestNowSession = useCallback(async () => {
     const userId = resolveClientUserId();
