@@ -36,7 +36,9 @@ export async function POST(req: Request) {
         source: blockRecord.source,
       });
       const rawCandidates = generateQuestionsFromBlock(normalized);
+      const activeTypes = new Set(["multiple_choice", "true_false", "cli_command"]);
       const candidates = rawCandidates.filter((q) => {
+        if (!activeTypes.has(String(q.type || "").toLowerCase())) return false;
         const quality = validateQuestionQuality(q);
         return quality.qualityScore >= 80 && quality.issues.length === 0;
       });
