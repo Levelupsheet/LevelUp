@@ -96,13 +96,24 @@ export function mapDbQuestionToRuntime(q: any) {
 export async function loadActiveBank(args: {
   lane: string;
   startingPosition?: string | null;
+  industry?: string | null;
+  careerPath?: string | null;
   certExam?: string | null;
   bankDomain?: string | null;
 }) {
   const where: any = { lane: String(args.lane || "").toUpperCase(), isActive: true };
   const bankDomain = String(args.bankDomain || "").trim().toUpperCase();
   if (bankDomain) where.set = { domain: bankDomain };
-  if (where.lane === "TRAINING") where.startingPosition = args.startingPosition || null;
+  if (where.lane === "TRAINING") {
+    const careerPath = String(args.careerPath || "").trim();
+    const industry = String(args.industry || "").trim();
+    if (careerPath) {
+      where.careerPath = careerPath;
+      if (industry) where.industry = industry;
+    } else {
+      where.startingPosition = args.startingPosition || null;
+    }
+  }
   if (where.lane === "CERTIFICATIONS") where.certExam = args.certExam || null;
 
   const placements = await loadPlacementsWithQuestions(where);
@@ -183,6 +194,8 @@ export async function buildQuestionBankSelection(args: {
   shouldShuffle?: boolean;
   excludeIds?: string[];
   startingPosition?: string | null;
+  industry?: string | null;
+  careerPath?: string | null;
   certExam?: string | null;
   bankDomain?: string | null;
   userId?: string | null;
@@ -190,7 +203,7 @@ export async function buildQuestionBankSelection(args: {
   weakDomainTraining?: boolean;
   missedQuestionTraining?: boolean;
 }) {
-  const bank = await loadActiveBank({ lane: args.lane, startingPosition: args.startingPosition, certExam: args.certExam, bankDomain: args.bankDomain });
+  const bank = await loadActiveBank({ lane: args.lane, startingPosition: args.startingPosition, industry: args.industry, careerPath: args.careerPath, certExam: args.certExam, bankDomain: args.bankDomain });
   const excludeSet = new Set((args.excludeIds || []).map((v) => String(v)));
   // For now the live study game supports the three formats that provide the
   // cleanest quiz/combat experience. Legacy formats stay in the DB/admin but
