@@ -487,6 +487,7 @@ export default function DiabloQuizRunner(props: {
   title: string;
   subtitle?: string;
   enemyName?: string;
+  playerDisplayName?: string;
   questions: DiabloQuestion[];
   timed?: boolean;
   metaLeft?: string;
@@ -508,6 +509,7 @@ export default function DiabloQuizRunner(props: {
     title,
     subtitle,
     enemyName = "Lagger",
+    playerDisplayName,
     questions,
     timed = false,
     metaLeft,
@@ -881,13 +883,14 @@ const showExpandedExplanation = useMemo(() => {
   }, [state.finished, state.locked, question, finishFeedbackPending, state.xpEarned, state.correctCount, state.playerHP, state.enemyHP, state.timeLeft, combatQuestions.length, onComplete, outcome, hintXpSpent, hintsUsedCount, bestStreak]);
 
   const playerName = useMemo(() => {
+    if (playerDisplayName) return String(playerDisplayName).toUpperCase().slice(0, 18);
     try {
       const u = getActiveUser();
       return (u?.displayName || "Player").toUpperCase().slice(0, 18);
     } catch {
       return "PLAYER";
     }
-  }, []);
+  }, [playerDisplayName]);
 
   useEffect(() => {
     const uid = resolveClientUserId();
