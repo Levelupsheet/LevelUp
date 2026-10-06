@@ -1616,9 +1616,10 @@ export default function AdminPage(){
 
           {questionView !== "manage" ? <div className="adminQuestionSetupGrid">
             <div className="card" style={{ background:"rgba(255,255,255,0.03)" }}>
-              <div style={{ fontWeight: 800, marginBottom: 10 }}>Question sets</div>
+              <div style={{ fontWeight: 800, marginBottom: 4 }}>1. Choose or create a question pool</div>
+              <small style={{ opacity: 0.76 }}>A pool is the group of questions for one subject, role, certification, or training area. Example: CNA • Patient Safety.</small>
               <label style={{ display:"grid", gap: 6 }}>
-                <small>Select set</small>
+                <small style={{ marginTop: 8 }}>Existing question pool</small>
                 <select value={selectedSet} onChange={(e) => setSelectedSet(e.target.value)}>
                   <option value="">-- Select a question set --</option>
                   {sets.map((s) => (
@@ -1682,17 +1683,19 @@ export default function AdminPage(){
                     <option value="INTERVIEW">Interview Practice</option>
                   </select>
                 </label>
-                <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(180px, 1fr))", gap: 10 }}>
+                {publishLane === "TRAINING" ? (
                   <label style={{ display:"grid", gap: 6 }}>
-                    <small>Training path</small>
+                    <small>Which training path?</small>
                     <select value={assignStartPos} onChange={(e) => setAssignStartPos(e.target.value as any)}>
                       <option value="HELPDESK_SUPPORT">Helpdesk Support</option>
                       <option value="DESKTOP_TECHNICIAN">Desktop Technician</option>
                       <option value="CLOUD_ENGINEER">Cloud Engineer</option>
                     </select>
                   </label>
+                ) : null}
+                {publishLane === "CERTIFICATIONS" ? (
                   <label style={{ display:"grid", gap: 6 }}>
-                    <small>Certification exam</small>
+                    <small>Which certification exam?</small>
                     <select value={assignCertExam} onChange={(e) => setAssignCertExam(e.target.value as any)}>
                       <option value="A_PLUS">A+</option>
                       <option value="SECURITY_PLUS">Security+</option>
@@ -1701,7 +1704,7 @@ export default function AdminPage(){
                       <option value="AZURE">Azure</option>
                     </select>
                   </label>
-                </div>
+                ) : null}
                 <div style={{ padding: 10, borderRadius: 10, background: "rgba(0,0,0,.18)", border: "1px solid rgba(255,255,255,.08)" }}>
                   <small>Publishing <b>{selectedSetObj?.name || "No pool selected"}</b>{selectedSetObj ? ` • ${selectedSetObj.domain} • ${questions.length} questions` : ""}</small>
                 </div>
