@@ -275,6 +275,19 @@ enum QuestionType {
   MATCHING
 }
 
+model CareerCatalog {
+  id         String   @id @default(cuid())
+  industry   String
+  careerPath String
+  isActive   Boolean  @default(true)
+  sortOrder  Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([industry, careerPath])
+  @@index([isActive, industry, sortOrder])
+}
+
 model QuestionSetPlacement {
   id              String           @id @default(cuid())
   setId           String
