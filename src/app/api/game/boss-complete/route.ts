@@ -33,7 +33,7 @@ export async function POST(req: Request) {
     const result = await prisma.$transaction(async (tx) => {
       const encounter = await tx.bossEncounter.findUnique({ where: { id: encounterId } });
       if (!encounter || encounter.userId !== userId) throw new Error("Boss encounter not found");
-      if (encounter.outcome !== "PENDING") return { alreadyProcessed: true, encounter, bonusXpAwarded: 0, raffleEntriesAwarded: 0 };
+      if (encounter.outcome !== "PENDING") return { alreadyProcessed: true, encounter, bonusXpAwarded: 0, raffleEntriesAwarded: 0, lootChestAwarded: null, powerupsAwarded: [] };
 
       const win = body.outcome === "victory";
       const xpFromQuestions = Math.max(0, Math.floor(Number(body.xpEarned || 0)));
@@ -43,6 +43,8 @@ export async function POST(req: Request) {
       const totalXp = xpFromQuestions + bonusXpAwarded - hintXpSpent;
 
       let raffleEntriesAwarded = 0;
+      let lootChestAwarded: { id: string; type: string } | null = null;
+      const powerupsAwarded: Array<{ itemRef: string; quantity: number }> = [];
       if (win) {
         const awarded = await awardRaffleEntries(tx as any, {
           userId,
@@ -54,6 +56,54 @@ export async function POST(req: Request) {
           auditKey: `boss:${userId}:${encounterId}`,
         });
         raffleEntriesAwarded = awarded.awarded;
+
+        // Every boss victory grants one unopened loot chest. Golden bosses
+        // upgrade the guaranteed chest from SILVER to GOLD.
+        const chest = await tx.lootBox.create({
+          data: {
+            userId,
+            type: encounter.isGolden ? "GOLD" : "SILVER",
+            status: "PENDING",
+            source: encounter.isGolden ? "golden_boss_victory" : "boss_victory",
+          },
+          select: { id: true, type: true },
+        });
+        lootChestAwarded = { id: chest.id, type: chest.type };
+
+        // Guaranteed combat powerups are granted directly to inventory in
+        // addition to whatever the loot chest contains when opened.
+        const powerupDrops = encounter.isGolden
+          ? [{ itemRef: "shield_charge", quantity: 1 }, { itemRef: "health_restore", quantity: 1 }, { itemRef: "fury_charge", quantity: 1 }]
+          : [{ itemRef: "shield_charge", quantity: 1 }, { itemRef: "health_restore", quantity: 1 }];
+
+        for (const drop of powerupDrops) {
+          const existingItem = await tx.inventoryItem.findFirst({
+            where: { userId, itemType: "POWERUP", itemRef: drop.itemRef },
+            orderBy: { createdAt: "asc" },
+          });
+          if (existingItem) {
+            await tx.inventoryItem.update({
+              where: { id: existingItem.id },
+              data: { quantity: { increment: drop.quantity } },
+            });
+          } else {
+            await tx.inventoryItem.create({
+              data: { userId, itemType: "POWERUP", itemRef: drop.itemRef, quantity: drop.quantity },
+            });
+          }
+          powerupsAwarded.push(drop);
+        }
+
+        await tx.notification.create({
+          data: {
+            userId,
+            type: "LOOT_BOX_EARNED",
+            title: encounter.isGolden ? "Golden Boss rewards unlocked!" : "Boss rewards unlocked!",
+            body: encounter.isGolden
+              ? "Victory awarded a Gold loot chest plus Shield, Health Restore, and Fury powerups."
+              : "Victory awarded a Silver loot chest plus Shield and Health Restore powerups.",
+          },
+        }).catch(() => null);
       }
 
       const currentUser = await tx.user.findUnique({ where: { id: userId }, select: { xp: true } });
@@ -85,7 +135,7 @@ export async function POST(req: Request) {
         },
       });
 
-      return { user, encounter: updatedEncounter, bonusXpAwarded, raffleEntriesAwarded };
+      return { user, encounter: updatedEncounter, bonusXpAwarded, raffleEntriesAwarded, lootChestAwarded, powerupsAwarded };
     });
 
     return Response.json(Object.assign({ ok: true }, result as any));
