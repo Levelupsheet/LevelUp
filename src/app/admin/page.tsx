@@ -1042,6 +1042,8 @@ export default function AdminPage(){
   const [newSetName, setNewSetName] = useState("Networking Set 1");
   const [newSetDomain, setNewSetDomain] = useState("GENERAL");
   const [publishLane, setPublishLane] = useState<"TEST_NOW" | "TRAINING" | "CERTIFICATIONS" | "INTERVIEW">("TRAINING");
+  const [publishIndustry, setPublishIndustry] = useState("Information Technology");
+  const [publishCareerPath, setPublishCareerPath] = useState("Help Desk");
   const [questions, setQuestions] = useState<Question[]>([]);
   const [dirtyOrder, setDirtyOrder] = useState(false);
   const questionQualitySummary = useMemo(() => {
@@ -1253,7 +1255,10 @@ export default function AdminPage(){
     try {
       setAssignMsg(null);
       const body: any = { setId: selectedSet, lane };
-      if (lane === "TRAINING") body.startingPosition = assignStartPos;
+      if (lane === "TRAINING") {
+        body.industry = publishIndustry.trim();
+        body.careerPath = publishCareerPath.trim();
+      }
       if (lane === "CERTIFICATIONS") body.certExam = assignCertExam;
 
       const res = await fetch("/api/admin/placements", {
@@ -1263,7 +1268,7 @@ export default function AdminPage(){
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json?.error || "Failed to assign");
-      setAssignMsg(`Assigned: ${lane}${lane === "TRAINING" ? " (" + assignStartPos + ")" : ""}${lane === "CERTIFICATIONS" ? " (" + assignCertExam + ")" : ""}`);
+      setAssignMsg(`Assigned: ${lane}${lane === "TRAINING" ? " (" + publishIndustry + " → " + publishCareerPath + ")" : ""}${lane === "CERTIFICATIONS" ? " (" + assignCertExam + ")" : ""}`);
     } catch (e: any) {
       setAssignMsg(e?.message || "Failed to assign");
     }
@@ -1684,14 +1689,18 @@ export default function AdminPage(){
                   </select>
                 </label>
                 {publishLane === "TRAINING" ? (
-                  <label style={{ display:"grid", gap: 6 }}>
-                    <small>Which training path?</small>
-                    <select value={assignStartPos} onChange={(e) => setAssignStartPos(e.target.value as any)}>
-                      <option value="HELPDESK_SUPPORT">Helpdesk Support</option>
-                      <option value="DESKTOP_TECHNICIAN">Desktop Technician</option>
-                      <option value="CLOUD_ENGINEER">Cloud Engineer</option>
-                    </select>
-                  </label>
+                  <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap: 10 }}>
+                    <label style={{ display:"grid", gap: 6 }}>
+                      <small>Industry</small>
+                      <input value={publishIndustry} onChange={(e) => setPublishIndustry(e.target.value)} placeholder="Healthcare" list="industry-suggestions" />
+                      <datalist id="industry-suggestions"><option value="Information Technology" /><option value="Healthcare" /><option value="Transportation" /><option value="Industrial / Skilled Trades" /></datalist>
+                    </label>
+                    <label style={{ display:"grid", gap: 6 }}>
+                      <small>Career path</small>
+                      <input value={publishCareerPath} onChange={(e) => setPublishCareerPath(e.target.value)} placeholder="CNA" list="career-suggestions" />
+                      <datalist id="career-suggestions"><option value="Help Desk" /><option value="Desktop Technician" /><option value="Cloud Engineer" /><option value="CNA" /><option value="LPN" /><option value="RN" /><option value="CDL Driver" /></datalist>
+                    </label>
+                  </div>
                 ) : null}
                 {publishLane === "CERTIFICATIONS" ? (
                   <label style={{ display:"grid", gap: 6 }}>
