@@ -11,6 +11,8 @@ export async function GET(req: Request) {
   const url = new URL(req.url);
   const lane = (url.searchParams.get("lane") || "").toUpperCase() as any;
   const startingPosition = url.searchParams.get("startingPosition");
+  const industry = url.searchParams.get("industry");
+  const careerPath = url.searchParams.get("careerPath");
   const certExam = url.searchParams.get("certExam");
   const questionCountParam = Number(url.searchParams.get("questionCount") || "0");
   const shouldShuffle = !["0", "false", "no"].includes((url.searchParams.get("shuffle") || "true").toLowerCase());
@@ -25,6 +27,8 @@ export async function GET(req: Request) {
   const result = await buildQuestionBankSelection({
     lane,
     startingPosition,
+    industry,
+    careerPath,
     certExam,
     questionCount: requestedCount,
     shouldShuffle,
@@ -43,6 +47,8 @@ export async function GET(req: Request) {
     placement: {
       lane,
       startingPosition,
+      industry,
+      careerPath,
       certExam,
       activePlacementIds: result.placements.map((placement) => placement.id),
       activeSetIds: result.placements.map((placement) => placement.setId),
