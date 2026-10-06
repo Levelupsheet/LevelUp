@@ -94,5 +94,15 @@ export async function GET() {
     take: 200,
     include: { set: true },
   });
-  return NextResponse.json({ placements });
+  const activeTestNowBanks = Array.from(new Map(
+    placements
+      .filter((p: any) => p.lane === "TEST_NOW" && p.isActive)
+      .map((p: any) => [String(p.set?.domain || "GENERAL"), {
+        domain: String(p.set?.domain || "GENERAL"),
+        setId: p.setId,
+        setName: p.set?.name || "Question pool",
+        questionCount: Number((p.set as any)?._count?.questions || 0),
+      }])
+  ).values());
+  return NextResponse.json({ placements, activeTestNowBanks });
 }
