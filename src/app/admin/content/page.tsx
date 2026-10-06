@@ -135,7 +135,7 @@ export default function AdminContentStudioPage() {
   const [selectedBlockId, setSelectedBlockId] = useState<string>("");
   const [questions, setQuestions] = useState<GeneratedQuestion[]>([]);
   const [liveQuestions, setLiveQuestions] = useState<LiveQuestion[]>([]);
-  const [bankSummary, setBankSummary] = useState<Array<{ id: string; name: string; domain: string; questionCount: number }>>([]);
+  const [bankSummary, setBankSummary] = useState<Array<{ id: string; name: string; domain: string; questionCount: number; bossCount?: number; goldenCount?: number; testNowCount?: number; byType?: Record<string, number>; byDifficulty?: Record<string, number>; bySubdomain?: Record<string, number> }>>([]);
   const [publishBankId, setPublishBankId] = useState<string>("");
   const [selectedAdminBankId, setSelectedAdminBankId] = useState<string>("");
   const [loading, setLoading] = useState(false);
@@ -788,6 +788,33 @@ export default function AdminContentStudioPage() {
               ) : (
                 <div style={{ display: "grid", gap: 12, marginTop: 16 }}>
                   <div className="card" style={{ padding: 14, background: "rgba(255,255,255,0.03)" }}>
+                    <div style={{ fontWeight: 900, fontSize: 16 }}>Boss Question Manager & Bank Health</div>
+                    <div style={{ fontSize: 12, opacity: 0.72, marginTop: 4 }}>Boss and Golden pools should be Hard and use Multiple Choice, True/False, or CLI. Counts below expose thin pools before they affect battles.</div>
+                    <div style={{ display: "grid", gap: 8, marginTop: 12 }}>
+                      {bankSummary.map((bank) => {
+                        const hard = bank.byDifficulty?.hard || 0;
+                        const boss = bank.bossCount || 0;
+                        const golden = bank.goldenCount || 0;
+                        const activeFormats = (bank.byType?.multiple_choice || 0) + (bank.byType?.true_false || 0) + (bank.byType?.cli_command || 0);
+                        const bossThin = boss < 5;
+                        return (
+                          <div key={bank.id} style={{ padding: 10, border: bossThin ? "1px solid rgba(239,68,68,.55)" : "1px solid rgba(255,255,255,.12)", borderRadius: 10, display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+                            <strong style={{ minWidth: 180 }}>{bank.name}</strong>
+                            <span className="badge">{bank.domain}</span>
+                            <span className="badge">{bank.questionCount} total</span>
+                            <span className="badge">{hard} hard</span>
+                            <span className="badge">{boss} boss</span>
+                            <span className="badge">{golden} golden</span>
+                            <span className="badge">{activeFormats} active formats</span>
+                            {bossThin ? <span className="badge" style={{ borderColor: "rgba(239,68,68,.65)" }}>Needs 5+ boss questions</span> : null}
+                            <button className="mini-btn" onClick={() => { setSelectedAdminBankId(bank.id); setLiveFilter("boss"); }}>Manage Boss Pool</button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <div className="card" style={{ padding: 14, background: "rgba(255,255,255,0.03)" }}>
                     <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center", justifyContent: "space-between" }}>
                       <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
                         <input value={liveSearch} onChange={(e) => setLiveSearch(e.target.value)} placeholder="Search live prompts or tags" style={{ ...fieldStyle, minHeight: 42, width: 280 }} />
@@ -968,8 +995,23 @@ function LiveQuestionCard({ question, saving, selected, onSelect, onSave }: { qu
         </div>
       </div>
 
-      <div style={{ fontSize: 12, opacity: 0.75, marginTop: 10 }}>
-        tags: {(question.tags || []).join(", ") || "—"}
+      <div style={{ display: "grid", gap: 8, marginTop: 12 }}>
+        <textarea value={question.prompt} onChange={(e) => onSave(question.id, { prompt: e.target.value })} disabled={saving} style={{ ...fieldStyle, minHeight: 66 }} />
+        <textarea value={question.explanation || ""} placeholder="Explanation" onChange={(e) => onSave(question.id, { explanation: e.target.value })} disabled={saving} style={{ ...fieldStyle, minHeight: 58 }} />
+        {(question.type === "MULTIPLE_CHOICE" || question.type === "TRUE_FALSE") && Array.isArray(question.choices) ? (
+          <div style={{ display: "grid", gap: 6 }}>
+            {question.choices.map((choice, index) => (
+              <div key={index} style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                <input type="radio" checked={question.correctIndex === index} onChange={() => onSave(question.id, { correctIndex: index })} disabled={saving} />
+                <input value={choice} onChange={(e) => { const choices = [...(question.choices || [])]; choices[index] = e.target.value; onSave(question.id, { choices } as any); }} disabled={saving || question.type === "TRUE_FALSE"} style={{ ...fieldStyle, minHeight: 38, height: 38 }} />
+              </div>
+            ))}
+          </div>
+        ) : null}
+        {question.type === "CLI_COMMAND" ? (
+          <input value={String((question.data as any)?.command || (question.data as any)?.answer || "")} placeholder="Expected CLI command" onChange={(e) => onSave(question.id, { data: { ...(question.data || {}), command: e.target.value, answer: e.target.value } } as any)} disabled={saving} style={{ ...fieldStyle, minHeight: 40 }} />
+        ) : null}
+        <div style={{ fontSize: 12, opacity: 0.75 }}>tags: {(question.tags || []).join(", ") || "—"}</div>
       </div>
     </div>
   );
