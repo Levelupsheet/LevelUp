@@ -76,6 +76,12 @@ function labelPos(p: string){
   return p;
 }
 
+function careerCharacterName(careerPath?: string | null, fallback?: string | null){
+  const path = String(careerPath || "").trim();
+  if (path) return path;
+  return fallback ? labelPos(fallback) : "Player";
+}
+
 function RoleCard(props: { title: string; desc: string; icon: string; imageSrc?: string; videoSrc?: string; selected: boolean; onClick: () => void }){
   return (
     <button className={"luRoleCard" + (props.selected ? " selected" : "")} onClick={props.onClick} type="button">
@@ -1169,7 +1175,7 @@ async function analyzeResumeStage12() {
           <div className="card dashboardNextAction dashboardGrimdarkPanel">
             <div className="dashboardNextCopy">
               <div className="dashboardEyebrow">RECOMMENDED NEXT</div>
-              <h2>{hasTechReady ? "Your Tech Battle is ready" : hrBattleUnlocked && !hrPassed ? "Take your HR Battle" : `Continue your ${user?.startingPosition ? labelPos(user.startingPosition) : "career"} path`}</h2>
+              <h2>{hasTechReady ? "Your Tech Battle is ready" : hrBattleUnlocked && !hrPassed ? "Take your HR Battle" : `Continue your ${careerCharacterName(selectedCareer?.careerPath, user?.startingPosition)} path`}</h2>
               <p>{hasTechReady ? "You cleared the HR gate. Put your technical reasoning to the test and keep your career progression moving." : hrBattleUnlocked && !hrPassed ? "You have unlocked the interview track. Complete the HR Battle to move toward the technical interview." : "Keep your momentum moving with the next training session. Your XP, mastery, and unlock progress update as you complete challenges."}</p>
             </div>
             {hasTechReady ? (
