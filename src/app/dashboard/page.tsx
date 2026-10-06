@@ -160,6 +160,9 @@ export default function Dashboard() {
   const [posSaving, setPosSaving] = useState(false);
   const [positionConfirmOpen, setPositionConfirmOpen] = useState(false);
   const [positionError, setPositionError] = useState<string | null>(null);
+  const [careerPaths, setCareerPaths] = useState<Array<{ industry: string; careerPath: string; poolCount: number }>>([]);
+  const [selectedCareer, setSelectedCareer] = useState<{ industry: string; careerPath: string } | null>(null);
+  const [careerPickerOpen, setCareerPickerOpen] = useState(false);
 
   const [notes, setNotes] = useState<Notification[]>([]);
   const [tokenBalance, setTokenBalance] = useState<number>(0);
@@ -178,6 +181,29 @@ export default function Dashboard() {
   const [careerMatches, setCareerMatches] = useState<CareerMatchRow[]>([]);
   const [sweepSummary, setSweepSummary] = useState<SweepstakesSummary | null>(null);
   const [subscriptionTier, setSubscriptionTier] = useState<string>("FREE");
+
+  useEffect(() => {
+    fetch("/api/career-paths", { cache: "no-store" as any })
+      .then((r) => r.json())
+      .then((json) => {
+        const paths = Array.isArray(json?.paths) ? json.paths : [];
+        setCareerPaths(paths);
+        try {
+          const raw = localStorage.getItem("lu_selected_career_path_v1");
+          const saved = raw ? JSON.parse(raw) : null;
+          if (saved?.careerPath && paths.some((p: any) => p.industry === saved.industry && p.careerPath === saved.careerPath)) setSelectedCareer(saved);
+        } catch {}
+      }).catch(() => {});
+  }, []);
+
+  function chooseCareerPath(path: { industry: string; careerPath: string }) {
+    setSelectedCareer(path);
+    try { localStorage.setItem("lu_selected_career_path_v1", JSON.stringify(path)); } catch {}
+    setCareerPickerOpen(false);
+    setShowLaunchModal(false);
+    setLaunchGate("position-training");
+    window.location.href = "/position-training";
+  }
   const [entitlements, setEntitlements] = useState<Entitlements | null>(null);
   const [freeStartCooldownUntil, setFreeStartCooldownUntil] = useState<number>(0);
   const [cooldownNow, setCooldownNow] = useState<number>(Date.now());
@@ -811,11 +837,11 @@ async function analyzeResumeStage12() {
                 <button
                   className="luRoleCard gdModalChoice gdModalChoiceOrange"
                   type="button"
-                  onClick={() => startLeveledMode("position")}
+                  onClick={() => careerPaths.length ? setCareerPickerOpen(true) : startLeveledMode("position")}
                 >
                   <div className="luRoleIcon" aria-hidden="true">🎯</div>
-                  <div className="luRoleTitle">Position training</div>
-                  <div className="luRoleDesc">Practice role-based questions and earn XP.</div>
+                  <div className="luRoleTitle">Career training</div>
+                  <div className="luRoleDesc">{selectedCareer ? `${selectedCareer.industry} • ${selectedCareer.careerPath}` : "Choose an industry and published career path."}</div>
                 </button>
 
                 <button
@@ -914,6 +940,32 @@ async function analyzeResumeStage12() {
           <div className="playerStatsDetail"><b>Domain intelligence</b><small>Strongest: {selectedPlayerStats.performance.strongestDomain ? `${selectedPlayerStats.performance.strongestDomain.domain} • ${selectedPlayerStats.performance.strongestDomain.mastery}%` : "Building profile"} &nbsp; | &nbsp; Needs work: {selectedPlayerStats.performance.weakestDomain ? `${selectedPlayerStats.performance.weakestDomain.domain} • ${selectedPlayerStats.performance.weakestDomain.mastery}%` : "Building profile"}</small></div>
         </> : <div className="playerStatsDetail"><b>Performance data unavailable</b></div>}
       </div></div> : null}
+
+      {careerPickerOpen && (
+        <div className="luModalBackdrop" onMouseDown={() => setCareerPickerOpen(false)}>
+          <div className="luModal" role="dialog" aria-modal="true" aria-label="Choose career path" onMouseDown={(e) => e.stopPropagation()}>
+            <div className="luModalHeader" style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+              <div><b style={{ fontSize:18 }}>Choose Your Career Path</b><div><small className="luHint">Only paths with published training pools appear here.</small></div></div>
+              <button className="secondaryBtn gdCloseButton" type="button" onClick={() => setCareerPickerOpen(false)}>EXIT</button>
+            </div>
+            <div className="luModalBody" style={{ display:"grid", gap:14 }}>
+              {Array.from(new Set(careerPaths.map((p) => p.industry))).map((industry) => (
+                <div key={industry}>
+                  <div style={{ fontWeight:900, marginBottom:8 }}>{industry}</div>
+                  <div className="luGrid3">
+                    {careerPaths.filter((p) => p.industry === industry).map((path) => (
+                      <button key={industry + path.careerPath} className="luRoleCard gdModalChoice gdModalChoiceOrange" type="button" onClick={() => chooseCareerPath(path)}>
+                        <div className="luRoleTitle">{path.careerPath}</div>
+                        <div className="luRoleDesc">{path.poolCount} published question pool{path.poolCount === 1 ? "" : "s"}</div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {showPositionModal && (
         <div className="luModalOverlay">
