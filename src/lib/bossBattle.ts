@@ -144,14 +144,22 @@ export function mapBossQuestion(q: any, domainId = "general"): BossQuestion {
 }
 
 export function selectBossQuestions(inputQuestions: any[], count = BOSS_QUESTION_COUNT, forcedDomain?: string | null) {
-  const sorted = [...inputQuestions].sort((a, b) => Number(b?.difficulty || 1) - Number(a?.difficulty || 1));
+  // Boss battles are intentionally hard-only. Never backfill with easy/normal
+  // questions just to reach the requested count.
+  const allowedTypes = new Set(["multiple_choice", "true_false", "cli_command"]);
+  const hard = [...inputQuestions]
+    .filter((q) => normalizeDifficultyLevel(q?.difficulty) === 3)
+    .filter((q) => allowedTypes.has(normalizeQuestionType(q?.type)))
+    .sort((a, b) => Number(b?.difficulty || 1) - Number(a?.difficulty || 1));
+
+  const curated = hard.filter((q) => Boolean(q?.bossEligible ?? q?.data?.bossEligible));
+  const base = curated.length ? curated : hard;
   const force = String(forcedDomain || "").toLowerCase();
-  const domainSubset = force ? sorted.filter((q) => String(q?.domainId || q?.domain || q?.setDomain || "").toLowerCase().includes(force)) : [];
-  const domainHigh = domainSubset.filter((q) => Number(q?.difficulty || 1) >= 2);
-  const fallbackHigh = sorted.filter((q) => Number(q?.difficulty || 1) >= 3);
-  const source = domainHigh.length >= count ? domainHigh : fallbackHigh.length >= count ? fallbackHigh : (domainSubset.length ? domainSubset : sorted.filter((q) => Number(q?.difficulty || 1) >= 2));
-  const finalSource = source.length >= count ? source : sorted;
-  return sampleQuestions(finalSource, Math.min(count, finalSource.length));
+  const domainHard = force
+    ? base.filter((q) => String(q?.domainId || q?.domain || q?.setDomain || "").toLowerCase().includes(force))
+    : [];
+  const source = domainHard.length >= count ? domainHard : base;
+  return sampleQuestions(source, Math.min(count, source.length));
 }
 
 export function applyBossAbilitiesToQuestions(questions: BossQuestion[], profile: BossProfile) {
