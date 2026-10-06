@@ -280,6 +280,8 @@ model QuestionSetPlacement {
   setId           String
   lane            ContentLane
   startingPosition StartingPosition?
+  industry        String?
+  careerPath      String?
   certExam        CertExam?
   isActive        Boolean          @default(true)
   createdAt       DateTime         @default(now())
@@ -289,6 +291,7 @@ model QuestionSetPlacement {
 
   @@index([lane, isActive, createdAt])
   @@index([lane, startingPosition])
+  @@index([lane, industry, careerPath])
   @@index([lane, certExam])
 }
 
