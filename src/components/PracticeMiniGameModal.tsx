@@ -23,7 +23,8 @@ export default function PracticeMiniGameModal(props: {
   const [path, setPath] = useState<PositionPath>(defaultPath ?? "HELPDESK_SUPPORT");
   const [cert, setCert] = useState<CertTrack>("A_PLUS");
   const [testMode, setTestMode] = useState<"STANDARD" | "WEAK_DOMAIN" | "MISSED_QUESTIONS">("STANDARD");
-  const [testBank, setTestBank] = useState<"GENERAL" | "IDENTITY" | "NETWORKING" | "SECURITY" | "COMPUTE" | "STORAGE" | "AZURE" | "AWS" | "WINDOWS">("GENERAL");
+  const [testBank, setTestBank] = useState<string>("GENERAL");
+  const [testBanks, setTestBanks] = useState<Array<{domain:string;label:string;questionCount:number;setCount:number}>>([{domain:"GENERAL",label:"Mixed",questionCount:0,setCount:0}]);
   const [finalScore, setFinalScore] = useState<{ correct: number; total: number; xp: number; timeLeft?: number; bestStreak?: number; outcome?: "victory" | "defeat" | "complete" | null; playerHP?: number }>({ correct: 0, total: 0, xp: 0, outcome: null });
   const [learningPath, setLearningPath] = useState<any | null>(null);
   const [sessionMastery, setSessionMastery] = useState<Record<string, number>>({});
@@ -54,6 +55,14 @@ export default function PracticeMiniGameModal(props: {
     setBossMeta(null);
     setBossReward(null);
   }, [open]);
+
+  useEffect(() => {
+    if (!open || kind !== "test") return;
+    fetch("/api/test-now/banks", { cache:"no-store" as any })
+      .then((r)=>r.json())
+      .then((json)=>{ if (Array.isArray(json?.banks) && json.banks.length) setTestBanks(json.banks); })
+      .catch(()=>{});
+  }, [open, kind]);
 
   if (!open) return null;
 
@@ -178,7 +187,7 @@ export default function PracticeMiniGameModal(props: {
                 </div>
                 <div style={{ fontWeight: 800, marginTop: 4 }}>Choose a question bank</div>
                 <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-                  {([["GENERAL","Mixed"],["AWS","AWS"],["AZURE","Azure"],["SECURITY","Security+"]] as const).map(([k,label]) => <button key={k} className={"trackBtn gdActionBlue gdTrackChoice" + (testBank === k ? " active gdTrackChoiceActive" : "")} type="button" onClick={() => setTestBank(k)}>{label}</button>)}
+                  {testBanks.map((bank) => <button key={bank.domain} className={"trackBtn gdActionBlue gdTrackChoice" + (testBank === bank.domain ? " active gdTrackChoiceActive" : "")} type="button" onClick={() => setTestBank(bank.domain)}>{bank.label}{bank.domain !== "GENERAL" && bank.questionCount ? ` (${bank.questionCount})` : ""}</button>)}
                 </div>
                 <div className="muted">15 questions • unseen questions first • adaptive modes use your personal learning history</div>
               </div>}
