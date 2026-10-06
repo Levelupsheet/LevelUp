@@ -1023,6 +1023,7 @@ export default function AdminPage(){
   const [authChecked, setAuthChecked] = useState(false);
   const [tab, setTab] = useState<"questions" | "users" | "local" | "career" | "loot" | "sweepstakes">("questions");
   const [bulkImporting, setBulkImporting] = useState(false);
+  const [questionView, setQuestionView] = useState<"manage" | "import" | "publish">("manage");
 
   const [err, setErr] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
@@ -1591,8 +1592,10 @@ export default function AdminPage(){
             </div>
           </div>
 
-          <div className="adminContentWorkflow">
-            {["1. Source concepts", "2. Generate original questions", "3. Quality review", "4. Assign learning lane", "5. Publish & monitor"].map((step) => <div key={step}>{step}</div>)}
+          <div className="row" style={{ gap: 8, flexWrap: "wrap", marginTop: 14 }}>
+            <button className={questionView === "manage" ? "primary" : ""} onClick={() => setQuestionView("manage")}>Manage Questions</button>
+            <button className={questionView === "import" ? "primary" : ""} onClick={() => setQuestionView("import")}>Import / Add</button>
+            <button className={questionView === "publish" ? "primary" : ""} onClick={() => setQuestionView("publish")}>Publish / Assign</button>
           </div>
 
           <div className="adminQuestionMetrics">
@@ -1604,7 +1607,7 @@ export default function AdminPage(){
             <div><small>Similar prompts</small><b>{questionQualitySummary.duplicateIds.size}</b></div>
           </div>
 
-          <div className="adminQuestionSetupGrid">
+          {questionView !== "manage" ? <div className="adminQuestionSetupGrid">
             <div className="card" style={{ background:"rgba(255,255,255,0.03)" }}>
               <div style={{ fontWeight: 800, marginBottom: 10 }}>Question sets</div>
               <label style={{ display:"grid", gap: 6 }}>
@@ -1688,10 +1691,10 @@ export default function AdminPage(){
                 {assignMsg ? <small style={{ opacity: 0.92 }}>{assignMsg}</small> : null}
               </div>
             </div>
-          </div>
+          </div> : null}
 
-          <div className="adminQuestionReviewGrid">
-            <div className="card" style={{ background:"rgba(255,255,255,0.03)" }}>
+          <div className="adminQuestionReviewGrid" style={{ gridTemplateColumns: questionView === "manage" ? "1fr" : undefined }}>
+            <div className="card" style={{ background:"rgba(255,255,255,0.03)", display: questionView === "import" ? "block" : "none" }}>
               <div style={{ display:"flex", justifyContent:"space-between", gap: 10, flexWrap:"wrap", alignItems:"center" }}>
                 <div>
                   <div style={{ fontWeight: 800 }}>Add one question</div>
