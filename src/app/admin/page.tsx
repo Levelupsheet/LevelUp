@@ -1040,6 +1040,8 @@ export default function AdminPage(){
 
   const [selectedSet, setSelectedSet] = useState<string>("");
   const [newSetName, setNewSetName] = useState("Networking Set 1");
+  const [newSetDomain, setNewSetDomain] = useState("GENERAL");
+  const [publishLane, setPublishLane] = useState<"TEST_NOW" | "TRAINING" | "CERTIFICATIONS" | "INTERVIEW">("TRAINING");
   const [questions, setQuestions] = useState<Question[]>([]);
   const [dirtyOrder, setDirtyOrder] = useState(false);
   const questionQualitySummary = useMemo(() => {
@@ -1267,6 +1269,11 @@ export default function AdminPage(){
     }
   }
 
+  async function publishSelectedPool() {
+    if (!selectedSet) { setAssignMsg("Step 1: choose the question pool you want to publish."); return; }
+    await assignPlacement(publishLane);
+  }
+
   async function refreshSets(){
     setErr(null);
     const r = await fetch("/api/admin/qsets", { cache: "no-store" as any });
@@ -1300,7 +1307,7 @@ export default function AdminPage(){
 
   async function createSet(){
     setErr(null);
-    const set = await createSetRecord(newSetName, "GENERAL");
+    const set = await createSetRecord(newSetName, newSetDomain);
     setSelectedSet(set.id);
     popToast("Set created");
     await refreshSets();
@@ -1624,12 +1631,16 @@ export default function AdminPage(){
                 {selectedSetObj ? <span className="badge">Domain: {selectedSetObj.domain}</span> : null}
                 {selectedSetObj ? <span className="badge">Questions: {selectedSetObj._count?.questions ?? questions.length}</span> : null}
               </div>
-              <div style={{ marginTop: 12, display:"grid", gridTemplateColumns:"1fr auto", gap: 10, alignItems:"end" }}>
+              <div style={{ marginTop: 12, display:"grid", gridTemplateColumns:"1fr 180px auto", gap: 10, alignItems:"end" }}>
                 <label style={{ display:"grid", gap: 6 }}>
-                  <small>Create new set</small>
-                  <input value={newSetName} onChange={(e) => setNewSetName(e.target.value)} placeholder="Cloud Engineer Stage 1" />
+                  <small>New pool name</small>
+                  <input value={newSetName} onChange={(e) => setNewSetName(e.target.value)} placeholder="CNA • Patient Safety • Pool 1" />
                 </label>
-                <button onClick={createSet} className="primary">Create set</button>
+                <label style={{ display:"grid", gap: 6 }}>
+                  <small>Subject / domain</small>
+                  <input value={newSetDomain} onChange={(e) => setNewSetDomain(e.target.value.toUpperCase())} placeholder="CNA" />
+                </label>
+                <button onClick={createSet} className="primary">Create pool</button>
               </div>
               <div style={{ marginTop: 12 }}>
                 <small style={{ opacity: 0.8 }}>Import format: an array of questions or <code>{'{ questions: [...] }'}</code>.</small>
@@ -1659,14 +1670,18 @@ export default function AdminPage(){
             </div>
 
             <div className="card" style={{ background:"rgba(255,255,255,0.03)" }}>
-              <div style={{ fontWeight: 800, marginBottom: 10 }}>Assign to live question bank</div>
-              <div style={{ display:"grid", gap: 10 }}>
-                <div className="row" style={{ gap: 8, flexWrap:"wrap" }}>
-                  <button onClick={() => assignPlacement("TEST_NOW")} disabled={!selectedSet}>Add to Test Now bank</button>
-                  <button onClick={() => assignPlacement("TRAINING")} disabled={!selectedSet}>Add to Training bank</button>
-                  <button onClick={() => assignPlacement("CERTIFICATIONS")} disabled={!selectedSet}>Add to Certification bank</button>
-                  <button onClick={() => assignPlacement("INTERVIEW")} disabled={!selectedSet}>Add to Interview bank</button>
-                </div>
+              <div style={{ fontWeight: 800, marginBottom: 4 }}>Publish this question pool</div>
+              <small style={{ opacity: 0.78 }}>1. Select the pool on the left. 2. Choose where learners should see it. 3. Click Publish pool.</small>
+              <div style={{ display:"grid", gap: 10, marginTop: 10 }}>
+                <label style={{ display:"grid", gap: 6 }}>
+                  <small>Use this pool for</small>
+                  <select value={publishLane} onChange={(e) => setPublishLane(e.target.value as any)}>
+                    <option value="TRAINING">Position Training</option>
+                    <option value="TEST_NOW">Test Now</option>
+                    <option value="CERTIFICATIONS">Certification Practice</option>
+                    <option value="INTERVIEW">Interview Practice</option>
+                  </select>
+                </label>
                 <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit, minmax(180px, 1fr))", gap: 10 }}>
                   <label style={{ display:"grid", gap: 6 }}>
                     <small>Training path</small>
@@ -1687,7 +1702,10 @@ export default function AdminPage(){
                     </select>
                   </label>
                 </div>
-                <small style={{ opacity: 0.78 }}>Each active placement adds that set into the live bank for the selected mode. Multiple active sets can now feed one quiz/test, and duplicate questions are filtered at runtime.</small>
+                <div style={{ padding: 10, borderRadius: 10, background: "rgba(0,0,0,.18)", border: "1px solid rgba(255,255,255,.08)" }}>
+                  <small>Publishing <b>{selectedSetObj?.name || "No pool selected"}</b>{selectedSetObj ? ` • ${selectedSetObj.domain} • ${questions.length} questions` : ""}</small>
+                </div>
+                <button className="primary" onClick={publishSelectedPool} disabled={!selectedSet}>Publish pool</button>
                 {assignMsg ? <small style={{ opacity: 0.92 }}>{assignMsg}</small> : null}
               </div>
             </div>
