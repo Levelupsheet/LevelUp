@@ -192,7 +192,13 @@ export async function buildQuestionBankSelection(args: {
 }) {
   const bank = await loadActiveBank({ lane: args.lane, startingPosition: args.startingPosition, certExam: args.certExam, bankDomain: args.bankDomain });
   const excludeSet = new Set((args.excludeIds || []).map((v) => String(v)));
-  const candidatePool = bank.questions.filter((q) => !excludeSet.has(String(q.id)));
+  // For now the live study game supports the three formats that provide the
+  // cleanest quiz/combat experience. Legacy formats stay in the DB/admin but
+  // are not selected into new sessions.
+  const activeTypes = new Set(["multiple_choice", "true_false", "cli_command"]);
+  const candidatePool = bank.questions.filter((q) =>
+    !excludeSet.has(String(q.id)) && activeTypes.has(normalizeQuestionType(q.type))
+  );
   const cycle = await getUnseenCyclePool(args.userId, args.lane, candidatePool);
   // Keep an active exposure cycle strictly unseen-first. If only a partial
   // unseen remainder is left, finish that remainder instead of mixing already-seen
