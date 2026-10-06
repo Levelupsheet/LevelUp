@@ -97,7 +97,13 @@ async function buildNewSession(userId: string, questionCount = 10, bankDomain?: 
   const primaryPlacement = bank.placements[0];
   const pool = bank.questions.map(mapQuestion);
   const selected = bank.selectedQuestions.map((q: any) => mapQuestion(q));
-  const goldenPool = pool.filter((q: any) => q.isGoldenEligible);
+  // Golden questions are always hard and use only active study formats.
+  const goldenTypes = new Set(["multiple_choice", "true_false", "cli_command"]);
+  const goldenPool = pool.filter((q: any) =>
+    q.isGoldenEligible &&
+    normalizeDifficultyLevel(q.difficulty) === 3 &&
+    goldenTypes.has(normalizeQuestionType(q.type))
+  );
   let goldenQuestionId: string | null = null;
   let goldenQuestionIndex: number | null = null;
   let finalQuestions: any[] = [...selected];
