@@ -1021,7 +1021,7 @@ function Toast({ msg }:{ msg: string }){
 export default function AdminPage(){
   const [ok, setOk] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
-  const [tab, setTab] = useState<"questions" | "users" | "local" | "career" | "catalog" | "loot" | "sweepstakes">("questions");
+  const [tab, setTab] = useState<"overview" | "questions" | "users" | "local" | "career" | "catalog" | "loot" | "sweepstakes">("overview");
   const [catalogRows, setCatalogRows] = useState<any[]>([]);
   const [catalogIndustry, setCatalogIndustry] = useState("Healthcare");
   const [catalogCareer, setCatalogCareer] = useState("CNA");
@@ -1458,17 +1458,48 @@ export default function AdminPage(){
           </div>
         </div>
 
-        <div className="row" style={{ alignItems:"center", gap: 10, flexWrap:"wrap", justifyContent:"flex-end" }}>
-          <button onClick={() => setTab("questions")} className={tab==="questions" ? "primary" : ""}>DB Question Bank</button>
-          <button onClick={() => { setTab("catalog"); void loadCareerCatalog(); }} className={tab==="catalog" ? "primary" : ""}>Career Catalog</button>
-          <button onClick={() => setTab("loot")} className={tab==="loot" ? "primary" : ""}>Economy & Loot</button>
-          <button onClick={() => setTab("sweepstakes")} className={tab==="sweepstakes" ? "primary" : ""}>Sweepstakes</button>
-          <button onClick={() => setTab("local")} className={tab==="local" ? "primary" : ""}>Local (Prototype)</button>
-          <button onClick={() => setTab("users")} className={tab==="users" ? "primary" : ""}>DB Users</button>
-          <button onClick={() => (window.location.href = "/admin/content")} className="primary">Content Studio</button>
+        <div className="row" style={{ alignItems:"center", gap: 8, flexWrap:"wrap", justifyContent:"flex-end" }}>
+          <button onClick={() => setTab("overview")} className={tab==="overview" ? "primary" : ""}>Overview</button>
+          <button onClick={() => { setTab("catalog"); void loadCareerCatalog(); }} className={tab==="catalog" ? "primary" : ""}>Careers</button>
+          <button onClick={() => { setTab("questions"); setQuestionView("manage"); }} className={tab==="questions" && questionView==="manage" ? "primary" : ""}>Question Pools</button>
+          <button onClick={() => { setTab("questions"); setQuestionView("import"); }} className={tab==="questions" && questionView==="import" ? "primary" : ""}>Questions</button>
+          <button onClick={() => { setTab("questions"); setQuestionView("publish"); }} className={tab==="questions" && questionView==="publish" ? "primary" : ""}>Publish</button>
+          <button onClick={() => setTab("loot")} className={tab==="loot" ? "primary" : ""}>Game & Rewards</button>
+          <button onClick={() => setTab("users")} className={tab==="users" ? "primary" : ""}>Users</button>
+          <details style={{ position:"relative" }}>
+            <summary className="secondaryBtn" style={{ cursor:"pointer", listStyle:"none" }}>Advanced</summary>
+            <div className="card" style={{ position:"absolute", right:0, top:"calc(100% + 8px)", zIndex:50, minWidth:210, padding:8, display:"grid", gap:6 }}>
+              <button onClick={() => setTab("sweepstakes")}>Sweepstakes Admin</button>
+              <button onClick={() => setTab("local")}>Local Prototype</button>
+              <button onClick={() => (window.location.href="/admin/content")}>Content Studio</button>
+            </div>
+          </details>
           <button className="danger" onClick={() => { window.location.href = "/dashboard"; }}>Back</button>
         </div>
       </div>
+
+      {tab === "overview" ? (
+        <div style={{ display:"grid", gap:14, marginTop:14 }}>
+          <div className="card" style={{ padding:18 }}>
+            <div style={{ fontWeight:900, fontSize:24 }}>Admin Overview</div>
+            <small>Manage LevelUp content in a simple order: career → pool → questions → publish.</small>
+            <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(190px,1fr))", gap:10, marginTop:16 }}>
+              <button className="card" style={{ textAlign:"left", padding:16 }} onClick={()=>{setTab("catalog");void loadCareerCatalog();}}><b>1. Careers</b><div><small>Add industries and career paths.</small></div></button>
+              <button className="card" style={{ textAlign:"left", padding:16 }} onClick={()=>{setTab("questions");setQuestionView("manage");}}><b>2. Question Pools</b><div><small>Create and organize learning pools.</small></div></button>
+              <button className="card" style={{ textAlign:"left", padding:16 }} onClick={()=>{setTab("questions");setQuestionView("import");}}><b>3. Questions</b><div><small>Add, import, review, and edit questions.</small></div></button>
+              <button className="card" style={{ textAlign:"left", padding:16 }} onClick={()=>{setTab("questions");setQuestionView("publish");}}><b>4. Publish</b><div><small>Choose where learners see each pool.</small></div></button>
+            </div>
+          </div>
+          <div className="card" style={{ padding:16 }}>
+            <b>Content snapshot</b>
+            <div style={{ display:"flex", gap:10, flexWrap:"wrap", marginTop:10 }}>
+              <span className="badge">{sets.length} question pools</span>
+              <span className="badge">{catalogRows.length} career paths loaded</span>
+              <span className="badge">Selected pool: {sets.find((s:any)=>s.id===selectedSet)?.name || "None"}</span>
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       {err ? (
         <div className="card" style={{ marginTop: 14, borderColor:"rgba(255,80,80,0.35)", background:"rgba(255,80,80,0.08)" }}>
@@ -1478,8 +1509,8 @@ export default function AdminPage(){
 
       {tab === "catalog" ? (
         <div className="card" style={{ marginTop:14, padding:16 }}>
-          <div style={{ fontWeight:900, fontSize:22 }}>Career Catalog</div>
-          <small>Keep this simple: add the industry, add the career path, then publish question pools to it from DB Question Bank.</small>
+          <div style={{ fontWeight:900, fontSize:22 }}>Careers</div>
+          <small>Add the industries and career paths learners can choose. Question content is managed separately.</small>
           <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr auto", gap:10, alignItems:"end", marginTop:14 }}>
             <label style={{ display:"grid", gap:6 }}><small>Industry</small><input value={catalogIndustry} onChange={(e)=>setCatalogIndustry(e.target.value)} placeholder="Healthcare" list="catalog-industries" /></label>
             <label style={{ display:"grid", gap:6 }}><small>Career path</small><input value={catalogCareer} onChange={(e)=>setCatalogCareer(e.target.value)} placeholder="CNA" /></label>
@@ -1640,7 +1671,7 @@ export default function AdminPage(){
           <div className="adminQuestionBankHeader">
             <div>
               <div className="dashboardEyebrow">CONTENT OPERATIONS</div>
-              <div style={{ fontWeight: 900, fontSize: 24 }}>DB Question Bank</div>
+              <div style={{ fontWeight: 900, fontSize: 24 }}>{questionView === "manage" ? "Question Pools" : questionView === "import" ? "Questions" : "Publish"}</div>
               <small>Review, organize, validate, and publish original LevelUp Pro learning content.</small>
             </div>
             <div className="row" style={{ gap: 8, flexWrap:"wrap" }}>
