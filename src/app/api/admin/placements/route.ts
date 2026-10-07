@@ -92,7 +92,7 @@ export async function GET() {
   const placements = await prisma.questionSetPlacement.findMany({
     orderBy: { createdAt: "desc" },
     take: 200,
-    include: { set: true },
+    include: { set: { include: { _count: { select: { questions: true } } } } },
   });
   const activeTestNowBanks = Array.from(new Map(
     placements
