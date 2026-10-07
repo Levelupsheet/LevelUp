@@ -1039,6 +1039,8 @@ export default function AdminPage(){
   // Question bank
   const [sets, setSets] = useState<QuestionSet[]>([]);
   const [assignMsg, setAssignMsg] = useState<string | null>(null);
+  const [placements, setPlacements] = useState<any[]>([]);
+  const [poolViewLane, setPoolViewLane] = useState<"TRAINING"|"CERTIFICATIONS"|"TEST_NOW"|"INTERVIEW">("TRAINING");
   const [assignStartPos, setAssignStartPos] = useState<"HELPDESK_SUPPORT" | "DESKTOP_TECHNICIAN" | "CLOUD_ENGINEER">("HELPDESK_SUPPORT");
   const [assignCertExam, setAssignCertExam] = useState<"A_PLUS" | "SECURITY_PLUS" | "AZ_900" | "AWS" | "AZURE">("A_PLUS");
 
@@ -1299,6 +1301,15 @@ export default function AdminPage(){
   async function publishSelectedPool() {
     if (!selectedSet) { setAssignMsg("Step 1: choose the question pool you want to publish."); return; }
     await assignPlacement(publishLane);
+    await refreshPlacements();
+  }
+
+  async function refreshPlacements(){
+    try {
+      const r = await fetch("/api/admin/placements", { cache:"no-store" as any });
+      const j = await r.json().catch(()=>null);
+      if (r.ok) setPlacements(Array.isArray(j?.placements) ? j.placements : []);
+    } catch {}
   }
 
   async function refreshSets(){
@@ -1325,6 +1336,8 @@ export default function AdminPage(){
   useEffect(() => {
     if (!ok) return;
     refreshSets();
+    refreshPlacements();
+    loadCareerCatalog();
     refreshUsers();
   }, [ok]);
 
@@ -1681,6 +1694,34 @@ export default function AdminPage(){
           </div>
 
 
+
+          {questionView === "manage" ? (
+            <div className="card" style={{ marginTop:14, background:"rgba(255,255,255,.03)" }}>
+              <div style={{ fontWeight:900, fontSize:18 }}>Live pools</div>
+              <small>See exactly which question pools are currently active for each learner experience.</small>
+              <div className="row" style={{ gap:8, flexWrap:"wrap", marginTop:12 }}>
+                {([["TRAINING","Position Training"],["CERTIFICATIONS","Certifications"],["TEST_NOW","Test Now"],["INTERVIEW","Interview"]] as const).map(([lane,label])=>
+                  <button key={lane} className={poolViewLane===lane ? "primary" : ""} onClick={()=>setPoolViewLane(lane)}>{label}</button>
+                )}
+              </div>
+              <div style={{ display:"grid", gap:8, marginTop:12 }}>
+                {placements.filter((p:any)=>p.isActive && p.lane===poolViewLane).map((p:any)=>(
+                  <button key={p.id} className="card" style={{ padding:12, textAlign:"left", background: selectedSet===p.setId ? "rgba(64,160,210,.12)" : "rgba(0,0,0,.18)" }} onClick={()=>setSelectedSet(p.setId)}>
+                    <div style={{ display:"flex", justifyContent:"space-between", gap:10, flexWrap:"wrap" }}>
+                      <b>{p.set?.name || "Question pool"}</b>
+                      <span className="badge">{p.set?.domain || "GENERAL"}</span>
+                    </div>
+                    <small>
+                      {poolViewLane==="TRAINING" ? `${p.industry || "Legacy"} → ${p.careerPath || p.startingPosition || "Training"}` :
+                       poolViewLane==="CERTIFICATIONS" ? `Exam: ${String(p.certExam || "").replaceAll("_"," ")}` :
+                       poolViewLane==="TEST_NOW" ? "Active in Test Now" : "Active in Interview Practice"}
+                    </small>
+                  </button>
+                ))}
+                {!placements.some((p:any)=>p.isActive && p.lane===poolViewLane) ? <small>No active pools in this area.</small> : null}
+              </div>
+            </div>
+          ) : null}
 
           <div className="adminQuestionMetrics">
             <div><small>Selected set</small><b>{selectedSetObj?.name || "None selected"}</b></div>
