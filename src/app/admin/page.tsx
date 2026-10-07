@@ -1087,6 +1087,10 @@ export default function AdminPage(){
           return;
         }
         setOk(true);
+        fetch("/api/admin/careers", { cache:"no-store" as any })
+          .then((res)=>res.json())
+          .then((data)=>{ if (Array.isArray(data?.careers)) setCatalogRows(data.careers); })
+          .catch(()=>{});
       } catch {
         if (!mounted) return;
         window.location.href = "/dashboard";
@@ -1735,13 +1739,22 @@ export default function AdminPage(){
                   <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap: 10 }}>
                     <label style={{ display:"grid", gap: 6 }}>
                       <small>Industry</small>
-                      <input value={publishIndustry} onChange={(e) => setPublishIndustry(e.target.value)} placeholder="Healthcare" list="industry-suggestions" />
-                      <datalist id="industry-suggestions"><option value="Information Technology" /><option value="Healthcare" /><option value="Transportation" /><option value="Industrial / Skilled Trades" /></datalist>
+                      <select value={publishIndustry} onChange={(e) => {
+                        const industry = e.target.value;
+                        setPublishIndustry(industry);
+                        const first = catalogRows.find((r:any) => r.industry === industry);
+                        setPublishCareerPath(first?.careerPath || "");
+                      }}>
+                        {Array.from(new Set(catalogRows.map((r:any)=>String(r.industry)))).map((industry) => <option key={industry} value={industry}>{industry}</option>)}
+                        {!catalogRows.length ? <option value="Information Technology">Information Technology</option> : null}
+                      </select>
                     </label>
                     <label style={{ display:"grid", gap: 6 }}>
                       <small>Career path</small>
-                      <input value={publishCareerPath} onChange={(e) => setPublishCareerPath(e.target.value)} placeholder="CNA" list="career-suggestions" />
-                      <datalist id="career-suggestions"><option value="Help Desk" /><option value="Desktop Technician" /><option value="Cloud Engineer" /><option value="CNA" /><option value="LPN" /><option value="RN" /><option value="CDL Driver" /></datalist>
+                      <select value={publishCareerPath} onChange={(e) => setPublishCareerPath(e.target.value)}>
+                        {catalogRows.filter((r:any)=>r.industry === publishIndustry).map((r:any)=><option key={r.id} value={r.careerPath}>{r.careerPath}</option>)}
+                        {!catalogRows.some((r:any)=>r.industry === publishIndustry) ? <option value={publishCareerPath}>{publishCareerPath || "Help Desk"}</option> : null}
+                      </select>
                     </label>
                   </div>
                 ) : null}
