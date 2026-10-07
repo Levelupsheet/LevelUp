@@ -1672,21 +1672,15 @@ export default function AdminPage(){
             <div>
               <div className="dashboardEyebrow">CONTENT OPERATIONS</div>
               <div style={{ fontWeight: 900, fontSize: 24 }}>{questionView === "manage" ? "Question Pools" : questionView === "import" ? "Questions" : "Publish"}</div>
-              <small>Review, organize, validate, and publish original LevelUp Pro learning content.</small>
+              <small>{questionView === "manage" ? "Create or select the pool you want to work with." : questionView === "import" ? "Add and review questions inside the selected pool." : "Choose where the selected pool should appear for learners."}</small>
             </div>
             <div className="row" style={{ gap: 8, flexWrap:"wrap" }}>
-              <button onClick={refreshSets}>Refresh sets</button>
-              <button onClick={() => fileRef.current?.click()} className="primary">Import questions JSON</button>
-              <button onClick={() => bulkFileRef.current?.click()} disabled={bulkImporting}>{bulkImporting ? "Bulk importing…" : "Bulk import & auto-assign"}</button>
-              <button onClick={() => (window.location.href = "/admin/content")} className="secondaryBtn">Open Content Studio</button>
+              <button onClick={refreshSets}>Refresh</button>
+              {questionView === "import" ? <button onClick={() => fileRef.current?.click()} className="primary">Import JSON</button> : null}
             </div>
           </div>
 
-          <div className="row" style={{ gap: 8, flexWrap: "wrap", marginTop: 14 }}>
-            <button className={questionView === "manage" ? "primary" : ""} onClick={() => setQuestionView("manage")}>Manage Questions</button>
-            <button className={questionView === "import" ? "primary" : ""} onClick={() => setQuestionView("import")}>Import / Add</button>
-            <button className={questionView === "publish" ? "primary" : ""} onClick={() => setQuestionView("publish")}>Publish / Assign</button>
-          </div>
+
 
           <div className="adminQuestionMetrics">
             <div><small>Selected set</small><b>{selectedSetObj?.name || "None selected"}</b></div>
@@ -1697,9 +1691,9 @@ export default function AdminPage(){
             <div><small>Similar prompts</small><b>{questionQualitySummary.duplicateIds.size}</b></div>
           </div>
 
-          {questionView !== "manage" ? <div className="adminQuestionSetupGrid">
+          <div className="adminQuestionSetupGrid" style={{ gridTemplateColumns: "1fr" }}>
             <div className="card" style={{ background:"rgba(255,255,255,0.03)" }}>
-              <div style={{ fontWeight: 800, marginBottom: 4 }}>1. Choose or create a question pool</div>
+              <div style={{ fontWeight: 800, marginBottom: 4 }}>{questionView === "manage" ? "Choose or create a question pool" : "Selected question pool"}</div>
               <small style={{ opacity: 0.76 }}>A pool is the group of questions for one subject, role, certification, or training area. Example: CNA • Patient Safety.</small>
               <label style={{ display:"grid", gap: 6 }}>
                 <small style={{ marginTop: 8 }}>Existing question pool</small>
@@ -1715,17 +1709,11 @@ export default function AdminPage(){
                 {selectedSetObj ? <span className="badge">Domain: {selectedSetObj.domain}</span> : null}
                 {selectedSetObj ? <span className="badge">Questions: {selectedSetObj._count?.questions ?? questions.length}</span> : null}
               </div>
-              <div style={{ marginTop: 12, display:"grid", gridTemplateColumns:"1fr 180px auto", gap: 10, alignItems:"end" }}>
-                <label style={{ display:"grid", gap: 6 }}>
-                  <small>New pool name</small>
-                  <input value={newSetName} onChange={(e) => setNewSetName(e.target.value)} placeholder="CNA • Patient Safety • Pool 1" />
-                </label>
-                <label style={{ display:"grid", gap: 6 }}>
-                  <small>Subject / domain</small>
-                  <input value={newSetDomain} onChange={(e) => setNewSetDomain(e.target.value.toUpperCase())} placeholder="CNA" />
-                </label>
+              {questionView === "manage" ? <div style={{ marginTop: 12, display:"grid", gridTemplateColumns:"1fr 180px auto", gap: 10, alignItems:"end" }}>
+                <label style={{ display:"grid", gap: 6 }}><small>New pool name</small><input value={newSetName} onChange={(e) => setNewSetName(e.target.value)} placeholder="CNA • Patient Safety • Pool 1" /></label>
+                <label style={{ display:"grid", gap: 6 }}><small>Subject / domain</small><input value={newSetDomain} onChange={(e) => setNewSetDomain(e.target.value.toUpperCase())} placeholder="GENERAL" /></label>
                 <button onClick={createSet} className="primary">Create pool</button>
-              </div>
+              </div> : null}
               <div style={{ marginTop: 12 }}>
                 <small style={{ opacity: 0.8 }}>Import format: an array of questions or <code>{'{ questions: [...] }'}</code>.</small>
               </div>
@@ -1753,7 +1741,7 @@ export default function AdminPage(){
               />
             </div>
 
-            <div className="card" style={{ background:"rgba(255,255,255,0.03)" }}>
+            {questionView === "publish" ? <div className="card" style={{ background:"rgba(255,255,255,0.03)" }}>
               <div style={{ fontWeight: 800, marginBottom: 4 }}>Publish this question pool</div>
               <small style={{ opacity: 0.78 }}>1. Select the pool on the left. 2. Choose where learners should see it. 3. Click Publish pool.</small>
               <div style={{ display:"grid", gap: 10, marginTop: 10 }}>
@@ -1807,10 +1795,10 @@ export default function AdminPage(){
                 <button className="primary" onClick={publishSelectedPool} disabled={!selectedSet}>Publish pool</button>
                 {assignMsg ? <small style={{ opacity: 0.92 }}>{assignMsg}</small> : null}
               </div>
-            </div>
-          </div> : null}
+            </div> : null}
+          </div>
 
-          <div className="adminQuestionReviewGrid" style={{ gridTemplateColumns: questionView === "manage" ? "1fr" : undefined }}>
+          <div className="adminQuestionReviewGrid" style={{ gridTemplateColumns:"1fr", display: questionView === "publish" ? "none" : "grid" }}>
             <div className="card" style={{ background:"rgba(255,255,255,0.03)", display: questionView === "import" ? "block" : "none" }}>
               <div style={{ display:"flex", justifyContent:"space-between", gap: 10, flexWrap:"wrap", alignItems:"center" }}>
                 <div>
