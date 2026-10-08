@@ -55,3 +55,19 @@ test('AWS, CNA and Help Desk banks produce 24 unique questions each with all tie
   const round=generateContentReport(normalizeKnowledgeBlock({...importEnvelope(raw)[0],questions:rows}));assert.equal(round.questions.length,24);assert.equal(round.issues.length,0);
  }
 });
+
+test('Security+ conversion accounts for all 90 source entries and imports 115 distinct supported questions',()=>{
+ const raw=JSON.parse(fs.readFileSync(require.resolve('../data/content/security-plus-sy0-701-v2.json'),'utf8'));
+ const [source]=importEnvelope(raw);assert.equal(source.lane,'CERTIFICATIONS');assert.equal(source.certExam,'SECURITY_PLUS');
+ const audit=source.referenceMaterial.conversionAudit;assert.equal(audit.sourceMapping.length,90);assert.deepEqual(audit.sourceMapping.map(x=>x.sourceQuestionNumber),Array.from({length:90},(_,i)=>i+1));
+ assert.equal(audit.sourceMapping.filter(x=>x.status==='consolidated').length,1);
+ const r=generateContentReport(normalizeKnowledgeBlock(source));assert.deepEqual(r.issues,[]);assert.equal(r.questions.length,115);assert.equal(r.summary.derivedFromWrongAnswers,16);
+ assert.deepEqual([...new Set(r.questions.map(q=>q.difficulty))].sort(),[1,2,3,4,5]);
+ assert.deepEqual([...new Set(r.questions.map(q=>q.data.domainId))].sort(),[1,2,3,4,5].map(n=>'security-plus-domain-'+n));
+ assert.ok(r.questions.every(q=>q.type==='multiple_choice' && q.explanation && q.data.hints.length && !q.goldenEligible && !q.data.bossEligible));
+ for(const map of audit.sourceMapping)assert.ok(r.questions.some(q=>q.data.objectiveId===map.targetObjectiveId),JSON.stringify(map));
+ for(const row of r.questions)assert.equal(duplicateContentReason(row,r.questions.filter(q=>q!==row)),'',row.prompt);
+ assert.equal(new Set(r.questions.map(q=>q.correctIndex)).size,4);
+ const round=generateContentReport(normalizeKnowledgeBlock({...source,questions:r.questions}));assert.deepEqual(round.issues,[]);assert.equal(round.questions.length,115);
+ const imported=contentImportReport(source);assert.equal(imported.issues.length,0);assert.equal(imported.questions.length,115);
+});

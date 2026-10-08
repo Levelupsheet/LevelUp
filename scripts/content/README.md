@@ -30,6 +30,14 @@ This is an authoring capability, not an automatic user-history job: choosing a w
 
 ## New career banks
 
+Security+ source bank: `data/content/security-plus-sy0-701-v2.json`. Select the existing Security+ certification pool in Admin. It uses `lane: CERTIFICATIONS` and `certExam: SECURITY_PLUS`; it does not create a new hard-coded learner button.
+
+The supplied 90-question results were converted into 89 source-based assessments; source 47 repeats EAP coverage and maps to source 13. Sixteen authored wrong-choice concepts plus ten new tier 4–5 scenarios bring generation to 115 supported MCQs. All questions have explanations, hints, specific objectives and domain/subdomain metadata. Correct-choice positions vary, and gameplay retains its existing answer shuffling.
+
+`data/content/security-plus-sy0-701-conversion-report.json` accounts for every source entry and explains revisions, including Bluetooth security, reflection/amplification overlap, location context versus MFA factors, DKIM identity limits, TOCTOU, snapshot dependency, shadow IT, sanitization and ambiguous answer choices. Original uploaded material remains unchanged. The bank embeds the same conversion report under referenceMaterial.
+
+Objective tags were compared with the CompTIA-authored SY0-701 V7 objectives document hosted by ExamCompass; sources 11, 26 and 43 were retagged while their original objective tags remain in the audit. This practice bank does not claim complete syllabus coverage or exam weighting. Targeted technical corrections reference NIST, RFC Editor, Bluetooth SIG, CWE and ICO material in the relevant question data. Human content review remains necessary, and all Golden/Boss flags remain off pending curation.
+
 - `data/content/aws-v2.json`: Cloud Engineer / AWS operations.
 - `data/content/helpdesk-technician-v2.json`: Help Desk Technician / support.
 - `data/content/cna-v2.json`: Certified Nursing Assistant / resident care.
