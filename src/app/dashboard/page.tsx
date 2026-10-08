@@ -852,7 +852,7 @@ async function analyzeResumeStage12() {
                 <button
                   className="luRoleCard gdModalChoice gdModalChoiceOrange"
                   type="button"
-                  onClick={() => { if (selectedCareer) { setShowLaunchModal(false); setLaunchGate("position-training"); window.location.href = "/position-training"; } else if (careerPaths.length) { setShowLaunchModal(false); setCareerPickerOpen(true); } else { startLeveledMode("position"); } }}
+                  onClick={() => { setShowLaunchModal(false); if (selectedCareer) { setLaunchGate("position-training"); window.location.href = "/position-training"; } else if (careerPaths.length) { setCareerPickerOpen(true); } else { startLeveledMode("position"); } }}
                 >
                   <div className="luRoleIcon" aria-hidden="true">🎯</div>
                   <div className="luRoleTitle">Career training</div>
