@@ -71,6 +71,7 @@ export default function GameEngine(props: Props) {
   const [sessionId, setSessionId] = useState<string>("");
   const [learningMastery, setLearningMastery] = useState<Record<string, number>>({});
   const [initialState, setInitialState] = useState<any>(null);
+  const [failedSummary, setFailedSummary] = useState<DiabloQuizRunSummary | null>(null);
   const rewardClaimKeyRef = useRef("");
   const progressSaveRef = useRef<number | null>(null);
 
@@ -91,7 +92,7 @@ export default function GameEngine(props: Props) {
     if (!res.ok) throw new Error(json?.error || "Failed to create learning session");
     const mapped = Array.isArray(json?.questions) ? json.questions.map(mapQuestion) : [];
     if (mapped.length) {
-      setQuestions(questionsOverride?.length ? mapped.map((q:any) => ({ ...q, data: { ...q.data, ...(questionsOverride.find(it=>it.id===q.id)?.data || {}) } })) : mapped);
+      setQuestions(mapped);
       setSessionId(String(json?.session?.id || ""));
       setInitialState(json?.session?.state || null);
       setLearningMastery(json?.learning?.masteryByDomain || {});
@@ -168,8 +169,10 @@ export default function GameEngine(props: Props) {
   const handleComplete = useCallback(async (summary: DiabloQuizRunSummary) => {
     if (progressSaveRef.current) { window.clearTimeout(progressSaveRef.current); progressSaveRef.current = null; }
     const speedBonus = timed ? calculateSpeedBonus(summary.timeLeft || 0) : 0;
-    const awardedXp = summary.xpEarned + speedBonus;
-    const local = awardXp(awardedXp);
+    let awardedXp = summary.xpEarned + speedBonus;
+    let settledOutcome = summary.outcome;
+    let settledBoss: any = null;
+    let local: any = null;
     const activeUserId = resolveClientUserId();
     try {
       const localUser = local || getActiveUser();
@@ -179,7 +182,7 @@ export default function GameEngine(props: Props) {
       if (sessionId) {
         await fetch("/api/learning/session", { method: "PATCH", headers: { "content-type": "application/json" }, body: JSON.stringify({ sessionId, status: "COMPLETED", currentIndex: summary.totalQuestions, state: { ...initialState, finished: true } }) });
       }
-      await fetch("/api/game/session", {
+      const response = await fetch("/api/game/session", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
@@ -197,11 +200,24 @@ export default function GameEngine(props: Props) {
           questionDomains: questions.map((q) => ({ id: String(q.id || ""), domainId: String(q.domainId || "general"), level: Number(q.level || 1) })),
         }),
       });
-    } catch {}
-    onComplete?.({ ...summary, awardedXp, learningSessionId: sessionId } as any);
+      const settled = await response.json();
+      if (!response.ok) throw new Error(settled?.error || "Could not settle rewards");
+      awardedXp = Number(settled?.xpAwarded ?? awardedXp);
+      settledOutcome = settled?.outcome || summary.outcome;
+      settledBoss = settled?.boss || null;
+      local = awardXp(settled?.duplicate ? 0 : awardedXp);
+      await hydrateAuthenticatedUser();
+    } catch (error: any) {
+      setLoadError(error?.message || "Could not settle rewards. Your saved answers are preserved.");
+      setFailedSummary(summary);
+      return;
+    }
+    onComplete?.({ ...summary, outcome: settledOutcome, awardedXp, learningSessionId: sessionId, boss: settledBoss } as any);
+    setFailedSummary(null);
   }, [timed, lane, title, onComplete, sessionId, initialState, questions]);
 
   if (loading) return <div className="page"><div className="container" style={{ maxWidth: 1280 }}><div className="card" style={{ padding: 18 }}><div style={{ fontWeight: 800, fontSize: 18 }}>Loading {title}…</div><div className="muted" style={{ marginTop: 8 }}>{lane === "TEST_NOW" ? "Creating your saved learning session." : "Creating a practice session from your active database pools."}</div></div></div></div>;
+  if (failedSummary) return <div className="card" role="alert"><p>{loadError}</p><button type="button" className="d2Btn" onClick={() => handleComplete(failedSummary)}>Retry reward settlement</button></div>;
   const activePosition = playerPosition || String((getActiveUser() as any)?.startingPosition || "HELPDESK_SUPPORT");
   const careerPlayerName = careerPath
     ? String(careerPath).trim()
@@ -216,5 +232,5 @@ export default function GameEngine(props: Props) {
 
   if (!questions.length) return <div className="page"><div className="container" style={{ maxWidth: 1120 }}><div className="card" style={{ padding: 18 }}><div style={{ fontWeight: 800, fontSize: 18 }}>No questions available</div><div className="muted" style={{ marginTop: 8 }}>{loadError || "Assign an active question set in Admin."}</div><div style={{ marginTop: 14 }}><Link className="btn" href="/admin">Open Admin</Link></div></div></div></div>;
 
-  return <DiabloQuizRunner title={title} subtitle={setLabel} enemyName={enemyName} playerDisplayName={careerPlayerName} questions={questions} timed={timed} metaLeft={metaLeft || `Adaptive lane: ${lane.replaceAll("_", " ")}`} metaRight={metaRight || `${questions.length} questions loaded`} exitHref={exitHref} exitLabel={exitLabel} onExit={onExit} onComplete={handleComplete} onStateChange={saveSessionProgress} onAdvanceQuestion={handleAdvanceQuestion} initialState={initialState} learningMastery={learningMastery} rules={rulesOverride} encounterType={encounterType} media={{ ...playerMedia, enemyIdleSrc: "/video/enemy-idle.mp4", enemyHitSrc: "/video/enemy-damage.mp4", width: 1600, height: 900 }} />;
+  return <DiabloQuizRunner title={title} subtitle={setLabel} enemyName={initialState?.boss?.visual?.bossName || enemyName} playerDisplayName={careerPlayerName} questions={questions} timed={timed} metaLeft={metaLeft || `Adaptive lane: ${lane.replaceAll("_", " ")}`} metaRight={metaRight || `${questions.length} questions loaded`} exitHref={exitHref} exitLabel={exitLabel} onExit={onExit} onComplete={handleComplete} onStateChange={saveSessionProgress} onAdvanceQuestion={handleAdvanceQuestion} initialState={initialState} learningMastery={learningMastery} rules={initialState?.boss?.rules || rulesOverride} encounterType={encounterType} media={{ ...playerMedia, enemyIdleSrc: "/video/enemy-idle.mp4", enemyHitSrc: "/video/enemy-damage.mp4", width: 1600, height: 900 }} />;
 }

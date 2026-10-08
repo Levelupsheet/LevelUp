@@ -12,6 +12,7 @@ import { awardGoldenQuestion } from "@/lib/goldenRewards";
 import { getOrCreateActiveGoldenSweepstakes } from "@/lib/raffle";
 import { buildQuestionExplanation } from "@/lib/explanations";
 import { levelFromXp } from "@/lib/progression";
+import { applyBossAbilitiesToQuestions, bossCombatRules, bossVisualMeta, buildBossProfile, GOLDEN_BOSS_PROBABILITY } from "@/lib/bossBattle";
 
 async function ensureGoldenQuestionHistoryTable() {
   try {
@@ -104,7 +105,7 @@ async function buildNewSession(userId: string, questionCount = 15, bankDomain?: 
   const primaryPlacement = bank.placements[0];
   const pool = bank.questions.map(mapQuestion);
   const selected = filters.questionIds
-    ? bank.questions.filter((q:any) => filters.questionIds.includes(q.id) && q.difficulty >= 4).map(mapQuestion)
+    ? bank.questions.filter((q:any) => filters.questionIds.includes(q.id) && q.difficulty >= 4 && Boolean(q.bossEligible || q.data?.bossEligible)).map(mapQuestion)
     : bank.selectedQuestions.map((q: any) => mapQuestion(q));
   if (filters.questionIds && selected.length !== filters.questionIds.length) throw new Error("Boss questions must belong to the active pool and be hard tier");
   // Golden questions are always hard and use only active study formats.
@@ -120,6 +121,17 @@ async function buildNewSession(userId: string, questionCount = 15, bankDomain?: 
 
   const currentXp = Number(((await db.user.findUnique({ where: { id: userId }, select: { xp: true } }).catch(() => ({ xp: 0 })) as any).xp || 0));
   const currentLevel = levelFromXp(currentXp);
+  let boss: any = null;
+  if (trainingMode === "BOSS") {
+    if (selected.length !== 3) throw new Error("Boss requires three curated hard questions");
+    const previous = await db.gameSession.findFirst({ where: { userId, trainingMode: "BOSS", createdAt: { gte: new Date(Date.now() - 15 * 60 * 1000) } } });
+    if (previous) throw new Error("Boss cooldown: wait 15 minutes between encounters");
+    const isGolden = Math.random() < GOLDEN_BOSS_PROBABILITY;
+    const profile = buildBossProfile({ userXp: currentXp, selectedQuestions: selected, isGolden });
+    finalQuestions.sort((a,b) => a.level - b.level);
+    finalQuestions = applyBossAbilitiesToQuestions(finalQuestions as any, profile);
+    boss = { isGolden, profile, rules: bossCombatRules(profile), visual: bossVisualMeta(isGolden), cooldownMinutes: 15 };
+  }
   const alreadyHadGolden = await db.$queryRawUnsafe(`SELECT 1 FROM "GoldenQuestionHistory" WHERE "userId" = $1 AND "level" = $2 AND "awarded" = TRUE LIMIT 1`, userId, currentLevel).then((rows: any[]) => Array.isArray(rows) && rows.length > 0).catch(() => false);
 
   // Mark an eligible question already selected by the unseen cycle. Never inject
@@ -153,7 +165,7 @@ async function buildNewSession(userId: string, questionCount = 15, bankDomain?: 
         questionCount: finalQuestions.length,
         goldenSpawned: Boolean(goldenQuestionId),
         currentIndex: 0,
-        stateJson: { idx:0, wrongStreak:0, inRecovery:false, trainingMode: bank.trainingMode, focusDomain:bank.focusDomain, missedQuestionCount:bank.missedQuestionCount, blueprint:bank.blueprint },
+        stateJson: { idx:0, wrongStreak:0, inRecovery:false, trainingMode, boss, focusDomain:bank.focusDomain, missedQuestionCount:bank.missedQuestionCount, blueprint:bank.blueprint },
       },
     });
     for (let i = 0; i < finalQuestions.length; i += 1) {
@@ -205,7 +217,7 @@ export async function POST(req: Request) {
     if (!["TEST_NOW","TRAINING","CERTIFICATIONS"].includes(lane)) return NextResponse.json({error:"Unsupported learning lane"},{status:400});
     if (body.trainingMode && !['STANDARD','WEAK_DOMAIN','MISSED_QUESTIONS'].includes(body.trainingMode)) return NextResponse.json({error:'Unsupported training mode'},{status:400});
     const requestedIds = body.encounterType === 'boss' && Array.isArray(body.questionIds) ? [...new Set(body.questionIds.map(String))] : undefined;
-    if (requestedIds && (!requestedIds.length || requestedIds.length > 10)) return NextResponse.json({error:"Invalid boss question count"},{status:400});
+    if (requestedIds && requestedIds.length !== 3) return NextResponse.json({error:"Three curated hard boss questions required"},{status:400});
     const filters = { lane, ...canonicalTrainingTarget(body), certExam: body.certExam || null, questionIds: requestedIds };
     await ensureGoldenQuestionHistoryTable();
     const session: any = await prisma.$transaction(async (tx:any) => {
@@ -281,7 +293,8 @@ export async function PATCH(req: Request) {
         where: { id: sessionId },
         data: {
           currentIndex: Number.isFinite(currentIndex) ? Math.min(latest.questionCount, Math.max(latest.currentIndex, currentIndex)) : undefined,
-          stateJson: state ? { ...(latest.stateJson || {}), ...state } : undefined,
+          // Preserve server-owned encounter configuration against client progress saves.
+          stateJson: state ? { ...(latest.stateJson || {}), ...state, boss: latest.stateJson?.boss || null, trainingMode: latest.trainingMode } : undefined,
           status: status === "COMPLETED" ? "COMPLETED" : status === "ABANDONED" ? "ABANDONED" : undefined,
           completedAt: status === "COMPLETED" ? new Date() : undefined,
         },
@@ -290,28 +303,8 @@ export async function PATCH(req: Request) {
     await ensureGoldenQuestionHistoryTable();
     const session = await (prisma as any).gameSession.findUnique({ where: { id: sessionId }, include: { questions: { orderBy: { orderIndex: "asc" } } } });
 
-    let goldenAwarded = false;
-    if (session?.lane === "TEST_NOW" && answered.length) {
-      const activeCampaign = await getOrCreateActiveGoldenSweepstakes(prisma as any).catch(() => null);
-      if (activeCampaign) {
-        const metaMap = await getSweepstakesCampaignMetaMap().catch(() => new Map());
-        const meta = metaMap.get(String(activeCampaign.id));
-        if (meta?.allowGoldenQuestion !== false) {
-          for (const row of answered) {
-            const sessionQuestionId = String(row?.sessionQuestionId || "").trim();
-            if (!sessionQuestionId) continue;
-            const q = (session.questions || []).find((it: any) => String(it.id) === sessionQuestionId);
-            if (q?.isCorrect !== true || !q?.answered) continue;
-            if (!q?.isGolden) continue;
-            const awarded = await prisma.$transaction(tx => awardGoldenQuestion(tx, {
-              userId: session.userId, sessionId: session.id,
-              questionId: String(q.questionId || q.id), campaignId: activeCampaign.id,
-            })).catch(error => { console.error("Golden question reward failed", error); return false; });
-            goldenAwarded = goldenAwarded || Boolean(awarded);
-          }
-        }
-      }
-    }
+    // Golden answers are only candidates. Final settlement grants on surviving completion.
+    const goldenAwarded = false;
     return NextResponse.json({ ...serializeSession(session), goldenAwarded, learning: { masteryByDomain: (await loadLearningContext(session.userId, session.scopeKey ? {scopeKey:session.scopeKey} : {})).masteryByDomain } });
   } catch (e: any) {
     console.error("PATCH /api/test-now/session failed", e);

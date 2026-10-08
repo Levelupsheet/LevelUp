@@ -99,9 +99,9 @@ type StageConfig = { name: string; hp: number; playerDamage: number; healChance:
 function buildStageConfigs(title: string, maxStages: number, encounterType: "standard" | "boss") : StageConfig[] {
   const upper = String(title || "").toUpperCase();
   const boss = encounterType === "boss";
-  const trainingNames = ["Ticket Gremlin", "Patch Warden", "Queue Tyrant", "System Reaper", "Golden Overseer"];
-  const certNames = ["Exam Shade", "Concept Warden", "Cipher Beast", "Proctor Revenant", "Golden Examiner"];
-  const testNames = ["Lagger", "Firewall Sentinel", "Identity Warden", "Cloud Tyrant", "Golden Boss"];
+  const trainingNames = ["Ticket Gremlin", "Patch Warden", "Queue Tyrant", "System Reaper", "Apex Overseer"];
+  const certNames = ["Exam Shade", "Concept Warden", "Cipher Beast", "Proctor Revenant", "Apex Examiner"];
+  const testNames = ["Lagger", "Firewall Sentinel", "Identity Warden", "Cloud Tyrant", "Apex Sentinel"];
   const baseNames = upper.includes("CERT") ? certNames : upper.includes("TEST NOW") ? testNames : trainingNames;
   return Array.from({ length: maxStages }).map((_, idx) => {
     const stage = idx + 1;
@@ -729,7 +729,7 @@ export default function DiabloQuizRunner(props: {
   activeQuestionKeyRef.current = `${state.idx}:${question?.id || ""}:${state.locked}`;
   const stageEnemyHP = state.enemyHP;
   const playerHealthPercent = Math.max(0, Math.min(100, state.playerHP / maxPlayerHP * 100));
-  const currentStageEnemyName = useMemo(() => currentStageConfig?.name || stageEnemyName(enemyName, sessionStage, maxStages, encounterType), [currentStageConfig, enemyName, sessionStage, maxStages, encounterType]);
+  const currentStageEnemyName = useMemo(() => encounterType === "boss" ? enemyName : currentStageConfig.name, [currentStageConfig, enemyName, encounterType]);
   const isGoldenBoss = encounterType === "boss" && sessionStage >= maxStages;
 
   const questionType = normalizeQuestionType(question?.type);

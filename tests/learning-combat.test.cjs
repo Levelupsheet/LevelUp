@@ -165,6 +165,24 @@ test('legacy level-tagged chests are preserved without granting duplicates', asy
 });
 
 const { awardGoldenQuestion } = require('../src/lib/goldenRewards.ts');
+const { buildBossProfile, bossCombatRules, selectBossQuestions, applyBossAbilitiesToQuestions } = require('../src/lib/bossBattle.ts');
+const { settleCombat } = require('../src/lib/combatSettlement.ts');
+test('bosses require curated hard content and three correct answers beat a shielded boss', () => {
+  assert.equal(selectBossQuestions([{difficulty:5,type:'multiple_choice',data:{}}]).length,0);
+  assert.equal(selectBossQuestions([{difficulty:3,type:'multiple_choice',data:{bossEligible:true}}]).length,0);
+  const raw = ['a','b','c'].map(id => ({...question(5,id),difficulty:5,type:'multiple_choice',data:{bossEligible:true}}));
+  const profile = buildBossProfile({ userXp:xpRequiredToReachLevel(12),selectedQuestions:raw,sessionCorrectCount:3,sessionTotalQuestions:3 });
+  assert.equal(profile.playerLevel,12);
+  const rules = bossCombatRules(profile);
+  const questions = applyBossAbilitiesToQuestions(raw,profile).map((q,i) => ({id:`sq${i}`,orderIndex:i,answered:true,isCorrect:true,payloadJson:q}));
+  const result = settleCombat({userId:'u',trainingMode:'BOSS',stateJson:{boss:{rules}},questions},[]);
+  assert.equal(result.finished,true); assert.equal(result.outcome,'victory'); assert.equal(result.enemyHP,0); assert.equal(result.playerHP,100);
+});
+test('server combat settlement ignores forged HP/outcome/XP and a Golden answer followed by lethal mistakes is defeat', () => {
+  const questions = Array.from({length:8},(_,i) => ({id:`sq${i}`,orderIndex:i,answered:true,isCorrect:i===0,isGolden:i===0,payloadJson:{level:5,data:{}}}));
+  const result = settleCombat({userId:'u',stateJson:{playerHP:100,outcome:'victory',xpEarned:999999},questions},[]);
+  assert.equal(result.outcome,'defeat'); assert.equal(result.playerHP,0); assert.equal(result.correctCount,1); assert.equal(result.xpEarned,75);
+});
 test('Golden reward reservation prevents simultaneous duplicate awards and reports capped grants honestly', async () => {
   let reserved = false, grants = 0, notifications = 0;
   const tx = {

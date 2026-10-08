@@ -29,10 +29,10 @@ function normalizeMeta(row: any): SweepstakesCampaignMeta {
   };
 }
 
-export async function readSweepstakesCampaignMeta(): Promise<SweepstakesCampaignMeta[]> {
+export async function readSweepstakesCampaignMeta(db: any = prisma): Promise<SweepstakesCampaignMeta[]> {
   try {
-    await ensureSweepstakesMetaTable(prisma);
-    const rows = (await prisma.$queryRawUnsafe(`
+    await ensureSweepstakesMetaTable(db);
+    const rows = (await db.$queryRawUnsafe(`
       SELECT * FROM "SweepstakesCampaignMeta"
       ORDER BY "updatedAt" DESC, "createdAt" DESC
     `)) as any[];
@@ -68,8 +68,8 @@ export async function writeSweepstakesCampaignMeta(rows: SweepstakesCampaignMeta
   });
 }
 
-export async function getSweepstakesCampaignMetaMap() {
-  const rows = await readSweepstakesCampaignMeta();
+export async function getSweepstakesCampaignMetaMap(db: any = prisma) {
+  const rows = await readSweepstakesCampaignMeta(db);
   return new Map(rows.map((row) => [row.campaignId, row]));
 }
 

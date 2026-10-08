@@ -106,7 +106,8 @@ export default function PracticeMiniGameModal(props: {
     try {
       const search = new URLSearchParams();
       search.set("lane", lane);
-      search.set("questionCount", "12");
+      // Inspect the complete active bank, not an adaptive subset that can omit curated hard content.
+      search.set("questionCount", "0");
       search.set("shuffle", "1");
       if (kind === "position" && selectedTrainingPool) {
         search.set("careerPath", selectedTrainingPool.careerPath!);
@@ -130,7 +131,7 @@ export default function PracticeMiniGameModal(props: {
         isGolden,
       });
       const picked = selectBossQuestions(sourceQuestions, 3, weakestDomain).map((q: any) => mapBossQuestion(q, weakestDomain));
-      if (!picked.length) throw new Error("No advanced boss questions available");
+      if (picked.length !== 3) throw new Error("Three reviewed hard boss questions are required");
       const applied = applyBossAbilitiesToQuestions(picked, profile);
       const visual = bossVisualMeta(isGolden);
       setBossQuestions(applied.map((q: any) => ({
@@ -248,6 +249,7 @@ export default function PracticeMiniGameModal(props: {
               rulesOverride={bossRules}
               encounterType="boss"
               onComplete={(summary: any) => {
+                if (summary?.boss?.visual) setBossMeta(summary.boss.visual);
                 setBossReward({ xp: Number(summary?.awardedXp || summary?.xpEarned || 0), won: summary?.outcome === "victory" });
                 setBossConsumed(true);
                 setBossReady(false);

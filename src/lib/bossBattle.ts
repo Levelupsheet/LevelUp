@@ -1,5 +1,6 @@
 import { normalizeDifficultyLevel, sampleQuestions, shuffleQuestionPayload } from "@/lib/questionTransforms";
 import { normalizeQuestionType } from "@/lib/questionTypes";
+import { levelFromXp } from "@/lib/progression";
 
 export const BOSS_SPAWN_PROBABILITY = 0.12;
 export const GOLDEN_BOSS_PROBABILITY = 0.07;
@@ -58,13 +59,6 @@ export function bossVisualMeta(isGolden: boolean) {
   };
 }
 
-function calculateLevel(totalXp: number) {
-  if (totalXp >= 2000) return 5;
-  if (totalXp >= 1500) return 4;
-  if (totalXp >= 1000) return 3;
-  if (totalXp >= 500) return 2;
-  return 1;
-}
 
 function pickRandom<T>(items: T[], count: number) {
   const pool = [...items];
@@ -89,14 +83,14 @@ export function buildBossProfile(args: {
   isGolden?: boolean;
 }) : BossProfile {
   const targetDomain = String(args.weakestDomain || "general").toLowerCase();
-  const playerLevel = calculateLevel(Number(args.userXp || 0));
+  const playerLevel = levelFromXp(Number(args.userXp || 0));
   const sessionTotal = Math.max(1, Number(args.sessionTotalQuestions || 0));
   const sessionAccuracy = clamp(Number(args.sessionCorrectCount || 0) / sessionTotal, 0, 1);
   const avgDifficulty = (args.selectedQuestions || []).length
     ? (args.selectedQuestions || []).reduce((sum, q) => sum + Number(q?.difficulty || 2), 0) / (args.selectedQuestions || []).length
     : 2;
 
-  const difficultyScale = Number((1 + playerLevel * 0.05 + sessionAccuracy * 0.18 + Math.max(0, avgDifficulty - 2) * 0.1 + (args.isGolden ? 0.08 : 0)).toFixed(2));
+  const difficultyScale = Number((1 + Math.min(20, playerLevel) * 0.05 + sessionAccuracy * 0.18 + Math.max(0, avgDifficulty - 2) * 0.1 + (args.isGolden ? 0.08 : 0)).toFixed(2));
 
   const abilities: BossAbility[] = [];
   if (targetDomain !== "general") abilities.push("DOMAIN_LOCK");
@@ -153,7 +147,7 @@ export function selectBossQuestions(inputQuestions: any[], count = BOSS_QUESTION
     .sort((a, b) => Number(b?.difficulty || 1) - Number(a?.difficulty || 1));
 
   const curated = hard.filter((q) => Boolean(q?.bossEligible ?? q?.data?.bossEligible));
-  const base = curated.length ? curated : hard;
+  const base = curated;
   const force = String(forcedDomain || "").toLowerCase();
   const domainHard = force
     ? base.filter((q) => String(q?.domainId || q?.domain || q?.setDomain || "").toLowerCase().includes(force))
@@ -191,8 +185,11 @@ export function bossCombatRules(profile?: BossProfile | null) {
   const baseEnemyDamage = Math.max(34, Math.round(34 * scale));
   const basePlayerDamage = Math.max(18, Math.round((profile?.attackPower || 22) * 0.9));
   return {
-    startHP,
-    enemyDamageByTier: { 1: baseEnemyDamage, 2: baseEnemyDamage, 3: baseEnemyDamage, 4: baseEnemyDamage, 5: baseEnemyDamage },
+    startHP: 100,
+    playerMaxHP: 100,
+    enemyMaxHP: startHP,
+    // Three correct answers must win despite one half-strength shielded hit.
+    enemyDamageByTier: { 1: Math.ceil(startHP / 2.5), 2: Math.ceil(startHP / 2.5), 3: Math.ceil(startHP / 2.5), 4: Math.ceil(startHP / 2.5), 5: Math.ceil(startHP / 2.5) },
     playerDamageByTier: {
       1: basePlayerDamage,
       2: Math.max(basePlayerDamage + 4, Math.round(basePlayerDamage * 1.1)),

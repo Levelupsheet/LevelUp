@@ -5,6 +5,11 @@ import { inferDomainFromQuestion } from "@/lib/learningProfile";
 import { applyUserXpIncrement } from "@/lib/xpCaps";
 import { reconcileLevelLoot } from "@/lib/levelLoot";
 import { levelFromXp } from "@/lib/progression";
+import { settleCombat } from "@/lib/combatSettlement";
+import { awardRaffleEntries, getOrCreateActiveGoldenSweepstakes } from "@/lib/raffle";
+import { awardGoldenQuestion } from "@/lib/goldenRewards";
+import { getSweepstakesCampaignMetaMap } from "@/lib/sweepstakesCampaignMeta";
+import { BOSS_BONUS_XP, GOLDEN_BOSS_RAFFLE_REWARD } from "@/lib/bossBattle";
 
 function asNum(v: unknown, fallback = 0) {
   const n = Number(v);
@@ -40,7 +45,36 @@ export async function POST(req: Request) {
       stage9: { ok: true; awarded: number; walletTokens: number };
       levelRewards?: { previousLevel: number; newLevel: number; lootBoxesAwarded: number };
     } = await prisma.$transaction(async (tx) => {
+      await tx.$queryRawUnsafe('SELECT "id" FROM "User" WHERE "id" = $1 FOR UPDATE', userId);
+      await tx.$queryRawUnsafe('SELECT "id" FROM "GameSession" WHERE "id" = $1 FOR UPDATE', rewardClaimKey);
+      const saved = await tx.gameSession.findFirst({ where: { id: rewardClaimKey, userId }, include: { questions: { orderBy: { orderIndex: "asc" } } } });
+      if (!saved || saved.status !== "COMPLETED") throw new Error("Completed owned learning session required");
+      const itemUses = await tx.rewardClaim.findMany({ where: { userId, kind: "ITEM_USE" } });
+      const facts = settleCombat(saved, itemUses);
+      if (!facts.finished) throw new Error("Session is not finished");
+      const { correctCount, totalQuestions, outcome, bestStreak } = facts;
+      const encounterType = facts.boss ? "boss" : "standard";
+      const xpEarned = facts.xpEarned + (facts.boss && outcome === "victory" ? BOSS_BONUS_XP : 0);
+      const masteryByDomain = {}; // Learning mastery is derived from answer history, not client gauges.
+      const questionDomains = saved.questions.filter((q: any) => q.answered).map((q: any) => ({ domainId: q.payloadJson?.domainId, level: q.payloadJson?.level }));
       await tx.rewardClaim.create({ data: { userId, claimKey, kind: "GAME_SESSION", meta: { xpEarned, correctCount, totalQuestions, outcome, encounterType, bestStreak } } });
+      if (facts.boss && outcome === "victory") {
+        await awardRaffleEntries(tx as any, { userId, source: facts.boss.isGolden ? "GOLDEN_BOSS" : "BOSS_BATTLE", quantity: facts.boss.isGolden ? GOLDEN_BOSS_RAFFLE_REWARD : 1, sourceRefType: "SESSION", sourceRefId: saved.id, auditKey: `boss:${saved.id}` });
+        await tx.lootBox.create({ data: { userId, type: facts.boss.isGolden ? "GOLD" : "SILVER", status: "PENDING", source: `BOSS_VICTORY:${saved.id}` } });
+        for (const itemRef of facts.boss.isGolden ? ["shield_charge","health_restore","fury_charge"] : ["shield_charge","health_restore"]) {
+          await tx.inventoryItem.create({ data: { userId, itemType: "POWERUP", itemRef, quantity: 1 } });
+        }
+      }
+      if (!facts.boss && outcome === "complete" && facts.playerHP > 0 && saved.lane === "TEST_NOW") {
+        const candidates = saved.questions.filter((q: any) => q.isGolden && q.answered && q.isCorrect);
+        if (candidates.length) {
+          const campaign = await getOrCreateActiveGoldenSweepstakes(tx as any);
+          const campaignMeta = await getSweepstakesCampaignMetaMap(tx as any);
+          if (campaignMeta.get(String(campaign.id))?.allowGoldenQuestion !== false) {
+            for (const q of candidates) await awardGoldenQuestion(tx, { userId, sessionId: saved.id, questionId: String(q.questionId || q.id), campaignId: campaign.id });
+          }
+        }
+      }
       const beforeXpUser = await tx.user.findUnique({ where: { id: userId }, select: { xp: true } });
       const previousLevel = levelFromXp(Number(beforeXpUser?.xp || 0));
       const user = await applyUserXpIncrement(tx, userId, xpEarned);
@@ -85,7 +119,7 @@ export async function POST(req: Request) {
       let awarded = correctCount * 2;
       if (totalQuestions > 0 && correctCount === totalQuestions) awarded += 10;
       if (outcome.toLowerCase() === "victory" || outcome.toLowerCase() === "complete") awarded += 8;
-      if (encounterType.toLowerCase() === "boss") awarded += 12;
+      if (encounterType.toLowerCase() === "boss" && outcome === "victory") awarded += 12;
       if (bestStreak >= 5) awarded += 6;
       awarded = Math.max(0, Math.floor(awarded));
 
@@ -107,16 +141,16 @@ export async function POST(req: Request) {
         });
       } catch {}
 
-      return { user, stage9: { ok: true as const, awarded, walletTokens: wallet.tokenBalance }, levelRewards: { previousLevel, newLevel, lootBoxesAwarded: lootReward.created } };
+      return { user, outcome, xpAwarded: xpEarned, boss: facts.boss, stage9: { ok: true as const, awarded, walletTokens: wallet.tokenBalance }, levelRewards: { previousLevel, newLevel, lootBoxesAwarded: lootReward.created } };
     });
 
     await import("@/lib/stage9Economy").then(({ touchUserActivity }) => touchUserActivity(userId)).catch(() => null);
-    return Response.json({ ok: true, user: result.user, stage9: result.stage9, levelRewards: result.levelRewards });
+    return Response.json({ ok: true, ...result });
   } catch (err: any) {
     if (err?.code === "P2002") {
       return Response.json({ ok: true, duplicate: true, stage9: { awarded: 0 } });
     }
     console.error("Game session save failed", err);
-    return Response.json({ ok: false, error: "Failed to save game session" }, { status: 500 });
+    return Response.json({ ok: false, error: err?.message || "Failed to save game session" }, { status: /Completed owned|not finished/.test(String(err?.message)) ? 400 : 500 });
   }
 }

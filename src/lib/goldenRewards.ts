@@ -2,8 +2,9 @@ import { awardRaffleEntries } from "@/lib/raffle";
 /** Reserve one Golden question reward in the same transaction as the entry. */
 export async function awardGoldenQuestion(tx: any, args: { userId: string; sessionId: string; questionId: string; campaignId: string }, grant = awardRaffleEntries) {
   const reserved = await tx.$queryRawUnsafe(
-    `UPDATE "GoldenQuestionHistory" SET "awarded" = TRUE WHERE "sessionId" = $1 AND "questionId" = $2 AND "awarded" = FALSE RETURNING "id"`,
-    args.sessionId, args.questionId,
+    `UPDATE "GoldenQuestionHistory" AS target SET "awarded" = TRUE WHERE "sessionId" = $1 AND "questionId" = $2 AND "userId" = $3 AND "awarded" = FALSE
+      AND NOT EXISTS (SELECT 1 FROM "GoldenQuestionHistory" AS previous WHERE previous."userId" = target."userId" AND previous."level" = target."level" AND previous."awarded" = TRUE) RETURNING "id"`,
+    args.sessionId, args.questionId, args.userId,
   );
   if (!reserved.length) return false;
   const reward = await grant(tx, {
