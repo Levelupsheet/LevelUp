@@ -852,7 +852,7 @@ async function analyzeResumeStage12() {
                 <button
                   className="luRoleCard gdModalChoice gdModalChoiceOrange"
                   type="button"
-                  onClick={() => { setShowLaunchModal(false); if (selectedCareer) { setLaunchGate("position-training"); window.location.href = "/position-training"; } else if (careerPaths.length) { setCareerPickerOpen(true); } else { startLeveledMode("position"); } }}
+                  onClick={() => { setShowLaunchModal(false); if (careerPaths.length) { setCareerPickerOpen(true); } else if (selectedCareer) { setLaunchGate("position-training"); window.location.href = "/position-training"; } else { startLeveledMode("position"); } }}
                 >
                   <div className="luRoleIcon" aria-hidden="true">🎯</div>
                   <div className="luRoleTitle">Career training</div>
@@ -1167,7 +1167,10 @@ async function analyzeResumeStage12() {
                 <div className="dashboardUtilityEyebrow">COMBAT LOADOUT</div><div style={{ fontWeight: 900 }}>PowerUps</div>
                 <div style={{ opacity: 0.78 }}><small>Inventory + daily claims</small></div>
               </div>
-              <button className="secondaryBtn gdActionBlue gdActionCompact" type="button" onClick={() => setPowerupsOpen(true)} style={{ minHeight: 30, padding: "5px 12px", fontSize: 12, borderColor: "rgba(110,190,255,0.35)", background: "linear-gradient(180deg, rgba(46,104,172,0.24), rgba(24,64,118,0.18))" }}>Open</button>
+              <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                <button className="secondaryBtn gdActionOrange gdActionCompact" type="button" onClick={() => setLootOpen(true)} style={{ minHeight: 30, padding: "5px 12px", fontSize: 12 }}>Loot Vault</button>
+                <button className="secondaryBtn gdActionBlue gdActionCompact" type="button" onClick={() => setPowerupsOpen(true)} style={{ minHeight: 30, padding: "5px 12px", fontSize: 12, borderColor: "rgba(110,190,255,0.35)", background: "linear-gradient(180deg, rgba(46,104,172,0.24), rgba(24,64,118,0.18))" }}>PowerUps</button>
+              </div>
             </div>
             <div className="powerHudTray" style={{ marginTop: 10, display: "flex", gap: 6, flexWrap: "wrap" }}>
               {compactInventory.length ? compactInventory.map((row) => (
