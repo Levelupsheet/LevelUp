@@ -36,11 +36,6 @@ type Props = {
   encounterType?: "standard" | "boss";
 };
 
-const FALLBACK_BY_LANE: Record<GameLane, DiabloQuestion[]> = {
-  TEST_NOW: [{ id: "fallback_dns", type: "multiple_choice", prompt: "A user can reach 8.8.8.8 but not google.com. What should you troubleshoot first?", choices: ["DNS", "Monitor brightness", "Printer drivers", "Bluetooth"], correctIndex: 0, explanation: "The host can reach an IP, so name resolution is the likely problem.", domainId: "networking", level: 1 }],
-  TRAINING: [{ id: "fallback_training", type: "multiple_choice", prompt: "No active training set is assigned. Where should you fix that?", choices: ["Admin placements", "Windows Update", "Task Manager", "Device Manager"], correctIndex: 0, explanation: "Assign a published question set to the training lane in Admin.", domainId: "general", level: 1 }],
-  CERTIFICATIONS: [{ id: "fallback_cert", type: "multiple_choice", prompt: "No certification set is currently assigned. Where should you fix that?", choices: ["Admin placements", "Registry Editor", "Services", "Disk Management"], correctIndex: 0, explanation: "Assign a published question set to the certification lane in Admin.", domainId: "general", level: 1 }],
-};
 
 function getRecentKey(lane: GameLane, startingPosition?: string | null, certExam?: string | null) {
   return `lu_recent_${lane}_${startingPosition || "all"}_${certExam || "all"}`;
@@ -67,7 +62,7 @@ function mapQuestion(q: any, idx: number): DiabloQuestion {
     data,
     explanation: q?.explanation ?? null,
     domainId: q?.domainId || (tags[0] ? String(tags[0]).toLowerCase() : undefined),
-    level: q?.level === 3 || q?.difficulty === 3 ? 3 : q?.level === 2 || q?.difficulty === 2 ? 2 : 1,
+    level: Math.max(1, Math.min(5, Number(q?.level ?? q?.difficulty ?? 1) || 1)),
     sessionQuestionId: q?.sessionQuestionId ? String(q.sessionQuestionId) : undefined,
     isGolden: Boolean(q?.isGolden),
   } as any;
@@ -76,6 +71,7 @@ function mapQuestion(q: any, idx: number): DiabloQuestion {
 export default function GameEngine(props: Props) {
   const { lane, title, subtitle, timed = false, exitHref = "/dashboard", exitLabel = "Close", onExit, metaLeft, metaRight, startingPosition, industry, careerPath, playerPosition, certExam, bankDomain, trainingMode = "STANDARD", enemyName = "Lagger", questionCount, questionsOverride, rulesOverride, onComplete, encounterType = questionsOverride?.length ? "boss" : "standard" } = props;
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [questions, setQuestions] = useState<DiabloQuestion[]>([]);
   const [setLabel, setSetLabel] = useState<string>(subtitle || title);
   const [sessionId, setSessionId] = useState<string>("");
@@ -103,14 +99,15 @@ export default function GameEngine(props: Props) {
     if (certExam) search.set("certExam", certExam);
     const res = await fetch(`/api/content/active?${search.toString()}`, { cache: "no-store" as any });
     const json = await res.json().catch(() => null);
+    if (!res.ok) throw new Error(json?.error || "Could not load published questions");
     const mapped = Array.isArray(json?.questions) ? json.questions.map(mapQuestion) : [];
     if (mapped.length) {
       setQuestions(mapped);
       writeRecentIds(recentKey, mapped.map((q) => String(q.id)));
       setSetLabel(json?.set?.name ? `${title} · ${json.set.name}` : subtitle || title);
     } else {
-      setQuestions(FALLBACK_BY_LANE[lane]);
-      setSetLabel(`${title} · Sample`);
+      setQuestions([]);
+      setLoadError("No published questions are available for this training selection. Assign a question pool in Admin → Question Pools.");
     }
   }, [lane, effectiveCount, startingPosition, industry, careerPath, certExam, title, subtitle]);
 
@@ -132,20 +129,21 @@ export default function GameEngine(props: Props) {
       const focus = String(json?.session?.state?.focusDomain || "").replace(/_/g, " ");
       setSetLabel(trainingMode === "WEAK_DOMAIN" ? `${title} · Weak Domain${focus ? `: ${focus}` : ""}` : trainingMode === "MISSED_QUESTIONS" ? `${title} · Missed Question Review` : `${title} · Active Session`);
     } else {
-      setQuestions(FALLBACK_BY_LANE.TEST_NOW);
-      setSetLabel(`${title} · Sample`);
+      setQuestions([]);
+      setLoadError("No questions are available for this Test Now selection. Check the published database pools.");
     }
   }, [effectiveCount, title, bankDomain, trainingMode]);
 
   const load = useCallback(async () => {
     setLoading(true);
+    setLoadError(null);
     try {
       await hydrateAuthenticatedUser();
       if (lane === "TEST_NOW") await loadTestNowSession();
       else await loadStandard();
-    } catch {
-      setQuestions(FALLBACK_BY_LANE[lane]);
-      setSetLabel(`${title} · Sample`);
+    } catch (error: any) {
+      setQuestions([]);
+      setLoadError(error?.message || "Could not load questions from the database.");
     } finally {
       setLoading(false);
     }
