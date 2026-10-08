@@ -1048,6 +1048,7 @@ export default function AdminPage(){
   const [newSetName, setNewSetName] = useState("Networking Set 1");
   const [newSetDomain, setNewSetDomain] = useState("GENERAL");
   const [publishLane, setPublishLane] = useState<"TEST_NOW" | "TRAINING" | "CERTIFICATIONS" | "INTERVIEW">("TRAINING");
+  const [replaceActivePools, setReplaceActivePools] = useState(false);
   const [publishIndustry, setPublishIndustry] = useState("Information Technology");
   const [publishCareerPath, setPublishCareerPath] = useState("Help Desk");
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -1264,7 +1265,7 @@ export default function AdminPage(){
   async function assignPlacement(lane: "TEST_NOW" | "TRAINING" | "CERTIFICATIONS" | "INTERVIEW") {
     try {
       setAssignMsg(null);
-      const body: any = { setId: selectedSet, lane };
+      const body: any = { setId: selectedSet, lane, exclusive: replaceActivePools };
       if (lane === "TRAINING") {
         body.industry = publishIndustry.trim();
         body.careerPath = publishCareerPath.trim();
@@ -1881,7 +1882,11 @@ export default function AdminPage(){
                 <div style={{ padding: 10, borderRadius: 10, background: "rgba(0,0,0,.18)", border: "1px solid rgba(255,255,255,.08)" }}>
                   <small>Publishing <b>{selectedSetObj?.name || "No pool selected"}</b>{selectedSetObj ? ` • ${selectedSetObj.domain} • ${questions.length} questions` : ""}</small>
                 </div>
-                <button className="primary" onClick={publishSelectedPool} disabled={!selectedSet}>Publish pool</button>
+                <label style={{ display:"flex", gap:8, alignItems:"center", marginBottom:8 }}>
+                  <input type="checkbox" checked={replaceActivePools} onChange={(e) => setReplaceActivePools(e.target.checked)} />
+                  <span>Replace other active pools for this destination (keep their questions)</span>
+                </label>
+                <button className="primary" onClick={publishSelectedPool} disabled={!selectedSet}>{replaceActivePools ? "Replace active pools" : "Publish pool"}</button>
                 {assignMsg ? <small style={{ opacity: 0.92 }}>{assignMsg}</small> : null}
               </div>
             </div> : null}
