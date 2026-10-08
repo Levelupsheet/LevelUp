@@ -1,7 +1,7 @@
 import { validateQuestionQuality } from './questionQuality';
 import type { NormalizedKnowledgeBlock, CandidateQuestion } from './contentEngine';
 import { validateContent, contentSignature } from './contentPipeline';
-export const GENERATOR_VERSION = '2.0';
+export const GENERATOR_VERSION = '2.1';
 const text = (value: any) => String(value ?? '').trim();
 export const canonicalContentText = (value: any) => text(value).toLowerCase().replace(/\s+/g, ' ').replace(/[.!?]+$/, '');
 const strings = (values: any) => Array.isArray(values) ? values.filter(v => typeof v === 'string' && v.trim()).map(text) : [];
@@ -23,6 +23,7 @@ export function duplicateContentReason(candidate: any, existing: any[]) {
     if (text(row.type).toLowerCase() === text(candidate.type).toLowerCase() && candidate.data?.assessment === 'recall') {
       if (candidate.data.sourceStatement && canonicalContentText(candidate.data.sourceStatement) === canonicalContentText(row.data?.sourceStatement)) return 'Repeated source fact already exists in this pool';
       if (candidate.data.conceptKey && row.data?.term && canonicalContentText(candidate.data.conceptKey) === canonicalContentText(row.data.term)) return 'Repeated recall concept already exists in this pool';
+      if (candidate.data.conceptKey && row.data?.assessment === 'recall' && canonicalContentText(candidate.data.conceptKey) === canonicalContentText(row.data.conceptKey) && (candidate.data.sourceSection === 'distractorKnowledge' || row.data.derivedFromWrongAnswer)) return 'Repeated wrong-choice recall concept already exists in this pool';
     }
     if (candidate.data?.generationKey && row.data?.generationKey === candidate.data.generationKey) return 'Repeated learning objective and assessment; review any revised source before replacing';
     if (text(row.type).toLowerCase() !== text(candidate.type).toLowerCase() || answerText(row) !== answer) continue;
@@ -63,6 +64,8 @@ export function generateContentReport(block: NormalizedKnowledgeBlock) {
     q.tags = unique([...block.tags,...strings(item.tags),subdomain]);
     q.data = { ...(q.data || {}), generatorVersion: GENERATOR_VERSION, generationKey: family, assessment, conceptKey: canonicalContentText(item.subject || item.term || concept || objective), sourceStatement: text(item.statement || item.definition || item.data?.sourceStatement), objectiveId: objective, sourceBlockId: block.sourceBlockId, sourceSection: section, sourceRow: row + 1, industry: source.industry || null, careerPath: source.careerPath || null, domainId, subdomain, hints, cognitiveLevel: ['recall','understand','apply','diagnose','complex_judgment'][difficulty-1], evidence, constraints, goldenEligible: golden && difficulty >= 4, bossEligible: boss && difficulty >= 4 };
     q.testNowEligible = block.lane === 'TEST_NOW';
+    q.data.sourceReferences = strings(item.sourceReferences || item.data?.sourceReferences || source.sourceReferences);
+    delete q.distractorKnowledge; // Source authoring stays in the block, not exported gameplay rows.
     q.goldenEligible = golden && difficulty >= 4;
     const errors = [...validateContent({ ...q, isGoldenEligible: q.goldenEligible }), ...validateQuestionQuality(q).issues];
     const duplicate = duplicateContentReason(q,questions);
@@ -122,5 +125,32 @@ export function generateContentReport(block: NormalizedKnowledgeBlock) {
     const normalized = type === 'true_false' && typeof data.correctAnswer === 'boolean' ? {...item,choices:['True','False'],correctIndex:data.correctAnswer?0:1} : item;
     add('questions',row,item,{...normalized,type,data},text(item?.assessment || item?.data?.assessment || 'authored:'+canonicalContentText(item?.prompt)),item?.difficulty ?? block.difficulty,item?.objectiveId);
   });
-  return { generatorVersion: GENERATOR_VERSION, questions, issues, summary: { generated: questions.length, issues: issues.length, byDifficulty: Object.fromEntries([1,2,3,4,5].map(t=>[t,questions.filter(q=>q.difficulty===t).length])) } };
+  // Expand only authored knowledge about real incorrect choices. A wrong option is
+  // not a statement of truth and must never simply become the next correct answer.
+  const parents = questions.slice();
+  for (const parent of parents) {
+    const section = parent.data.sourceSection;
+    const row = parent.data.sourceRow - 1;
+    const item = source[section]?.[row];
+    const knowledge = item?.distractorKnowledge;
+    if (knowledge === undefined) continue;
+    if (!Array.isArray(knowledge)) { report(section,row,'distractorKnowledge must be an array of authored wrong-choice concepts',item); continue; }
+    knowledge.forEach((entry:any,index:number) => {
+      const payload = { parentPrompt: parent.prompt, entry, entryIndex: index + 1 };
+      const choice = text(entry?.choice);
+      const wrongChoices = parent.type === 'multiple_choice' ? (parent.choices || []).filter((_:string,i:number) => i !== parent.correctIndex) : [];
+      if (!choice || !wrongChoices.some((v:string) => canonicalContentText(v) === canonicalContentText(choice))) {
+        report('distractorKnowledge',index,'choice must match an incorrect multiple-choice option on an accepted parent question',payload); return;
+      }
+      if (!text(entry?.definition) || !text(entry?.explanation) || !text(entry?.objectiveId)) {
+        report('distractorKnowledge',index,'Provide a verified definition, teaching explanation and stable objectiveId; incorrect options alone are not source facts',payload); return;
+      }
+      const before = questions.length;
+      const difficulty = entry.difficulty ?? Math.min(2,parent.difficulty);
+      if (difficulty > 2 && !text(entry.prompt)) { report('distractorKnowledge',index,'Higher-tier follow-ups need an authored application prompt, not a definition recall',payload); return; }
+      mcq('distractorKnowledge',index,{...entry,subject:choice,statement:entry.definition,domainId:entry.domainId || parent.data.domainId,subdomain:entry.subdomain || parent.data.subdomain},text(entry.prompt) || `Which description best matches ${choice}?`,text(entry.answer || entry.definition),strings(entry.distractors),text(entry.explanation),difficulty <= 2 ? 'recall' : 'application:'+canonicalContentText(entry.prompt),difficulty,entry.objectiveId);
+      if (questions.length > before) questions[questions.length-1].data = {...questions[questions.length-1].data,derivedFromWrongAnswer:true,parentGenerationKey:parent.data.generationKey,parentObjectiveId:parent.data.objectiveId,sourceChoice:choice};
+    });
+  }
+  return { generatorVersion: GENERATOR_VERSION, questions, issues, summary: { generated: questions.length, issues: issues.length, derivedFromWrongAnswers: questions.filter(q=>q.data.derivedFromWrongAnswer).length, byDifficulty: Object.fromEntries([1,2,3,4,5].map(t=>[t,questions.filter(q=>q.difficulty===t).length])) } };
 }

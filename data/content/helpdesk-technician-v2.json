@@ -1,0 +1,515 @@
+{
+  "schemaVersion": 2,
+  "authoringNotes": [
+    "Original role-training exercises; local support policies stated in scenarios are assumptions, not universal legal requirements.",
+    "Uses the existing canonical Help Desk career path; the bank focuses on Help Desk Technician responsibilities.",
+    "Three authored distractor concepts expand into additional questions."
+  ],
+  "blocks": [
+    {
+      "id": "helpdesk-technician-v2",
+      "title": "Help Desk Technician practice bank",
+      "setName": "Help Desk Technician — helpdesk-support Practice",
+      "lane": "TRAINING",
+      "industry": "Information Technology",
+      "careerPath": "Help Desk",
+      "domain": "GENERAL",
+      "domainId": "helpdesk-support",
+      "difficulty": 1,
+      "questions": [
+        {
+          "objectiveId": "helpdesk.dns-function",
+          "type": "multiple_choice",
+          "difficulty": 1,
+          "prompt": "Which service resolves a host name to an IP address?",
+          "choices": [
+            "DNS name resolution",
+            "DHCP address leasing",
+            "Default gateway",
+            "Local print spooler"
+          ],
+          "correctIndex": 0,
+          "explanation": "DNS supports name resolution. An address lease, routed traffic and a print queue are different functions.",
+          "subdomain": "networking",
+          "hints": [
+            "Separate address configuration, name lookup, routing, and cached information."
+          ],
+          "sourceReferences": [
+            "https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/nslookup"
+          ],
+          "distractorKnowledge": [
+            {
+              "choice": "DHCP address leasing",
+              "objectiveId": "helpdesk.dhcp-function",
+              "definition": "Automatic leasing of IP configuration",
+              "distractors": [
+                "Resolution of host names to addresses",
+                "Routing packets to other networks",
+                "Holding print jobs before processing"
+              ],
+              "explanation": "DHCP supplies leased network settings. It does not replace DNS name resolution or routing to another subnet.",
+              "difficulty": 1,
+              "sourceReferences": [
+                "https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/ipconfig"
+              ],
+              "hints": [
+                "Compare the purpose of this concept with the other functions described."
+              ]
+            },
+            {
+              "choice": "Default gateway",
+              "objectiveId": "helpdesk.gateway-function",
+              "definition": "A next hop for traffic outside the local network",
+              "distractors": [
+                "A service that assigns printer job numbers",
+                "A cache of recently resolved host names",
+                "A process that grants user account roles"
+              ],
+              "explanation": "The default gateway is a routing concept. It is separate from resolving names, managing print jobs and authorizing user actions.",
+              "difficulty": 1,
+              "sourceReferences": [],
+              "hints": [
+                "Compare the purpose of this concept with the other functions described."
+              ]
+            },
+            {
+              "choice": "Local print spooler",
+              "objectiveId": "helpdesk.spooler-function",
+              "definition": "A service that manages queued print jobs",
+              "distractors": [
+                "A server that leases network addresses",
+                "A tool that resolves external host names",
+                "A device that routes traffic between subnets"
+              ],
+              "explanation": "The spooler handles queued print jobs. A queue problem requires different evidence from a name-resolution or routing problem.",
+              "difficulty": 1,
+              "sourceReferences": [],
+              "hints": [
+                "Compare the purpose of this concept with the other functions described."
+              ]
+            }
+          ]
+        },
+        {
+          "objectiveId": "helpdesk.ticket-evidence",
+          "type": "multiple_choice",
+          "difficulty": 1,
+          "prompt": "Which ticket note provides the most useful reproducible evidence?",
+          "choices": [
+            "The exact error, affected device and observed time",
+            "A guess about the cause with no observed symptoms",
+            "A copied password used by the affected person",
+            "A statement that computers are unreliable"
+          ],
+          "correctIndex": 0,
+          "explanation": "Reproducible observations support diagnosis and handoff. Guesses should be marked as hypotheses; passwords should not be collected in ticket notes.",
+          "subdomain": "service-management",
+          "hints": [
+            "Choose information that enables a reproducible handoff without exposing secrets."
+          ],
+          "sourceReferences": []
+        },
+        {
+          "objectiveId": "helpdesk.identity-verification",
+          "type": "multiple_choice",
+          "difficulty": 1,
+          "prompt": "Under a support policy requiring identity verification, what should happen before resetting a caller account?",
+          "choices": [
+            "Complete the approved identity-verification procedure",
+            "Accept the caller name as sufficient identification",
+            "Request the password and record it in the ticket",
+            "Bypass verification when the caller sounds confident"
+          ],
+          "correctIndex": 0,
+          "explanation": "The stated policy requires verification before changing account access. Familiarity or confidence does not establish identity.",
+          "subdomain": "identity",
+          "hints": [
+            "Check whether verification and authorization match the specific target account."
+          ],
+          "sourceReferences": []
+        },
+        {
+          "objectiveId": "helpdesk.read-only-first",
+          "type": "multiple_choice",
+          "difficulty": 1,
+          "prompt": "Which first step best preserves evidence in a troubleshooting session?",
+          "choices": [
+            "Record symptoms and collect relevant read-only observations",
+            "Reinstall the system before asking about the symptom",
+            "Delete all event records to create a clean starting point",
+            "Change several unrelated settings without recording them"
+          ],
+          "correctIndex": 0,
+          "explanation": "Observations establish a baseline before intervention. Destructive or simultaneous changes can hide the original cause and complicate recovery.",
+          "subdomain": "troubleshooting",
+          "hints": [
+            "Start from observed symptoms; isolate one supported hypothesis at a time."
+          ],
+          "sourceReferences": []
+        },
+        {
+          "objectiveId": "helpdesk.ip-details",
+          "type": "multiple_choice",
+          "difficulty": 2,
+          "prompt": "Which Windows command displays detailed adapter IP configuration?",
+          "choices": [
+            "ipconfig /all",
+            "ipconfig /flushdns",
+            "nslookup example.com",
+            "ipconfig /release"
+          ],
+          "correctIndex": 0,
+          "explanation": "The all switch displays adapter details, including configured network parameters. The other commands query names or change local network state.",
+          "subdomain": "networking",
+          "hints": [
+            "Separate address configuration, name lookup, routing, and cached information."
+          ],
+          "sourceReferences": [
+            "https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/ipconfig"
+          ]
+        },
+        {
+          "objectiveId": "helpdesk.dns-cache",
+          "type": "multiple_choice",
+          "difficulty": 2,
+          "prompt": "Which Windows command clears the local DNS resolver cache?",
+          "choices": [
+            "ipconfig /flushdns",
+            "ipconfig /all",
+            "ipconfig /renew",
+            "nslookup example.com"
+          ],
+          "correctIndex": 0,
+          "explanation": "Flushdns clears the resolver cache; it does not renew a DHCP lease or merely display adapter settings. Use it when the diagnostic evidence supports a cache issue.",
+          "subdomain": "networking",
+          "hints": [
+            "Separate address configuration, name lookup, routing, and cached information."
+          ],
+          "sourceReferences": [
+            "https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/ipconfig"
+          ]
+        },
+        {
+          "objectiveId": "helpdesk.escalation-packet",
+          "type": "multiple_choice",
+          "difficulty": 2,
+          "prompt": "Under a ticket handoff procedure, what should accompany escalation?",
+          "choices": [
+            "Symptoms, impact, evidence and actions already attempted",
+            "Only the user name and a request to start over",
+            "The caller password and unrelated account secrets",
+            "A guessed solution presented as a confirmed cause"
+          ],
+          "correctIndex": 0,
+          "explanation": "A focused handoff helps the next team continue the investigation without repeating work or exposing secrets. Label unconfirmed hypotheses clearly.",
+          "subdomain": "service-management",
+          "hints": [
+            "Choose information that enables a reproducible handoff without exposing secrets."
+          ],
+          "sourceReferences": []
+        },
+        {
+          "objectiveId": "helpdesk.change-isolation",
+          "type": "multiple_choice",
+          "difficulty": 2,
+          "prompt": "Why should a technician test after each approved troubleshooting change?",
+          "choices": [
+            "To link the observed result to a specific intervention",
+            "To make several hidden changes before recording anything",
+            "To guarantee that every restart permanently fixes a problem",
+            "To avoid collecting any baseline evidence beforehand"
+          ],
+          "correctIndex": 0,
+          "explanation": "Testing after an individual change helps establish its effect and supports rollback. It does not prove unrelated problems are fixed.",
+          "subdomain": "troubleshooting",
+          "hints": [
+            "Start from observed symptoms; isolate one supported hypothesis at a time."
+          ],
+          "sourceReferences": []
+        },
+        {
+          "objectiveId": "helpdesk.dns-diagnostic",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "A workstation reaches a service by IP address but cannot resolve its host name. Which read-only test best investigates the name-resolution path?",
+          "choices": [
+            "Query the name with nslookup and review the response",
+            "Reimage the workstation before gathering more evidence",
+            "Replace the keyboard because the address entry worked",
+            "Delete every account cached on the workstation"
+          ],
+          "correctIndex": 0,
+          "explanation": "The contrasting results point toward the name-resolution path. A DNS query gathers relevant evidence without erasing the workstation or changing unrelated hardware.",
+          "subdomain": "networking",
+          "hints": [
+            "Separate address configuration, name lookup, routing, and cached information."
+          ],
+          "sourceReferences": [
+            "https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/nslookup"
+          ]
+        },
+        {
+          "objectiveId": "helpdesk.scope-outage",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "Ten users report the same application error at the same time. Which question most usefully narrows the incident scope?",
+          "choices": [
+            "Which locations, devices and functions are affected?",
+            "Which desktop wallpaper does each user prefer?",
+            "Which unrelated password should every user disclose?",
+            "Which printer model should be replaced immediately?"
+          ],
+          "correctIndex": 0,
+          "explanation": "Scope and common timing help distinguish a shared incident from isolated device issues. Collect relevant evidence before selecting a remediation.",
+          "subdomain": "incident-management",
+          "hints": [
+            "Compare service impact and affected scope with the stated priority rules."
+          ],
+          "sourceReferences": []
+        },
+        {
+          "objectiveId": "helpdesk.password-pressure",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "A caller refuses the required identity checks but requests an urgent password reset. Which response fits the supplied procedure?",
+          "choices": [
+            "Use the approved verification or escalation route",
+            "Reset the account because the caller expresses urgency",
+            "Ask a nearby stranger to approve the account change",
+            "Email the caller a copy of the previous password"
+          ],
+          "correctIndex": 0,
+          "explanation": "The procedure still applies under urgency. An authorized escalation can resolve a verification problem without granting access to an unverified caller.",
+          "subdomain": "identity",
+          "hints": [
+            "Check whether verification and authorization match the specific target account."
+          ],
+          "sourceReferences": []
+        },
+        {
+          "objectiveId": "helpdesk.local-vs-shared",
+          "type": "multiple_choice",
+          "difficulty": 4,
+          "prompt": "Only one workstation fails to resolve an internal name; peers using the same DNS service succeed. What is the best next diagnostic step?",
+          "choices": [
+            "Compare its DNS settings and query results with a working peer",
+            "Replace the shared DNS service without inspecting the device",
+            "Delete all application files on every working peer device",
+            "Disable the entire network security boundary immediately"
+          ],
+          "correctIndex": 0,
+          "explanation": "The affected scope favors comparing client configuration first. A working peer provides useful evidence while preserving the service used by other people.",
+          "subdomain": "networking",
+          "hints": [
+            "Separate address configuration, name lookup, routing, and cached information."
+          ],
+          "sourceReferences": [
+            "https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/ipconfig",
+            "https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/nslookup"
+          ],
+          "evidence": "Failures are limited to one workstation; peers resolve the same name.",
+          "constraints": [
+            "Use read-only comparison before changes",
+            "Keep working clients operational"
+          ],
+          "bossEligible": false,
+          "isGoldenEligible": false
+        },
+        {
+          "objectiveId": "helpdesk.conflicting-change",
+          "type": "multiple_choice",
+          "difficulty": 4,
+          "prompt": "Two approved changes were applied together and a fault began. The rollback procedure permits reverting one change at a time. What is the best diagnostic approach?",
+          "choices": [
+            "Document the baseline and revert one change with verification",
+            "Revert random settings until the symptom disappears",
+            "Erase the change record to avoid confusing the next team",
+            "Apply both changes again repeatedly without observing results"
+          ],
+          "correctIndex": 0,
+          "explanation": "A controlled rollback isolates which intervention changes the result. Preserving the record supports subsequent investigation and recovery.",
+          "subdomain": "change-management",
+          "hints": [
+            "Preserve the change record and test which single intervention changes the result."
+          ],
+          "sourceReferences": [],
+          "evidence": "The fault followed two changes; neither was tested separately.",
+          "constraints": [
+            "Follow the approved rollback procedure",
+            "Record each intervention and result"
+          ],
+          "bossEligible": false,
+          "isGoldenEligible": false
+        },
+        {
+          "objectiveId": "helpdesk.identity-mismatch",
+          "type": "multiple_choice",
+          "difficulty": 4,
+          "prompt": "A reset request names one account, but the verified caller owns another. What should support do under the account-access procedure?",
+          "choices": [
+            "Pause the reset and resolve ownership through authorized verification",
+            "Reset both accounts because one identity was verified",
+            "Copy the account secrets into the ticket for comparison",
+            "Allow the caller to choose an account without further checks"
+          ],
+          "correctIndex": 0,
+          "explanation": "Verification must match the account whose access will change. Evidence for one identity does not authorize modifying another identity.",
+          "subdomain": "identity",
+          "hints": [
+            "Check whether verification and authorization match the specific target account."
+          ],
+          "sourceReferences": [],
+          "evidence": "Verified caller identity does not match the target account owner.",
+          "constraints": [
+            "No reset without matching authorization",
+            "Use the approved ownership escalation route"
+          ],
+          "bossEligible": false,
+          "isGoldenEligible": false
+        },
+        {
+          "objectiveId": "helpdesk.competing-priorities",
+          "type": "multiple_choice",
+          "difficulty": 5,
+          "prompt": "A shared service fails while an executive requests a cosmetic desktop change. How should support prioritize under the supplied incident matrix?",
+          "choices": [
+            "Escalate the shared outage and communicate its impact and status",
+            "Complete the cosmetic request first because of the caller title",
+            "Close the outage tickets because multiple reports are duplicates",
+            "Reinstall every affected computer before checking shared services"
+          ],
+          "correctIndex": 0,
+          "explanation": "The exercise matrix ranks service impact over caller seniority. Grouping reports can support incident handling, but it should not hide the unresolved outage.",
+          "subdomain": "incident-management",
+          "hints": [
+            "Compare service impact and affected scope with the stated priority rules."
+          ],
+          "sourceReferences": [],
+          "evidence": "The matrix ranks a many-user service outage above a cosmetic single-user request.",
+          "constraints": [
+            "Preserve linked reports",
+            "Assign an owner and communicate progress",
+            "Use authorized escalation"
+          ],
+          "bossEligible": false,
+          "isGoldenEligible": false
+        },
+        {
+          "objectiveId": "helpdesk.security-boundary",
+          "type": "multiple_choice",
+          "difficulty": 5,
+          "prompt": "A suspicious message requests a support password and contains an unexpected attachment. An unrelated outage is also active. Which plan best protects evidence and continuity under the supplied procedure?",
+          "choices": [
+            "Report the message through security channels; continue outage triage safely",
+            "Open the attachment to learn whether it contains outage instructions",
+            "Forward the message and password to every member of the team",
+            "Delete all records of the message and postpone the shared outage"
+          ],
+          "correctIndex": 0,
+          "explanation": "The procedure separates security reporting from operational triage. Avoid interacting with the suspicious payload and preserve the information required by the security team.",
+          "subdomain": "security-awareness",
+          "hints": [
+            "Protect credentials and evidence while following the stated reporting route."
+          ],
+          "sourceReferences": [],
+          "evidence": "The local procedure forbids opening untrusted attachments and requires security reporting.",
+          "constraints": [
+            "Do not disclose credentials",
+            "Preserve the suspicious message as directed",
+            "Keep an owner on the ongoing outage"
+          ],
+          "bossEligible": false,
+          "isGoldenEligible": false
+        },
+        {
+          "objectiveId": "helpdesk.tf-dnslease",
+          "type": "true_false",
+          "difficulty": 2,
+          "prompt": "True or false: ipconfig /flushdns renews the workstation DHCP lease.",
+          "correctAnswer": false,
+          "explanation": "Flushdns clears cached DNS information. Renew is a separate operation for refreshing DHCP configuration; the commands should not be treated as interchangeable.",
+          "subdomain": "networking",
+          "sourceReferences": [
+            "https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/ipconfig"
+          ],
+          "hints": [
+            "Separate address configuration, name lookup, routing, and cached information."
+          ]
+        },
+        {
+          "objectiveId": "helpdesk.tf-secrets",
+          "type": "true_false",
+          "difficulty": 2,
+          "prompt": "True or false: under a procedure prohibiting secret collection, a support ticket should include the caller password for easier handoff.",
+          "correctAnswer": false,
+          "explanation": "That procedure forbids collecting the password. Handoff should include symptoms, evidence and prior actions without exposing account secrets.",
+          "subdomain": "service-management",
+          "sourceReferences": [],
+          "hints": [
+            "Choose information that enables a reproducible handoff without exposing secrets."
+          ]
+        },
+        {
+          "objectiveId": "helpdesk.cli-config",
+          "type": "cli_command",
+          "difficulty": 3,
+          "prompt": "In Windows Command Prompt, enter the command to display detailed IP configuration for all adapters.",
+          "expectedCommands": [
+            "ipconfig /all"
+          ],
+          "data": {
+            "caseSensitive": false
+          },
+          "explanation": "The all parameter displays detailed adapter configuration for read-only investigation.",
+          "subdomain": "networking",
+          "sourceReferences": [
+            "https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/ipconfig"
+          ],
+          "hints": [
+            "Separate address configuration, name lookup, routing, and cached information."
+          ]
+        },
+        {
+          "objectiveId": "helpdesk.cli-dns",
+          "type": "cli_command",
+          "difficulty": 3,
+          "prompt": "In Windows Command Prompt, enter the command to query DNS for example.com using the default DNS server. Do not add other arguments.",
+          "expectedCommands": [
+            "nslookup example.com"
+          ],
+          "data": {
+            "caseSensitive": false
+          },
+          "explanation": "Nslookup queries DNS. Comparing its response with the reported symptom helps investigate the resolution path.",
+          "subdomain": "networking",
+          "sourceReferences": [
+            "https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/nslookup"
+          ],
+          "hints": [
+            "Separate address configuration, name lookup, routing, and cached information."
+          ]
+        },
+        {
+          "objectiveId": "helpdesk.cli-cache",
+          "type": "cli_command",
+          "difficulty": 3,
+          "prompt": "In Windows Command Prompt, enter the approved command to clear the local DNS resolver cache.",
+          "expectedCommands": [
+            "ipconfig /flushdns"
+          ],
+          "data": {
+            "caseSensitive": false
+          },
+          "explanation": "Flushdns clears the local resolver cache. This focused action is different from releasing a lease or resetting unrelated configuration.",
+          "subdomain": "networking",
+          "sourceReferences": [
+            "https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/ipconfig"
+          ],
+          "hints": [
+            "Separate address configuration, name lookup, routing, and cached information."
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -31,3 +31,27 @@ test('v2 envelope propagates schema version and requires explicit training desti
  const raw={schemaVersion:2,blocks:[{id:'b',setName:'Bank',lane:'TRAINING'}]};
  const [source]=importEnvelope(raw);assert.equal(source.schemaVersion,2);assert.throws(()=>normalizeKnowledgeBlock(source),/industry and careerPath/);
 });
+
+test('authored wrong-choice concepts expand with provenance, stay deterministic and round-trip once',()=>{
+ const knowledge={choice:fact.distractors[0],objectiveId:'storage-purpose',definition:'Maintaining stored information',distractors:['Coordinating customer requests','Scheduling report production','Monitoring identity permissions'],explanation:'Storage administration concerns stored information rather than customer requests.',sourceReferences:['https://example.test/source']};
+ const source=block({facts:[{...fact,distractorKnowledge:[knowledge,knowledge,{...knowledge,objectiveId:"another-id-same-concept"}]}]});
+ const r=generateContentReport(source);assert.equal(r.questions.length,2);assert.equal(r.summary.derivedFromWrongAnswers,1);assert.equal(r.issues.length,2);assert.ok(r.issues.every(i=>/duplicate|Repeated/i.test(i.reason)));assert.deepEqual(r,generateContentReport(source));
+ const follow=r.questions[1];assert.equal(follow.data.derivedFromWrongAnswer,true);assert.equal(follow.data.parentGenerationKey,r.questions[0].data.generationKey);assert.equal(follow.data.sourceChoice,knowledge.choice);assert.equal(follow.choices[follow.correctIndex],knowledge.definition);assert.deepEqual(follow.data.sourceReferences,knowledge.sourceReferences);
+ const round=generateContentReport(block({facts:[],questions:r.questions}));assert.equal(round.issues.length,0);assert.equal(round.questions.length,2);assert.equal(round.questions[1].data.derivedFromWrongAnswer,true);
+});
+
+test('wrong answers alone, correct options, invalid parents and inflated follow-up tiers cannot create facts',()=>{
+ const entries=[{choice:fact.answer,definition:'A verified description',objectiveId:'correct',explanation:'This option is already correct.'},{choice:fact.distractors[0]},{choice:'Not an option',definition:'Some description',objectiveId:'absent',explanation:'This choice is absent.'},{choice:fact.distractors[1],objectiveId:'inflated',definition:'A short definition',explanation:'This is a recall definition.',difficulty:5,distractors:['First alternative','Second alternative','Third alternative']}];
+ const r=generateContentReport(block({facts:[{...fact,distractorKnowledge:entries}]}));assert.equal(r.questions.length,1);assert.equal(r.issues.length,4);assert.ok(r.issues.some(i=>i.reason.includes('verified definition')));assert.ok(r.issues.some(i=>i.reason.includes('incorrect')));assert.ok(r.issues.some(i=>i.reason.includes('Higher-tier')));
+ const bad=generateContentReport(block({questions:[{prompt:'Broken question',type:'multiple_choice',choices:['One'],correctIndex:0,explanation:'A broken parent.',distractorKnowledge:entries}],facts:[]}));assert.equal(bad.questions.length,0);
+});
+
+test('AWS, CNA and Help Desk banks produce 24 unique questions each with all tiers and three concept follow-ups',()=>{
+ for(const name of ['aws','cna','helpdesk-technician']){
+  const raw=JSON.parse(fs.readFileSync(require.resolve('../data/content/'+name+'-v2.json'),'utf8'));
+  const rows=[];for(const b of importEnvelope(raw)){const r=generateContentReport(normalizeKnowledgeBlock(b));assert.deepEqual(r.issues,[],name);assert.equal(r.summary.derivedFromWrongAnswers,3);rows.push(...r.questions);}
+  assert.equal(rows.length,24,name);assert.deepEqual([...new Set(rows.map(q=>q.difficulty))].sort(),[1,2,3,4,5]);for(const row of rows)assert.equal(duplicateContentReason(row,rows.filter(q=>q!==row)),'',row.prompt);
+  const imported=contentImportReport(importEnvelope(raw)[0]);assert.equal(imported.issues.length,0);assert.equal(imported.questions.length,24);
+  const round=generateContentReport(normalizeKnowledgeBlock({...importEnvelope(raw)[0],questions:rows}));assert.equal(round.questions.length,24);assert.equal(round.issues.length,0);
+ }
+});

@@ -1,0 +1,528 @@
+{
+  "schemaVersion": 2,
+  "authoringNotes": [
+    "Original introductory US aide-role exercises, not a state CNA exam bank or a clinical protocol.",
+    "Facility-policy scenarios state their assumptions; tasks, delegation and escalation must match local training and policy.",
+    "Require qualified nurse-educator review before publishing. No medications, dosage advice or independent diagnosis.",
+    "Hard tiers are multi-constraint reasoning within the aide role; Golden/Boss remain off pending curation."
+  ],
+  "blocks": [
+    {
+      "id": "cna-v2",
+      "title": "Certified Nursing Assistant practice bank",
+      "setName": "Certified Nursing Assistant — cna-resident-care Practice",
+      "lane": "TRAINING",
+      "industry": "Healthcare",
+      "careerPath": "Certified Nursing Assistant",
+      "domain": "GENERAL",
+      "domainId": "cna-resident-care",
+      "difficulty": 1,
+      "questions": [
+        {
+          "objectiveId": "cna.hand-hygiene",
+          "type": "multiple_choice",
+          "difficulty": 1,
+          "prompt": "Which statement correctly describes gloves and hand hygiene in resident care?",
+          "choices": [
+            "Gloves do not replace required hand hygiene",
+            "Gloves remove the need to clean hands after care",
+            "One pair of gloves is suitable for multiple residents",
+            "Hand hygiene is needed only when gloves tear"
+          ],
+          "correctIndex": 0,
+          "explanation": "Gloves are a barrier, not a replacement for hand hygiene. Clean hands at the appropriate moments, including after removing gloves.",
+          "subdomain": "infection-prevention",
+          "hints": [
+            "Consider how contamination could move between hands, equipment, residents, or tasks."
+          ],
+          "sourceReferences": [
+            "https://www.cdc.gov/clean-hands/hcp/clinical-safety/index.html"
+          ]
+        },
+        {
+          "objectiveId": "cna.standard-precautions",
+          "type": "multiple_choice",
+          "difficulty": 1,
+          "prompt": "To whom do Standard Precautions apply in healthcare?",
+          "choices": [
+            "All patients regardless of known infection status",
+            "Only patients with a confirmed infectious diagnosis",
+            "Only patients whose laboratory results are pending",
+            "Only patients in rooms with isolation signage"
+          ],
+          "correctIndex": 0,
+          "explanation": "Standard Precautions apply to all patients. Additional precautions may be required, but absence of a known diagnosis does not remove baseline precautions.",
+          "subdomain": "infection-prevention",
+          "hints": [
+            "Consider how contamination could move between hands, equipment, residents, or tasks."
+          ],
+          "sourceReferences": [
+            "https://www.cdc.gov/infection-control/hcp/isolation-precautions/precautions.html"
+          ]
+        },
+        {
+          "objectiveId": "cna.observation-note",
+          "type": "multiple_choice",
+          "difficulty": 1,
+          "prompt": "In this facility exercise, which note meets the rule to record observable facts rather than diagnoses?",
+          "choices": [
+            "Resident stated that the room was spinning at 10:15",
+            "Resident definitely has an inner-ear disease",
+            "Resident is pretending because yesterday was normal",
+            "Resident needs a new prescription chosen by the aide"
+          ],
+          "correctIndex": 0,
+          "explanation": "The exercise rule requires an observation and the resident statement, not an unsupported diagnosis. Report the change to the supervising nurse as directed.",
+          "subdomain": "observation-reporting",
+          "hints": [
+            "Separate what was observed or reported from an unsupported clinical conclusion."
+          ],
+          "sourceReferences": []
+        },
+        {
+          "objectiveId": "cna.policy-escalation",
+          "type": "multiple_choice",
+          "difficulty": 1,
+          "prompt": "In this exercise, the aide procedure requires uncertain tasks to be checked with the supervising nurse. Which concept describes that action?",
+          "choices": [
+            "Escalation",
+            "Delegation",
+            "Care plan",
+            "Objective documentation"
+          ],
+          "correctIndex": 0,
+          "explanation": "Escalation brings a concern or uncertainty to an authorized supervisor. It does not itself authorize a new task or replace the resident care plan.",
+          "subdomain": "role-boundaries",
+          "hints": [
+            "Check the task against the aide training, authorization, and supervising nurse instructions."
+          ],
+          "sourceReferences": [],
+          "distractorKnowledge": [
+            {
+              "choice": "Delegation",
+              "objectiveId": "cna.delegation-concept",
+              "definition": "Assignment of a task within stated authority and limits",
+              "distractors": [
+                "A factual record of an observation and its time",
+                "A request for review of an unresolved concern",
+                "A resident-specific outline of approved care"
+              ],
+              "explanation": "In this exercise, delegation assigns a task with defined boundaries. The aide still follows training, the stated limits and the supervising nurse instructions.",
+              "difficulty": 1,
+              "sourceReferences": [],
+              "hints": [
+                "Compare the purpose of this concept with the other functions described."
+              ]
+            },
+            {
+              "choice": "Care plan",
+              "objectiveId": "cna.careplan-concept",
+              "definition": "A resident-specific outline of approved care needs",
+              "distractors": [
+                "A request for an authorized person to review a concern",
+                "A factual note of a single observation and its time",
+                "An assignment of a task with defined authority limits"
+              ],
+              "explanation": "A care plan guides resident-specific care. It is not a substitute for reporting changes or resolving an unclear task with the supervising nurse.",
+              "difficulty": 1,
+              "sourceReferences": [],
+              "hints": [
+                "Compare the purpose of this concept with the other functions described."
+              ]
+            },
+            {
+              "choice": "Objective documentation",
+              "objectiveId": "cna.objective-concept",
+              "definition": "A factual record of observations without unsupported conclusions",
+              "distractors": [
+                "Assignment of a task with stated authority and limits",
+                "A resident-specific outline of approved care needs",
+                "A request for supervisory review of an unresolved concern"
+              ],
+              "explanation": "Objective documentation separates observed facts from guesses. A record may include the resident own statement and the time of the observation.",
+              "difficulty": 1,
+              "sourceReferences": [],
+              "hints": [
+                "Compare the purpose of this concept with the other functions described."
+              ]
+            }
+          ]
+        },
+        {
+          "objectiveId": "cna.privacy-practice",
+          "type": "multiple_choice",
+          "difficulty": 2,
+          "prompt": "Which action respects resident privacy during personal care?",
+          "choices": [
+            "Provide appropriate covering and a private care space",
+            "Discuss the resident care with unrelated visitors",
+            "Keep the door open for spectators during all care",
+            "Display the resident information in a public corridor"
+          ],
+          "correctIndex": 0,
+          "explanation": "Privacy is a resident right. Explain the care and provide appropriate privacy rather than exposing the resident or discussing care publicly.",
+          "subdomain": "resident-rights",
+          "hints": [
+            "Consider the resident choice, dignity, and appropriate communication with the care team."
+          ],
+          "sourceReferences": [
+            "https://www.cms.gov/about-cms/what-we-do/nursing-homes/patients-caregivers/rights-quality-care"
+          ]
+        },
+        {
+          "objectiveId": "cna.glove-change",
+          "type": "multiple_choice",
+          "difficulty": 2,
+          "prompt": "After completing care for one resident, what should happen before care requiring gloves for another resident?",
+          "choices": [
+            "Remove gloves, clean hands and use a new pair",
+            "Keep the same gloves if they look visibly clean",
+            "Wash the used gloves and carry them to the next room",
+            "Wipe the gloves on a towel and continue working"
+          ],
+          "correctIndex": 0,
+          "explanation": "Change gloves between patients and perform appropriate hand hygiene. Reusing the same pair can transfer contamination to another resident.",
+          "subdomain": "infection-prevention",
+          "hints": [
+            "Consider how contamination could move between hands, equipment, residents, or tasks."
+          ],
+          "sourceReferences": [
+            "https://www.cdc.gov/clean-hands/hcp/clinical-safety/index.html"
+          ]
+        },
+        {
+          "objectiveId": "cna.ppe-purpose",
+          "type": "multiple_choice",
+          "difficulty": 2,
+          "prompt": "What should guide PPE selection under Standard Precautions?",
+          "choices": [
+            "The anticipated exposure during the care task",
+            "Only the resident preferred clothing color",
+            "Only whether the room has a television",
+            "Only the distance from the nursing station"
+          ],
+          "correctIndex": 0,
+          "explanation": "PPE selection depends on anticipated exposure. A label or unrelated room attribute does not by itself describe the exposure involved in the task.",
+          "subdomain": "infection-prevention",
+          "hints": [
+            "Consider how contamination could move between hands, equipment, residents, or tasks."
+          ],
+          "sourceReferences": [
+            "https://www.cdc.gov/infection-control/hcp/isolation-precautions/precautions.html"
+          ]
+        },
+        {
+          "objectiveId": "cna.respect-choice",
+          "type": "multiple_choice",
+          "difficulty": 2,
+          "prompt": "A resident makes a care preference known. Which response best supports respectful care?",
+          "choices": [
+            "Listen and communicate the preference to the care team",
+            "Dismiss the preference because routines are always identical",
+            "Tell unrelated visitors to decide without involving the resident",
+            "Hide the preference so it cannot affect the scheduled care"
+          ],
+          "correctIndex": 0,
+          "explanation": "Resident-centered care respects choices and communicates them to the team. Care planning and safety questions should be resolved with the appropriate staff.",
+          "subdomain": "resident-rights",
+          "hints": [
+            "Consider the resident choice, dignity, and appropriate communication with the care team."
+          ],
+          "sourceReferences": [
+            "https://www.cms.gov/about-cms/what-we-do/nursing-homes/patients-caregivers/rights-quality-care"
+          ]
+        },
+        {
+          "objectiveId": "cna.refused-care",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "A resident declines a scheduled nonurgent bath. Under the exercise procedure, what should the aide do?",
+          "choices": [
+            "Respect the refusal and notify the nurse for follow-up",
+            "Force the bath because it appears on the schedule",
+            "Record the bath as completed to avoid a late task",
+            "Ask an unrelated visitor to pressure the resident"
+          ],
+          "correctIndex": 0,
+          "explanation": "The exercise procedure requires respecting refusal and notifying the nurse. Report what occurred; do not coerce the resident or falsely document completed care.",
+          "subdomain": "resident-rights",
+          "hints": [
+            "Consider the resident choice, dignity, and appropriate communication with the care team."
+          ],
+          "sourceReferences": [
+            "https://www.cms.gov/about-cms/what-we-do/nursing-homes/patients-caregivers/rights-quality-care"
+          ]
+        },
+        {
+          "objectiveId": "cna.uncertain-transfer",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "The exercise care plan requires two trained staff for a transfer, but only one is available. What should the aide do?",
+          "choices": [
+            "Obtain the required assistance before the transfer",
+            "Transfer alone to keep the schedule unchanged",
+            "Ask an untrained visitor to take the second role",
+            "Ignore the plan because the resident feels ready"
+          ],
+          "correctIndex": 0,
+          "explanation": "Follow the stated plan and seek trained help. Scheduling pressure does not change the exercise requirement or authorize an unsupported transfer.",
+          "subdomain": "safe-care",
+          "hints": [
+            "Use the stated care plan and required verification before proceeding."
+          ],
+          "sourceReferences": []
+        },
+        {
+          "objectiveId": "cna.report-change",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "During routine care, a resident reports new discomfort. The exercise procedure requires prompt reporting of new symptoms. What is the aide next step?",
+          "choices": [
+            "Notify the nurse and report the resident words and observations",
+            "Diagnose the cause and select a new medication",
+            "Wait until the next day because discomfort is subjective",
+            "Change the care plan independently without consulting anyone"
+          ],
+          "correctIndex": 0,
+          "explanation": "The stated procedure assigns assessment decisions to the nurse. The aide contributes timely observations and the resident report rather than an independent diagnosis.",
+          "subdomain": "observation-reporting",
+          "hints": [
+            "Separate what was observed or reported from an unsupported clinical conclusion."
+          ],
+          "sourceReferences": []
+        },
+        {
+          "objectiveId": "cna.contamination-sequence",
+          "type": "multiple_choice",
+          "difficulty": 4,
+          "prompt": "After a soiled-care task, an aide must assist with a clean-care task for the same resident. What is the best transition?",
+          "choices": [
+            "Remove gloves, clean hands and prepare fresh task-appropriate PPE",
+            "Keep soiled gloves because it is the same resident",
+            "Handle clean supplies first and clean hands afterward",
+            "Wipe soiled gloves and use them for every remaining task"
+          ],
+          "correctIndex": 0,
+          "explanation": "A dirty-to-clean transition must avoid carrying contamination into clean care. Change gloves and perform hand hygiene before continuing the appropriate task.",
+          "subdomain": "infection-prevention",
+          "hints": [
+            "Consider how contamination could move between hands, equipment, residents, or tasks."
+          ],
+          "sourceReferences": [
+            "https://www.cdc.gov/clean-hands/hcp/clinical-safety/index.html",
+            "https://www.cdc.gov/infection-control/hcp/isolation-precautions/precautions.html"
+          ],
+          "evidence": "Current gloves contacted soiled material; the next task uses clean supplies.",
+          "constraints": [
+            "Avoid transferring contamination",
+            "Use PPE appropriate to the next exposure"
+          ],
+          "bossEligible": false,
+          "isGoldenEligible": false
+        },
+        {
+          "objectiveId": "cna.record-discrepancy",
+          "type": "multiple_choice",
+          "difficulty": 4,
+          "prompt": "A care entry was marked complete, but the resident declined the task. What should the aide do under the stated record-correction policy?",
+          "choices": [
+            "Report the discrepancy and correct the record through the approved process",
+            "Leave the entry because the task was originally scheduled",
+            "Erase all earlier entries to prevent questions about the record",
+            "Complete the task against the resident wishes to match the entry"
+          ],
+          "correctIndex": 0,
+          "explanation": "A correction should preserve an accurate, accountable record. The stated process addresses the error without coercion or hiding the original entry.",
+          "subdomain": "documentation",
+          "hints": [
+            "Distinguish scheduled care from completed care and preserve an accurate correction history."
+          ],
+          "sourceReferences": [],
+          "evidence": "The entry says complete; the aide observed and reported a refusal.",
+          "constraints": [
+            "Follow the approved amendment procedure",
+            "Do not erase the audit history",
+            "Respect the resident refusal"
+          ],
+          "bossEligible": false,
+          "isGoldenEligible": false
+        },
+        {
+          "objectiveId": "cna.assignment-limit",
+          "type": "multiple_choice",
+          "difficulty": 4,
+          "prompt": "A supervisor asks an aide to perform an unfamiliar task. Under this exercise policy, only trained and authorized tasks may be assigned. What is the best response?",
+          "choices": [
+            "Explain the training gap and seek a trained authorized staff member",
+            "Attempt the task quietly using instructions from a visitor",
+            "Agree to do it and report the gap only if a problem occurs",
+            "Change the authorization record to show uncompleted training"
+          ],
+          "correctIndex": 0,
+          "explanation": "The policy requires both training and authorization. Raising the gap protects the resident while allowing the supervisor to arrange appropriate care.",
+          "subdomain": "role-boundaries",
+          "hints": [
+            "Check the task against the aide training, authorization, and supervising nurse instructions."
+          ],
+          "sourceReferences": [],
+          "evidence": "The aide has neither training nor authorization for this specific task.",
+          "constraints": [
+            "Do not perform untrained tasks",
+            "Notify the supervising nurse",
+            "Arrange appropriate staff coverage"
+          ],
+          "bossEligible": false,
+          "isGoldenEligible": false
+        },
+        {
+          "objectiveId": "cna.competing-care",
+          "type": "multiple_choice",
+          "difficulty": 5,
+          "prompt": "One resident reports an urgent concern while another waits for routine grooming. The exercise policy requires urgent concerns to be escalated immediately. What plan best fits both needs?",
+          "choices": [
+            "Notify the nurse about the concern and arrange coverage for routine care",
+            "Finish all grooming before telling anyone about the concern",
+            "Leave both residents without telling the team where help is needed",
+            "Diagnose the concern alone and cancel all other care for the shift"
+          ],
+          "correctIndex": 0,
+          "explanation": "The supplied priority rule requires escalation. Communicating and coordinating coverage addresses competing care needs without taking over licensed assessment decisions.",
+          "subdomain": "prioritization",
+          "hints": [
+            "Apply the stated urgency rule while coordinating coverage for other care needs."
+          ],
+          "sourceReferences": [],
+          "evidence": "The concern meets the exercise urgent-reporting criterion; grooming is nonurgent.",
+          "constraints": [
+            "Follow immediate escalation policy",
+            "Communicate coverage needs",
+            "Remain within the aide role"
+          ],
+          "bossEligible": false,
+          "isGoldenEligible": false
+        },
+        {
+          "objectiveId": "cna.conflicting-instructions",
+          "type": "multiple_choice",
+          "difficulty": 5,
+          "prompt": "A verbal request conflicts with a documented two-person assistance plan. The nurse can be reached and no emergency is described. What is the safest next step under the exercise policy?",
+          "choices": [
+            "Pause the transfer and clarify the conflict with the nurse",
+            "Follow the faster request and document the conflict tomorrow",
+            "Choose the instruction that requires less staffing effort",
+            "Ask a visitor to decide which instruction should be ignored"
+          ],
+          "correctIndex": 0,
+          "explanation": "Clarification resolves the conflict before action. Neither convenience nor an untrained third party establishes authorization to change the resident plan.",
+          "subdomain": "care-coordination",
+          "hints": [
+            "Resolve conflicting instructions through the authorized care team before acting."
+          ],
+          "sourceReferences": [],
+          "evidence": "The written plan requires two staff; the new request would use one.",
+          "constraints": [
+            "No emergency exception is present",
+            "Use the documented plan until clarified",
+            "Obtain authorized clarification"
+          ],
+          "bossEligible": false,
+          "isGoldenEligible": false
+        },
+        {
+          "objectiveId": "cna.abuse-concern",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "In this exercise, the facility requires suspected mistreatment to be reported immediately through its safeguarding route. What should the aide do after witnessing concerning behavior?",
+          "choices": [
+            "Follow the reporting route and give factual observations",
+            "Wait for other residents to investigate the behavior",
+            "Promise to keep the concern secret from the care team",
+            "Post the resident details publicly to request opinions"
+          ],
+          "correctIndex": 0,
+          "explanation": "The exercise reporting rule directs timely safeguarding escalation. Factual observations support review without delaying protection or exposing resident details publicly.",
+          "subdomain": "safeguarding",
+          "hints": [
+            "Follow the stated reporting route using factual observations and appropriate privacy."
+          ],
+          "sourceReferences": [
+            "https://www.cms.gov/about-cms/what-we-do/nursing-homes/patients-caregivers/rights-quality-care"
+          ]
+        },
+        {
+          "objectiveId": "cna.identity-check",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "This facility requires two approved resident identifiers before a listed care task. One identifier does not match. What should the aide do?",
+          "choices": [
+            "Pause and resolve the mismatch using the approved procedure",
+            "Continue because the resident is in the expected room",
+            "Change the label to make it match without checking",
+            "Ask another resident to guess who the person is"
+          ],
+          "correctIndex": 0,
+          "explanation": "The stated identification procedure is not complete. Resolve the mismatch before proceeding rather than relying on room location or a guess.",
+          "subdomain": "safe-care",
+          "hints": [
+            "Use the stated care plan and required verification before proceeding."
+          ],
+          "sourceReferences": []
+        },
+        {
+          "objectiveId": "cna.equipment-check",
+          "type": "multiple_choice",
+          "difficulty": 4,
+          "prompt": "A shared device is labeled awaiting cleaning, but a coworker says it is probably ready. Under the exercise policy, what should the aide do?",
+          "choices": [
+            "Obtain verified clean equipment or complete the approved cleaning process",
+            "Use the device because a coworker expressed confidence",
+            "Remove the cleaning label without checking its status",
+            "Hide the device status so the task can proceed on time"
+          ],
+          "correctIndex": 0,
+          "explanation": "The label is unresolved evidence under the supplied process. A verified clean device or an approved cleaning completion resolves the status; confidence alone does not.",
+          "subdomain": "infection-prevention",
+          "hints": [
+            "Consider how contamination could move between hands, equipment, residents, or tasks."
+          ],
+          "sourceReferences": [],
+          "evidence": "The device label says cleaning pending; no completion record is available.",
+          "constraints": [
+            "Use only verified ready equipment",
+            "Follow facility and device cleaning instructions"
+          ],
+          "bossEligible": false,
+          "isGoldenEligible": false
+        },
+        {
+          "objectiveId": "cna.tf-gloves",
+          "type": "true_false",
+          "difficulty": 2,
+          "prompt": "True or false: gloves eliminate the need for hand hygiene after removing them.",
+          "correctAnswer": false,
+          "explanation": "Hands can become contaminated during care or glove removal. Hand hygiene remains necessary after gloves are removed.",
+          "subdomain": "infection-prevention",
+          "sourceReferences": [
+            "https://www.cdc.gov/clean-hands/hcp/clinical-safety/index.html"
+          ],
+          "hints": [
+            "Consider how contamination could move between hands, equipment, residents, or tasks."
+          ]
+        },
+        {
+          "objectiveId": "cna.tf-objective",
+          "type": "true_false",
+          "difficulty": 2,
+          "prompt": "True or false: under a factual-documentation policy, recording a resident exact statement can be appropriate when clearly attributed.",
+          "correctAnswer": true,
+          "explanation": "An attributed statement records what the resident said. It should be distinguished from a diagnosis or an inference the aide has not established.",
+          "subdomain": "documentation",
+          "sourceReferences": [],
+          "hints": [
+            "Distinguish scheduled care from completed care and preserve an accurate correction history."
+          ]
+        }
+      ]
+    }
+  ]
+}

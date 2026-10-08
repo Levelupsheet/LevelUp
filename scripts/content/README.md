@@ -1,6 +1,42 @@
-# LevelUp Pro content generator v2
+# LevelUp Pro content generator v2.1
 
 Admin: Career → Pool → Questions → Preview generation & duplicates → Import → Review → Publish.
+
+## Generate follow-ups from wrong choices
+
+Attach `distractorKnowledge` to an authored source question, fact, definition, procedure or scenario. Each entry must name an actual incorrect multiple-choice option in `choice`, with a verified `definition`, stable `objectiveId`, three plausible `distractors`, and a teaching `explanation`. The generator builds a new question about that concept, so the old wrong choice becomes a topic rather than an unverified correct statement.
+
+```json
+{
+  "choice": "Amazon EC2",
+  "objectiveId": "aws.compute-concept",
+  "definition": "On-demand virtual server capacity",
+  "distractors": [
+    "Object storage organized into buckets",
+    "Permissions attached to identities",
+    "Isolated virtual network configuration"
+  ],
+  "explanation": "EC2 supplies virtual machines rather than only object storage.",
+  "difficulty": 1,
+  "sourceReferences": [
+    "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/concepts.html"
+  ]
+}
+```
+
+Only accepted parent questions can produce follow-ups. Correct options, absent choices, missing knowledge and invalid quality enter the preserved issue report. Repeated concepts are deduplicated even when several parents use them as wrong options. Recall defaults to tier 1–2; higher-tier entries additionally require an authored `prompt`, and tiers 4–5 require evidence or constraints. Use optional `answer` for an authored application prompt; otherwise the definition is the new answer. Sources and parent objective/generation key are retained in gameplay metadata. Follow-ups are not recursively expanded. Exported questions can be reimported without generating another copy.
+
+This is an authoring capability, not an automatic user-history job: choosing a wrong answer during play does not publish a new question. Existing missed-question/adaptive selection still uses reviewed pool content.
+
+## New career banks
+
+- `data/content/aws-v2.json`: Cloud Engineer / AWS operations.
+- `data/content/helpdesk-technician-v2.json`: Help Desk Technician / support.
+- `data/content/cna-v2.json`: Certified Nursing Assistant / resident care.
+
+Each source generates 24 supported questions across five tiers, including three wrong-choice concept follow-ups. AWS and Help Desk include read-only/explicitly scoped CLI tasks; CNA uses multiple choice and true/false. Each bank has stable objectives, subdomains, explanations, hints and references where applicable. They are original training exercises, not comprehensive certification exam banks. Golden/Boss flags stay off until a reviewer curates the hard questions.
+
+CNA scenarios explicitly state facility-policy assumptions and stay within an aide role. A qualified nurse educator should review them against local scope, training and policy before publishing. Sources used include CDC hand hygiene and Standard Precautions guidance and CMS resident-rights resources; URLs are embedded with relevant questions. Hypothetical local procedures are identified as exercise assumptions.
 
 Use `data/content/azure365-v2.json` as the revised Azure/M365 source sample. It produces 41 supported questions across tiers 1–5 before comparison with an existing pool. Use `data/content/career-template-v2.json` for a career-neutral authoring example and `data/content/knowledge-bank-v2.schema.json` for editor validation. The uploaded original remains intact; its repeated/unsupported material is retained under referenceMaterial in the revised sample.
 

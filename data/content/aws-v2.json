@@ -1,0 +1,542 @@
+{
+  "schemaVersion": 2,
+  "authoringNotes": [
+    "Original role-training practice, not copied exam content or a complete AWS certification syllabus.",
+    "Tier 4–5 labels require reviewer calibration; Golden/Boss remain off until curated.",
+    "Follow-up concepts are authored under distractorKnowledge and retain parent provenance."
+  ],
+  "blocks": [
+    {
+      "id": "aws-v2",
+      "title": "Cloud Engineer practice bank",
+      "setName": "Cloud Engineer — aws-operations Practice",
+      "lane": "TRAINING",
+      "industry": "Information Technology",
+      "careerPath": "Cloud Engineer",
+      "domain": "AWS",
+      "domainId": "aws-operations",
+      "difficulty": 1,
+      "questions": [
+        {
+          "objectiveId": "aws.object-storage",
+          "type": "multiple_choice",
+          "difficulty": 1,
+          "prompt": "Which AWS service stores files as objects in buckets?",
+          "choices": [
+            "Amazon S3",
+            "Amazon EC2",
+            "Amazon VPC",
+            "AWS IAM"
+          ],
+          "correctIndex": 0,
+          "explanation": "S3 is object storage. EC2 provides virtual servers; VPC provides networking; IAM manages access. Choose the storage model required by the workload.",
+          "subdomain": "storage",
+          "hints": [
+            "Decide whether the task concerns stored objects, file locations, or server capacity."
+          ],
+          "sourceReferences": [
+            "https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html"
+          ],
+          "distractorKnowledge": [
+            {
+              "choice": "Amazon EC2",
+              "objectiveId": "aws.compute-concept",
+              "definition": "On-demand virtual server capacity",
+              "distractors": [
+                "Object storage organized into buckets",
+                "Permissions attached to identities",
+                "Isolated virtual network configuration"
+              ],
+              "explanation": "EC2 supplies virtual machines. It is useful when a workload needs an operating system and server configuration, rather than only object storage.",
+              "difficulty": 1,
+              "sourceReferences": [
+                "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/concepts.html"
+              ],
+              "hints": [
+                "Compare the purpose of this concept with the other functions described."
+              ]
+            },
+            {
+              "choice": "Amazon VPC",
+              "objectiveId": "aws.network-concept",
+              "definition": "A logically isolated virtual network",
+              "distractors": [
+                "A repository for application objects",
+                "A record of account API events",
+                "A service for identity permissions"
+              ],
+              "explanation": "A VPC provides a virtual network for AWS resources. Its function differs from object storage, account auditing and identity authorization.",
+              "difficulty": 1,
+              "sourceReferences": [
+                "https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html"
+              ],
+              "hints": [
+                "Compare the purpose of this concept with the other functions described."
+              ]
+            },
+            {
+              "choice": "AWS IAM",
+              "objectiveId": "aws.identity-concept",
+              "definition": "Identity and resource access management",
+              "distractors": [
+                "Virtual server capacity provisioning",
+                "Object uploads and bucket versioning",
+                "Virtual network subnet allocation"
+              ],
+              "explanation": "IAM controls who can access AWS resources and which actions they can perform. It does not provide the storage or server itself.",
+              "difficulty": 1,
+              "sourceReferences": [
+                "https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html"
+              ],
+              "hints": [
+                "Compare the purpose of this concept with the other functions described."
+              ]
+            }
+          ]
+        },
+        {
+          "objectiveId": "aws.metric-purpose",
+          "type": "multiple_choice",
+          "difficulty": 1,
+          "prompt": "Which service is suited to collecting operational metrics and creating threshold alarms?",
+          "choices": [
+            "Amazon CloudWatch",
+            "AWS CloudTrail",
+            "Amazon S3",
+            "Amazon VPC"
+          ],
+          "correctIndex": 0,
+          "explanation": "CloudWatch supports operational monitoring and alarms. An audit event history answers a different question from a time-series metric.",
+          "subdomain": "monitoring",
+          "hints": [
+            "Match the reported interval with operational measurements rather than assumptions."
+          ],
+          "sourceReferences": [
+            "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/WhatIsCloudWatch.html"
+          ]
+        },
+        {
+          "objectiveId": "aws.audit-purpose",
+          "type": "multiple_choice",
+          "difficulty": 1,
+          "prompt": "Which service records account activity and API events for an audit investigation?",
+          "choices": [
+            "AWS CloudTrail",
+            "Amazon CloudWatch",
+            "Amazon EC2",
+            "Amazon VPC"
+          ],
+          "correctIndex": 0,
+          "explanation": "CloudTrail records activity events that help investigate actions in an account. A CPU alarm alone cannot identify the identity that changed a resource.",
+          "subdomain": "audit",
+          "hints": [
+            "Distinguish a record of an action from a measurement of resource behavior."
+          ],
+          "sourceReferences": [
+            "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html"
+          ]
+        },
+        {
+          "objectiveId": "aws.sg-purpose",
+          "type": "multiple_choice",
+          "difficulty": 1,
+          "prompt": "What is the purpose of an EC2 security group?",
+          "choices": [
+            "Control allowed traffic for associated instances",
+            "Schedule instance operating-system patches",
+            "Assign user permissions to all AWS services",
+            "Store application objects in named buckets"
+          ],
+          "correctIndex": 0,
+          "explanation": "A security group is a virtual firewall controlling traffic to associated resources. It does not replace identity permissions or guest maintenance.",
+          "subdomain": "network-security",
+          "hints": [
+            "Trace the required protocol and allowed traffic path before changing a boundary."
+          ],
+          "sourceReferences": [
+            "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-security-groups.html"
+          ]
+        },
+        {
+          "objectiveId": "aws.object-location",
+          "type": "multiple_choice",
+          "difficulty": 2,
+          "prompt": "An application must identify an object within an S3 bucket. Which pair provides its basic location?",
+          "choices": [
+            "Bucket name and object key",
+            "Instance type and security group",
+            "Role name and password length",
+            "Subnet range and alarm threshold"
+          ],
+          "correctIndex": 0,
+          "explanation": "Objects belong to buckets and have keys. Compute, network and identity attributes do not identify an S3 object.",
+          "subdomain": "storage",
+          "hints": [
+            "Decide whether the task concerns stored objects, file locations, or server capacity."
+          ],
+          "sourceReferences": [
+            "https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html"
+          ]
+        },
+        {
+          "objectiveId": "aws.temporary-workload",
+          "type": "multiple_choice",
+          "difficulty": 2,
+          "prompt": "Which credential approach is preferred for a workload running on EC2?",
+          "choices": [
+            "Temporary credentials from an IAM role",
+            "Root access keys embedded in source code",
+            "One shared password for every deployment",
+            "Permanent keys copied into public objects"
+          ],
+          "correctIndex": 0,
+          "explanation": "AWS recommends roles and temporary credentials for supported workloads, avoiding distribution of long-lived credentials in application code.",
+          "subdomain": "identity",
+          "hints": [
+            "Separate the caller identity, credential lifetime, permitted actions, and resource scope."
+          ],
+          "sourceReferences": [
+            "https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html"
+          ]
+        },
+        {
+          "objectiveId": "aws.minimum-permissions",
+          "type": "multiple_choice",
+          "difficulty": 2,
+          "prompt": "What does least privilege mean when authoring access permissions?",
+          "choices": [
+            "Grant only actions needed for the assigned task",
+            "Grant administrator access to simplify support",
+            "Share root credentials between service owners",
+            "Allow every action until an audit is scheduled"
+          ],
+          "correctIndex": 0,
+          "explanation": "Least privilege limits access to the actions and resources required by the workload. Broad permissions increase exposure without solving the actual requirement.",
+          "subdomain": "identity",
+          "hints": [
+            "Separate the caller identity, credential lifetime, permitted actions, and resource scope."
+          ],
+          "sourceReferences": [
+            "https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html"
+          ]
+        },
+        {
+          "objectiveId": "aws.instance-template",
+          "type": "multiple_choice",
+          "difficulty": 2,
+          "prompt": "What does an Amazon Machine Image provide when launching an instance?",
+          "choices": [
+            "A template with an operating system and software",
+            "A list of approved incoming network connections",
+            "A history of every account management action",
+            "A bucket name used to upload object backups"
+          ],
+          "correctIndex": 0,
+          "explanation": "An AMI provides the launch template for instance software. Network rules, audit records and object locations serve separate purposes.",
+          "subdomain": "compute",
+          "hints": [
+            "Identify whether the task concerns a running server, its launch template, or its configuration."
+          ],
+          "sourceReferences": [
+            "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/concepts.html"
+          ]
+        },
+        {
+          "objectiveId": "aws.cpu-investigation",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "A support ticket reports slow processing on an EC2 worker. Which evidence should you examine first to test whether compute capacity is saturated?",
+          "choices": [
+            "Time-aligned CPU metrics and application behavior",
+            "The color of the service dashboard header",
+            "An unrelated bucket naming convention",
+            "The password age of a different account"
+          ],
+          "correctIndex": 0,
+          "explanation": "Correlate symptoms with measurements during the affected interval. A metric is evidence to investigate, not proof that every slowdown needs a larger instance.",
+          "subdomain": "monitoring",
+          "hints": [
+            "Match the reported interval with operational measurements rather than assumptions."
+          ],
+          "sourceReferences": [
+            "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/WhatIsCloudWatch.html"
+          ]
+        },
+        {
+          "objectiveId": "aws.changed-network",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "HTTPS worked before a reviewed security-group update. The new rules omit inbound TCP 443 from the approved client range. What is the best targeted correction?",
+          "choices": [
+            "Restore the approved HTTPS rule through change control",
+            "Allow all ports from every public address",
+            "Replace the application database credentials",
+            "Delete the instance and its attached volumes"
+          ],
+          "correctIndex": 0,
+          "explanation": "The observed rule change explains the missing allowed path. A targeted correction preserves the approved boundary and avoids unrelated destructive changes.",
+          "subdomain": "network-security",
+          "hints": [
+            "Trace the required protocol and allowed traffic path before changing a boundary."
+          ],
+          "sourceReferences": [
+            "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-security-groups.html"
+          ]
+        },
+        {
+          "objectiveId": "aws.object-vs-compute",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "A team needs to distribute static files without maintaining a server operating system. Which service most directly matches the storage requirement?",
+          "choices": [
+            "Use S3 for the static objects",
+            "Use an EC2 VM as the only file repository",
+            "Use IAM as a file upload destination",
+            "Use a security group as an archive store"
+          ],
+          "correctIndex": 0,
+          "explanation": "Object storage fits the stated requirement without introducing a guest operating system solely for file storage. Access and delivery settings still require design.",
+          "subdomain": "storage",
+          "hints": [
+            "Decide whether the task concerns stored objects, file locations, or server capacity."
+          ],
+          "sourceReferences": [
+            "https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html"
+          ]
+        },
+        {
+          "objectiveId": "aws.incident-account",
+          "type": "multiple_choice",
+          "difficulty": 4,
+          "prompt": "Two AWS accounts contain a bucket with a similar business name. A support tool reports access denied. What should the engineer verify before changing permissions?",
+          "choices": [
+            "Confirm the active identity and intended resource account",
+            "Grant administrator access in both accounts",
+            "Disable monitoring until the request succeeds",
+            "Create a public copy of the requested files"
+          ],
+          "correctIndex": 0,
+          "explanation": "Identity and target-account mismatches must be eliminated before changing authorization. Broad access or public copies would bypass the security requirement.",
+          "subdomain": "identity",
+          "hints": [
+            "Separate the caller identity, credential lifetime, permitted actions, and resource scope."
+          ],
+          "sourceReferences": [
+            "https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html"
+          ],
+          "evidence": "The tool uses cached credentials; the ticket names a specific account.",
+          "constraints": [
+            "Use read-only diagnostics first",
+            "Do not broaden permissions until the identity is verified"
+          ],
+          "bossEligible": false,
+          "isGoldenEligible": false
+        },
+        {
+          "objectiveId": "aws.role-boundary",
+          "type": "multiple_choice",
+          "difficulty": 4,
+          "prompt": "A batch worker needs read access to one input prefix but must never modify its source data. Which proposed permission design fits the requirement?",
+          "choices": [
+            "Limit the role to required read actions on that prefix",
+            "Allow every S3 action on every account bucket",
+            "Use the account root keys for the batch process",
+            "Permit deletes because the worker normally only reads"
+          ],
+          "correctIndex": 0,
+          "explanation": "The policy should match required operations and resource boundaries. Expected application behavior is not a substitute for restricting unnecessary permissions.",
+          "subdomain": "identity",
+          "hints": [
+            "Separate the caller identity, credential lifetime, permitted actions, and resource scope."
+          ],
+          "sourceReferences": [
+            "https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html"
+          ],
+          "evidence": "The job consumes existing input objects and writes output to a different destination.",
+          "constraints": [
+            "No source modification",
+            "Use workload role credentials"
+          ],
+          "bossEligible": false,
+          "isGoldenEligible": false
+        },
+        {
+          "objectiveId": "aws.audit-correlation",
+          "type": "multiple_choice",
+          "difficulty": 4,
+          "prompt": "A networking change preceded an outage. CPU alarms show no unusual load. Which evidence best identifies who made the configuration change?",
+          "choices": [
+            "Review matching CloudTrail activity for the affected interval",
+            "Read the current CPU value as an identity record",
+            "Rotate every unrelated password immediately",
+            "Rename the instance to force a new audit record"
+          ],
+          "correctIndex": 0,
+          "explanation": "An audit event is suited to tracing a management action. Resource metrics describe behavior but do not by themselves establish who changed the configuration.",
+          "subdomain": "audit",
+          "hints": [
+            "Distinguish a record of an action from a measurement of resource behavior."
+          ],
+          "sourceReferences": [
+            "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html",
+            "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/WhatIsCloudWatch.html"
+          ],
+          "evidence": "The change timestamp and affected resource identifier are known.",
+          "constraints": [
+            "Preserve audit evidence",
+            "Avoid speculative changes during investigation"
+          ],
+          "bossEligible": false,
+          "isGoldenEligible": false
+        },
+        {
+          "objectiveId": "aws.multiple-signals",
+          "type": "multiple_choice",
+          "difficulty": 5,
+          "prompt": "A rollout causes errors only for the new worker group. Older workers still read the same S3 input. Which investigation best preserves service while distinguishing credential and configuration causes?",
+          "choices": [
+            "Compare identities and configuration; correlate errors with the rollout",
+            "Make the entire input bucket public to remove access checks",
+            "Terminate every older worker before gathering any evidence",
+            "Disable all logging and rerun the rollout repeatedly"
+          ],
+          "correctIndex": 0,
+          "explanation": "The healthy group provides a comparison. Read-only identity and configuration checks narrow the cause while retaining working capacity and evidence.",
+          "subdomain": "incident-response",
+          "hints": [
+            "Use the working group as a comparison and preserve evidence before intervening."
+          ],
+          "sourceReferences": [
+            "https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html",
+            "https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html"
+          ],
+          "evidence": "Only new workers fail; the input objects and working older workers are unchanged.",
+          "constraints": [
+            "Keep existing healthy capacity",
+            "Preserve error evidence",
+            "Do not expose private data"
+          ],
+          "bossEligible": false,
+          "isGoldenEligible": false
+        },
+        {
+          "objectiveId": "aws.privileged-request",
+          "type": "multiple_choice",
+          "difficulty": 5,
+          "prompt": "A requester asks support to bypass a failed approval and grant broad production access for an urgent batch run. What is the best response under the stated access procedure?",
+          "choices": [
+            "Verify the need and use the authorized escalation path for scoped access",
+            "Grant permanent administrator access and document it next month",
+            "Share the root account key through the ticket attachment",
+            "Turn the private input bucket public until the deadline passes"
+          ],
+          "correctIndex": 0,
+          "explanation": "Urgency does not authorize bypassing the specified approval process. Escalation can resolve the operational need while retaining a bounded, accountable access decision.",
+          "subdomain": "access-governance",
+          "hints": [
+            "Identify who can authorize the request and which boundaries the approval must preserve."
+          ],
+          "sourceReferences": [],
+          "evidence": "The exercise procedure requires an authorized approver for production access.",
+          "constraints": [
+            "Support cannot self-approve production access",
+            "Use the documented urgent escalation process",
+            "Record the scope and decision"
+          ],
+          "bossEligible": false,
+          "isGoldenEligible": false
+        },
+        {
+          "objectiveId": "aws.tf-root",
+          "type": "true_false",
+          "difficulty": 2,
+          "prompt": "True or false: embedding account root access keys in application source code is the preferred workload credential pattern.",
+          "correctAnswer": false,
+          "explanation": "Use supported workload roles and temporary credentials instead of exposing root credentials in application code. Root access is not appropriate for routine workloads.",
+          "subdomain": "identity",
+          "sourceReferences": [
+            "https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html"
+          ],
+          "hints": [
+            "Separate the caller identity, credential lifetime, permitted actions, and resource scope."
+          ]
+        },
+        {
+          "objectiveId": "aws.tf-bucket",
+          "type": "true_false",
+          "difficulty": 2,
+          "prompt": "True or false: S3 objects are organized in buckets and identified by object keys.",
+          "correctAnswer": true,
+          "explanation": "A bucket holds objects, and the key identifies an object within that bucket. The location is distinct from an EC2 instance identifier.",
+          "subdomain": "storage",
+          "sourceReferences": [
+            "https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html"
+          ],
+          "hints": [
+            "Decide whether the task concerns stored objects, file locations, or server capacity."
+          ]
+        },
+        {
+          "objectiveId": "aws.cli-identity",
+          "type": "cli_command",
+          "difficulty": 3,
+          "prompt": "In AWS CLI v2, enter the read-only command to display the active caller identity using the configured credentials. Do not add optional flags.",
+          "expectedCommands": [
+            "aws sts get-caller-identity"
+          ],
+          "data": {
+            "caseSensitive": true
+          },
+          "explanation": "The STS operation returns identifying information for the credentials in use; it does not grant additional permissions.",
+          "subdomain": "identity",
+          "sourceReferences": [
+            "https://docs.aws.amazon.com/cli/latest/reference/sts/get-caller-identity.html"
+          ],
+          "hints": [
+            "Separate the caller identity, credential lifetime, permitted actions, and resource scope."
+          ]
+        },
+        {
+          "objectiveId": "aws.cli-buckets",
+          "type": "cli_command",
+          "difficulty": 3,
+          "prompt": "In AWS CLI v2, enter the command to list buckets available to the configured identity. Do not specify a bucket or optional flags.",
+          "expectedCommands": [
+            "aws s3 ls"
+          ],
+          "data": {
+            "caseSensitive": true
+          },
+          "explanation": "The high-level S3 ls command without a path lists buckets. Successful results depend on the configured identity and permitted access.",
+          "subdomain": "storage",
+          "sourceReferences": [
+            "https://docs.aws.amazon.com/cli/latest/reference/s3/ls.html"
+          ],
+          "hints": [
+            "Decide whether the task concerns stored objects, file locations, or server capacity."
+          ]
+        },
+        {
+          "objectiveId": "aws.cli-instances",
+          "type": "cli_command",
+          "difficulty": 3,
+          "prompt": "In AWS CLI v2, enter the read-only EC2 command to describe instances in the configured region. Do not add optional flags.",
+          "expectedCommands": [
+            "aws ec2 describe-instances"
+          ],
+          "data": {
+            "caseSensitive": true
+          },
+          "explanation": "DescribeInstances retrieves instance information rather than creating or terminating resources. The configured account and region determine the scope.",
+          "subdomain": "compute",
+          "sourceReferences": [
+            "https://docs.aws.amazon.com/cli/latest/reference/ec2/describe-instances.html"
+          ],
+          "hints": [
+            "Identify whether the task concerns a running server, its launch template, or its configuration."
+          ]
+        }
+      ]
+    }
+  ]
+}
