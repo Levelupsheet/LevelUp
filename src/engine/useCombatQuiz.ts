@@ -401,9 +401,11 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
       const nextLvl = nextQ ? resolveQuestionLevel(nextQ, s) : 1;
       const effNextTier: DifficultyTier = nextLvl;
       const enemy = nextQ && opts.getEnemyProfile?.(nextQ);
+      const enemyDefeated = s.enemyHP <= 0;
+      const shouldLoadEnemy = Boolean(enemy) && (enemyDefeated || enemy!.tier !== s.enemyTier);
       return {
         ...s,
-        ...(enemy && enemy.tier !== s.enemyTier ? { enemyHP: enemy.maxHP, enemyMaxHP: enemy.maxHP, enemyTier: enemy.tier, enemyInventory: enemy.inventory } : {}),
+        ...(shouldLoadEnemy && enemy ? { enemyHP: enemy.maxHP, enemyMaxHP: enemy.maxHP, enemyTier: enemy.tier, enemyInventory: enemy.inventory } : {}),
         idx: nextIdx,
         selected: null,
         locked: false,
