@@ -1751,19 +1751,21 @@ export default function AdminPage(){
               </div>
               <div style={{ display:"grid", gap:8, marginTop:12 }}>
                 {placements.filter((p:any)=>p.isActive && p.lane===poolViewLane).map((p:any)=>(
-                  <button key={p.id} className="card" style={{ padding:12, textAlign:"left", background: selectedSet===p.setId ? "rgba(64,160,210,.12)" : "rgba(0,0,0,.18)" }} onClick={()=>{setSelectedSet(p.setId);setQuestionView("manage");}}>
+                  <div key={p.id} className="card" style={{ padding:12, background: selectedSet===p.setId ? "rgba(64,160,210,.12)" : "rgba(0,0,0,.18)" }}>
                     <div style={{ display:"flex", justifyContent:"space-between", gap:10, flexWrap:"wrap" }}>
                       <b>{p.set?.name || "Question pool"}</b>
                       <span className="badge">{p.set?.domain || "GENERAL"}</span>
                     </div>
-                    <span className="badge">View deployed questions →</span>
-                    <span className="badge" role="button" tabIndex={0} onClick={(event) => { event.stopPropagation(); unpublishPlacement(p.id, p.set?.name || "Question pool"); }} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); event.stopPropagation(); unpublishPlacement(p.id, p.set?.name || "Question pool"); } }} style={{ cursor:"pointer", borderColor:"rgba(255,120,120,.6)" }}>Unpublish</span>
                     <small>
                       {poolViewLane==="TRAINING" ? `${p.industry || "Legacy"} → ${p.careerPath || p.startingPosition || "Training"}` :
                        poolViewLane==="CERTIFICATIONS" ? `Exam: ${String(p.certExam || "").replaceAll("_"," ")}` :
                        poolViewLane==="TEST_NOW" ? "Active in Test Now" : "Active in Interview Practice"}
                     </small>
-                  </button>
+                    <div className="row" style={{ gap:8, marginTop:8, flexWrap:"wrap" }}>
+                      <button onClick={()=>{setSelectedSet(p.setId);setQuestionView("manage");}}>View deployed questions →</button>
+                      <button className="danger" onClick={()=>unpublishPlacement(p.id, p.set?.name || "Question pool")}>Unpublish</button>
+                    </div>
+                  </div>
                 ))}
                 {!placements.some((p:any)=>p.isActive && p.lane===poolViewLane) ? <small>No active pools in this area.</small> : null}
               </div>
