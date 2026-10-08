@@ -106,3 +106,22 @@ export async function GET() {
   ).values());
   return NextResponse.json({ placements, activeTestNowBanks });
 }
+
+/** Deactivate one exact placement without deleting its question set. */
+export async function PATCH(req: Request) {
+  const admin = await requireAdminRequest();
+  if (!admin.ok) return admin.response;
+  try {
+    const body = await req.json().catch(() => ({}));
+    const id = String(body?.id || "").trim();
+    if (!id) return NextResponse.json({ error: "Placement id is required" }, { status: 400 });
+    const result = await prisma.questionSetPlacement.updateMany({
+      where: { id, isActive: true },
+      data: { isActive: false },
+    });
+    if (!result.count) return NextResponse.json({ error: "Active placement not found" }, { status: 404 });
+    return NextResponse.json({ ok: true, deactivated: result.count });
+  } catch (e: any) {
+    return NextResponse.json({ error: e?.message || "Failed to unpublish pool" }, { status: 500 });
+  }
+}
