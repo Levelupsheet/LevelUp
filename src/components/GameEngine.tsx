@@ -86,7 +86,7 @@ export default function GameEngine(props: Props) {
     const res = await fetch("/api/learning/session", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ userId, lane, industry, careerPath, startingPosition, certExam, questionCount: effectiveCount, bankDomain, trainingMode, encounterType, resume: true, questionIds: encounterType === "boss" ? questionsOverride?.map(q => q.id) : undefined }),
+      body: JSON.stringify({ userId, lane, industry, careerPath, startingPosition, certExam, questionCount: effectiveCount, bankDomain, trainingMode, encounterType, resume: false, questionIds: encounterType === "boss" ? questionsOverride?.map(q => q.id) : undefined }),
       cache: "no-store" as any,
     });
     const json = await res.json().catch(() => null);
