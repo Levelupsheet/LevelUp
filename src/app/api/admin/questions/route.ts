@@ -1,9 +1,11 @@
+import { expandContentImport } from '@/lib/contentImport';
+import { contentApiError } from '@/lib/contentApiError';
 import { NextResponse } from 'next/server';
 import { requireAdminRequest } from '@/app/api/_lib/adminGuard';
 import { prisma } from '@/lib/prisma';
 import { auditContent, authorQuestion, contentSignature, validateContent, DIFFICULTY_TIERS } from '@/lib/contentPipeline';
 
-export async function GET(req: Request) {
+async function loadContent(req: Request) {
   const admin = await requireAdminRequest(); if (!admin.ok) return admin.response;
   const params = new URL(req.url).searchParams;
   if (params.get('summary') === '1') {
@@ -22,7 +24,8 @@ export async function POST(req: Request) {
   try {
     const body = await req.json(); const setId = String(body.setId || '');
     if (!await prisma.questionSet.findUnique({ where: { id: setId } })) return NextResponse.json({ error: 'Pool not found' }, { status: 404 });
-    const incoming = Array.isArray(body.questions) ? body.questions : [body];
+    const source = Array.isArray(body.questions) ? body.questions : [body];
+    const incoming = source.flatMap((raw: any) => { try { return expandContentImport(raw); } catch { return [raw]; } });
     const report = await prisma.$transaction(async tx => {
       const existing = await tx.mCQQuestion.findMany({ where: { setId } });
       const seen = new Set(existing.map(contentSignature)); let order = Math.max(-1, ...existing.map(q => q.sortOrder)) + 1;
@@ -86,4 +89,9 @@ export async function PATCH(req: Request) {
     }, {timeout:60000,maxWait:10000});
     return NextResponse.json({ ok: true });
   } catch (e: any) { return NextResponse.json({ error: e.message }, { status: 400 }); }
+}
+
+export async function GET(req: Request) {
+  try { return await loadContent(req); }
+  catch (error) { console.error("Admin content load failed", error); return NextResponse.json({ error: contentApiError(error) }, { status: 500 }); }
 }

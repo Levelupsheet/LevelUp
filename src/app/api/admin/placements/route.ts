@@ -1,3 +1,4 @@
+import { contentApiError } from '@/lib/contentApiError';
 import { NextResponse } from "next/server";
 import { requireAdminRequest } from "@/app/api/_lib/adminGuard";
 import { buildContentPoolCatalog, testNowBanks, canonicalTrainingTarget, trainingPlacementFilter } from "@/lib/contentPools";
@@ -98,7 +99,7 @@ export async function POST(req: Request) {
   }
 }
 
-export async function GET() {
+async function loadContent() {
   const admin = await requireAdminRequest();
   if (!admin.ok) return admin.response;
   const placements = await prisma.questionSetPlacement.findMany({
@@ -126,4 +127,9 @@ export async function PATCH(req: Request) {
   } catch (e: any) {
     return NextResponse.json({ error: e?.message || "Failed to unpublish pool" }, { status: 500 });
   }
+}
+
+export async function GET(req: Request) {
+  try { return await loadContent(); }
+  catch (error) { console.error("Admin content load failed", error); return NextResponse.json({ error: contentApiError(error) }, { status: 500 }); }
 }

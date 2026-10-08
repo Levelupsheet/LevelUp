@@ -1,0 +1,12 @@
+Pool publishing repair
+=====================
+
+The reported screenshots show pool lists loading while pool details and learner catalogs fail. Server logs are required to confirm the production cause; a missing QuestionImportIssue table or placement columns can cause these failures when code is deployed without migrations. No production database was accessed during this repair.
+
+After pulling main and installing dependencies, run `npm run deploy:build` with the production DATABASE_URL configured. This applies existing Prisma migrations, regenerates the client, and builds Next.js in that order. Restart the existing application service only after this command succeeds. Do not use migrate reset or delete production question data.
+
+Verify a pool's stored questions load, review imported questions, approve valid content, and publish the selected destination. Confirm the destination appears in Position Training, Test Now or Certification Practice. If loading still fails, inspect the server log entries “Admin content load failed” and “Active pools load failed”.
+
+The admin Advanced menu now raises its containing header above sibling cards. Pool requests preserve HTTP error context and no longer display zero stored questions when detail loading fails. Knowledge-block imports use the existing generator and enter the same pending-review workflow as direct question imports. Existing question records are preserved.
+
+Validation: automated regression tests cover empty API responses, safe schema diagnostics, and knowledge-bank expansion. Production publishing still requires the server deployment and live smoke check above.

@@ -13,7 +13,8 @@
     "prisma:studio": "prisma studio",
     "seed": "ts-node --transpile-only prisma/seed.ts",
     "content:notes": "echo Use /admin/content to upload or sync the fact bank JSON into the live DB",
-    "test": "node --test tests/*.test.cjs"
+    "test": "node --test tests/*.test.cjs",
+    "deploy:build": "prisma migrate deploy && prisma generate && next build"
   },
   "dependencies": {
     "@prisma/client": "^5.20.0",

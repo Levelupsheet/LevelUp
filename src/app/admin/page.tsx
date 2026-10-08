@@ -1492,7 +1492,7 @@ export default function AdminPage(){
   if (!authChecked || !ok){
     return (
       <div style={{ maxWidth: 520, margin: "0 auto", padding: 18 }}>
-        <div className="topbar">
+        <div className="topbar" style={{ position: "relative", zIndex: 70, overflow: "visible" }}>
           <div style={{ display:"flex", alignItems:"center", gap:10 }}>
             <div style={{ width: 34, height: 34, borderRadius: 10, display:"grid", placeItems:"center", background:"rgba(255,255,255,0.08)", border:"1px solid rgba(255,255,255,0.18)" }}>L</div>
             <div>
@@ -1508,7 +1508,7 @@ export default function AdminPage(){
 
   return (
     <div style={{ maxWidth: 1200, margin:"0 auto", padding: 18 }}>
-      <div className="topbar">
+      <div className="topbar" style={{ position: "relative", zIndex: 70, overflow: "visible" }}>
         <div style={{ display:"flex", alignItems:"center", gap:10 }}>
           <div style={{ width: 34, height: 34, borderRadius: 10, display:"grid", placeItems:"center", background:"rgba(255,255,255,0.08)", border:"1px solid rgba(255,255,255,0.18)" }}>L</div>
           <div>
