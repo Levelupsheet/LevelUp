@@ -9,4 +9,6 @@ Verify a pool's stored questions load, review imported questions, approve valid 
 
 The admin Advanced menu now raises its containing header above sibling cards. Pool requests preserve HTTP error context and no longer display zero stored questions when detail loading fails. Knowledge-block imports use the existing generator and enter the same pending-review workflow as direct question imports. Existing question records are preserved.
 
+Publishing destinations now include a selector assembled from the career catalog, stored pools and existing placements, including the legacy Help Desk, Desktop Technician and Cloud Engineer mappings. Selecting a pool restores its existing placement target. Certification choices come from the server's Prisma enum and display readable labels such as Microsoft AZ-900 while submitting AZ_900. The API also accepts AZ-900 as an alias. Learner buttons continue to require active published placements with eligible content.
+
 Validation: automated regression tests cover empty API responses, safe schema diagnostics, and knowledge-bank expansion. Production publishing still requires the server deployment and live smoke check above.

@@ -1,3 +1,4 @@
+import { CertExam } from "@prisma/client";
 import { contentApiError } from '@/lib/contentApiError';
 import { NextResponse } from "next/server";
 import { requireAdminRequest } from "@/app/api/_lib/adminGuard";
@@ -23,7 +24,8 @@ export async function POST(req: Request) {
     const setId = String(body?.setId || "");
     const lane = body?.lane as "TEST_NOW" | "TRAINING" | "CERTIFICATIONS" | "INTERVIEW";
     const { startingPosition, industry, careerPath } = canonicalTrainingTarget(body);
-    const certExam = body?.certExam ?? null;
+    const certExam = body?.certExam ? String(body.certExam).trim().toUpperCase().replace(/[-\s]+/g, '_') : null;
+    if (certExam && !Object.values(CertExam).includes(certExam as any)) return NextResponse.json({ error: "Choose a supported certification destination" }, { status: 400 });
     const exclusive = Boolean(body?.exclusive);
     const isActive = body?.isActive === false ? false : true;
 
@@ -107,7 +109,7 @@ async function loadContent() {
     include: { set: { include: { questions: true, _count: { select: { questions: true } } } } },
   });
   const activePools = buildContentPoolCatalog(placements);
-  return NextResponse.json({ placements, activePools, activeTestNowBanks: testNowBanks(activePools) });
+  return NextResponse.json({ placements, certificationDestinations: Object.values(CertExam), activePools, activeTestNowBanks: testNowBanks(activePools) });
 }
 
 /** Deactivate one exact placement without deleting its question set. */

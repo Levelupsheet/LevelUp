@@ -26,3 +26,17 @@ test('knowledge banks expand to supported questions while direct questions remai
  const direct={prompt:'Keep this existing question'};
  assert.deepEqual(expandContentImport(direct),[direct]);
 });
+
+test('publisher exposes deployed legacy and catalog careers without inventing replacements',()=>{
+ const { trainingDestinations, certificationLabel } = require('../src/lib/publishDestinations.ts');
+ const rows=trainingDestinations([{industry:'Healthcare',careerPath:'RN'}],[
+  {lane:'TRAINING',startingPosition:'HELPDESK_SUPPORT'},
+  {lane:'TRAINING',startingPosition:'DESKTOP_TECHNICIAN'},
+  {lane:'TRAINING',startingPosition:'CLOUD_ENGINEER'},
+  {lane:'TRAINING',industry:'Information Technology',careerPath:'Help Desk'},
+  {lane:'CERTIFICATIONS',certExam:'AZ_900'}
+ ],[]);
+ assert.deepEqual(rows.filter(r=>r.industry==='Information Technology').map(r=>r.careerPath),['Cloud Engineer','Desktop Technician','Help Desk']);
+ assert.ok(rows.some(r=>r.careerPath==='RN'));
+ assert.equal(certificationLabel('AZ_900'),'Microsoft AZ-900');
+});

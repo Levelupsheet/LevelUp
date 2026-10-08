@@ -1,4 +1,4 @@
-import { learnerEligible } from "@/lib/contentPipeline";
+import { learnerEligible } from "./contentPipeline";
 /** Only active placements of published sets define learner availability. */
 export const LEGACY_TRAINING_PATHS: Record<string, { industry: string; careerPath: string }> = {
   HELPDESK_SUPPORT: { industry: "Information Technology", careerPath: "Help Desk" },
