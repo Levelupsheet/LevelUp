@@ -843,7 +843,7 @@ async function analyzeResumeStage12() {
                 <button
                   className="luRoleCard gdModalChoice gdModalChoiceOrange"
                   type="button"
-                  onClick={() => careerPaths.length ? setCareerPickerOpen(true) : startLeveledMode("position")}
+                  onClick={() => { if (selectedCareer) { setShowLaunchModal(false); setLaunchGate("position-training"); window.location.href = "/position-training"; } else if (careerPaths.length) { setShowLaunchModal(false); setCareerPickerOpen(true); } else { startLeveledMode("position"); } }}
                 >
                   <div className="luRoleIcon" aria-hidden="true">🎯</div>
                   <div className="luRoleTitle">Career training</div>
