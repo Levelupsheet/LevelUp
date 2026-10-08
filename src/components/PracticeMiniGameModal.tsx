@@ -46,6 +46,30 @@ export default function PracticeMiniGameModal(props: {
   const [bossRules, setBossRules] = useState<any>(null);
   const [bossMeta, setBossMeta] = useState<{ bossName: string; bossLabel: string; introTitle: string; variant: string } | null>(null);
   const [bossReward, setBossReward] = useState<{ xp: number; won: boolean } | null>(null);
+  const [runNonce, setRunNonce] = useState(0);
+
+  async function abandonActiveRun() {
+    // Explicit EXIT means "end this run", not "resume it next time".
+    // Long-term mastery/history remain persisted independently.
+    try {
+      const response = await fetch(`/api/learning/session?lane=${encodeURIComponent(lane)}`, { cache: "no-store" as any });
+      const json = await response.json().catch(() => null);
+      const activeSessionId = String(json?.session?.id || "");
+      if (activeSessionId) {
+        await fetch("/api/learning/session", {
+          method: "PATCH",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ sessionId: activeSessionId, status: "ABANDONED" }),
+        });
+      }
+    } catch {}
+  }
+
+  async function exitRun() {
+    if (step === "quiz" || step === "boss") await abandonActiveRun();
+    setRunNonce((value) => value + 1);
+    onClose();
+  }
 
   useEffect(() => {
     if (!open) return;
@@ -172,7 +196,7 @@ export default function PracticeMiniGameModal(props: {
   }
 
   return (
-    <div className={`luModalOverlay practiceGameOverlay practiceGameOverlay--${kind}`} onMouseDown={onClose}>
+    <div className={`luModalOverlay practiceGameOverlay practiceGameOverlay--${kind}`} onMouseDown={() => void exitRun()}>
       <div className={`luModal practiceGameModal practiceGameModal--${step}`} role="dialog" aria-modal="true" aria-label={title} onMouseDown={(e) => e.stopPropagation()} style={{ width: (step === "quiz" || step === "boss") ? "min(96vw, 1800px)" : "min(92vw, 980px)", maxWidth: (step === "quiz" || step === "boss") ? 1800 : 980 }}>
         <div className="luVideoBg" aria-hidden="true">
           <video className="luVideoEl" autoPlay loop muted playsInline preload="metadata"><source src="/video/blackhole-loop.mp4" type="video/mp4" /></video>
@@ -181,7 +205,7 @@ export default function PracticeMiniGameModal(props: {
         {step !== "quiz" && step !== "boss" ? (
           <div className="luModalHeader practiceGameOuterHeader" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <div className="practiceGameOuterTitle"><b style={{ fontSize: 18 }}>{title}</b><div><small className="luHint">{subtitle}</small></div></div>
-            <button className="secondaryBtn gdCloseButton practiceGameExit" type="button" aria-label="Exit" title="Exit" onClick={onClose}><span>EXIT</span></button>
+            <button className="secondaryBtn gdCloseButton practiceGameExit" type="button" aria-label="Exit" title="Exit" onClick={() => void exitRun()}><span>EXIT</span></button>
           </div>
         ) : null}
 
@@ -210,6 +234,7 @@ export default function PracticeMiniGameModal(props: {
 
           {step === "quiz" && (
             <GameEngine
+              key={`practice-run-${kind}-${runNonce}`}
               lane={lane}
               title={title}
               subtitle={subtitle}
@@ -222,7 +247,7 @@ export default function PracticeMiniGameModal(props: {
               bankDomain={kind === "test" && selectedTestBank?.domain !== "MIXED" ? selectedTestBank?.domain : undefined}
               trainingMode={kind === "test" ? testMode : "STANDARD"}
               exitLabel="EXIT"
-              onExit={onClose}
+              onExit={() => void exitRun()}
               metaLeft={kind === "position" ? `Path: ${selectedTrainingPool?.label || ""}` : kind === "cert" ? `Exam: ${selectedCertPool?.label || ""}` : `Bank: ${selectedTestBank?.label || "Mixed"}`}
               questionCount={15}
               onComplete={finishRun as any}
