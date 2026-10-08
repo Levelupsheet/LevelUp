@@ -12302,3 +12302,44 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
   margin-left:auto!important;
   margin-right:auto!important;
 }
+
+
+/* 2026-10-08 dashboard XP bar: restore the purchased loading background + frame.
+   Keep the original compact in-card footprint; only the inner fill scales with XP. */
+.dashboardProgressGameCard .dashboardAssetXpBar{
+  position:relative!important;
+  width:min(60%,456px)!important;
+  height:30px!important;
+  margin:10px 0 4px!important;
+  overflow:hidden!important;
+  isolation:isolate!important;
+  background:none!important;
+}
+.dashboardProgressGameCard .dashboardAssetXpBarBg,
+.dashboardProgressGameCard .dashboardAssetXpBarFrame{
+  display:block!important;
+  visibility:visible!important;
+  opacity:1!important;
+  position:absolute!important;
+  inset:0!important;
+  width:100%!important;
+  height:100%!important;
+  object-fit:fill!important;
+  pointer-events:none!important;
+}
+.dashboardProgressGameCard .dashboardAssetXpBarBg{z-index:0!important}
+.dashboardProgressGameCard .dashboardAssetXpBarFill{
+  position:absolute!important;
+  left:16px!important;
+  top:7px!important;
+  height:16px!important;
+  max-width:calc(100% - 32px)!important;
+  z-index:1!important;
+  clip-path:polygon(0 0,calc(100% - 12px) 0,100% 50%,calc(100% - 12px) 100%,0 100%,8px 50%)!important;
+  background:linear-gradient(90deg,#254bc7 0%,#328ee8 48%,#28c7ca 100%)!important;
+}
+.dashboardProgressGameCard .dashboardAssetXpBarFrame{z-index:3!important}
+.dashboardProgressGameCard .dashboardAssetXpBar::after{content:none!important;display:none!important}
+@media(max-width:700px){
+  .dashboardProgressGameCard .dashboardAssetXpBar{width:min(88%,456px)!important}
+}
