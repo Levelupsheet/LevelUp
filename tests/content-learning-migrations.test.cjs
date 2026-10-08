@@ -1,4 +1,15 @@
 const {test}=require('node:test');const assert=require('node:assert/strict');const fs=require('node:fs');const path=require('node:path');const {PGlite}=require('@electric-sql/pglite');
+test('question schema repair creates the missing subdomain column and preserves rows and existing values',async()=>{
+ const db=new PGlite();try{
+ await db.exec(`CREATE TABLE "MCQQuestion" ("id" TEXT PRIMARY KEY,"prompt" TEXT,"data" JSONB); INSERT INTO "MCQQuestion" VALUES ('q','Existing question','{"reviewStatus":"APPROVED"}');`);
+ const sql=fs.readFileSync(path.join(__dirname,'../prisma/migrations/20261008160000_question_subdomain_schema_repair/migration.sql'),'utf8');
+ await db.exec(sql);
+ const row=(await db.query('SELECT * FROM "MCQQuestion"')).rows[0];
+ assert.equal(row.prompt,'Existing question');assert.equal(row.data.reviewStatus,'APPROVED');assert.equal(row.subdomain,null);
+ await db.exec(`UPDATE "MCQQuestion" SET "subdomain"='Identity' WHERE "id"='q'`);
+ await db.exec(sql);assert.equal((await db.query('SELECT "subdomain" FROM "MCQQuestion"')).rows[0].subdomain,'Identity');
+ }finally{await db.close();}
+});
 test('content and learning migrations preserve existing rows and apply repeatedly in PostgreSQL',async()=>{
  const db=new PGlite();try{
  await db.exec(`CREATE TYPE "GameSessionMode" AS ENUM ('TEST_NOW'); CREATE TABLE "QuestionSet" ("id" TEXT PRIMARY KEY,"name" TEXT); INSERT INTO "QuestionSet" VALUES ('pool','Existing pool'); CREATE TABLE "GameSession" ("id" TEXT PRIMARY KEY,"userId" TEXT,"createdAt" TIMESTAMP); INSERT INTO "GameSession" VALUES ('s','u',CURRENT_TIMESTAMP);CREATE TABLE "GameSessionQuestion" ("id" TEXT PRIMARY KEY,"questionId" TEXT,"answeredAt" TIMESTAMP); INSERT INTO "GameSessionQuestion" VALUES ('q','original',CURRENT_TIMESTAMP);`);
