@@ -54,29 +54,30 @@ export async function POST(req: Request) {
         });
       }
 
+      const placementFilter = {
+        setId,
+        lane,
+        startingPosition: lane === "TRAINING" && !careerPath ? startingPosition : null,
+        industry: lane === "TRAINING" ? industry : null,
+        careerPath: lane === "TRAINING" ? careerPath : null,
+        certExam: lane === "CERTIFICATIONS" ? certExam : null,
+      };
+      // Reactivate a previously unpublished placement rather than creating duplicates.
       const existing = await tx.questionSetPlacement.findFirst({
-        where: {
-          setId,
-          lane,
-          isActive,
-          startingPosition: lane === "TRAINING" && !careerPath ? startingPosition : null,
-          industry: lane === "TRAINING" ? industry : null,
-          careerPath: lane === "TRAINING" ? careerPath : null,
-          certExam: lane === "CERTIFICATIONS" ? certExam : null,
-        },
+        where: placementFilter,
+        orderBy: { createdAt: "desc" },
       });
-      if (existing) return existing;
-
+      if (existing) {
+        if (existing.isActive !== isActive) {
+          return tx.questionSetPlacement.update({
+            where: { id: existing.id },
+            data: { isActive },
+          });
+        }
+        return existing;
+      }
       return tx.questionSetPlacement.create({
-        data: {
-          setId,
-          lane,
-          startingPosition: lane === "TRAINING" && !careerPath ? startingPosition : null,
-          industry: lane === "TRAINING" ? industry : null,
-          careerPath: lane === "TRAINING" ? careerPath : null,
-          certExam: lane === "CERTIFICATIONS" ? certExam : null,
-          isActive,
-        },
+        data: { ...placementFilter, isActive },
       });
     });
 
