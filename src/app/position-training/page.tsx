@@ -9,6 +9,22 @@ import { normalizeCareerTarget, isPublishedCareer } from "@/lib/careerPreference
 
 export default function PositionTrainingPage() {
   const router = useRouter();
+
+  async function exitTraining() {
+    try {
+      const response = await fetch("/api/learning/session?lane=TRAINING", { cache: "no-store" as any });
+      const json = await response.json().catch(() => null);
+      const activeSessionId = String(json?.session?.id || "");
+      if (activeSessionId) {
+        await fetch("/api/learning/session", {
+          method: "PATCH",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ sessionId: activeSessionId, status: "ABANDONED" }),
+        });
+      }
+    } catch {}
+    router.replace("/dashboard");
+  }
   const [ready, setReady] = useState(false);
   const [startingPosition, setStartingPosition] = useState<string>("");
   const [industry, setIndustry] = useState<string | null>(null);
@@ -59,7 +75,7 @@ export default function PositionTrainingPage() {
   return (
     <div className="page paidAssetPage positionTrainingAssetPage">
       <div className="container" style={{ maxWidth: 1280 }}>
-        {selectionError ? <p role="alert">{selectionError} <a href="/dashboard">Choose career</a></p> : ready ? <GameEngine lane="TRAINING" playerPosition={startingPosition || null} industry={industry} careerPath={careerPath} title="Career Training" subtitle={`Career training • ${careerPath}`} metaLeft={`Path: ${industry} • ${careerPath}`} exitHref="/dashboard" exitLabel="Close" /> : <p>Loading your selected training path…</p>}
+        {selectionError ? <p role="alert">{selectionError} <a href="/dashboard">Choose career</a></p> : ready ? <GameEngine lane="TRAINING" playerPosition={startingPosition || null} industry={industry} careerPath={careerPath} title="Career Training" subtitle={`Career training • ${careerPath}`} metaLeft={`Path: ${industry} • ${careerPath}`} exitHref="/dashboard" exitLabel="Close" onExit={() => void exitTraining()} /> : <p>Loading your selected training path…</p>}
       </div>
     </div>
   );
