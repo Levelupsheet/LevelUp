@@ -157,6 +157,11 @@ export async function awardRaffleEntries(
   if (!input.userId || quantityRequested <= 0) {
     return { awarded: 0, capped: false, remaining: RAFFLE_WEEKLY_ENTRY_LIMIT };
   }
+  await tx.$queryRawUnsafe('SELECT "id" FROM "User" WHERE "id" = $1 FOR UPDATE', input.userId);
+  if (input.auditKey) {
+    const existingGrant = await tx.$queryRawUnsafe('SELECT "id" FROM "RaffleEntry" WHERE "userId" = $1 AND "auditKey" = $2 LIMIT 1', input.userId, input.auditKey) as any[];
+    if (existingGrant.length) return { awarded: 0, capped: false, remaining: 0, duplicate: true };
+  }
 
   const createdAt = input.createdAt || new Date();
   const weekStart = startOfWeekUtc(createdAt);

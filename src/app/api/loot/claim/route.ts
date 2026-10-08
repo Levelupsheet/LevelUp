@@ -3,6 +3,8 @@ import { prisma } from "../../_lib/prisma";
 import { ensureUser } from "../../_lib/ensureUser";
 import { applyUserXpIncrement } from "@/lib/xpCaps";
 import { getSessionUser } from "@/lib/auth/session";
+import { awardRaffleEntries } from "@/lib/raffle";
+import { redeemRaffleCredits } from "@/lib/raffleCredits";
 
 export async function POST(req: Request) {
   try {
@@ -24,6 +26,8 @@ export async function POST(req: Request) {
     if (!lootBoxIds.length) return NextResponse.json({ error: "Missing lootBoxIds" }, { status: 400 });
 
     const result = await prisma.$transaction(async (tx: any) => {
+      await tx.$queryRawUnsafe('SELECT "id" FROM "User" WHERE "id" = $1 FOR UPDATE', userId);
+      const recovered = await redeemRaffleCredits(tx,userId);
       // Ensure wallet exists
       const wallet = await tx.wallet.upsert({
         where: { userId },
@@ -41,6 +45,8 @@ export async function POST(req: Request) {
 
       let tokensToAdd = 0;
       let xpToAdd = 0;
+      let raffleEntriesAwarded = recovered.awarded;
+      let raffleEntriesDeferred = 0;
       const claimedBoxIds: string[] = [];
 
       for (const box of claimable) {
@@ -52,6 +58,14 @@ export async function POST(req: Request) {
         claimedBoxIds.push(box.id);
 
         for (const d of box.drops) {
+          if (d.rewardType === "RAFFLE_ENTRY") {
+            const grant = await awardRaffleEntries(tx, { userId, source: "CHEST_REWARD", quantity: d.quantity, sourceRefType: "LOOT_BOX", sourceRefId: box.id, auditKey: `loot-drop:${d.id}` });
+            raffleEntriesAwarded += Number(grant.awarded || 0);
+            const deferred = Math.max(0,d.quantity - Number(grant.awarded || 0));
+            if (deferred) await tx.inventoryItem.create({data:{userId,itemType:"RAFFLE_ENTRY",itemRef:`loot-credit:${d.id}`,quantity:deferred}});
+            raffleEntriesDeferred += deferred;
+            continue;
+          }
           if (d.rewardType === "TOKENS") {
             tokensToAdd += d.quantity;
             continue;
@@ -84,16 +98,19 @@ export async function POST(req: Request) {
       });
 
       if (xpToAdd > 0) {
-        await applyUserXpIncrement(tx, userId, xpToAdd);
+        const before = await tx.user.findUnique({where:{id:userId},select:{xp:true}});
+        const after = await applyUserXpIncrement(tx, userId, xpToAdd);
+        xpToAdd = Math.max(0,Number(after.xp || 0) - Number(before?.xp || 0));
       }
 
       // Clear LOOT notifications after claiming (server-side)
-      await tx.notification.updateMany({
+      const remainingBoxes = await tx.lootBox.count({where:{userId,status:{in:["PENDING","OPENED"]}}});
+      if (!remainingBoxes) await tx.notification.updateMany({
         where: { userId, type: "LOOT_BOX_EARNED", readAt: null },
         data: { readAt: new Date() },
       });
 
-      return { claimed: claimedBoxIds.length, tokenBalance: updatedWallet.tokenBalance, tokensAdded: tokensToAdd, xpAdded: xpToAdd };
+      return { claimed: claimedBoxIds.length, tokenBalance: updatedWallet.tokenBalance, tokensAdded: tokensToAdd, xpAdded: xpToAdd, raffleEntriesAwarded, raffleEntriesDeferred };
     });
 
     return NextResponse.json(result);

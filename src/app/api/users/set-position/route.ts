@@ -17,6 +17,8 @@ export async function POST(req: Request) {
     // Character-change pricing is enforced server-side. Admins bypass the
     // token charge only for their own authenticated account.
     const sessionUser = await getSessionUser();
+    if (!sessionUser?.id) return Response.json({ error: "Sign in required" }, { status: 401 });
+    if (sessionUser.id !== body.userId) return Response.json({ error: "Cannot change another user's character" }, { status: 403 });
     const isAdminCharacterChange =
       Boolean(sessionUser?.email) &&
       isAdminEmail(sessionUser?.email) &&
@@ -65,6 +67,12 @@ export async function POST(req: Request) {
 
     const result: { user: { id: string; startingPosition: string | null }; tokenBalance: number } =
       await prisma.$transaction(async (tx): Promise<{ user: { id: string; startingPosition: string | null }; tokenBalance: number }> => {
+      await tx.$queryRawUnsafe('SELECT "id" FROM "User" WHERE "id" = $1 FOR UPDATE', body.userId);
+      const current = await tx.user.findUnique({ where: { id: body.userId } });
+      if (current?.startingPosition === body.startingPosition) {
+        const wallet = await tx.wallet.findUnique({where:{userId:body.userId}});
+        return {user:current,tokenBalance:wallet?.tokenBalance || 0};
+      }
       const charged = await tx.wallet.updateMany({
         where: { userId: body.userId, tokenBalance: { gte: POSITION_CHANGE_COST } },
         data: { tokenBalance: { decrement: POSITION_CHANGE_COST } },

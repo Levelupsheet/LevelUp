@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { prisma } from "../../_lib/prisma";
 import { applyUserXpIncrement } from "@/lib/xpCaps";
+import { getSessionUser } from "@/lib/auth/session";
 
 const Body = z.object({
   userId: z.string().min(1),
@@ -12,6 +13,9 @@ const Body = z.object({
 export async function POST(req: Request) {
   try {
     const body = Body.parse(await req.json());
+    const sessionUser = await getSessionUser();
+    if (!sessionUser?.id) return Response.json({error:"Sign in required"},{status:401});
+    if (sessionUser.id !== body.userId) return Response.json({error:"Cannot write another user's answers"},{status:403});
 
     const user = await prisma.user.upsert({
       where: { id: body.userId },
@@ -20,7 +24,7 @@ export async function POST(req: Request) {
     });
 
     const len = body.answer.trim().length;
-    const xpAwarded = Math.min(40, Math.max(8, Math.round(len / 40)));
+    const xpAwarded = 0; // Legacy self-authored free-text answers are not verified gameplay.
 
     await prisma.certPracticeAnswer.create({
       data: {

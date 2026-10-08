@@ -23,6 +23,7 @@ export async function POST(req: Request) {
     if (!user) return Response.json({ error: "Authenticated user not found" }, { status: 404 });
 
     const score = gradeAnswer({ tier: body.tier, answerText: body.answer });
+    score.xpAwarded = 0; // Keep feedback/history, but reward only verified database gameplay.
 
     await prisma.practiceAnswer.create({
       data: {
@@ -42,7 +43,7 @@ export async function POST(req: Request) {
     const updated = await applyUserXpIncrement(prisma, user.id, score.xpAwarded);
 
     // Update per-domain mastery (domain XP is a smaller slice of awarded XP)
-    const domainXP = Math.max(2, Math.round(score.xpAwarded * 0.15));
+    const domainXP = 0;
     await prisma.userDomain.upsert({
       where: { userId_domain: { userId: user.id, domain: body.domain } },
       update: { xp: { increment: domainXP }, lastPracticedAt: new Date() },

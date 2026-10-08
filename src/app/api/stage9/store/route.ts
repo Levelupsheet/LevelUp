@@ -16,7 +16,8 @@ export async function POST(req: Request) {
     const itemId = String(body?.itemId || "").trim();
     if (!itemId) return Response.json({ ok: false, error: "itemId required" }, { status: 400 });
     const adminFreePurchase = Boolean(sessionUser?.email) && isAdminEmail(sessionUser?.email);
-    const result = await purchaseStage9Item(userId, itemId, { free: adminFreePurchase });
+    const actionKey = String(body?.actionKey || "").trim();
+    const result = await purchaseStage9Item(userId, itemId, { free: adminFreePurchase, actionKey });
     return Response.json(result, { status: result.ok ? 200 : 400 });
   } catch (err: any) {
     return Response.json({ ok: false, error: err?.message || "Failed to purchase store item" }, { status: 500 });

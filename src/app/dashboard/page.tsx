@@ -352,20 +352,26 @@ useEffect(() => {
     }
   }
 
+  const purchaseKeysRef = useRef(new Map<string,string>());
+  const purchasePendingRef = useRef(false);
   async function purchaseStage9StoreItem(itemId: string) {
-    if (!userId || !itemId) return;
+    if (!userId || !itemId || purchasePendingRef.current) return;
+    purchasePendingRef.current = true;
+    if (!purchaseKeysRef.current.has(itemId)) purchaseKeysRef.current.set(itemId,crypto.randomUUID());
     setBuyingItemId(itemId);
     setStage9Message(null);
     try {
-      const res = await fetch(`/api/stage9/store`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ userId, itemId }) });
+      const res = await fetch(`/api/stage9/store`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ userId, itemId, actionKey: purchaseKeysRef.current.get(itemId) }) });
       const data = await res.json().catch(() => null);
       if (!res.ok || !data?.ok) throw new Error(data?.error || "Purchase failed");
+      purchaseKeysRef.current.delete(itemId);
       setStage9Message(`${data?.item?.name || "Item"} purchased successfully.`);
       await refresh(userId);
     } catch (err: any) {
       setStage9Message(err?.message || "Purchase failed");
     } finally {
       setBuyingItemId(null);
+      purchasePendingRef.current = false;
     }
   }
 

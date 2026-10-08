@@ -197,9 +197,6 @@ export default function LootVaultModal(props: {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error ?? "Failed to claim");
-      try {
-        await fetch('/api/notifications/clear', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ userId, type: 'LOOT_BOX_EARNED' }) });
-      } catch {}
       onClaimed?.();
       onClose();
     } catch (e: any) {
@@ -266,6 +263,15 @@ export default function LootVaultModal(props: {
             <button className="gold" type="button" disabled={!canClaim} onClick={claimAll}>
               Claim
             </button>
+            <button className="secondaryBtn" type="button" disabled={spinning} onClick={async () => {
+              try {
+                const response = await fetch("/api/loot/redeem-entries",{method:"POST"});
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.error || "Entry redemption failed");
+                setErrorMsg(result.awarded ? `Redeemed ${result.awarded} sweepstakes entries.` : "No entries redeemable now. Capped credits remain saved for later.");
+                onClaimed?.();
+              } catch (error: any) {setErrorMsg(error.message);}
+            }}>Redeem entry credits</button>
             <span style={{ marginLeft: "auto", opacity: 0.75, fontSize: 13 }}>{loading ? "Loading…" : ""}</span>
           </div>
 

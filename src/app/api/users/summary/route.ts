@@ -73,10 +73,7 @@ export async function GET(req: Request) {
       }
     }
 
-    const cappedXp = capXpForTier(user.xp, subscriptionTier as any);
-    if (cappedXp !== user.xp) {
-      user = await prisma.user.update({ where: { id: userId }, data: { xp: cappedXp } });
-    }
+    // Subscription caps limit future earning; never erase previously earned XP on a summary read.
 
     const [notifications, badges, offers] = await Promise.all([
       prisma.notification.findMany({ where: { userId, readAt: null }, orderBy: { createdAt: "desc" }, take: 20 }),

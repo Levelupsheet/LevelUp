@@ -144,10 +144,13 @@ test('separate maximum HP and stage changes preserve player damage without regen
   await combat.close();
 });
 
-function lootFixture(marker = 11, sources = []) {
+function lootFixture(marker = 11, sources = Array.from({length:marker},(_,i) => `LEVEL_UP:${i+1}`)) {
   const user = { id:'u', xp:xpRequiredToReachLevel(12), lootGrantedUpToLevel:marker };
   const boxes = sources.map(source => ({ source }));
+  const claims = new Set();
   return { user, boxes, tx: {
+    async $queryRawUnsafe() { return []; },
+    rewardClaim: { async findMany() { return [...claims].map(claimKey => ({claimKey})); }, async createMany({data}) { let count=0; for(const row of data) { if(!claims.has(row.claimKey)){claims.add(row.claimKey);count++;} } return {count}; } },
     user: { async findUnique() { return { ...user }; }, async updateMany({where,data}) { if (user.lootGrantedUpToLevel !== where.lootGrantedUpToLevel) return {count:0}; Object.assign(user,data); return {count:1}; } },
     lootBox: { async findMany() { return [...boxes]; }, async createMany({data}) { boxes.push(...data); } },
     notification: { async deleteMany() {}, async create() {} },
@@ -156,12 +159,43 @@ function lootFixture(marker = 11, sources = []) {
 test('level 12 chest catch-up is idempotent under concurrent requests', async () => {
   const { user, boxes, tx } = lootFixture();
   const rewards = await Promise.all([reconcileLevelLoot(tx,'u'), reconcileLevelLoot(tx,'u')]);
-  assert.equal(rewards.reduce((sum,r)=>sum+r.created,0),1); assert.equal(boxes.length,1); assert.equal(boxes[0].source,'LEVEL_UP:12'); assert.equal(user.lootGrantedUpToLevel,12);
+  assert.equal(rewards.reduce((sum,r)=>sum+r.created,0),1); assert.equal(boxes.length,12); assert.equal(boxes.at(-1).source,'LEVEL_UP:12'); assert.equal(user.lootGrantedUpToLevel,12);
   assert.equal((await reconcileLevelLoot(tx,'u')).created,0);
 });
 test('legacy level-tagged chests are preserved without granting duplicates', async () => {
-  const { boxes, tx } = lootFixture(10,['LEVEL_UP:11','LEVEL_UP:12']);
-  assert.equal((await reconcileLevelLoot(tx,'u')).created,0); assert.equal(boxes.length,2);
+  const { boxes, tx } = lootFixture(10,Array.from({length:12},(_,i) => `LEVEL_UP:${i+1}`));
+  assert.equal((await reconcileLevelLoot(tx,'u')).created,0); assert.equal(boxes.length,12);
+});
+test('an advanced marker cannot hide a missing historical level chest', async () => {
+  const {boxes,tx} = lootFixture(12,Array.from({length:12},(_,i) => `LEVEL_UP:${i+1}`).filter(source => source !== 'LEVEL_UP:7'));
+  assert.equal((await reconcileLevelLoot(tx,'u')).created,1); assert.equal(boxes.at(-1).source,'LEVEL_UP:7');
+  assert.equal((await reconcileLevelLoot(tx,'u')).created,0);
+});
+test('consumable retries consume exactly once across duplicate inventory rows', async () => {
+  const prisma = require('../src/lib/prisma.ts').prisma;
+  const {useStage9Item} = require('../src/lib/stage9Economy.ts');
+  const inventory = [{id:'i1',quantity:1},{id:'i2',quantity:2}];
+  const claims = new Map(); let chain = Promise.resolve();
+  const tx = {
+    async $queryRaw() {},
+    rewardClaim:{async findUnique({where}){return claims.get(where.claimKey);},async create({data}){claims.set(data.claimKey,data);}},
+    inventoryItem:{async findFirst(){return inventory.find(row=>row.quantity>0);},async updateMany({where}){const row=inventory.find(row=>row.id===where.id);if(!row?.quantity)return {count:0};row.quantity--;return {count:1};},async findMany(){return inventory;}}
+  };
+  prisma.$transaction = fn => {const run=chain.then(()=>fn(tx));chain=run.catch(()=>{});return run;};
+  try {
+    const results = await Promise.all([useStage9Item('u','shield_charge','sq:shield_charge:'),useStage9Item('u','shield_charge','sq:shield_charge:')]);
+    assert.equal(results.filter(result=>result.replayed).length,1); assert.equal(inventory.reduce((n,row)=>n+row.quantity,0),2); assert.equal(results[0].remaining,2);
+    assert.equal((await useStage9Item('u','fury_charge','sq:shield_charge:')).ok,false);
+  } finally {delete prisma.$transaction;}
+});
+test('raffle credits retain capped balances and redeem only the actual awarded quantity', async () => {
+  const {redeemRaffleCredits} = require('../src/lib/raffleCredits.ts');
+  const credit = {id:'credit',quantity:5}; let limit=2;
+  const tx = {async $queryRawUnsafe(){},inventoryItem:{async findMany(){return credit.quantity ? [credit] : [];},async update({data}){credit.quantity-=data.quantity.decrement;}}};
+  const grant = async (_,input) => ({awarded:Math.min(limit,input.quantity)});
+  assert.equal((await redeemRaffleCredits(tx,'u',grant)).awarded,2); assert.equal(credit.quantity,3);
+  limit=0; assert.equal((await redeemRaffleCredits(tx,'u',grant)).awarded,0);assert.equal(credit.quantity,3);
+  limit=10; assert.equal((await redeemRaffleCredits(tx,'u',grant)).awarded,3);assert.equal(credit.quantity,0);
 });
 
 const { awardGoldenQuestion } = require('../src/lib/goldenRewards.ts');

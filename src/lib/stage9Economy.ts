@@ -67,6 +67,7 @@ export async function touchUserActivity(userId: string, now = new Date()): Promi
   const today = dayKey(now);
   const yesterday = yesterdayKey(now);
   return prisma.$transaction(async (tx): Promise<Stage9Ledger> => {
+    await tx.$queryRawUnsafe('SELECT "id" FROM "User" WHERE "id" = $1 FOR UPDATE', key);
     const current = await tx.userEconomyState.findUnique({ where: { userId: key } });
     let streakDays = Math.max(0, Number(current?.streakDays || 0));
     if (!current?.lastSeenDate) streakDays = Math.max(1, streakDays || 1);
@@ -134,6 +135,7 @@ export async function claimDailyBonus(userId: string) {
 
   try {
     return await prisma.$transaction(async (tx) => {
+      await tx.$queryRawUnsafe('SELECT "id" FROM "User" WHERE "id" = $1 FOR UPDATE', key);
       const state = await tx.userEconomyState.findUnique({ where: { userId: key } });
       if (state?.lastClaimDate === today) {
         const wallet = await tx.wallet.findUnique({ where: { userId: key } });
@@ -175,12 +177,20 @@ export async function claimDailyBonus(userId: string) {
   }
 }
 
-export async function purchaseStage9Item(userId: string, itemId: string, options?: { free?: boolean }) {
+export async function purchaseStage9Item(userId: string, itemId: string, options?: { free?: boolean; actionKey?: string }) {
   const item = STORE.find((x) => x.id === itemId);
   if (!item) return { ok: false as const, error: "Item not found" };
+  if (!options?.actionKey || options.actionKey.length > 200) return {ok:false as const,error:"actionKey required"};
   await prisma.wallet.upsert({ where: { userId }, update: {}, create: { userId, tokenBalance: 0 } });
   const free = Boolean(options?.free);
   const next = await prisma.$transaction(async (tx) => {
+    await tx.$queryRawUnsafe('SELECT "id" FROM "User" WHERE "id" = $1 FOR UPDATE', userId);
+    const claimKey = `store:${userId}:${options.actionKey}`;
+    const prior = await tx.rewardClaim.findUnique({where:{claimKey}});
+    if (prior) {
+      if ((prior.meta as any)?.itemId !== itemId) throw new Error("Action key already used for another item");
+      return {tokenBalance:Number((prior.meta as any)?.tokenBalance || 0)};
+    }
     if (!free) {
       const debited = await tx.wallet.updateMany({
         where: { userId, tokenBalance: { gte: item.cost } },
@@ -199,6 +209,7 @@ export async function purchaseStage9Item(userId: string, itemId: string, options
     try {
       await tx.notification.create({ data: { userId, type: "STAGE9_STORE_PURCHASE", title: `${item.name} purchased`, body: free ? `Admin purchase • ${item.description}` : `-${item.cost} tokens • ${item.description}` } as any });
     } catch {}
+    await tx.rewardClaim.create({data:{userId,claimKey,kind:"STORE_PURCHASE",meta:{itemId,tokenBalance:updatedWallet.tokenBalance,charged:free ? 0 : item.cost}}});
     return updatedWallet;
   });
   return { ok: true as const, walletTokens: Number((next as any)?.tokenBalance || 0), item, charged: free ? 0 : item.cost, adminBypass: free };
@@ -236,7 +247,7 @@ export async function useStage9Item(userId: string, itemId: string, actionKey: s
   });
 }
 
-export async function awardSessionRewards(userId: string, input: { correctCount?: number; totalQuestions?: number; outcome?: string | null; encounterType?: string | null; bestStreak?: number; }) {
+async function obsoleteAwardSessionRewards(userId: string, input: { correctCount?: number; totalQuestions?: number; outcome?: string | null; encounterType?: string | null; bestStreak?: number; }) {
   const key = String(userId || "").trim();
   if (!key) return { ok: false as const, error: "userId required" };
   const correctCount = Math.max(0, Number(input.correctCount || 0));

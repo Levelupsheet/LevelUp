@@ -2,6 +2,8 @@ import { prisma } from "../../_lib/prisma";
 import { ensureUser } from "../../_lib/ensureUser";
 import { syncUserXpUpward } from "@/lib/xpCaps";
 import { getSessionUser } from "@/lib/auth/session";
+import { isAdminEmail } from "@/lib/adminAuth";
+import { reconcileLevelLoot } from "@/lib/levelLoot";
 
 // Sync local/demo XP to the server (never decreases).
 // This keeps the leaderboard consistent with what the dashboard shows.
@@ -23,7 +25,11 @@ export async function POST(req: Request) {
 
     const current = await prisma.user.findUnique({ where: { id: userId }, select: { xp: true } });
     const currentXp = current?.xp ?? 0;
-    const updated = await syncUserXpUpward(prisma, userId, xp);
+    // Browser storage is not evidence of earned rewards. Admins can seed XP for testing.
+    const updated: any = isAdminEmail(sessionUser?.email) ? await syncUserXpUpward(prisma, userId, xp) : await prisma.$transaction(async (tx: any) => {
+      await reconcileLevelLoot(tx,userId);
+      return tx.user.findUnique({where:{id:userId},select:{xp:true}});
+    });
     return Response.json({ ok: true, xp: (updated as any)?.xp ?? currentXp });
   } catch (err: any) {
     console.error("XP sync failed", err);

@@ -38,7 +38,7 @@ export async function POST(req: Request) {
 
     const claimKey = `game-session:${userId}:${rewardClaimKey}`;
     const priorClaim = await prisma.rewardClaim.findUnique({ where: { claimKey } });
-    if (priorClaim) return Response.json({ ok: true, duplicate: true, stage9: { awarded: 0 } });
+    if (priorClaim) return Response.json({ ok: true, ...(priorClaim.meta as any)?.result, duplicate: true });
 
     const result: {
       user: Awaited<ReturnType<typeof applyUserXpIncrement>>;
@@ -46,6 +46,8 @@ export async function POST(req: Request) {
       levelRewards?: { previousLevel: number; newLevel: number; lootBoxesAwarded: number };
     } = await prisma.$transaction(async (tx) => {
       await tx.$queryRawUnsafe('SELECT "id" FROM "User" WHERE "id" = $1 FOR UPDATE', userId);
+      const retry = await tx.rewardClaim.findUnique({ where: { claimKey } });
+      if (retry) return { ...(retry.meta as any)?.result, duplicate: true } as any;
       await tx.$queryRawUnsafe('SELECT "id" FROM "GameSession" WHERE "id" = $1 FOR UPDATE', rewardClaimKey);
       const saved = await tx.gameSession.findFirst({ where: { id: rewardClaimKey, userId }, include: { questions: { orderBy: { orderIndex: "asc" } } } });
       if (!saved || saved.status !== "COMPLETED") throw new Error("Completed owned learning session required");
@@ -79,7 +81,6 @@ export async function POST(req: Request) {
       const previousLevel = levelFromXp(Number(beforeXpUser?.xp || 0));
       const user = await applyUserXpIncrement(tx, userId, xpEarned);
       const newLevel = levelFromXp(Number((user as any)?.xp || 0));
-      const lootReward = await reconcileLevelLoot(tx, userId);
 
       const domainMap = new Map<string, { mastery: number; questions: number; level: number }>();
       for (const [key, val] of Object.entries(masteryByDomain || {})) {
@@ -141,7 +142,9 @@ export async function POST(req: Request) {
         });
       } catch {}
 
-      return { user, outcome, xpAwarded: xpEarned, boss: facts.boss, stage9: { ok: true as const, awarded, walletTokens: wallet.tokenBalance }, levelRewards: { previousLevel, newLevel, lootBoxesAwarded: lootReward.created } };
+      const result = { user: { id: user.id, xp: user.xp }, outcome, xpAwarded: Math.max(0,Number(user.xp) - Number(beforeXpUser?.xp || 0)), boss: facts.boss, stage9: { ok: true as const, awarded, walletTokens: wallet.tokenBalance }, levelRewards: { previousLevel, newLevel, lootBoxesAwarded: Number(user.levelRewardsCreated || 0) } };
+      await tx.rewardClaim.update({ where: { claimKey }, data: { meta: { xpEarned, correctCount, totalQuestions, outcome, encounterType, bestStreak, result } } });
+      return result;
     });
 
     await import("@/lib/stage9Economy").then(({ touchUserActivity }) => touchUserActivity(userId)).catch(() => null);
