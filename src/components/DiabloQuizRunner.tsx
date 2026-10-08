@@ -530,7 +530,7 @@ export default function DiabloQuizRunner(props: {
 
   const combatQuestions: CombatQuestion[] = useMemo(
     () =>
-      questions.map((q, i) => ({
+      [...questions].sort((a, b) => encounterType === "boss" ? 0 : (Math.max(1, Math.min(3, Number(a.level || 1))) - Math.max(1, Math.min(3, Number(b.level || 1))))).map((q, i) => ({
         id: q.id || `q_${i}`,
         prompt: q.prompt,
         type: normalizeQuestionType(q.type),
@@ -543,7 +543,7 @@ export default function DiabloQuizRunner(props: {
         sessionQuestionId: (q as any).sessionQuestionId,
         isGolden: Boolean((q as any).isGolden),
       } as any)),
-    [questions]
+    [questions, encounterType]
   );
 
   const [hitPulse, setHitPulse] = useState<null | "player" | "enemy">(null);
