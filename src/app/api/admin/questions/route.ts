@@ -1,497 +1,89 @@
-import { NextResponse } from "next/server";
-import { requireAdminRequest } from "@/app/api/_lib/adminGuard";
-import { prisma } from "@/lib/prisma";
-import { normalizeQuestionType, safeArray, uniqueSortedNumbers } from "@/lib/questionTypes";
-import { clusterQuestionsBySimilarity, validateQuestionQuality } from "@/lib/questionQuality";
-
-
-function isMissingSubdomainColumnError(error: any) {
-  const message = String(error?.message || "").toLowerCase();
-  return message.includes("mcqquestion.subdomain") && message.includes("does not exist");
-}
-
-async function listQuestionsForSet(setId: string) {
-  try {
-    return await prisma.mCQQuestion.findMany({
-      where: { setId },
-      orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
-      take: 500,
-    });
-  } catch (e: any) {
-    if (!isMissingSubdomainColumnError(e)) throw e;
-    const rows = await prisma.$queryRawUnsafe(
-      `SELECT "id", "setId", "prompt", "type", "data", "choices", "correctIndex", "sortOrder", "explanation", "difficulty", "tags", "testNowEligible", "isGoldenEligible", "goldenWeight", "goldenBonusXp", "createdAt", "updatedAt" FROM "MCQQuestion" WHERE "setId" = $1 ORDER BY "sortOrder" ASC, "createdAt" ASC LIMIT 500`,
-      setId,
-    );
-    return Array.isArray(rows) ? rows : [];
-  }
-}
-
-async function listExistingQuestionSignatures(setId: string) {
-  try {
-    return await prisma.mCQQuestion.findMany({
-      where: { setId },
-      select: { prompt: true, type: true, choices: true, data: true },
-    });
-  } catch (e: any) {
-    if (!isMissingSubdomainColumnError(e)) throw e;
-    const rows = await prisma.$queryRawUnsafe(
-      `SELECT "prompt", "type", "choices", "data" FROM "MCQQuestion" WHERE "setId" = $1`,
-      setId,
-    );
-    return Array.isArray(rows) ? rows : [];
-  }
-}
-
-function stripUnsupportedColumnsForLegacyDb(payload: any) {
-  const cloned = { ...(payload || {}) };
-  delete (cloned as any).subdomain;
-  return cloned;
-}
-
-async function createQuestionCompat(data: any) {
-  try {
-    return await prisma.mCQQuestion.create({ data });
-  } catch (e: any) {
-    if (!isMissingSubdomainColumnError(e)) throw e;
-    return prisma.mCQQuestion.create({ data: stripUnsupportedColumnsForLegacyDb(data) });
-  }
-}
-
-async function createManyQuestionsCompat(data: any[]) {
-  try {
-    return await prisma.mCQQuestion.createMany({ data: data as any });
-  } catch (e: any) {
-    if (!isMissingSubdomainColumnError(e)) throw e;
-    return prisma.mCQQuestion.createMany({ data: data.map((row) => stripUnsupportedColumnsForLegacyDb(row)) as any });
-  }
-}
-
-function toDbQuestionPayload(input: any, sortOrder: number) {
-  const type = normalizeQuestionType(input?.type);
-  const prompt = String(input?.prompt || "").trim();
-  const explanation = input?.explanation ?? null;
-  const difficulty = Math.max(1, Math.min(5, Number(input?.difficulty ?? 1) || 1));
-  const tags = Array.isArray(input?.tags) ? input.tags : [];
-  const sourceData = input?.data && typeof input.data === "object" ? input.data : {};
-  const subdomain = String(input?.subdomain ?? (sourceData as any)?.subdomain ?? "").trim();
-  const lifecycleStatus = String(input?.lifecycleStatus ?? (sourceData as any)?.lifecycleStatus ?? "ACTIVE").trim().toUpperCase();
-
-  if (!prompt) throw new Error("Each question requires prompt");
-
-  if (type === "multiple_choice" || type === "incident") {
-    const choices = Array.isArray(input?.choices) ? input.choices : safeArray<string>((sourceData as any)?.choices);
-    const correctIndex = typeof input?.correctIndex === "number" ? input.correctIndex : Number((sourceData as any)?.correctIndex ?? -1);
-    if (!Array.isArray(choices) || choices.length < 2 || !Number.isInteger(correctIndex) || correctIndex < 0 || correctIndex >= choices.length) {
-      throw new Error(`${type} questions require choices[] and a valid correctIndex`);
-    }
-    return {
-      prompt,
-      type: type.toUpperCase(),
-      choices,
-      correctIndex,
-      data: {
-        ...(sourceData || {}),
-        ...(subdomain ? { subdomain } : {}),
-        choices,
-        correctIndex,
-      },
-      explanation,
-      difficulty,
-      tags,
-      sortOrder,
-    };
-  }
-
-  if (type === "true_false") {
-    const answerRaw = String((sourceData as any)?.correctAnswer ?? input?.correctAnswer ?? (Number(input?.correctIndex ?? (sourceData as any)?.correctIndex ?? 0) === 0 ? "true" : "false")).trim().toLowerCase();
-    const choices = ["True", "False"];
-    const correctIndex = answerRaw === "false" ? 1 : 0;
-    return {
-      prompt,
-      type: "TRUE_FALSE",
-      choices,
-      correctIndex,
-      data: {
-        ...sourceData,
-        ...(subdomain ? { subdomain } : {}),
-        choices,
-        correctIndex,
-        correctAnswer: correctIndex === 0,
-      },
-      explanation,
-      difficulty,
-      tags,
-      sortOrder,
-    };
-  }
-
-  if (type === "fill_blank") {
-    const answers = safeArray<string>((sourceData as any)?.answers).map((value) => String(value).trim()).filter(Boolean);
-    if (!answers.length) throw new Error("fill_blank questions require data.answers[]");
-    return {
-      prompt,
-      type: "FILL_BLANK",
-      choices: null,
-      correctIndex: null,
-      data: {
-        ...sourceData,
-        ...(subdomain ? { subdomain } : {}),
-        answers,
-      },
-      explanation,
-      difficulty,
-      tags,
-      sortOrder,
-    };
-  }
-
-  if (type === "sequence_order") {
-    const items = safeArray<string>((sourceData as any)?.items);
-    const correctOrder = safeArray<string>((sourceData as any)?.correctOrder).length ? safeArray<string>((sourceData as any)?.correctOrder) : items;
-    if (items.length < 2 || correctOrder.length < 2) throw new Error("sequence_order questions require data.items[] / data.correctOrder[]");
-    return {
-      prompt,
-      type: "SEQUENCE_ORDER",
-      choices: null,
-      correctIndex: null,
-      data: {
-        ...sourceData,
-        ...(subdomain ? { subdomain } : {}),
-        items,
-        correctOrder,
-      },
-      explanation,
-      difficulty,
-      tags,
-      sortOrder,
-    };
-  }
-
-  if (type === "multi_select") {
-    const choices = safeArray<string>((sourceData as any)?.choices);
-    const correctIndices = uniqueSortedNumbers((sourceData as any)?.correctIndices);
-    if (choices.length < 2 || !correctIndices.length) throw new Error("multi_select questions require data.choices[] and data.correctIndices[]");
-    return {
-      prompt,
-      type: "MULTI_SELECT",
-      choices,
-      correctIndex: null,
-      data: {
-        ...sourceData,
-        ...(subdomain ? { subdomain } : {}),
-        choices,
-        correctIndices,
-      },
-      explanation,
-      difficulty,
-      tags,
-      sortOrder,
-    };
-  }
-
-  if (type === "matching") {
-    const pairs = safeArray<any>((sourceData as any)?.pairs)
-      .map((pair) => ({ left: String(pair?.left || "").trim(), right: String(pair?.right || "").trim() }))
-      .filter((pair) => pair.left && pair.right);
-    if (pairs.length < 2) throw new Error("matching questions require data.pairs[] with left/right values");
-    return {
-      prompt,
-      type: "MATCHING",
-      choices: null,
-      correctIndex: null,
-      data: {
-        ...sourceData,
-        ...(subdomain ? { subdomain } : {}),
-        pairs,
-        leftItems: pairs.map((pair) => pair.left),
-        rightItems: Array.from(new Set(pairs.map((pair) => pair.right))),
-        correctMatches: pairs.map((pair) => pair.right),
-      },
-      explanation,
-      difficulty,
-      tags,
-      sortOrder,
-    };
-  }
-
-  if (type === "cli_command") {
-    const expectedCommands = safeArray<string>((sourceData as any)?.expectedCommands).map((value) => String(value).trim()).filter(Boolean);
-    if (!expectedCommands.length) throw new Error("cli_command questions require data.expectedCommands[]");
-    return {
-      prompt,
-      type: "CLI_COMMAND",
-      choices: null,
-      correctIndex: null,
-      data: {
-        ...sourceData,
-        ...(subdomain ? { subdomain } : {}),
-        expectedCommands,
-      },
-      explanation,
-      difficulty,
-      tags,
-      sortOrder,
-    };
-  }
-
-  if (type === "log_analysis") {
-    const logText = String((sourceData as any)?.logText || (sourceData as any)?.log || "").trim();
-    const answers = safeArray<string>((sourceData as any)?.answers).map((value) => String(value).trim()).filter(Boolean);
-    const expectedFindings = safeArray<string>((sourceData as any)?.expectedFindings).map((value) => String(value).trim()).filter(Boolean);
-    const acceptable = answers.length ? answers : expectedFindings;
-    if (!logText || !acceptable.length) throw new Error("log_analysis questions require data.logText and data.answers[] or data.expectedFindings[]");
-    return {
-      prompt,
-      type: "LOG_ANALYSIS",
-      choices: null,
-      correctIndex: null,
-      data: {
-        ...sourceData,
-        ...(subdomain ? { subdomain } : {}),
-        logText,
-        answers: acceptable,
-        expectedFindings: expectedFindings.length ? expectedFindings : acceptable,
-      },
-      explanation,
-      difficulty,
-      tags,
-      sortOrder,
-    };
-  }
-
-  throw new Error(`Unsupported question type: ${type}`);
-}
-
-
-function normalizePromptSignature(input: any) {
-  const prompt = String(input?.prompt || "").trim().toLowerCase().replace(/\s+/g, " ");
-  const type = String(input?.type || "").trim().toUpperCase();
-  const data = input?.data && typeof input.data === "object" ? input.data : {};
-  const choices = Array.isArray(input?.choices) ? input.choices : Array.isArray((data as any)?.choices) ? (data as any).choices : [];
-  const subdomain = String((data as any)?.subdomain || input?.subdomain || "").trim().toLowerCase();
-  return JSON.stringify({ prompt, type, subdomain, choices: choices.map((v: any) => String(v).trim().toLowerCase()) });
-}
+import { NextResponse } from 'next/server';
+import { requireAdminRequest } from '@/app/api/_lib/adminGuard';
+import { prisma } from '@/lib/prisma';
+import { auditContent, authorQuestion, contentSignature, validateContent, DIFFICULTY_TIERS } from '@/lib/contentPipeline';
 
 export async function GET(req: Request) {
-  const admin = await requireAdminRequest();
-  if (!admin.ok) return admin.response;
-  try {
-    const { searchParams } = new URL(req.url);
-    const setId = searchParams.get("setId");
-    const summary = searchParams.get("summary") === "1";
-    if (summary) {
-      const sets = await prisma.questionSet.findMany({
-        orderBy: { name: "asc" },
-        select: {
-          id: true, name: true, domain: true, status: true,
-          questions: { select: { type: true, difficulty: true, testNowEligible: true, isGoldenEligible: true, data: true, subdomain: true } },
-        },
-      });
-      const mapped = sets.map((set: any) => {
-        const questions = Array.isArray(set.questions) ? set.questions : [];
-        const byType: Record<string, number> = {};
-        const byDifficulty: Record<string, number> = { easy: 0, normal: 0, hard: 0 };
-        const bySubdomain: Record<string, number> = {};
-        let bossCount = 0, goldenCount = 0, testNowCount = 0;
-        for (const q of questions) {
-          const type = normalizeQuestionType(q.type);
-          byType[type] = (byType[type] || 0) + 1;
-          const d = Number(q.difficulty || 1);
-          const bucket = d >= 3 ? "hard" : d === 2 ? "normal" : "easy";
-          byDifficulty[bucket] = (byDifficulty[bucket] || 0) + 1;
-          const sub = String(q.subdomain || q?.data?.subdomain || "GENERAL").trim().toUpperCase() || "GENERAL";
-          bySubdomain[sub] = (bySubdomain[sub] || 0) + 1;
-          if (Boolean(q?.data?.bossEligible)) bossCount += 1;
-          if (q.isGoldenEligible) goldenCount += 1;
-          if (q.testNowEligible) testNowCount += 1;
-        }
-        return {
-          id: set.id, name: set.name, domain: set.domain, status: set.status,
-          questionCount: questions.length, bossCount, goldenCount, testNowCount,
-          byType, byDifficulty, bySubdomain,
-        };
-      });
-      return NextResponse.json({
-        sets: mapped,
-        totalQuestions: mapped.reduce((sum: number, set: any) => sum + Number(set.questionCount || 0), 0),
-      });
-    }
-    if (!setId) return NextResponse.json({ error: "setId is required" }, { status: 400 });
-
-    const questions = await listQuestionsForSet(setId);
-    return NextResponse.json({ questions, questionCount: questions.length });
-  } catch (e: any) {
-    return NextResponse.json({ error: e?.message || "Failed" }, { status: 500 });
+  const admin = await requireAdminRequest(); if (!admin.ok) return admin.response;
+  const params = new URL(req.url).searchParams;
+  if (params.get('summary') === '1') {
+    const sets = await prisma.questionSet.findMany({ include: { questions: true } });
+    const mapped = sets.map(s => { const rows = auditContent(s.questions); return { ...s, questions: undefined, questionCount: rows.length, eligibleCount: rows.filter(q => q.review.eligible).length, byDifficulty: Object.fromEntries(DIFFICULTY_TIERS.map(t => [t.value, rows.filter(q => q.difficulty === t.value).length])) }; });
+    return NextResponse.json({ sets: mapped, totalQuestions: mapped.reduce((n, s) => n + s.questionCount, 0) });
   }
+  const setId = params.get('setId'); if (!setId) return NextResponse.json({ error: 'setId required' }, { status: 400 });
+  const rows = await prisma.mCQQuestion.findMany({ where: { setId }, orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }] });
+  const questions = auditContent(rows);
+  const importIssues = await prisma.questionImportIssue.findMany({ where: { setId }, orderBy: { createdAt: 'desc' } });
+  return NextResponse.json({ questions, questionCount: rows.length, eligibleCount: questions.filter(q => q.review.eligible).length, importIssues, tiers: DIFFICULTY_TIERS });
 }
-
 export async function POST(req: Request) {
-  const admin = await requireAdminRequest();
-  if (!admin.ok) return admin.response;
+  const admin = await requireAdminRequest(); if (!admin.ok) return admin.response;
   try {
-    const body = await req.json();
-    const setId = body.setId;
-    if (!setId) return NextResponse.json({ error: "setId is required" }, { status: 400 });
-
-    const max = await prisma.mCQQuestion.aggregate({
-      where: { setId },
-      _max: { sortOrder: true },
+    const body = await req.json(); const setId = String(body.setId || '');
+    if (!await prisma.questionSet.findUnique({ where: { id: setId } })) return NextResponse.json({ error: 'Pool not found' }, { status: 404 });
+    const incoming = Array.isArray(body.questions) ? body.questions : [body];
+    const report = await prisma.$transaction(async tx => {
+      const existing = await tx.mCQQuestion.findMany({ where: { setId } });
+      const seen = new Set(existing.map(contentSignature)); let order = Math.max(-1, ...existing.map(q => q.sortOrder)) + 1;
+      const report = { inserted: 0, skippedDuplicates: 0, quarantined: 0, issues: [] as any[] };
+      for (let i = 0; i < incoming.length; i++) {
+        const raw = incoming[i]; let reason = '';
+        try {
+          const payload = authorQuestion(raw, order++); const signature = contentSignature(payload);
+          if (seen.has(signature)) { reason = 'Duplicate question (same prompt, choices and answer)'; report.skippedDuplicates++; }
+          else { await tx.mCQQuestion.create({ data: { ...payload, setId } as any }); seen.add(signature); report.inserted++; }
+        } catch (e: any) { reason = e.message; report.quarantined++; }
+        if (reason) { await tx.questionImportIssue.create({ data: { setId, rowIndex: i + 1, reason, payload: raw ?? {} } }); report.issues.push({ row: i + 1, reason }); }
+      }
+      return report;
     });
-    let nextOrder = (max._max.sortOrder ?? -1) + 1;
-
-    if (Array.isArray(body.questions)) {
-      const incoming = body.questions;
-      if (incoming.length === 0) return NextResponse.json({ inserted: 0, skippedDuplicates: 0 });
-
-      const existingQuestions = await listExistingQuestionSignatures(setId);
-      const seen = new Set(existingQuestions.map((q) => normalizePromptSignature(q)));
-      const localSeen = new Set<string>();
-      const data: any[] = [];
-      let skippedDuplicates = 0;
-
-      for (const q of incoming) {
-        const normalized = toDbQuestionPayload(q, typeof q.sortOrder === "number" ? q.sortOrder : nextOrder++);
-        const quality = validateQuestionQuality(normalized as any);
-        const payload = { setId, ...normalized, data: { ...((normalized as any).data || {}), lifecycleStatus: String((q?.lifecycleStatus || (normalized as any)?.data?.lifecycleStatus || "ACTIVE")).toUpperCase(), qualityScore: quality.qualityScore, qualityIssues: quality.issues } };
-        const signature = normalizePromptSignature(payload);
-        if (seen.has(signature) || localSeen.has(signature)) {
-          skippedDuplicates += 1;
-          continue;
-        }
-        localSeen.add(signature);
-        data.push(payload);
-      }
-
-      if (!data.length) return NextResponse.json({ inserted: 0, skippedDuplicates });
-      const res = await createManyQuestionsCompat(data as any);
-      return NextResponse.json({ inserted: res.count, skippedDuplicates });
-    }
-
-    const payload = toDbQuestionPayload(body, typeof body.sortOrder === "number" ? body.sortOrder : nextOrder);
-    const quality = validateQuestionQuality(payload as any);
-    const q = await createQuestionCompat({ setId, ...(payload as any), data: { ...((payload as any).data || {}), lifecycleStatus: String((body?.lifecycleStatus || (payload as any)?.data?.lifecycleStatus || "ACTIVE")).toUpperCase(), qualityScore: quality.qualityScore, qualityIssues: quality.issues } });
-    return NextResponse.json({ question: q });
-  } catch (e: any) {
-    return NextResponse.json({ error: e?.message || "Failed" }, { status: 500 });
-  }
+    return NextResponse.json(report);
+  } catch (e: any) { return NextResponse.json({ error: e.message }, { status: 400 }); }
 }
-
 export async function DELETE(req: Request) {
-  const admin = await requireAdminRequest();
-  if (!admin.ok) return admin.response;
-  try {
-    const body = await req.json().catch(() => ({}));
-    const ids = Array.isArray(body?.ids)
-      ? body.ids.map((v: any) => String(v).trim()).filter(Boolean)
-      : [String(body?.id || "").trim()].filter(Boolean);
-    const setId = String(body?.setId || "").trim();
-    if (body?.clearSet === true && setId) {
-      const result = await prisma.mCQQuestion.deleteMany({ where: { setId } });
-      return NextResponse.json({ ok: true, deleted: result.count, setId });
-    }
-    if (!ids.length) return NextResponse.json({ error: "id or ids required" }, { status: 400 });
-    const result = await prisma.mCQQuestion.deleteMany({ where: { id: { in: ids } } });
-    return NextResponse.json({ ok: true, deleted: result.count });
-  } catch (e: any) {
-    return NextResponse.json({ error: e?.message || "Failed to delete question" }, { status: 500 });
-  }
+  const admin = await requireAdminRequest(); if (!admin.ok) return admin.response;
+  const body = await req.json();
+  const ids = body.ids || [body.id];
+  if (!body.setId && !ids.filter(Boolean).length) return NextResponse.json({ error: 'Question or pool required' }, { status: 400 });
+  const result = await prisma.$transaction(async tx => {
+    const rows = await tx.mCQQuestion.findMany({ where: body.clearSet && body.setId ? { setId: body.setId } : { id: { in: ids.filter(Boolean) } } });
+    for (const q of rows) await tx.mCQQuestion.update({ where: { id: q.id }, data: { data: { ...(q.data as any || {}), lifecycleStatus: 'ARCHIVED' } } });
+    if (body.clearSet && body.setId) { await tx.questionSetPlacement.updateMany({ where: { setId: body.setId }, data: { isActive: false } }); await tx.questionSet.update({ where: { id: body.setId }, data: { status: 'DRAFT' } }); }
+    return rows.length;
+  });
+  return NextResponse.json({ ok: true, archived: result, deleted: 0 });
 }
-
 export async function PATCH(req: Request) {
-  const admin = await requireAdminRequest();
-  if (!admin.ok) return admin.response;
+  const admin = await requireAdminRequest(); if (!admin.ok) return admin.response;
   try {
     const body = await req.json();
-
-    if (body?.setId && Array.isArray(body?.order)) {
-      const setId = String(body.setId);
-      const rows = await listQuestionsForSet(setId);
-      const clusters = clusterQuestionsBySimilarity(rows as any[], 0.84).filter((cluster: any) => cluster.ids.length > 1);
-      const duplicateIds = new Set<string>();
-      for (const cluster of clusters) {
-        for (const id of cluster.ids.slice(1)) duplicateIds.add(String(id));
+    await prisma.$transaction(async tx => {
+      if (body.setId && Array.isArray(body.order)) {
+        const rows = await tx.mCQQuestion.findMany({ where: { setId: body.setId } }); const ids = new Set(rows.map(q => q.id));
+        if (new Set(body.order).size !== body.order.length || body.order.some((id: string) => !ids.has(id))) throw new Error('Order contains duplicate or foreign question IDs');
+        for (let i = 0; i < body.order.length; i++) await tx.mCQQuestion.update({ where: { id: body.order[i] }, data: { sortOrder: i } });
+        return;
       }
-      const exactSeen = new Set<string>();
-      for (const row of rows) {
-        const sig = normalizePromptSignature(row);
-        if (exactSeen.has(sig)) duplicateIds.add(String((row as any).id));
-        else exactSeen.add(sig);
+      const ids = body.ids || [body.id]; const patch = body.patch || body;
+      const rows = await tx.mCQQuestion.findMany({ where: { id: { in: ids.filter(Boolean) } } });
+      if (!rows.length) throw new Error('Questions not found');
+      for (const q of rows) {
+        const merged = { ...q, ...patch, data: { ...(q.data as any || {}), ...(patch.data || {}) } };
+        if (patch.bossEligible !== undefined) merged.data.bossEligible = Boolean(patch.bossEligible);
+        if (patch.lifecycleStatus) merged.data.lifecycleStatus = patch.lifecycleStatus;
+        // Archiving/rejection must remain possible even for malformed legacy content.
+        if (patch.reviewStatus === 'REJECTED' || patch.lifecycleStatus === 'ARCHIVED') {
+          await tx.mCQQuestion.update({ where: { id: q.id }, data: { data: { ...(q.data as any || {}), ...(patch.lifecycleStatus ? { lifecycleStatus: patch.lifecycleStatus } : {}), ...(patch.reviewStatus ? { reviewStatus: patch.reviewStatus } : {}) } } }); continue;
+        }
+        const normalized = authorQuestion(merged, q.sortOrder);
+        const issues = validateContent(merged);
+        if (patch.reviewStatus === 'APPROVED' && issues.length) throw new Error(issues.join('; '));
+        normalized.data.reviewStatus = patch.reviewStatus === 'APPROVED' ? 'APPROVED' : 'PENDING';
+        normalized.data.lifecycleStatus = patch.lifecycleStatus || merged.data.lifecycleStatus || 'ACTIVE';
+        await tx.mCQQuestion.update({ where: { id: q.id }, data: normalized as any });
       }
-      if (duplicateIds.size) {
-        await prisma.mCQQuestion.deleteMany({ where: { setId, id: { in: [...duplicateIds] } } });
-      }
-      const remainingOrder = (body.order as string[]).filter((id) => !duplicateIds.has(String(id)));
-      await prisma.$transaction(remainingOrder.map((id, idx) =>
-        prisma.mCQQuestion.update({
-          where: { id },
-          data: { sortOrder: idx },
-        })
-      ));
-      return NextResponse.json({ ok: true, removedDuplicates: duplicateIds.size });
-    }
-
-    if (body?.id) {
-      const id = String(body.id).trim();
-      if (!id) return NextResponse.json({ error: "id is required" }, { status: 400 });
-      const updateData: any = {};
-      if (typeof body.prompt === "string") updateData.prompt = body.prompt.trim();
-      if (body.difficulty !== undefined) updateData.difficulty = Math.max(1, Math.min(5, Number(body.difficulty) || 1));
-      if (body.explanation !== undefined) updateData.explanation = body.explanation === null ? null : String(body.explanation);
-      if (body.lifecycleStatus !== undefined) updateData.data = { lifecycleStatus: String(body.lifecycleStatus || "ACTIVE").toUpperCase() } as any;
-      if (Array.isArray(body.tags)) updateData.tags = body.tags.map((v: any) => String(v).trim()).filter(Boolean);
-      if (body.testNowEligible !== undefined) updateData.testNowEligible = Boolean(body.testNowEligible);
-      if (body.isGoldenEligible !== undefined) {
-        updateData.isGoldenEligible = Boolean(body.isGoldenEligible);
-        // Eligibility never relabels the authored difficulty. Runtime requires tiers 4–5.
-      }
-      if (body.bossEligible !== undefined) updateData.data = { bossEligible: Boolean(body.bossEligible) } as any;
-      if (body.goldenWeight !== undefined) updateData.goldenWeight = Math.max(1, Number(body.goldenWeight) || 1);
-      if (body.goldenBonusXp !== undefined) updateData.goldenBonusXp = Math.max(0, Number(body.goldenBonusXp) || 0);
-      const existing = await prisma.mCQQuestion.findUnique({ where: { id } });
-      const mergedData = { ...(((existing as any)?.data && typeof (existing as any).data === "object") ? (existing as any).data : {}), ...((updateData.data && typeof updateData.data === "object") ? updateData.data : {}) } as any;
-      const quality = validateQuestionQuality({
-        prompt: updateData.prompt ?? (existing as any)?.prompt,
-        type: (existing as any)?.type,
-        choices: (existing as any)?.choices,
-        correctIndex: (existing as any)?.correctIndex,
-        data: mergedData,
-        explanation: updateData.explanation ?? (existing as any)?.explanation,
-      });
-      updateData.data = { ...mergedData, qualityScore: quality.qualityScore, qualityIssues: quality.issues };
-      const question = await prisma.mCQQuestion.update({ where: { id }, data: updateData });
-      return NextResponse.json({ ok: true, question, quality });
-    }
-
-    if (Array.isArray(body?.ids) && body?.patch && typeof body.patch === "object") {
-      const ids = body.ids.map((v: any) => String(v).trim()).filter(Boolean);
-      if (!ids.length) return NextResponse.json({ error: "ids are required" }, { status: 400 });
-      const patch: any = {};
-      if (body.patch.testNowEligible !== undefined) patch.testNowEligible = Boolean(body.patch.testNowEligible);
-      if (body.patch.isGoldenEligible !== undefined) {
-        patch.isGoldenEligible = Boolean(body.patch.isGoldenEligible);
-
-      }
-      if (body.patch.goldenWeight !== undefined) patch.goldenWeight = Math.max(1, Number(body.patch.goldenWeight) || 1);
-      if (body.patch.goldenBonusXp !== undefined) patch.goldenBonusXp = Math.max(0, Number(body.patch.goldenBonusXp) || 0);
-      if (body.patch.difficulty !== undefined) patch.difficulty = Math.max(1, Math.min(5, Number(body.patch.difficulty) || 1));
-      if (body.patch.bossEligible !== undefined) {
-        const rows = await prisma.mCQQuestion.findMany({ where: { id: { in: ids } }, select: { id: true, data: true } });
-        await prisma.$transaction(rows.map((row: any) => prisma.mCQQuestion.update({
-          where: { id: row.id },
-          data: {
-            ...patch,
-            data: { ...((row.data && typeof row.data === "object") ? row.data : {}), bossEligible: Boolean(body.patch.bossEligible) } as any,
-          },
-        })));
-        return NextResponse.json({ ok: true, updated: rows.length });
-      }
-      const res = await prisma.mCQQuestion.updateMany({ where: { id: { in: ids } }, data: patch });
-      return NextResponse.json({ ok: true, updated: res.count });
-    }
-
-    return NextResponse.json({ error: "Unsupported PATCH body" }, { status: 400 });
-  } catch (e: any) {
-    return NextResponse.json({ error: e?.message || "Failed" }, { status: 500 });
-  }
+    });
+    return NextResponse.json({ ok: true });
+  } catch (e: any) { return NextResponse.json({ error: e.message }, { status: 400 }); }
 }

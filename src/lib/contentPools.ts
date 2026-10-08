@@ -1,3 +1,4 @@
+import { learnerEligible } from "@/lib/contentPipeline";
 /** Only active placements of published sets define learner availability. */
 export const LEGACY_TRAINING_PATHS: Record<string, { industry: string; careerPath: string }> = {
   HELPDESK_SUPPORT: { industry: "Information Technology", careerPath: "Help Desk" },
@@ -38,6 +39,8 @@ export function buildContentPoolCatalog(placements: any[]): ContentPool[] {
     const domain = String(p.set.domain || "GENERAL").toUpperCase();
     const key = p.lane === "TRAINING" ? `${p.lane}:${industry}:${careerPath}` : p.lane === "CERTIFICATIONS" ? `${p.lane}:${certExam}` : `${p.lane}:${domain}`;
     if ((p.lane === "TRAINING" && !careerPath) || (p.lane === "CERTIFICATIONS" && !certExam)) continue;
+    const questionCount = Array.isArray(p.set.questions) ? p.set.questions.filter(learnerEligible).length : Number(p.set._count?.questions || 0);
+    if (!questionCount) continue;
     const group = groups.get(key) || {
       key, lane: p.lane, label: careerPath || String(certExam || domain).replaceAll("_", " "),
       industry, careerPath, startingPosition: p.startingPosition || null, certExam,
@@ -47,7 +50,7 @@ export function buildContentPoolCatalog(placements: any[]): ContentPool[] {
     if (!group.setIds.includes(p.setId)) {
       group.setIds.push(p.setId);
       group.poolCount += 1;
-      group.questionCount += Number(p.set._count?.questions || 0);
+      group.questionCount += questionCount;
     }
     groups.set(key, group);
   }

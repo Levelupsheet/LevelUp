@@ -308,10 +308,22 @@ model QuestionSetPlacement {
   @@index([lane, certExam])
 }
 
+model QuestionImportIssue {
+  id String @id @default(cuid())
+  setId String
+  rowIndex Int
+  reason String
+  payload Json
+  createdAt DateTime @default(now())
+  @@index([setId, createdAt])
+}
+
 model QuestionSet {
   id        String            @id @default(cuid())
   domain    QuestionDomain
   name      String
+  industry String?
+  careerPath String?
   status    QuestionSetStatus @default(DRAFT)
   createdAt DateTime          @default(now())
   updatedAt DateTime          @updatedAt

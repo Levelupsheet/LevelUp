@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireAdminRequest } from "@/app/api/_lib/adminGuard";
 import { buildContentPoolCatalog, testNowBanks, canonicalTrainingTarget, trainingPlacementFilter } from "@/lib/contentPools";
+import { learnerEligible } from "@/lib/contentPipeline";
 import { prisma } from "@/lib/prisma";
 
 /**
@@ -50,6 +51,10 @@ export async function POST(req: Request) {
     }
 
     const created = await prisma.$transaction(async (tx: any) => {
+      if (isActive) {
+        const questions = await tx.mCQQuestion.findMany({ where: { setId } });
+        if (!questions.some(learnerEligible)) throw new Error("Review and approve valid questions before publishing");
+      }
       // The Admin Publish pool action publishes the set and placement together.
       if (isActive) await tx.questionSet.update({ where: { id: setId }, data: { status: "PUBLISHED" } });
       if (exclusive) {
@@ -98,7 +103,7 @@ export async function GET() {
   if (!admin.ok) return admin.response;
   const placements = await prisma.questionSetPlacement.findMany({
     orderBy: { createdAt: "desc" },
-    include: { set: { include: { _count: { select: { questions: true } } } } },
+    include: { set: { include: { questions: true, _count: { select: { questions: true } } } } },
   });
   const activePools = buildContentPoolCatalog(placements);
   return NextResponse.json({ placements, activePools, activeTestNowBanks: testNowBanks(activePools) });

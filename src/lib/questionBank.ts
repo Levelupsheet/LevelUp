@@ -1,3 +1,4 @@
+import { learnerEligible } from "@/lib/contentPipeline";
 import { trainingPlacementFilter } from "@/lib/contentPools";
 import { prisma } from "@/lib/prisma";
 import { inferDomainFromQuestion } from "@/lib/learningProfile";
@@ -117,8 +118,8 @@ export async function loadActiveBank(args: {
   for (const placement of placements) {
     for (const raw of placement?.set?.questions || []) {
       const runtime = mapDbQuestionToRuntime({ ...raw, setName: placement.set.name, setDomain: placement.set.domain });
-      const lifecycleStatus = String((runtime.data as any)?.lifecycleStatus || "ACTIVE").toUpperCase();
-      if (["RETIRED", "ARCHIVED"].includes(lifecycleStatus)) continue;
+      
+      if (!learnerEligible(raw)) continue;
       const signature = stableQuestionSignature(runtime);
       if (seen.has(signature)) continue;
       seen.add(signature);
@@ -127,11 +128,7 @@ export async function loadActiveBank(args: {
   }
 
   const clusters = clusterQuestionsBySimilarity(deduped, 0.9);
-  const clusteredOut = new Set<string>();
-  for (const cluster of clusters) {
-    for (const id of cluster.ids.slice(1)) clusteredOut.add(String(id));
-  }
-  const filtered = deduped.filter((q) => !clusteredOut.has(String(q.id)));
+  const filtered = deduped;
 
   return {
     placements,

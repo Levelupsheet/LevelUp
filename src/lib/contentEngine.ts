@@ -280,7 +280,7 @@ function questionTags(block: NormalizedKnowledgeBlock, extra?: string[]) { retur
 function toBase(block: NormalizedKnowledgeBlock, difficulty = block.difficulty) { return { difficulty, data: { xp: xpForDifficulty(difficulty), timer: timerForDifficulty(difficulty) } }; }
 function goldenDefaults(block: NormalizedKnowledgeBlock, difficulty = block.difficulty) {
   const testNowEligible = block.lane === "TEST_NOW";
-  const isGoldenEligible = testNowEligible && difficulty >= 2;
+  const isGoldenEligible = testNowEligible && difficulty >= 4;
   return { testNowEligible, goldenEligible: isGoldenEligible, goldenWeight: difficulty >= 3 ? 3 : difficulty >= 2 ? 2 : 1, goldenBonusXp: difficulty >= 3 ? 75 : 50 };
 }
 
@@ -447,7 +447,7 @@ function definitionQuestions(block: NormalizedKnowledgeBlock, def: any): Candida
     ...goldenDefaults(block, Math.min(2, block.difficulty)),
   });
 
-  return questions;
+  return questions.filter(q => ["multiple_choice", "true_false", "cli_command"].includes(q.type));
 }
 function procedureQuestion(block: NormalizedKnowledgeBlock, procedure: any): CandidateQuestion | null {
   const steps = uniqueStrings(procedure?.steps || []);
@@ -545,7 +545,7 @@ export function generateQuestionsFromBlock(block: NormalizedKnowledgeBlock): Can
   for (const entry of block.logs) { const log = logAnalysisQuestion(block, entry); if (log) questions.push(log); }
   for (const entry of block.matching) { const q = matchingQuestion(block, entry); if (q) questions.push(q); }
   const multi = multiSelectQuestion(block); if (multi) questions.push(multi);
-  return questions;
+  return questions.filter(q => ["multiple_choice", "true_false", "cli_command"].includes(q.type));
 }
 
 export function mapCandidateToDbQuestion(question: CandidateQuestion, sortOrder: number) {

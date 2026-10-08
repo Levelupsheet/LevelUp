@@ -1,5 +1,6 @@
 "use client";
 
+import QuestionPipelineAdmin from "@/components/QuestionPipelineAdmin";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { clusterQuestionsBySimilarity, validateQuestionQuality } from "@/lib/questionQuality";
 import {
@@ -1027,7 +1028,7 @@ export default function AdminPage(){
   const [catalogCareer, setCatalogCareer] = useState("CNA");
   const [catalogMsg, setCatalogMsg] = useState("");
   const [bulkImporting, setBulkImporting] = useState(false);
-  const [questionView, setQuestionView] = useState<"manage" | "import" | "publish">("manage");
+  const [questionView, setQuestionView] = useState<"manage" | "import" | "review" | "publish">("manage");
 
   const [err, setErr] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
@@ -1521,6 +1522,7 @@ export default function AdminPage(){
           <button onClick={() => { setTab("catalog"); void loadCareerCatalog(); }} className={tab==="catalog" ? "primary" : ""}>Careers</button>
           <button onClick={() => { setTab("questions"); setQuestionView("manage"); }} className={tab==="questions" && questionView==="manage" ? "primary" : ""}>Question Pools</button>
           <button onClick={() => { setTab("questions"); setQuestionView("import"); }} className={tab==="questions" && questionView==="import" ? "primary" : ""}>Questions</button>
+          <button onClick={() => { setTab("questions"); setQuestionView("review"); }} className={tab==="questions" && questionView==="review" ? "primary" : ""}>Review</button>
           <button onClick={() => { setTab("questions"); setQuestionView("publish"); }} className={tab==="questions" && questionView==="publish" ? "primary" : ""}>Publish</button>
           <button onClick={() => setTab("loot")} className={tab==="loot" ? "primary" : ""}>Game & Rewards</button>
           <button onClick={() => setTab("users")} className={tab==="users" ? "primary" : ""}>Users</button>
@@ -1724,244 +1726,7 @@ export default function AdminPage(){
         </div>
       ) : null}
 
-      {tab === "questions" ? (
-        <div className="card adminQuestionBank" style={{ marginTop: 14 }}>
-          <div className="adminQuestionBankHeader">
-            <div>
-              <div className="dashboardEyebrow">CONTENT OPERATIONS</div>
-              <div style={{ fontWeight: 900, fontSize: 24 }}>{questionView === "manage" ? "Question Pools" : questionView === "import" ? "Questions" : "Publish"}</div>
-              <small>{questionView === "manage" ? "Create or select the pool you want to work with." : questionView === "import" ? "Add and review questions inside the selected pool." : "Choose where the selected pool should appear for learners."}</small>
-            </div>
-            <div className="row" style={{ gap: 8, flexWrap:"wrap" }}>
-              <button onClick={refreshSets}>Refresh</button>
-              {questionView === "import" ? <button onClick={() => fileRef.current?.click()} className="primary">Import JSON</button> : null}
-            </div>
-          </div>
-
-
-
-          {questionView === "manage" ? (
-            <div className="card" style={{ marginTop:14, background:"rgba(255,255,255,.03)" }}>
-              <div style={{ fontWeight:900, fontSize:18 }}>Live pools</div>
-              <small>See exactly which question pools are currently active for each learner experience.</small>
-              <div className="row" style={{ gap:8, flexWrap:"wrap", marginTop:12 }}>
-                {([["TRAINING","Position Training"],["CERTIFICATIONS","Certifications"],["TEST_NOW","Test Now"],["INTERVIEW","Interview"]] as const).map(([lane,label])=>
-                  <button key={lane} className={poolViewLane===lane ? "primary" : ""} onClick={()=>setPoolViewLane(lane)}>{label}</button>
-                )}
-              </div>
-              <div style={{ display:"grid", gap:8, marginTop:12 }}>
-                {placements.filter((p:any)=>p.isActive && p.set?.status === "PUBLISHED" && p.lane===poolViewLane).map((p:any)=>(
-                  <div key={p.id} className="card" style={{ padding:12, background: selectedSet===p.setId ? "rgba(64,160,210,.12)" : "rgba(0,0,0,.18)" }}>
-                    <div style={{ display:"flex", justifyContent:"space-between", gap:10, flexWrap:"wrap" }}>
-                      <b>{p.set?.name || "Question pool"}</b>
-                      <span className="badge">{p.set?.domain || "GENERAL"} • {p.set?._count?.questions || 0} questions</span>
-                    </div>
-                    <small>
-                      {poolViewLane==="TRAINING" ? `${p.industry || "Legacy"} → ${p.careerPath || p.startingPosition || "Training"}` :
-                       poolViewLane==="CERTIFICATIONS" ? `Exam: ${String(p.certExam || "").replaceAll("_"," ")}` :
-                       poolViewLane==="TEST_NOW" ? "Active in Test Now" : "Active in Interview Practice"}
-                    </small>
-                    <div className="row" style={{ gap:8, marginTop:8, flexWrap:"wrap" }}>
-                      <button onClick={()=>{setSelectedSet(p.setId);setQuestionView("manage");}}>View deployed questions →</button>
-                      <button className="danger" onClick={()=>unpublishPlacement(p.id, p.set?.name || "Question pool")}>Unpublish</button>
-                    </div>
-                  </div>
-                ))}
-                {!placements.some((p:any)=>p.isActive && p.set?.status === "PUBLISHED" && p.lane===poolViewLane) ? <small>No active pools in this area.</small> : null}
-              </div>
-            </div>
-          ) : null}
-
-          <div className="adminQuestionMetrics">
-            <div><small>Selected set</small><b>{selectedSetObj?.name || "None selected"}</b></div>
-            <div><small>Questions</small><b>{questions.length}</b></div>
-            <div><small>Advanced tiers (4–5)</small><b>{questions.filter(q => Number(q.difficulty) > 3).length}</b></div>
-            <div><small>Easy / Medium / Hard</small><b>{[1,2,3].map(level => questions.filter(q => Number(q.difficulty) === level).length).join(" / ")}</b></div>
-            <div><small>Quality ready</small><b>{questionQualitySummary.passing}</b></div>
-            <div><small>Needs review</small><b>{questionQualitySummary.needsReview}</b></div>
-            <div><small>Avg. quality</small><b>{questions.length ? `${questionQualitySummary.average}/100` : "—"}</b></div>
-            <div><small>Similar prompts</small><b>{questionQualitySummary.duplicateIds.size}</b></div>
-          </div>
-
-          <div className="adminQuestionSetupGrid" style={{ gridTemplateColumns: "1fr" }}>
-            <div className="card" style={{ background:"rgba(255,255,255,0.03)" }}>
-              <div style={{ fontWeight: 800, marginBottom: 4 }}>{questionView === "manage" ? "Choose or create a question pool" : "Selected question pool"}</div>
-              <small style={{ opacity: 0.76 }}>A pool is the group of questions for one subject, role, certification, or training area. Example: CNA • Patient Safety.</small>
-              <label style={{ display:"grid", gap: 6 }}>
-                <small style={{ marginTop: 8 }}>Existing question pool</small>
-                <select value={selectedSet} onChange={(e) => setSelectedSet(e.target.value)}>
-                  <option value="">-- Select a question set --</option>
-                  {sets.map((s) => (
-                    <option key={s.id} value={s.id}>{s.name} • {s.status} • {s._count?.questions ?? 0} q</option>
-                  ))}
-                </select>
-              </label>
-              <div className="row" style={{ marginTop: 10, flexWrap:"wrap" }}>
-                <span className="badge">Sets: {sets.length}</span>
-                {selectedSetObj ? <span className="badge">Domain: {selectedSetObj.domain}</span> : null}
-                {selectedSetObj ? <span className="badge">Questions: {selectedSetObj._count?.questions ?? questions.length}</span> : null}
-              </div>
-              {questionView === "manage" ? <div style={{ marginTop: 12, display:"grid", gridTemplateColumns:"1fr 180px auto", gap: 10, alignItems:"end" }}>
-                <label style={{ display:"grid", gap: 6 }}><small>New pool name</small><input value={newSetName} onChange={(e) => setNewSetName(e.target.value)} placeholder="CNA • Patient Safety • Pool 1" /></label>
-                <label style={{ display:"grid", gap: 6 }}><small>Subject / domain</small><input value={newSetDomain} onChange={(e) => setNewSetDomain(e.target.value.toUpperCase())} placeholder="GENERAL" /></label>
-                <button onClick={createSet} className="primary">Create pool</button>
-              </div> : null}
-              <div style={{ marginTop: 12 }}>
-                <small style={{ opacity: 0.8 }}>Import format: an array of questions or <code>{'{ questions: [...] }'}</code>.</small>
-              </div>
-              <input
-                ref={fileRef}
-                type="file"
-                accept="application/json,.json"
-                style={{ display: "none" }}
-                onChange={(e) => {
-                  const f = e.target.files?.[0];
-                  if (f) uploadJsonFile(f);
-                  e.currentTarget.value = "";
-                }}
-              />
-              <input
-                ref={bulkFileRef}
-                type="file"
-                accept="application/json,.json"
-                style={{ display: "none" }}
-                onChange={(e) => {
-                  const f = e.target.files?.[0];
-                  if (f) bulkImportAndAssign(f);
-                  e.currentTarget.value = "";
-                }}
-              />
-            </div>
-
-            {questionView === "publish" ? <div className="card" style={{ background:"rgba(255,255,255,0.03)" }}>
-              <div style={{ fontWeight: 800, marginBottom: 4 }}>Publish this question pool</div>
-              <small style={{ opacity: 0.78 }}>1. Select the pool on the left. 2. Choose where learners should see it. 3. Click Publish pool.</small>
-              <div style={{ display:"grid", gap: 10, marginTop: 10 }}>
-                <label style={{ display:"grid", gap: 6 }}>
-                  <small>Use this pool for</small>
-                  <select value={publishLane} onChange={(e) => setPublishLane(e.target.value as any)}>
-                    <option value="TRAINING">Position Training</option>
-                    <option value="TEST_NOW">Test Now</option>
-                    <option value="CERTIFICATIONS">Certification Practice</option>
-                    <option value="INTERVIEW">Interview Practice</option>
-                  </select>
-                </label>
-                {publishLane === "TRAINING" ? (
-                  <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap: 10 }}>
-                    <label style={{ display:"grid", gap: 6 }}>
-                      <small>Industry</small>
-                      <select value={publishIndustry} onChange={(e) => {
-                        const industry = e.target.value;
-                        setPublishIndustry(industry);
-                        const first = catalogRows.find((r:any) => r.industry === industry);
-                        setPublishCareerPath(first?.careerPath || "");
-                      }}>
-                        {Array.from(new Set(catalogRows.map((r:any)=>String(r.industry)))).map((industry) => <option key={industry} value={industry}>{industry}</option>)}
-                        {!catalogRows.length ? <option value="Information Technology">Information Technology</option> : null}
-                      </select>
-                    </label>
-                    <label style={{ display:"grid", gap: 6 }}>
-                      <small>Career path</small>
-                      <select value={publishCareerPath} onChange={(e) => setPublishCareerPath(e.target.value)}>
-                        {catalogRows.filter((r:any)=>r.industry === publishIndustry).map((r:any)=><option key={r.id} value={r.careerPath}>{r.careerPath}</option>)}
-                        {!catalogRows.some((r:any)=>r.industry === publishIndustry) ? <option value={publishCareerPath}>{publishCareerPath || "Help Desk"}</option> : null}
-                      </select>
-                    </label>
-                  </div>
-                ) : null}
-                {publishLane === "CERTIFICATIONS" ? (
-                  <label style={{ display:"grid", gap: 6 }}>
-                    <small>Which certification exam?</small>
-                    <select value={assignCertExam} onChange={(e) => setAssignCertExam(e.target.value as any)}>
-                      <option value="A_PLUS">A+</option>
-                      <option value="SECURITY_PLUS">Security+</option>
-                      <option value="AZ_900">AZ-900</option>
-                      <option value="AWS">AWS</option>
-                      <option value="AZURE">Azure</option>
-                    </select>
-                  </label>
-                ) : null}
-                <div style={{ padding: 10, borderRadius: 10, background: "rgba(0,0,0,.18)", border: "1px solid rgba(255,255,255,.08)" }}>
-                  <small>Publishing <b>{selectedSetObj?.name || "No pool selected"}</b>{selectedSetObj ? ` • ${selectedSetObj.domain} • ${questions.length} questions` : ""}</small>
-                </div>
-                <label style={{ display:"flex", gap:8, alignItems:"center", marginBottom:8 }}>
-                  <input type="checkbox" checked={replaceActivePools} onChange={(e) => setReplaceActivePools(e.target.checked)} />
-                  <span>Replace other active pools for this destination (keep their questions)</span>
-                </label>
-                <button className="primary" onClick={publishSelectedPool} disabled={!selectedSet}>{replaceActivePools ? "Replace active pools" : "Publish pool"}</button>
-                {assignMsg ? <small style={{ opacity: 0.92 }}>{assignMsg}</small> : null}
-              </div>
-            </div> : null}
-          </div>
-
-          <div className="adminQuestionReviewGrid" style={{ gridTemplateColumns:"1fr", display: questionView === "publish" ? "none" : "grid" }}>
-            <div className="card" style={{ background:"rgba(255,255,255,0.03)", display: questionView === "import" ? "block" : "none" }}>
-              <div style={{ display:"flex", justifyContent:"space-between", gap: 10, flexWrap:"wrap", alignItems:"center" }}>
-                <div>
-                  <div style={{ fontWeight: 800 }}>Add one question</div>
-                  <small>Useful for quick edits after your bulk import.</small>
-                </div>
-                <button onClick={saveSingleQuestion} className="primary" disabled={!selectedSet}>Save question</button>
-              </div>
-              <textarea
-                value={qDraft}
-                onChange={(e) => setQDraft(e.target.value)}
-                style={{ width:"100%", minHeight: 260, marginTop: 10, fontFamily:"ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace", fontSize: 12 }}
-              />
-            </div>
-
-            <div className="card" style={{ background:"rgba(255,255,255,0.03)" }}>
-              <div style={{ display:"flex", justifyContent:"space-between", gap: 10, flexWrap:"wrap", alignItems:"center" }}>
-                <div>
-                  <div style={{ fontWeight: 800 }}>Questions in selected set</div>
-                  <small>{selectedSetObj ? selectedSetObj.name : "Select a set to review imported questions."}</small>
-                </div>
-                <div className="row" style={{ gap: 8, flexWrap:"wrap" }}>
-                  <button onClick={saveOrder} disabled={!dirtyOrder || !selectedSet}>Save order</button>
-                  <button className="danger" onClick={clearSelectedSet} disabled={!selectedSet || questions.length === 0 || clearingSet}>{clearingSet ? "Clearing..." : "Clear all questions"}</button>
-                  <span className="badge">Total: {questions.length}</span>
-                </div>
-              </div>
-              <div style={{ marginTop: 12, maxHeight: 560, overflow:"auto", display:"grid", gap: 10 }}>
-                {questions.map((q, idx) => {
-                  const quality = validateQuestionQuality(q);
-                  const isSimilar = questionQualitySummary.duplicateIds.has(q.id);
-                  return (
-                  <div key={q.id} className={"card adminQuestionReviewCard " + (quality.issues.length ? "needsReview" : "qualityReady")}>
-                    <div style={{ display:"flex", justifyContent:"space-between", gap: 10, flexWrap:"wrap", alignItems:"center" }}>
-                      <div style={{ fontWeight: 800 }}>{idx + 1}. {q.prompt}</div>
-                      <div className="row" style={{ gap: 8, flexWrap:"wrap" }}>
-                        <button onClick={() => moveQuestion(idx, -1)} disabled={idx === 0}>↑</button>
-                        <button onClick={() => moveQuestion(idx, 1)} disabled={idx === questions.length - 1}>↓</button>
-                        <button className="danger" onClick={() => deleteQuestion(q.id)}>Delete</button>
-                      </div>
-                    </div>
-                    <div className="row" style={{ marginTop: 8, flexWrap:"wrap" }}>
-                      <span className="badge">Difficulty: {q.difficulty}</span>
-                      <span className="badge">Correct: {q.correctIndex + 1}</span>
-                      <span className="badge">Quality: {quality.qualityScore}/100</span>
-                      <span className={"badge " + (quality.issues.length ? "adminQualityWarn" : "adminQualityReady")}>{quality.issues.length ? `${quality.issues.length} issue${quality.issues.length === 1 ? "" : "s"}` : "Ready"}</span>
-                      {isSimilar ? <span className="badge adminQualityWarn">Similar prompt</span> : null}
-                    </div>
-                    {quality.issues.length ? <div className="adminQualityIssues"><b>Review before publishing:</b> {quality.issues.join(" • ")}</div> : null}
-                    {isSimilar ? <div className="adminQualityIssues"><b>Similarity check:</b> This prompt closely overlaps another question in the selected set. Review both before publishing.</div> : null}
-                    <div style={{ marginTop: 10, display:"grid", gap: 6 }}>
-                      {asArray(q.choices).map((choice, choiceIndex) => (
-                        <div key={choiceIndex} style={{ padding:"8px 10px", borderRadius:12, border:"1px solid rgba(255,255,255,0.08)", background: choiceIndex === q.correctIndex ? "rgba(74, 222, 128, 0.12)" : "rgba(255,255,255,0.04)" }}>
-                          <small><b>{choiceIndex + 1}.</b> {choice}</small>
-                        </div>
-                      ))}
-                    </div>
-                    {q.explanation ? <div style={{ marginTop: 8 }}><small><b>Explanation:</b> {q.explanation}</small></div> : null}
-                  </div>
-                  );
-                })}
-                {!questions.length ? <div className="card" style={{ background:"rgba(0,0,0,0.25)" }}><small>No questions in this set yet.</small></div> : null}
-              </div>
-            </div>
-          </div>
-        </div>
-      ) : null}
+      {tab === "questions" ? <QuestionPipelineAdmin view={questionView} onViewChange={setQuestionView} /> : null}
 
       <Modal open={!!previewQ} title="Question preview" onClose={() => setPreviewQ(null)}>
         {previewQ ? (

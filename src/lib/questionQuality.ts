@@ -1,11 +1,8 @@
+import { contentSignature } from "@/lib/contentPipeline";
 import { normalizeQuestionType, normalizeText, safeArray, uniqueSortedNumbers } from "@/lib/questionTypes";
 
 export function promptSignature(input: { prompt?: string | null; type?: string | null; subdomain?: string | null; choices?: any[] | null; data?: any }) {
-  const prompt = normalizeText(String(input.prompt || "")).replace(/\s+/g, " ");
-  const type = String(normalizeQuestionType(input.type)).toLowerCase();
-  const subdomain = normalizeText(String(input.subdomain || input.data?.subdomain || "general"));
-  const choices = safeArray<string>(input.choices || input.data?.choices).map((v) => normalizeText(String(v)));
-  return JSON.stringify({ prompt, type, subdomain, choices });
+  return contentSignature(input);
 }
 
 export function estimatePromptSimilarity(a?: string | null, b?: string | null) {
@@ -80,8 +77,7 @@ export function validateQuestionQuality(input: { prompt?: string | null; type?: 
   if (type === "cli_command") {
     const commands = safeArray<string>(data.expectedCommands).filter(Boolean);
     if (!commands.length) issues.push("CLI question missing expectedCommands");
-    const distractors = safeArray<string>(data.distractors || data.wrongCommands).filter(Boolean);
-    if (!distractors.length) issues.push("CLI question missing wrong command distractors");
+
   }
 
   if (type === "log_analysis") {

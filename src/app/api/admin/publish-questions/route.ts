@@ -1,3 +1,4 @@
+import { validateContent } from "@/lib/contentPipeline";
 import { NextResponse } from "next/server";
 import { requireAdminRequest } from "@/app/api/_lib/adminGuard";
 import { QuestionSetStatus } from "@prisma/client";
@@ -30,6 +31,8 @@ export async function POST(req: Request) {
     if (block.lane === "CERTIFICATIONS") placementFilter.certExam = block.certExam;
     if (block.lane === "TEST_NOW") placementFilter.set = { domain: setDomain };
 
+    const contentIssues = block.generatedQuestions.flatMap((q: any) => validateContent(q).map(issue => ({ id: q.id, issue })));
+    if (contentIssues.length) return NextResponse.json({ error: "Unsupported or malformed generated content", contentIssues }, { status: 400 });
     const reviewedQuality = block.generatedQuestions.map((q: any) => ({ id: q.id, prompt: q.prompt, quality: validateQuestionQuality(q as any) }));
     const blockedQuality = reviewedQuality.filter((row: any) => row.quality.issues.length > 0 || row.quality.qualityScore < 70);
     if (blockedQuality.length) {
@@ -38,15 +41,7 @@ export async function POST(req: Request) {
         blockedQuestions: blockedQuality.map((row: any) => ({ id: row.id, prompt: row.prompt, qualityScore: row.quality.qualityScore, issues: row.quality.issues })),
       }, { status: 400 });
     }
-    // Similar prompts are an automation concern, not an admin chore. Keep the
-    // first quality-ready question from each near-duplicate cluster and publish
-    // the rest of the batch without forcing a manual review.
-    const similarityClusters = clusterQuestionsBySimilarity(block.generatedQuestions as any[], 0.84).filter((cluster) => cluster.ids.length > 1);
-    const duplicateGeneratedIds = new Set<string>();
-    for (const cluster of similarityClusters) {
-      for (const id of cluster.ids.slice(1)) duplicateGeneratedIds.add(String(id));
-    }
-    const publishableQuestions = block.generatedQuestions.filter((q: any) => !duplicateGeneratedIds.has(String(q.id)));
+    const publishableQuestions = block.generatedQuestions;
 
     const incoming = publishableQuestions.map((q: any, index: number) => {
       const mapped = mapCandidateToDbQuestion({ prompt: q.prompt, type: q.type.toLowerCase() as any, difficulty: q.difficulty, explanation: q.explanation, tags: q.tags, data: (q.data as any) || {}, choices: Array.isArray(q.choices) ? (q.choices as string[]) : null, correctIndex: q.correctIndex }, index);
@@ -55,7 +50,7 @@ export async function POST(req: Request) {
         ...mapped,
         data: {
           ...((mapped as any).data || {}),
-          lifecycleStatus: "ACTIVE",
+          lifecycleStatus: "ACTIVE", reviewStatus: "APPROVED",
           qualityScore: quality.qualityScore,
           qualityIssues: quality.issues,
         },
@@ -76,7 +71,7 @@ export async function POST(req: Request) {
         await tx.questionSetPlacement.update({ where: { id: existingPlacement.id }, data: { isActive: true } });
       }
 
-      const existingQuestions = await tx.mCQQuestion.findMany({ where: { setId }, select: { prompt: true, type: true, choices: true, data: true } });
+      const existingQuestions = await tx.mCQQuestion.findMany({ where: { setId }, select: { prompt: true, type: true, choices: true, correctIndex: true, data: true } });
       const seen = new Set(existingQuestions.map((row: any) => promptSignature(row)));
       const toInsert = incoming.filter((row: any) => {
         const sig = promptSignature(row);
@@ -86,7 +81,8 @@ export async function POST(req: Request) {
       });
 
       if (replaceExisting) {
-        await tx.mCQQuestion.deleteMany({ where: { setId } });
+        const previous = await tx.mCQQuestion.findMany({ where: { setId } });
+        for (const q of previous) await tx.mCQQuestion.update({ where: { id: q.id }, data: { data: { ...(q.data || {}), lifecycleStatus: "ARCHIVED" } } });
         if (incoming.length) await tx.mCQQuestion.createMany({ data: incoming.map((row: any) => ({ setId, ...row })) });
       } else if (toInsert.length) {
         const max = await tx.mCQQuestion.aggregate({ where: { setId }, _max: { sortOrder: true } });
@@ -109,8 +105,8 @@ export async function POST(req: Request) {
       setName,
       publishedCount: publishResult.insertedCount,
       appendedCount: publishResult.insertedCount,
-      skippedDuplicateCount: publishResult.skippedDuplicateCount + duplicateGeneratedIds.size,
-      autoRemovedSimilarCount: duplicateGeneratedIds.size,
+      skippedDuplicateCount: publishResult.skippedDuplicateCount,
+      autoRemovedSimilarCount: 0,
       activeQuestionCount: publishResult.activeQuestionCount,
       replaceExisting,
     });
