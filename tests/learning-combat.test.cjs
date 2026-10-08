@@ -21,7 +21,7 @@ const { buildSessionBlueprint } = require('../src/lib/bankRules.ts');
 const { weightedAdaptiveQuestionPlan } = require('../src/lib/adaptiveEngine.ts');
 const { reconcileLevelLoot } = require('../src/lib/levelLoot.ts');
 const { xpRequiredToReachLevel } = require('../src/lib/progression.ts');
-const { incomingEnemyDamage, outgoingEnemyDamage, enemyAbilityForQuestion } = require('../src/engine/systems/EnemyAbilities.ts');
+const { incomingEnemyDamage, outgoingEnemyDamage, enemyAbilityForQuestion, createEnemyProfile, nextEnemyAbility, consumeEnemyAbility } = require('../src/engine/systems/EnemyAbilities.ts');
 const React = require('react');
 const { create, act } = require('react-test-renderer');
 const { useCombatQuiz } = require('../src/engine/useCombatQuiz.ts');
@@ -106,6 +106,8 @@ test('shield blocks one question and fury applies damage; healing clamps to maxi
   const combat = await mountCombat({ questions: [question(5,'a'),question(5,'b')], finishOnEnemyDefeat: false, getActiveModifiers: () => modifiers, onConsumeModifier: key => { modifiers[key] = false; }, onSubmit: r => results.push(r) });
   await combat.run(c => c.select(1)); await combat.run(c => c.submit());
   assert.equal(combat.value.state.playerHP,100); assert.equal(results[0].usedShield,true); assert.equal(results[0].playerDamage,0);
+  assert.equal(modifiers.furyActive,false, 'unused armed fury expires on the answered question');
+  modifiers.furyActive = true; // A new charge is explicitly armed for the next question.
   await combat.run(c => c.next()); await combat.run(c => c.select(0)); await combat.run(c => c.submit());
   assert.equal(results[1].enemyDamage,80); assert.equal(modifiers.furyActive,false);
   await combat.run(c => c.restorePlayerHP(500)); assert.equal(combat.value.state.playerHP,100);
@@ -118,6 +120,27 @@ test('lethal timeout locks feedback and finishes without allowing healing or adv
   assert.equal(combat.value.state.playerHP,0); assert.equal(combat.value.state.finished,true); assert.equal(combat.value.state.locked,true); assert.equal(combat.value.state.feedback,"Time's up.");
   await combat.run(c => c.restorePlayerHP(100)); await combat.run(c => c.next());
   assert.equal(combat.value.state.playerHP,0); assert.equal(combat.value.state.idx,0);
+  await combat.close();
+});
+
+test('enemy inventory is finite, independent, and Ticket Gremlin cannot gain lower-tier powers', () => {
+  for (const tier of [1,2,3]) assert.deepEqual(createEnemyProfile('Ticket Gremlin', tier, 90, { fury: 10 }).inventory, { shield: 0, fury: 0, restore: 0, time: 0 });
+  const profile = createEnemyProfile('System Reaper', 4, 150);
+  let inventory = profile.inventory;
+  for (let count = 0; count < 4; count++) inventory = consumeEnemyAbility(inventory, nextEnemyAbility(inventory));
+  assert.equal(nextEnemyAbility(inventory), null);
+  assert.equal(profile.inventory.shield, 1, 'consumption does not mutate configured loadout');
+});
+
+test('separate maximum HP and stage changes preserve player damage without regenerating dead same-tier enemies', async () => {
+  const combat = await mountCombat({ questions: [question(1,'one'),question(1,'two'),question(2,'three')], finishOnEnemyDefeat: false,
+    rules: { playerMaxHP: 80 }, getEnemyProfile: q => createEnemyProfile('Enemy', q.level, q.level * 60),
+    getEnemyDamageDealt: () => 1000 });
+  assert.equal(combat.value.state.playerHP,80); assert.equal(combat.value.state.enemyHP,60);
+  await combat.run(c => c.select(0)); await combat.run(c => c.submit()); await combat.run(c => c.next());
+  assert.equal(combat.value.state.enemyHP,0);
+  await combat.run(c => c.select(1)); await combat.run(c => c.submit()); await combat.run(c => c.next());
+  assert.equal(combat.value.state.enemyHP,120); assert.equal(combat.value.state.playerHP,72);
   await combat.close();
 });
 

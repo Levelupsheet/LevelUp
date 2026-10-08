@@ -37,7 +37,7 @@ const STORE: Stage9StoreItem[] = [
   { id: "fury_charge", name: "Fury Charge", cost: 45, description: "Adds one fury burst for tougher sessions.", itemType: "POWERUP", quantity: 1, badge: "Damage" },
   { id: "hint_discount", name: "Hint Discount", cost: 35, description: "Banks one reduced-cost hint for a future run.", itemType: "BOOST", quantity: 1, badge: "Support" },
   { id: "extra_life", name: "Boss Extra Life", cost: 80, description: "Stores one extra life for boss battle runs.", itemType: "BOSS", quantity: 1, badge: "Boss" },
-  { id: "xp_surge", name: "XP Surge", cost: 60, description: "Stores one 15 minute XP surge consumable.", itemType: "BOOST", quantity: 1, badge: "XP" },
+  { id: "xp_surge", name: "XP Surge", cost: 60, description: "Adds 50% XP to the current answer; expires after that answer.", itemType: "BOOST", quantity: 1, badge: "XP" },
 ];
 
 function dayKey(date = new Date()) {
@@ -205,21 +205,35 @@ export async function purchaseStage9Item(userId: string, itemId: string, options
 }
 
 
-export async function useStage9Item(userId: string, itemId: string) {
+export async function useStage9Item(userId: string, itemId: string, actionKey: string) {
   const key = String(userId || "").trim();
   if (!key) return { ok: false as const, error: "userId required" };
-  const existing = await prisma.inventoryItem.findFirst({
+  if (!STORE.some(item => item.id === itemId)) return { ok: false as const, error: "Unsupported item" };
+  if (!actionKey || actionKey.length > 200) return { ok: false as const, error: "actionKey required" };
+  return prisma.$transaction<{ ok: boolean; error?: string; remaining?: number; replayed?: boolean }>(async (tx: any) => {
+  // Serialize this user's consumption, including retries and multiple inventory rows.
+  await tx.$queryRaw`SELECT id FROM "User" WHERE id = ${key} FOR UPDATE`;
+  const claimKey = `use-item:${key}:${actionKey}`;
+  const prior = await tx.rewardClaim.findUnique({ where: { claimKey } });
+  if (prior) {
+    if (prior.meta?.itemId !== itemId) return { ok: false as const, error: "Action key already used for another item" };
+    return { ok: true as const, remaining: Number(prior.meta.remaining || 0), replayed: true };
+  }
+  const existing = await tx.inventoryItem.findFirst({
     where: { userId: key, itemRef: itemId, quantity: { gt: 0 } },
     orderBy: { createdAt: "asc" },
   });
   if (!existing) return { ok: false as const, error: "Item not available" };
-  const result = await prisma.inventoryItem.updateMany({
+  const result = await tx.inventoryItem.updateMany({
     where: { id: existing.id, userId: key, quantity: { gt: 0 } },
     data: { quantity: { decrement: 1 } },
   });
   if (result.count !== 1) return { ok: false as const, error: "Item not available" };
-  const updated = await prisma.inventoryItem.findUnique({ where: { id: existing.id } });
-  return { ok: true as const, remaining: Math.max(0, Number(updated?.quantity || 0)) };
+  const rows = await tx.inventoryItem.findMany({ where: { userId: key, itemRef: itemId } });
+  const remaining = rows.reduce((sum: number, row: any) => sum + Math.max(0, Number(row.quantity || 0)), 0);
+  await tx.rewardClaim.create({ data: { userId: key, claimKey, kind: "ITEM_USE", meta: { itemId, remaining } } });
+  return { ok: true as const, remaining };
+  });
 }
 
 export async function awardSessionRewards(userId: string, input: { correctCount?: number; totalQuestions?: number; outcome?: string | null; encounterType?: string | null; bestStreak?: number; }) {

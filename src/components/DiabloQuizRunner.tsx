@@ -9,7 +9,7 @@ import { getActiveUser } from "@/lib/userStore";
 import { resolveClientUserId } from "@/lib/activeUser";
 import { useCombatQuiz } from "@/engine/useCombatQuiz";
 import { inferLevel } from "@/engine/CombatQuizEngine";
-import { enemyAbilityForQuestion, incomingEnemyDamage, outgoingEnemyDamage } from "@/engine/systems/EnemyAbilities";
+import { createEnemyProfile, nextEnemyAbility, combatDamageScale, incomingEnemyDamage, outgoingEnemyDamage } from "@/engine/systems/EnemyAbilities";
 import type { CombatQuestion, DifficultyTier } from "@/engine/CombatQuizEngine";
 import {
   normalizeQuestionType,
@@ -571,7 +571,12 @@ export default function DiabloQuizRunner(props: {
   const [powerups, setPowerups] = useState<Stage7PowerupState>({ shieldActive: false, furyActive: false, shieldUses: 0, furyUses: 0 });
   const [stage9Inventory, setStage9Inventory] = useState<{ shield: number; fury: number; restore: number; xpSurge: number; hintDiscount: number; extraLife: number }>({ shield: 0, fury: 0, restore: 0, xpSurge: 0, hintDiscount: 0, extraLife: 0 });
   const userIdRef = useRef<string>("");
-  const consumedInventoryRef = useRef<{ shield: number; fury: number; restore: number; xpSurge: number }>({ shield: 0, fury: 0, restore: 0, xpSurge: 0 });
+  const itemRunKeyRef = useRef<string>("");
+  const itemPendingRef = useRef(new Set<string>());
+  const itemAppliedRef = useRef(new Set<string>());
+  const activeQuestionKeyRef = useRef("");
+  const xpSurgeQuestionRef = useRef<number | null>(null);
+  const consumedInventoryRef = useRef({ shield: 0, fury: 0, restore: 0, xpSurge: 0, extraLife: 0 });
   const [stage8History, setStage8History] = useState<Stage8QuestionResult[]>([]);
   const [xpBoostRemaining, setXpBoostRemaining] = useState(0);
   const [microRewardFlash, setMicroRewardFlash] = useState<string | null>(null);
@@ -595,9 +600,8 @@ export default function DiabloQuizRunner(props: {
   const stageConfigs = useMemo(() => buildStageConfigs(title, maxStages, encounterType), [title, maxStages, encounterType]);
   const currentStageConfig = useMemo(() => stageConfigs[Math.min(stageConfigs.length - 1, Math.max(0, sessionStage - 1))] || buildStageConfigs(title, 1, encounterType)[0], [stageConfigs, sessionStage, title, encounterType]);
 
-  const activeEnemyAbility = encounterType === "boss" ? null : enemyAbilityForQuestion(sessionStage, stageAnswered);
-  const maxPlayerHP = rules?.startHP ?? 100;
-  const { state, question, select, clear, submit, submitManual, next, addTime, restorePlayerHP, restoreEnemyHP, reset, currentDomainId, currentMastery, outcome } = useCombatQuiz({    questions: combatQuestions,
+  const maxPlayerHP = rules?.playerMaxHP ?? rules?.startHP ?? 100;
+  const { state, question, select, clear, submit, submitManual, next, addTime, restorePlayerHP, restoreEnemyHP, revivePlayer, reset, currentDomainId, currentMastery, outcome } = useCombatQuiz({    questions: combatQuestions,
     rules,
     timed,
     onXp,
@@ -606,14 +610,19 @@ export default function DiabloQuizRunner(props: {
       furyActive: powerups.furyActive && furyQuestionRef.current === state.idx,
     }),
     getQuestionLevel: (q) => inferLevel(q),
-    getPlayerDamageTaken: ({ usedShield, question: hitQuestion, tier }) => incomingEnemyDamage(
+    getEnemyProfile: (q) => {
+      const tier = encounterType === "boss" ? 5 : inferLevel(q);
+      const config = stageConfigs[Math.min(stageConfigs.length - 1, tier - 1)];
+      return createEnemyProfile(encounterType === "boss" ? (enemyName || config.name) : config.name, tier,
+        encounterType === "boss" ? (rules?.enemyMaxHP ?? rules?.startHP ?? 100) : config.hp);
+    },
+    getPlayerDamageTaken: ({ usedShield, question: hitQuestion, tier, state: hitState }) => incomingEnemyDamage(
       encounterType === "boss" ? (rules?.playerDamageByTier?.[tier] ?? currentStageConfig.playerDamage) : currentStageConfig.playerDamage,
-      usedShield, Number((hitQuestion.data as any)?.playerDamageMultiplier || 1) * (activeEnemyAbility === "fury" ? 1.5 : 1)),
-    getEnemyDamageDealt: ({ correct, usedFury, question: hitQuestion, tier }) => correct ? outgoingEnemyDamage(
-      encounterType === "boss" ? (rules?.enemyDamageByTier?.[tier] ?? 34) : Math.ceil(maxPlayerHP / 3),
-      usedFury, activeEnemyAbility === "shield" || Boolean((hitQuestion.data as any)?.blockNextCorrect)) : 0,
-    getHealOnCorrect: () => (encounterType === "boss" ? 0 : Math.random() < currentStageConfig.healChance ? (currentStageConfig.healMin + Math.floor(Math.random() * (currentStageConfig.healMax - currentStageConfig.healMin + 1))) : 0),
-    getXpMultiplier: ({ correct }) => (correct && xpBoostRemaining > 0 ? 1.25 : 1),
+      usedShield, combatDamageScale(inferLevel(hitQuestion), hitState.enemyTier) * Number((hitQuestion.data as any)?.playerDamageMultiplier || 1) * (nextEnemyAbility(hitState.enemyInventory) === "fury" ? 1.5 : 1)),
+    getEnemyDamageDealt: ({ correct, usedFury, question: hitQuestion, tier, state: hitState }) => correct ? outgoingEnemyDamage(
+      encounterType === "boss" ? (rules?.enemyDamageByTier?.[tier] ?? 34) : Math.ceil(hitState.enemyMaxHP / 3) * combatDamageScale(inferLevel(hitQuestion), hitState.enemyTier),
+      usedFury, nextEnemyAbility(hitState.enemyInventory) === "shield" || Boolean((hitQuestion.data as any)?.blockNextCorrect)) : 0,
+    getXpMultiplier: ({ correct, state: hitState }) => correct ? (xpBoostRemaining > 0 ? 1.25 : 1) * (xpSurgeQuestionRef.current === hitState.idx ? 1.5 : 1) : 1,
     getXpBonus: ({ correct }) => {
       if (!correct) return 0;
       const reward = getMicroReward({ streak: streak + 1, questionIndex: state.idx, totalQuestions: combatQuestions.length, correct });
@@ -630,6 +639,7 @@ export default function DiabloQuizRunner(props: {
       }));
     },
     onSubmit: (r) => {
+      xpSurgeQuestionRef.current = null;
       const responseTimeMs = Math.max(500, Date.now() - questionStartRef.current);
       setQuestionResults((current) => {
         const next = current.length === combatQuestions.length ? [...current] : Array.from({ length: combatQuestions.length }, (_, i) => current[i] ?? null);
@@ -639,11 +649,10 @@ export default function DiabloQuizRunner(props: {
       const baseTier = ((question?.level || 1) as DifficultyTier);
       setHitPulse(r.correct ? "enemy" : "player");
       if (r.correct) {
-        const damage = encounterType === "boss" ? r.enemyDamage : Math.round(r.enemyDamage / maxPlayerHP * currentStageConfig.hp);
+        const damage = r.enemyDamage;
         setDamageFloat({ enemy: `-${damage} HP`, player: r.playerHealing > 0 ? `+${r.playerHealing} HP` : null });
       } else {
         setDamageFloat({ player: r.usedShield ? "Blocked" : `-${r.playerDamage} HP` });
-        if (activeEnemyAbility === "restore") restoreEnemyHP(Math.ceil(maxPlayerHP * 0.1));
       }
       setStageAnswered(count => count + 1);
       window.setTimeout(() => setDamageFloat({}), 2200);
@@ -716,7 +725,9 @@ export default function DiabloQuizRunner(props: {
   );
 
   const effectiveQuestionTier: DifficultyTier = question ? inferLevel(question) : 1;
-  const stageEnemyHP = encounterType === "boss" ? state.enemyHP : Math.round(state.enemyHP / maxPlayerHP * currentStageConfig.hp);
+  const activeEnemyAbility = nextEnemyAbility(state.enemyInventory);
+  activeQuestionKeyRef.current = `${state.idx}:${question?.id || ""}:${state.locked}`;
+  const stageEnemyHP = state.enemyHP;
   const playerHealthPercent = Math.max(0, Math.min(100, state.playerHP / maxPlayerHP * 100));
   const currentStageEnemyName = useMemo(() => currentStageConfig?.name || stageEnemyName(enemyName, sessionStage, maxStages, encounterType), [currentStageConfig, enemyName, sessionStage, maxStages, encounterType]);
   const isGoldenBoss = encounterType === "boss" && sessionStage >= maxStages;
@@ -781,12 +792,6 @@ const showExpandedExplanation = useMemo(() => {
   }, [question?.id]);
 
 
-  useEffect(() => {
-    if (activeEnemyAbility === "time" && timed && !state.locked) {
-      const seconds = rules?.timePerQuestionByTier?.[effectiveQuestionTier] ?? [0, 35, 30, 25, 22, 20][effectiveQuestionTier];
-      addTime(-Math.ceil(seconds * 0.2));
-    }
-  }, [question?.id]);
 
   useEffect(() => {
     const data = (question?.data || {}) as Record<string, unknown>;
@@ -914,14 +919,19 @@ const showExpandedExplanation = useMemo(() => {
     return `We\'ll reinforce ${domainLabel}. Review why this answer works; upcoming adaptive questions can give extra weight to weaker areas and recent misses.`;
   }, [state.locked, state.lastWasCorrect, streak, masteryPercent, domainLabel]);
 
-  function useHint(type: HintType) {
+  async function useHint(type: HintType) {
     if (!question || state.locked) return;
+    if (type === "REMOVE_TWO" && !removableIncorrectIndices(question).some(index => !hiddenChoiceIndices.includes(index))) {
+      setHintMessage("No incorrect choices remain to remove.");
+      return;
+    }
     const baseCost = getHintCost(type);
     const usingDiscount = stage9Inventory.hintDiscount > 0;
     const cost = usingDiscount ? Math.max(0, baseCost - 10) : baseCost;
     if (usingDiscount && userIdRef.current) {
-      fetch("/api/stage9/use-item", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ userId: userIdRef.current, itemId: "hint_discount" }) }).catch(() => {});
-      setStage9Inventory((current) => ({ ...current, hintDiscount: Math.max(0, current.hintDiscount - 1) }));
+      const result = await consumeItem("hint_discount", type);
+      if (!result?.ok) return;
+      setStage9Inventory((current) => ({ ...current, hintDiscount: Number(result.remaining) }));
     }
     setHintXpSpent((v) => v + cost);
     setHintsUsedCount((v) => v + 1);
@@ -985,6 +995,7 @@ const showExpandedExplanation = useMemo(() => {
   }, [state.locked, (question as any)?.sessionQuestionId]);
 
   async function handleNext() {
+    if (itemPendingRef.current.size) return;
     const currentQuestion = question as any;
     let awarded = false;
     if (state.locked && currentQuestion?.sessionQuestionId && onAdvanceQuestion) {
@@ -1021,10 +1032,9 @@ const showExpandedExplanation = useMemo(() => {
       const nextQuestion = combatQuestions[state.idx + 1];
       if (nextQuestion) {
         const nextStage = inferLevel(nextQuestion);
-        if (nextStage !== sessionStage || state.enemyHP <= 0) {
+        if (nextStage !== sessionStage) {
           setSessionStage(nextStage);
           setStageAnswered(0);
-          restoreEnemyHP(maxPlayerHP);
           const config = stageConfigs[nextStage - 1];
           setStageBanner(`Stage ${nextStage} • ${config.name}`);
           window.setTimeout(() => setStageBanner(null), 2200);
@@ -1049,6 +1059,7 @@ const showExpandedExplanation = useMemo(() => {
   const enemyVideo = hitPulse === "enemy" ? media?.enemyHitSrc || media?.enemyIdleSrc : media?.enemyIdleSrc;
 
   function handleManualSubmit() {
+    if (itemPendingRef.current.size) return;
     if (!question || state.locked) return;
     let answer: unknown = null;
     if (questionType === "fill_blank") answer = fillValue;
@@ -1108,6 +1119,21 @@ const showExpandedExplanation = useMemo(() => {
     }
   }, [state.idx]);
 
+  async function consumeItem(itemId: string, suffix = "") {
+    if (!itemRunKeyRef.current) itemRunKeyRef.current = crypto.randomUUID();
+    const questionKey = activeQuestionKeyRef.current;
+    const actionKey = `${(question as any)?.sessionQuestionId || itemRunKeyRef.current + ":" + state.idx}:${itemId}:${suffix}`;
+    if (itemPendingRef.current.has(actionKey) || itemAppliedRef.current.has(actionKey)) return null;
+    itemPendingRef.current.add(actionKey);
+    try {
+      const result = await fetch("/api/stage9/use-item", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ itemId, actionKey }) }).then(r => r.json());
+      if (result?.ok) itemAppliedRef.current.add(actionKey);
+      if (questionKey !== activeQuestionKeyRef.current) return null;
+      return result;
+    } catch { setHintMessage("Could not use item. Retry to confirm the same action."); return null; }
+    finally { itemPendingRef.current.delete(actionKey); }
+  }
+
   async function activateShield() {
     if (powerups.shieldActive || state.locked) return;
     shieldQuestionRef.current = state.idx;
@@ -1116,7 +1142,7 @@ const showExpandedExplanation = useMemo(() => {
       return;
     }
     if (stage9Inventory.shield > 0 && userIdRef.current) {
-      const res = await fetch("/api/stage9/use-item", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ userId: userIdRef.current, itemId: "shield_charge" }) }).then((r) => r.json()).catch(() => null);
+      const res = await consumeItem("shield_charge");
       if (res?.ok) {
         consumedInventoryRef.current.shield += 1;
         setStage9Inventory((current) => ({ ...current, shield: Math.max(0, Number(res.remaining ?? current.shield - 1)) }));
@@ -1133,7 +1159,7 @@ const showExpandedExplanation = useMemo(() => {
       return;
     }
     if (stage9Inventory.fury > 0 && userIdRef.current) {
-      const res = await fetch("/api/stage9/use-item", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ userId: userIdRef.current, itemId: "fury_charge" }) }).then((r) => r.json()).catch(() => null);
+      const res = await consumeItem("fury_charge");
       if (res?.ok) {
         consumedInventoryRef.current.fury += 1;
         setStage9Inventory((current) => ({ ...current, fury: Math.max(0, Number(res.remaining ?? current.fury - 1)) }));
@@ -1143,12 +1169,23 @@ const showExpandedExplanation = useMemo(() => {
   }
 
   async function activateRestore() {
-    if (state.locked || state.playerHP >= (rules?.startHP ?? 100) || stage9Inventory.restore <= 0 || !userIdRef.current) return;
-    const res = await fetch("/api/stage9/use-item", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ userId: userIdRef.current, itemId: "health_restore" }) }).then((r) => r.json()).catch(() => null);
+    if (encounterType === "boss" && state.playerHP <= 0 && stage9Inventory.extraLife > 0) {
+      const result = await consumeItem("extra_life");
+      if (result?.ok) {
+        consumedInventoryRef.current.extraLife += 1;
+        setStage9Inventory(current => ({ ...current, extraLife: Number(result.remaining) }));
+        revivePlayer();
+        setFinishFeedbackPending(false);
+        setMicroRewardFlash("Extra life: revived at 25% HP");
+      }
+      return;
+    }
+    if (state.locked || state.playerHP >= maxPlayerHP || stage9Inventory.restore <= 0 || !userIdRef.current) return;
+    const res = await consumeItem("health_restore");
     if (res?.ok) {
       consumedInventoryRef.current.restore += 1;
       setStage9Inventory((current) => ({ ...current, restore: Math.max(0, Number(res.remaining ?? current.restore - 1)) }));
-      restorePlayerHP(Math.ceil((rules?.startHP ?? 100) * 0.25));
+      restorePlayerHP(Math.ceil(maxPlayerHP * 0.25));
       setMicroRewardFlash("❤️ Health restored +25%");
       window.setTimeout(() => setMicroRewardFlash(null), 1800);
     }
@@ -1156,20 +1193,20 @@ const showExpandedExplanation = useMemo(() => {
 
   async function activateXpSurge() {
     if (state.locked || stage9Inventory.xpSurge <= 0 || !userIdRef.current) return;
-    const res = await fetch("/api/stage9/use-item", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ userId: userIdRef.current, itemId: "xp_surge" }) }).then((r) => r.json()).catch(() => null);
+    const res = await consumeItem("xp_surge");
     if (res?.ok) {
       consumedInventoryRef.current.xpSurge += 1;
       setStage9Inventory((current) => ({ ...current, xpSurge: Math.max(0, Number(res.remaining ?? current.xpSurge - 1)) }));
-      addTime(10);
-      timeSlowActiveRef.current = true;
-      setMicroRewardFlash("⏳ Time Slow active for +10s");
-      window.setTimeout(() => { timeSlowActiveRef.current = false; setMicroRewardFlash(null); }, 10000);
+      xpSurgeQuestionRef.current = state.idx;
+      setMicroRewardFlash("XP Surge: +50% XP on this answer");
+      window.setTimeout(() => setMicroRewardFlash(null), 1800);
     }
   }
 
 
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
+      if (itemPendingRef.current.size) return;
       if (e.key !== "Enter" || e.defaultPrevented) return;
       const target = e.target as HTMLElement | null;
       const tag = (target?.tagName || "").toLowerCase();
@@ -1285,8 +1322,8 @@ const showExpandedExplanation = useMemo(() => {
                   {[
                     { key: "shield", qty: stage9Inventory.shield + powerups.shieldUses, src: "/ui/grimdark/flow_skill3_001.png", label: "Shield", action: activateShield, disabled: state.locked || powerups.shieldActive },
                     { key: "fury", qty: stage9Inventory.fury + powerups.furyUses, src: "/ui/grimdark/flow_skill1_001.png", label: "Fury", action: activateFury, disabled: state.locked || powerups.furyActive },
-                    { key: "restore", qty: stage9Inventory.restore, src: "/ui/grimdark/flow_icon_buff_items_001.png", label: "Restore Health", action: activateRestore, disabled: state.locked || state.playerHP >= (rules?.startHP ?? 100) },
-                    { key: "xpSurge", qty: stage9Inventory.xpSurge, src: "/ui/grimdark/flow_skill6_001.png", label: "Time Slow", action: activateXpSurge, disabled: state.locked },
+                    { key: "restore", qty: encounterType === "boss" && state.playerHP <= 0 ? stage9Inventory.extraLife : stage9Inventory.restore, src: "/ui/grimdark/flow_icon_buff_items_001.png", label: encounterType === "boss" && state.playerHP <= 0 ? "Extra Life" : "Restore Health", action: activateRestore, disabled: state.playerHP <= 0 ? encounterType !== "boss" || stage9Inventory.extraLife <= 0 : state.locked || state.playerHP >= maxPlayerHP },
+                    { key: "xpSurge", qty: stage9Inventory.xpSurge, src: "/ui/grimdark/flow_skill6_001.png", label: "XP Surge", action: activateXpSurge, disabled: state.locked || xpSurgeQuestionRef.current === state.idx },
                   ].filter((item) => item.qty > 0).slice(0, 4).map((item, index) => (
                     <button className={`playerPowerupSlot slot${index + 1}`} type="button" key={item.key} title={`Use ${item.label} (x${item.qty})`} aria-label={`Use ${item.label}, ${item.qty} available`} onClick={item.action} disabled={item.disabled}>
                       <img src={item.src} alt="" aria-hidden="true" />
@@ -1366,7 +1403,7 @@ const showExpandedExplanation = useMemo(() => {
                   <div className="stage7PowerStrip quizPowerStrip batch8CenterPowerStrip">
                     <button className={"d2Btn power" + (powerups.shieldActive ? " active" : "")} type="button" disabled={state.locked || powerups.shieldActive || (powerups.shieldUses + stage9Inventory.shield) <= 0} onClick={activateShield}>Shield {powerups.shieldActive ? "On" : (powerups.shieldUses + stage9Inventory.shield) > 0 ? `x${powerups.shieldUses + stage9Inventory.shield}` : "Locked"}</button>
                     <button className={"d2Btn power" + (powerups.furyActive ? " active" : "")} type="button" disabled={state.locked || powerups.furyActive || (powerups.furyUses + stage9Inventory.fury) <= 0} onClick={activateFury}>Fury {powerups.furyActive ? "On" : (powerups.furyUses + stage9Inventory.fury) > 0 ? `x${powerups.furyUses + stage9Inventory.fury}` : "Locked"}</button>
-                <button className="d2Btn power" type="button" disabled={state.locked || stage9Inventory.xpSurge <= 0} onClick={activateXpSurge}>Time Slow {stage9Inventory.xpSurge > 0 ? `x${stage9Inventory.xpSurge}` : "Locked"}</button>
+                <button className="d2Btn power" type="button" disabled={state.locked || stage9Inventory.xpSurge <= 0 || xpSurgeQuestionRef.current === state.idx} onClick={activateXpSurge}>XP Surge {stage9Inventory.xpSurge > 0 ? `x${stage9Inventory.xpSurge}` : "Locked"}</button>
                     <span className="stage7PowerHint">Streak 3: Shield • Streak 5: Fury</span>
                   </div>
 
@@ -1467,27 +1504,27 @@ const showExpandedExplanation = useMemo(() => {
             </div>
 
             <div className="quizPlayerRail batch8CombatRail batch8PlayerRail enemyExactPlayerClone" style={{ display: "grid", gap: 10, alignContent: "start", minHeight: 0 }}>
-              <div className={"playerOrbComposite " + (hitPulse === "enemy" ? "d2Shake" : "")} aria-label={`${currentStageEnemyName} health ${stageEnemyHP} of ${currentStageConfig.hp}`}>
+              <div className={"playerOrbComposite " + (hitPulse === "enemy" ? "d2Shake" : "")} aria-label={`${currentStageEnemyName} health ${stageEnemyHP} of ${state.enemyMaxHP}`}>
                 <img className="playerOrbFrameAsset" src="/ui/grimdark/flow_main_panel_player.png" alt="" aria-hidden="true" />
                 <div className="playerOrbBlood" aria-hidden="true">
                   <img className="playerOrbBloodBase" src="/ui/grimdark/flow_energy_ball_001.png" alt="" />
                   <div
                     className="playerOrbBloodMask"
-                    style={{ clipPath: `inset(${100 - Math.max(0, Math.min(100, (stageEnemyHP / Math.max(1, currentStageConfig.hp)) * 100))}% 0 0 0)` }}
+                    style={{ clipPath: `inset(${100 - Math.max(0, Math.min(100, (stageEnemyHP / Math.max(1, state.enemyMaxHP)) * 100))}% 0 0 0)` }}
                   >
                     <img src="/ui/grimdark/flow_energy_ball_001.png" alt="" />
                   </div>
                 </div>
               </div>
               <ModelPanel title="" src={enemyVideo} loop={!isEnemyHitVideo} onEnded={isEnemyHitVideo ? () => setHitPulse(null) : undefined} height="clamp(180px, 22vh, 280px)" damageText={damageFloat.enemy || null} damageTone="enemy" />
-              <div className="playerPowerupRack" aria-label="Enemy cloned powerups">
+              <div className="playerPowerupRack" aria-label="Enemy powerup inventory">
                 <img className="playerPowerupRackAsset" src="/ui/grimdark/flow_main_panel_powerup1.png" alt="" aria-hidden="true" />
                 <div className="playerPowerupSlots">
                   {[
-                    { key: "shield", qty: stage9Inventory.shield + powerups.shieldUses, src: "/ui/grimdark/flow_skill3_001.png", label: "Shield" },
-                    { key: "fury", qty: stage9Inventory.fury + powerups.furyUses, src: "/ui/grimdark/flow_skill1_001.png", label: "Fury" },
-                    { key: "restore", qty: stage9Inventory.restore, src: "/ui/grimdark/flow_icon_buff_items_001.png", label: "Restore Health" },
-                    { key: "xpSurge", qty: stage9Inventory.xpSurge, src: "/ui/grimdark/flow_skill6_001.png", label: "Time Slow" },
+                    { key: "shield", qty: state.enemyInventory.shield, src: "/ui/grimdark/flow_skill3_001.png", label: "Shield" },
+                    { key: "fury", qty: state.enemyInventory.fury, src: "/ui/grimdark/flow_skill1_001.png", label: "Fury" },
+                    { key: "restore", qty: state.enemyInventory.restore, src: "/ui/grimdark/flow_icon_buff_items_001.png", label: "Restore Health" },
+                    { key: "time", qty: state.enemyInventory.time, src: "/ui/grimdark/flow_skill6_001.png", label: "Time pressure" },
                   ].filter((item) => item.qty > 0).slice(0, 4).map((item, index) => (
                     <div className={`playerPowerupSlot slot${index + 1}`} key={item.key} title={item.label} aria-label={item.label}>
                       <img src={item.src} alt="" aria-hidden="true" />
@@ -1504,17 +1541,17 @@ const showExpandedExplanation = useMemo(() => {
             <div className="mobileCombatCard mobileEnemyCard mobileEnemyCardTop">
               <div className="mobileEnemyHud">
                 <div className="mobileEnemyHealth">
-                  <div className="mobileEnemyOrbClone" aria-label={`${currentStageEnemyName} health ${stageEnemyHP} of ${currentStageConfig.hp}`}>
+                  <div className="mobileEnemyOrbClone" aria-label={`${currentStageEnemyName} health ${stageEnemyHP} of ${state.enemyMaxHP}`}>
                     <img className="mobileEnemyOrbFrame" src="/ui/grimdark/flow_main_panel_enemy.png" alt="" aria-hidden="true" />
                     <div className="mobileEnemyOrbEnergy" aria-hidden="true">
                       <img className="mobileEnemyOrbEnergyBase" src="/ui/grimdark/flow_energy_ball_001.png" alt="" />
-                      <div className="mobileEnemyOrbEnergyMask" style={{ clipPath: `inset(${100 - Math.max(0, Math.min(100, (stageEnemyHP / Math.max(1, currentStageConfig.hp)) * 100))}% 0 0 0)` }}>
+                      <div className="mobileEnemyOrbEnergyMask" style={{ clipPath: `inset(${100 - Math.max(0, Math.min(100, (stageEnemyHP / Math.max(1, state.enemyMaxHP)) * 100))}% 0 0 0)` }}>
                         <img src="/ui/grimdark/flow_energy_ball_001.png" alt="" />
                       </div>
                     </div>
                     <div className="mobileEnemyOrbValue">
-                      {Math.max(0, Math.floor(stageEnemyHP))} / {Math.max(1, Math.floor(currentStageConfig.hp))}<br />
-                      {Math.max(0, Math.min(100, (stageEnemyHP / Math.max(1, currentStageConfig.hp)) * 100)).toFixed(0)}%
+                      {Math.max(0, Math.floor(stageEnemyHP))} / {Math.max(1, Math.floor(state.enemyMaxHP))}<br />
+                      {Math.max(0, Math.min(100, (stageEnemyHP / Math.max(1, state.enemyMaxHP)) * 100)).toFixed(0)}%
                     </div>
                   </div>
                   

@@ -10,7 +10,9 @@ export async function POST(req: Request) {
     const itemId = String(body?.itemId || "").trim();
     if (!userId) return NextResponse.json({ ok: false, error: "Sign in required" }, { status: 401 });
     if (!itemId) return NextResponse.json({ ok: false, error: "itemId required" }, { status: 400 });
-    const result = await useStage9Item(userId, itemId);
+    const actionKey = String(body?.actionKey || "").trim();
+    if (!actionKey || actionKey.length > 200) return NextResponse.json({ ok: false, error: "actionKey required" }, { status: 400 });
+    const result = await useStage9Item(userId, itemId, actionKey);
     return NextResponse.json(result, { status: result.ok ? 200 : 400 });
   } catch (err: any) {
     return NextResponse.json({ ok: false, error: "Failed to use item", detail: String(err?.message ?? err) }, { status: 500 });

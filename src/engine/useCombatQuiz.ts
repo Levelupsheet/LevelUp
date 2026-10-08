@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { consumeEnemyAbility, nextEnemyAbility, type EnemyProfile } from "@/engine/systems/EnemyAbilities";
 import type { CombatQuestion, CombatRules, CombatState, DifficultyTier, SubmitResult } from "./CombatQuizEngine";
 import {
   DEFAULT_RULES,
@@ -38,6 +39,7 @@ export type CombatEngineOptions = {
   getEnemyDamageDealt?: (args: { question: CombatQuestion; state: CombatState; tier: DifficultyTier; correct: boolean; usedFury: boolean }) => number;
   getHealOnCorrect?: (args: { question: CombatQuestion; state: CombatState; tier: DifficultyTier }) => number;
   finishOnEnemyDefeat?: boolean;
+  getEnemyProfile?: (question: CombatQuestion) => EnemyProfile;
 };
 
 export function useCombatQuiz(opts: CombatEngineOptions) {
@@ -77,12 +79,32 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
   }, [opts.onXp, opts.onSubmit, opts.onStateChange, opts.getActiveModifiers, opts.onConsumeModifier, opts.getQuestionLevel, opts.getXpMultiplier, opts.getXpBonus, opts.getPlayerDamageTaken, opts.getEnemyDamageDealt, opts.getHealOnCorrect]);
 
   function buildInitialState() {
-    return { ...initialCombatState(rules, timed), ...(opts.initialState || {}) } as CombatState;
+    const base = initialCombatState(rules, timed);
+    const question = opts.questions[Number(opts.initialState?.idx || 0)];
+    const enemy = question && opts.getEnemyProfile?.(question);
+    if (enemy) Object.assign(base, { enemyHP: enemy.maxHP, enemyMaxHP: enemy.maxHP, enemyTier: enemy.tier, enemyInventory: enemy.inventory });
+    const restored = { ...base, ...(opts.initialState || {}) };
+    restored.playerHP = clamp(restored.playerHP, 0, restored.playerMaxHP);
+    restored.enemyHP = clamp(restored.enemyHP, 0, restored.enemyMaxHP);
+    return restored;
   }
 
   const [state, setState] = useState<CombatState>(() => buildInitialState());
   const timerRef = useRef<number | null>(null);
   const timeoutResolvedRef = useRef<string | null>(null);
+  const submittedKeysRef = useRef(new Set<string>());
+  function reportOnce(key: string, result: SubmitResult, modifiers: CombatRuntimeModifiers, totalXp: number) {
+    queueMicrotask(() => {
+      if (submittedKeysRef.current.has(key)) return;
+      submittedKeysRef.current.add(key);
+      // Armed effects expire on this answer, even if the answer did not benefit.
+      if (modifiers.shieldActive) onConsumeModifierRef.current?.("shieldActive");
+      if (modifiers.furyActive) onConsumeModifierRef.current?.("furyActive");
+      if (modifiers.timeWarpActive) onConsumeModifierRef.current?.("timeWarpActive");
+      if (result.xpDelta > 0) onXpRef.current?.(result.xpDelta, totalXp);
+      onSubmitRef.current?.(result);
+    });
+  }
 
 
   const resolveQuestionLevel = useCallback((question: CombatQuestion | undefined, combatState: CombatState) => {
@@ -94,6 +116,7 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
   const q = opts.questions[state.idx];
 
   useEffect(() => {
+    submittedKeysRef.current.clear();
     setState(buildInitialState());
   }, [questionsKey, timed, rules, opts.initialState]);
 
@@ -134,9 +157,10 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
 
     const lvl = resolveQuestionLevel(q, state);
     const eff: DifficultyTier = lvl;
-    const seconds = rules.timePerQuestionByTier[eff];
-    startTimer(seconds);
-  }, [q?.id, state.tier, state.locked, state.finished, timed, rules.timePerQuestionByTier, startTimer, stopTimer, resolveQuestionLevel]);
+    const seconds = Math.ceil(rules.timePerQuestionByTier[eff] * (nextEnemyAbility(state.enemyInventory) === "time" ? 0.8 : 1));
+    const savedTime = opts.initialState?.idx === state.idx ? opts.initialState?.timeLeft : undefined;
+    startTimer(typeof savedTime === "number" && Number.isFinite(savedTime) ? clamp(savedTime, 0, seconds) : seconds);
+  }, [q?.id, state.locked, state.finished, timed, rules.timePerQuestionByTier, startTimer, stopTimer, resolveQuestionLevel]);
 
   useEffect(() => {
     if (!timed || !q || state.finished || state.locked || state.timeLeft !== 0) return;
@@ -155,8 +179,9 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
       const modifiers = getActiveModifiersRef.current?.() || {};
       const usedShield = Boolean(modifiers.shieldActive);
       const playerDamage = getPlayerDamageTakenRef.current?.({ question: q, state: s, tier: effTier, correct: false, usedShield }) ?? (usedShield ? 0 : rules.playerDamageByTier[effTier]);
-      const playerHP = clamp(s.playerHP - Math.max(0, playerDamage), 0, rules.startHP);
-      const enemyHP = s.enemyHP;
+      const playerHP = clamp(s.playerHP - Math.max(0, playerDamage), 0, s.playerMaxHP);
+      const ability = nextEnemyAbility(s.enemyInventory);
+      const enemyHP = clamp(s.enemyHP + (ability === "restore" && s.enemyHP > 0 ? Math.ceil(s.enemyMaxHP * 0.1) : 0), 0, s.enemyMaxHP);
 
       const prevMastery = s.mastery[domainId] ?? 0;
       const nextMastery = clamp(prevMastery - rules.masteryLossWrong, 0, 100);
@@ -169,6 +194,7 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
         ...s,
         playerHP,
         enemyHP,
+        enemyInventory: consumeEnemyAbility(s.enemyInventory, ability),
         mastery,
         tier,
         locked: true,
@@ -176,9 +202,7 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
         feedback: "Time's up.",
       };
 
-      queueMicrotask(() => {
-        if (usedShield) onConsumeModifierRef.current?.("shieldActive");
-        onSubmitRef.current?.({
+      reportOnce(`${s.idx}:${q.id}`, {
           correct,
           playerHP,
           enemyHP,
@@ -191,8 +215,7 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
           playerHealing: Math.max(0, playerHP - s.playerHP),
           usedShield,
           usedFury: false,
-        });
-      });
+        }, modifiers, next.xpEarned);
 
       return playerHP <= 0 ? { ...next, finished: true } : next;
     });
@@ -228,8 +251,9 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
       const healOnCorrect = correct ? Math.max(0, getHealOnCorrectRef.current?.({ question: q, state: s, tier: effTier }) ?? 0) : 0;
       const playerDamage = correct ? 0 : (getPlayerDamageTakenRef.current?.({ question: q, state: s, tier: effTier, correct, usedShield }) ?? (usedShield ? 0 : rules.playerDamageByTier[effTier]));
       const enemyDamage = correct ? Math.max(0, getEnemyDamageDealtRef.current?.({ question: q, state: s, tier: effTier, correct, usedFury }) ?? (rules.enemyDamageByTier[effTier] * (usedFury ? 2 : 1))) : 0;
-      const playerHP = clamp(correct ? s.playerHP + healOnCorrect : s.playerHP - Math.max(0, playerDamage), 0, rules.startHP);
-      const enemyHP = clamp(correct ? s.enemyHP - enemyDamage : s.enemyHP, 0, rules.startHP);
+      const playerHP = clamp(correct ? s.playerHP + healOnCorrect : s.playerHP - Math.max(0, playerDamage), 0, s.playerMaxHP);
+      const ability = nextEnemyAbility(s.enemyInventory);
+      const enemyHP = clamp(correct ? s.enemyHP - enemyDamage : s.enemyHP + (ability === "restore" && s.enemyHP > 0 ? Math.ceil(s.enemyMaxHP * 0.1) : 0), 0, s.enemyMaxHP);
 
       const prevMastery = s.mastery[domainId] ?? 0;
       const masteryDelta = correct ? rules.masteryGainBase * effTier : -rules.masteryLossWrong;
@@ -243,6 +267,7 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
         ...s,
         playerHP,
         enemyHP,
+        enemyInventory: consumeEnemyAbility(s.enemyInventory, ability),
         mastery,
         tier,
         locked: true,
@@ -252,11 +277,7 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
         feedback: q.explanation || (correct ? "Direct hit." : s.timeLeft <= 0 ? "Time's up." : "Not quite."),
       };
 
-      queueMicrotask(() => {
-        if (usedShield) onConsumeModifierRef.current?.("shieldActive");
-        if (usedFury) onConsumeModifierRef.current?.("furyActive");
-        if (xpDelta > 0) onXpRef.current?.(xpDelta, next.xpEarned);
-        onSubmitRef.current?.({
+      reportOnce(`${s.idx}:${q.id}`, {
           correct,
           playerHP,
           enemyHP,
@@ -269,8 +290,7 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
           playerHealing: Math.max(0, playerHP - s.playerHP),
           usedShield,
           usedFury,
-        });
-      });
+        }, modifiers, next.xpEarned);
 
       // A lethal wrong answer ends the run immediately. Previously defeat was
       // only finalized by next(), which left the quiz active at 0 HP.
@@ -308,13 +328,14 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
       const baseXp = typeof manual.xpDelta === "number" ? manual.xpDelta : (correct ? rules.xpByTier[effTier] : 0);
       const extraMultiplier = getXpMultiplierRef.current?.({ question: q, state: s, correct, baseXp }) ?? 1;
       const extraBonus = getXpBonusRef.current?.({ question: q, state: s, correct, baseXp }) ?? 0;
-      const xpDelta = Math.max(0, Math.round(baseXp * (usedFury ? 1.5 : 1) * extraMultiplier) + extraBonus);
+      const xpDelta = correct ? Math.max(0, Math.round(baseXp * (usedFury ? 1.5 : 1) * extraMultiplier) + extraBonus) : 0;
 
       const healOnCorrect = correct ? Math.max(0, getHealOnCorrectRef.current?.({ question: q, state: s, tier: effTier }) ?? 0) : 0;
       const playerDamage = correct ? 0 : (getPlayerDamageTakenRef.current?.({ question: q, state: s, tier: effTier, correct, usedShield }) ?? (usedShield ? 0 : rules.playerDamageByTier[effTier]));
       const enemyDamage = correct ? Math.max(0, getEnemyDamageDealtRef.current?.({ question: q, state: s, tier: effTier, correct, usedFury }) ?? (rules.enemyDamageByTier[effTier] * (usedFury ? 2 : 1))) : 0;
-      const playerHP = clamp(correct ? s.playerHP + healOnCorrect : s.playerHP - Math.max(0, playerDamage), 0, rules.startHP);
-      const enemyHP = clamp(correct ? s.enemyHP - enemyDamage : s.enemyHP, 0, rules.startHP);
+      const playerHP = clamp(correct ? s.playerHP + healOnCorrect : s.playerHP - Math.max(0, playerDamage), 0, s.playerMaxHP);
+      const ability = nextEnemyAbility(s.enemyInventory);
+      const enemyHP = clamp(correct ? s.enemyHP - enemyDamage : s.enemyHP + (ability === "restore" && s.enemyHP > 0 ? Math.ceil(s.enemyMaxHP * 0.1) : 0), 0, s.enemyMaxHP);
 
       const prevMastery = s.mastery[domainId] ?? 0;
       const masteryDelta = correct ? rules.masteryGainBase * effTier : -rules.masteryLossWrong;
@@ -327,6 +348,7 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
         ...s,
         playerHP,
         enemyHP,
+        enemyInventory: consumeEnemyAbility(s.enemyInventory, ability),
         mastery,
         tier,
         locked: true,
@@ -336,11 +358,7 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
         feedback: manual.feedback ?? q.explanation ?? (correct ? "Direct hit." : "Not quite."),
       };
 
-      queueMicrotask(() => {
-        if (usedShield) onConsumeModifierRef.current?.("shieldActive");
-        if (usedFury) onConsumeModifierRef.current?.("furyActive");
-        if (xpDelta > 0) onXpRef.current?.(xpDelta, next.xpEarned);
-        onSubmitRef.current?.({
+      reportOnce(`${s.idx}:${q.id}`, {
           correct,
           playerHP,
           enemyHP,
@@ -353,8 +371,7 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
           playerHealing: Math.max(0, playerHP - s.playerHP),
           usedShield,
           usedFury,
-        });
-      });
+        }, modifiers, next.xpEarned);
 
       // A lethal wrong answer ends the run immediately. Previously defeat was
       // only finalized by next(), which left the quiz active at 0 HP.
@@ -383,8 +400,10 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
       const nextQ = opts.questions[nextIdx];
       const nextLvl = nextQ ? resolveQuestionLevel(nextQ, s) : 1;
       const effNextTier: DifficultyTier = nextLvl;
+      const enemy = nextQ && opts.getEnemyProfile?.(nextQ);
       return {
         ...s,
+        ...(enemy && enemy.tier !== s.enemyTier ? { enemyHP: enemy.maxHP, enemyMaxHP: enemy.maxHP, enemyTier: enemy.tier, enemyInventory: enemy.inventory } : {}),
         idx: nextIdx,
         selected: null,
         locked: false,
@@ -397,21 +416,26 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
 
   const addTime = useCallback((seconds: number) => {
     if (!seconds) return;
-    setState((s) => ({ ...s, timeLeft: Math.max(0, s.timeLeft + Math.floor(seconds)) }));
-  }, []);
+    setState((s) => s.finished || s.locked || !timed ? s : ({ ...s, timeLeft: Math.max(0, s.timeLeft + Math.floor(seconds)) }));
+  }, [timed]);
 
   const restorePlayerHP = useCallback((amount: number) => {
     if (!amount) return;
-    setState((s) => s.finished || s.playerHP <= 0 ? s : ({ ...s, playerHP: clamp(s.playerHP + Math.floor(amount), 0, rules.startHP) }));
+    setState((s) => s.finished || s.playerHP <= 0 ? s : ({ ...s, playerHP: clamp(s.playerHP + Math.floor(amount), 0, s.playerMaxHP) }));
   }, [rules.startHP]);
 
   const restoreEnemyHP = useCallback((amount: number) => {
-    setState(s => s.finished ? s : { ...s, enemyHP: clamp(s.enemyHP + amount, 0, rules.startHP) });
+    setState(s => s.finished ? s : { ...s, enemyHP: clamp(s.enemyHP + amount, 0, s.enemyMaxHP) });
   }, [rules.startHP]);
+
+  const revivePlayer = useCallback(() => {
+    setState(s => s.finished && s.playerHP <= 0 ? { ...s, playerHP: Math.max(1, Math.ceil(s.playerMaxHP * 0.25)), finished: false } : s);
+  }, []);
 
   const reset = useCallback(() => {
     stopTimer();
-    setState(initialCombatState(rules, timed));
+    submittedKeysRef.current.clear();
+    setState(buildInitialState());
   }, [rules, timed, stopTimer]);
 
   const currentDomainId = useMemo(() => (q ? inferDomainId(q) : "general"), [q]);
@@ -437,6 +461,7 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
     addTime,
     restorePlayerHP,
     restoreEnemyHP,
+    revivePlayer,
     reset,
     timed,
     currentDomainId,

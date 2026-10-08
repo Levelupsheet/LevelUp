@@ -1,6 +1,8 @@
 "use client";
 
 import type { QuestionData, QuestionType } from "@/lib/questionTypes";
+import { GAME_CONFIG } from "@/engine/constants/gameConfig";
+import type { EnemyInventory } from "@/engine/systems/EnemyAbilities";
 
 export type DifficultyTier = 1 | 2 | 3 | 4 | 5;
 
@@ -21,6 +23,8 @@ export type CombatQuestion = {
 export type CombatRules = {
   /** Starting HP for player/enemy each run */
   startHP: number;
+  playerMaxHP?: number;
+  enemyMaxHP?: number;
 
   /** Promotion thresholds based on overall mastery average (0..100). */
   promoteTo2At: number;
@@ -66,18 +70,22 @@ export const DEFAULT_RULES: CombatRules = {
   masteryGainBase: 4,
   masteryLossWrong: 2,
 
-  playerDamageByTier: { 1: 8, 2: 12, 3: 16, 4: 20, 5: 24 },
-  enemyDamageByTier: { 1: 12, 2: 18, 3: 25, 4: 32, 5: 40 },
+  playerDamageByTier: GAME_CONFIG.playerDamageByTier,
+  enemyDamageByTier: GAME_CONFIG.enemyDamageByTier,
 
-  xpByTier: { 1: 15, 2: 25, 3: 40, 4: 55, 5: 75 },
+  xpByTier: GAME_CONFIG.xpByTier,
 
   // "slow -> faster as questions get harder" but still fair
-  timePerQuestionByTier: { 1: 35, 2: 30, 3: 25, 4: 22, 5: 20 },
+  timePerQuestionByTier: GAME_CONFIG.timerByTier,
 };
 
 export type CombatState = {
   playerHP: number;
   enemyHP: number;
+  playerMaxHP: number;
+  enemyMaxHP: number;
+  enemyTier: number;
+  enemyInventory: EnemyInventory;
 
   idx: number;
   selected: number | null;
@@ -156,8 +164,12 @@ export function masteryAverage(mastery: Record<string, number>): number {
 
 export function initialCombatState(rules: CombatRules, timed: boolean): CombatState {
   return {
-    playerHP: rules.startHP,
-    enemyHP: rules.startHP,
+    playerHP: rules.playerMaxHP ?? rules.startHP,
+    enemyHP: rules.enemyMaxHP ?? rules.startHP,
+    playerMaxHP: rules.playerMaxHP ?? rules.startHP,
+    enemyMaxHP: rules.enemyMaxHP ?? rules.startHP,
+    enemyTier: 1,
+    enemyInventory: { shield: 0, fury: 0, restore: 0, time: 0 },
 
     idx: 0,
     selected: null,
