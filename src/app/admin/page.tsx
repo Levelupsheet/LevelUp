@@ -1304,6 +1304,24 @@ export default function AdminPage(){
     await refreshPlacements();
   }
 
+  async function unpublishPlacement(id: string, name: string) {
+    if (!window.confirm(`Unpublish "${name}" from this learner experience? Questions will remain saved.`)) return;
+    setErr(null);
+    try {
+      const res = await fetch("/api/admin/placements", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
+      const result = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(result.error || "Could not unpublish pool");
+      await refreshPlacements();
+      popToast(`Unpublished ${name}`);
+    } catch (e: any) {
+      setErr(e?.message || "Could not unpublish pool");
+    }
+  }
+
   async function refreshPlacements(){
     try {
       const r = await fetch("/api/admin/placements", { cache:"no-store" as any });
@@ -1738,6 +1756,7 @@ export default function AdminPage(){
                       <span className="badge">{p.set?.domain || "GENERAL"}</span>
                     </div>
                     <span className="badge">View deployed questions →</span>
+                    <span className="badge" role="button" tabIndex={0} onClick={(event) => { event.stopPropagation(); unpublishPlacement(p.id, p.set?.name || "Question pool"); }} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); event.stopPropagation(); unpublishPlacement(p.id, p.set?.name || "Question pool"); } }} style={{ cursor:"pointer", borderColor:"rgba(255,120,120,.6)" }}>Unpublish</span>
                     <small>
                       {poolViewLane==="TRAINING" ? `${p.industry || "Legacy"} → ${p.careerPath || p.startingPosition || "Training"}` :
                        poolViewLane==="CERTIFICATIONS" ? `Exam: ${String(p.certExam || "").replaceAll("_"," ")}` :
