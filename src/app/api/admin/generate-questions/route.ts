@@ -1,3 +1,4 @@
+import { contentSignature, validateContent } from "@/lib/contentPipeline";
 import { NextResponse } from "next/server";
 import { requireAdminRequest } from "@/app/api/_lib/adminGuard";
 import { prisma } from "@/lib/prisma";
@@ -10,7 +11,7 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
     const ids = Array.isArray(body?.knowledgeBlockIds) ? body.knowledgeBlockIds.filter(Boolean) : [];
-    const autoApprove = body?.autoApprove !== false;
+    const autoApprove = false; // Generation always precedes human review.
     if (!ids.length) return NextResponse.json({ error: "knowledgeBlockIds required" }, { status: 400 });
 
     const blocks = await prisma.knowledgeBlock.findMany({ where: { id: { in: ids } } });
@@ -36,16 +37,18 @@ export async function POST(req: Request) {
         source: blockRecord.source,
       });
       const rawCandidates = generateQuestionsFromBlock(normalized);
-      const activeTypes = new Set(["multiple_choice", "true_false", "cli_command"]);
-      const candidates = rawCandidates.filter((q) => {
-        if (!activeTypes.has(String(q.type || "").toLowerCase())) return false;
-        const quality = validateQuestionQuality(q);
-        return quality.qualityScore >= 80 && quality.issues.length === 0;
-      });
+      const setId = `kb-${blockRecord.sourceBlockId}`;
+      await prisma.questionSet.upsert({ where: {id:setId}, update:{}, create:{id:setId,name:blockRecord.setName,domain:blockRecord.domain,status:'DRAFT'} });
+      const existing = await prisma.generatedQuestion.findMany({where:{knowledgeBlockId:blockRecord.id}});
+      const seen = new Set(existing.map(contentSignature));
+      const candidates: typeof rawCandidates = [];
+      for (let rowIndex=0;rowIndex<rawCandidates.length;rowIndex++) {
+        const q=rawCandidates[rowIndex]; const errors=validateContent(q);const signature=contentSignature(q);
+        const reason=errors.length ? errors.join('; ') : seen.has(signature) ? 'Duplicate generated content' : '';
+        if (reason) { rejectedCount++; await prisma.questionImportIssue.create({data:{setId,rowIndex:rowIndex+1,reason,payload:q as any}}); continue; }
+        seen.add(signature);candidates.push(q);
+      }
 
-      rejectedCount += rawCandidates.length - candidates.length;
-
-      await prisma.generatedQuestion.deleteMany({ where: { knowledgeBlockId: blockRecord.id } });
       for (let i = 0; i < candidates.length; i += 1) {
         const q = candidates[i];
         await prisma.generatedQuestion.create({

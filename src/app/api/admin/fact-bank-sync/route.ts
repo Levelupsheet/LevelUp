@@ -13,7 +13,7 @@ export async function POST(req: Request) {
     const body = await req.json();
     const incoming = Array.isArray(body?.blocks) ? body.blocks : Array.isArray(body) ? body : [];
     if (!incoming.length) return NextResponse.json({ error: "blocks array is required" }, { status: 400 });
-    const summary = { blocksImported: 0, generatedQuestions: 0, approvedQuestions: 0, publishedQuestions: 0, skippedDuplicates: 0, rejectedWeak: 0, setsPublished: 0 };
+    const summary = { blocksImported: 0, generatedQuestions: 0, stagedQuestions: 0, approvedQuestions: 0, publishedQuestions: 0, skippedDuplicates: 0, rejectedWeak: 0, setsPublished: 0 };
     const results: Array<{ sourceBlockId: string; setId: string; lane: string; startingPosition: string | null; certExam: string | null; publishedCount: number }> = [];
     for (let i = 0; i < incoming.length; i += 1) {
       const block = normalizeKnowledgeBlock(incoming[i], i);
@@ -46,11 +46,16 @@ export async function POST(req: Request) {
         for (let idx = 0; idx < rejected.length; idx++) await tx.questionImportIssue.create({ data: { setId, rowIndex: idx + 1, ...rejected[idx] } });
         const savedBlock = await tx.knowledgeBlock.upsert({ where: { sourceBlockId: block.sourceBlockId }, update: { title: block.title, setName: block.setName, domain: block.domain, lane: block.lane, startingPosition: block.startingPosition, certExam: block.certExam, difficulty: block.difficulty, stage: block.stage, tags: block.tags, source: block.source, contentJson: block.contentJson, status: "APPROVED" }, create: { sourceBlockId: block.sourceBlockId, title: block.title, setName: block.setName, domain: block.domain, lane: block.lane, startingPosition: block.startingPosition, certExam: block.certExam, difficulty: block.difficulty, stage: block.stage, tags: block.tags, source: block.source, contentJson: block.contentJson, status: "APPROVED" } });
         // Preserve earlier reviewed/generated content and its publishing history.
+        const generatedSeen = new Set((await tx.generatedQuestion.findMany({where:{knowledgeBlockId:savedBlock.id}})).map(contentSignature));
         for (let idx = 0; idx < candidates.length; idx += 1) {
           const q = candidates[idx];
+          const signature=contentSignature(q);
+          if (generatedSeen.has(signature)) continue;
+          generatedSeen.add(signature);
+          summary.generatedQuestions++;
           await tx.generatedQuestion.create({ data: { knowledgeBlockId: savedBlock.id, prompt: q.prompt, type: q.type.toUpperCase(), data: q.data, choices: q.choices ?? (Array.isArray(q.data?.choices) ? q.data.choices : null), correctIndex: q.correctIndex ?? null, explanation: q.explanation, difficulty: q.difficulty, tags: q.tags, sortOrder: idx, reviewStatus: "PENDING" } });
         }
-        await tx.questionSet.upsert({ where: { id: setId }, update: { name: block.setName, domain: block.domain, status: QuestionSetStatus.DRAFT }, create: { id: setId, name: block.setName, domain: block.domain, status: QuestionSetStatus.DRAFT } });
+        await tx.questionSet.upsert({ where: { id: setId }, update: { name: block.setName, domain: block.domain }, create: { id: setId, name: block.setName, domain: block.domain, status: QuestionSetStatus.DRAFT } });
         const existing = await tx.mCQQuestion.findMany({ where: { setId }, select: { prompt: true, type: true, choices: true, correctIndex: true, data: true } });
         const seen = new Set(existing.map((q: any) => contentSignature(q)));
         const rows: any[] = [];
@@ -66,10 +71,10 @@ export async function POST(req: Request) {
           rows.push({ setId, ...mapped, data: { ...(mapped.data || {}), reviewStatus: "PENDING", lifecycleStatus: "ACTIVE" }, sortOrder: nextOrder++ });
         }
         if (rows.length) await tx.mCQQuestion.createMany({ data: rows });
-        summary.generatedQuestions += rows.length;
-      });
-      summary.blocksImported += 1; summary.generatedQuestions += candidates.length; summary.approvedQuestions += 0;
-      results.push({ sourceBlockId: block.sourceBlockId, setId, lane: block.lane, startingPosition: block.startingPosition, certExam: block.certExam, publishedCount: candidates.length });
+        summary.stagedQuestions += rows.length;
+      }, {timeout:60000,maxWait:10000});
+      summary.blocksImported += 1;
+      results.push({ sourceBlockId: block.sourceBlockId, setId, lane: block.lane, startingPosition: block.startingPosition, certExam: block.certExam, publishedCount: 0 });
     }
     return NextResponse.json({ ok: true, summary, results });
   } catch (e: any) { return NextResponse.json({ error: e?.message || "Failed to sync fact bank" }, { status: 500 }); }

@@ -1,3 +1,4 @@
+import { validateContent } from "@/lib/contentPipeline";
 import { NextResponse } from "next/server";
 import { requireAdminRequest } from "@/app/api/_lib/adminGuard";
 import { prisma } from "@/lib/prisma";
@@ -12,7 +13,7 @@ export async function GET(req: Request) {
     const questions = await prisma.generatedQuestion.findMany({
       where,
       orderBy: [{ knowledgeBlockId: "asc" }, { sortOrder: "asc" }, { createdAt: "asc" }],
-      take: 500,
+
       include: { knowledgeBlock: { select: { title: true, setName: true } } },
     });
     return NextResponse.json({ questions });
@@ -29,14 +30,21 @@ export async function PATCH(req: Request) {
     const id = String(body?.id || "").trim();
     if (!id) return NextResponse.json({ error: "id is required" }, { status: 400 });
 
+    const existing = await prisma.generatedQuestion.findUnique({where:{id}});
+    if (!existing) return NextResponse.json({error:'Question not found'},{status:404});
+    if (['APPROVED','EDITED'].includes(body.reviewStatus)) {
+      const issues = validateContent({...existing,...body,data:{...(existing.data as any || {}),...(body.data || {})}});
+      if (issues.length) return NextResponse.json({error:issues.join('; ')},{status:400});
+    }
     const question = await prisma.generatedQuestion.update({
       where: { id },
       data: {
+        type: typeof body.type === "string" ? body.type.toUpperCase() as any : undefined,
         prompt: typeof body.prompt === "string" ? body.prompt : undefined,
         explanation: body.explanation === undefined ? undefined : body.explanation,
         difficulty: body.difficulty === undefined ? undefined : Number(body.difficulty),
         tags: Array.isArray(body.tags) ? body.tags : undefined,
-        data: body.data && typeof body.data === "object" ? body.data : undefined,
+        data: body.data && typeof body.data === "object" ? {...(existing.data as any || {}),...body.data} : undefined,
         choices: Array.isArray(body.choices) ? body.choices : body.choices === null ? null : undefined,
         correctIndex: body.correctIndex === undefined ? undefined : body.correctIndex === null ? null : Number(body.correctIndex),
         reviewStatus: typeof body.reviewStatus === "string" ? body.reviewStatus : undefined,
@@ -60,8 +68,8 @@ export async function DELETE(req: Request) {
       ? body.ids.map((value: any) => String(value).trim()).filter(Boolean)
       : [String(body?.id || "").trim()].filter(Boolean);
     if (!ids.length) return NextResponse.json({ error: "id or ids required" }, { status: 400 });
-    const result = await prisma.generatedQuestion.deleteMany({ where: { id: { in: ids } } });
-    return NextResponse.json({ ok: true, deleted: result.count });
+    const result = await prisma.generatedQuestion.updateMany({ where: { id: { in: ids } }, data: { reviewStatus: "REJECTED", editorNotes: "Archived by administrator" } });
+    return NextResponse.json({ ok: true, archived: result.count, deleted: 0 });
   } catch (e: any) {
     return NextResponse.json({ error: e?.message || "Failed to delete generated question" }, { status: 500 });
   }

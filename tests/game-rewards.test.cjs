@@ -19,11 +19,11 @@ mock('lib/userStore.ts',{awardXp:()=>({id:'u',xp:100}),getActiveUser:()=>({id:'u
 mock('lib/activityStore.ts',{addActivity(){}});
 mock('lib/activeUser.ts',{hydrateAuthenticatedUser:async()=>{},resolveClientUserId:()=> 'u'});
 const GameEngine=require('../src/components/GameEngine.tsx').default;
-global.window={clearTimeout(){}};
+global.window={clearTimeout(){},setTimeout(){}};
 
 test('quiz completion submits the required stable reward claim key and actual question difficulty',async()=>{
   const requests=[];
-  global.fetch=async(url,options)=>{requests.push({url,body:JSON.parse(options.body)});return {ok:true,json:async()=>({ok:true})};};
+  global.fetch=async(url,options)=>{requests.push({url,body:JSON.parse(options.body)});return {ok:true,json:async()=>url==='/api/learning/session' ? ({session:{id:'saved-session',state:null},questions:[{id:'db-q',prompt:'Question',choices:['A','B'],correctIndex:0,level:5,sessionQuestionId:'sq'}]}) : ({ok:true})};};
   const questions=[{id:'db-q',prompt:'Question',choices:['A','B'],correctIndex:0,level:5}];
   let renderer;
   await act(async()=>{renderer=create(React.createElement(GameEngine,{lane:'TRAINING',title:'Position Training',questionsOverride:questions}));});
@@ -31,8 +31,21 @@ test('quiz completion submits the required stable reward claim key and actual qu
   await act(async()=>{await runnerProps.onComplete(summary);await runnerProps.onComplete(summary);});
   const saves=requests.filter(r=>r.url==='/api/game/session');
   assert.equal(saves.length,2);
-  assert.match(saves[0].body.rewardClaimKey,/^[a-f0-9-]{36}$/i);
+  assert.equal(saves[0].body.rewardClaimKey,'saved-session');
+  assert.equal(requests[0].body.questionIds[0],'db-q');
   assert.equal(saves[0].body.rewardClaimKey,saves[1].body.rewardClaimKey);
   assert.equal(saves[0].body.questionDomains[0].level,5);
   await act(async()=>renderer.unmount());
+});
+test('training and certification answers use saved sessions and propagate failed persistence for retry',async()=>{
+ for(const lane of ['TRAINING','CERTIFICATIONS']){
+  const requests=[];let fail=false;
+  global.fetch=async(url,options)=>{const body=JSON.parse(options.body);requests.push({url,body});return {ok:!fail,json:async()=>fail?{error:'Temporary save failure'}:options.method==='POST'?{session:{id:`s-${lane}`,state:null},questions:[{id:'q',sessionQuestionId:'sq',prompt:'Choose A',type:'multiple_choice',choices:['A','B'],correctIndex:0,level:3}]}:{learning:{masteryByDomain:{general:55}}}};};
+  let renderer;await act(async()=>{renderer=create(React.createElement(GameEngine,{lane,title:'Practice',industry:'Healthcare',careerPath:'Nursing',certExam:'A_PLUS'}));});
+  assert.equal(requests[0].body.lane,lane);
+  await act(async()=>{await runnerProps.onAdvanceQuestion({question:runnerProps.questions[0],selectedAnswer:'B',isCorrect:false,nextIndex:1});});
+  assert.equal(requests[1].body.sessionId,`s-${lane}`);assert.equal(requests[1].body.answeredQuestions[0].selectedAnswer,'B');
+  fail=true;await assert.rejects(()=>runnerProps.onAdvanceQuestion({question:runnerProps.questions[0],selectedAnswer:'B',nextIndex:1}),/Temporary save failure/);
+  await act(async()=>renderer.unmount());
+ }
 });

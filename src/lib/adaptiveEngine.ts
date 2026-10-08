@@ -1,5 +1,6 @@
+import { loadLearningContext } from "@/lib/learningHistory";
 import { prisma } from "@/lib/prisma";
-import { masteryToTargetDifficulty, normalizeQuestionDomain } from "@/lib/learningProfile";
+import { masteryToTargetDifficulty } from "@/lib/learningProfile";
 import { normalizeQuestionType } from "@/lib/questionTypes";
 import { buildSessionBlueprint, getBankRule, type SessionBlueprintStep } from "@/lib/bankRules";
 
@@ -28,7 +29,7 @@ function toMillis(value?: string | Date | null) {
 
 function normalizeRuntimeQuestion(input: RuntimeQuestion) {
   const data = input.data && typeof input.data === "object" ? input.data : {};
-  const domain = normalizeQuestionDomain(String(input.domainId || (data as any).domainId || (data as any).domain || ""));
+  const domain = String(input.domainId || (data as any).domainId || (data as any).domain || "GENERAL").trim().toUpperCase();
   const subdomain = normSubdomain(String(input.subdomain || (data as any).subdomain || (data as any).topic || ""));
   const type = String(normalizeQuestionType(input.type) || "multiple_choice").toLowerCase();
   const level = Math.max(1, Math.min(5, Number(input.level ?? input.difficulty ?? 1) || 1));
@@ -39,219 +40,12 @@ function normalizeRuntimeQuestion(input: RuntimeQuestion) {
   return { ...input, domain, subdomain, type, level, prerequisites, minMastery, lifecycleStatus, qualityScore };
 }
 
-export async function ensureAdaptiveLearningTables() {
-  try {
-    await (prisma as any).$executeRawUnsafe(`
-      CREATE TABLE IF NOT EXISTS "UserSkill" (
-        "id" TEXT PRIMARY KEY,
-        "userId" TEXT NOT NULL,
-        "domain" TEXT NOT NULL,
-        "subdomain" TEXT NOT NULL DEFAULT 'GENERAL',
-        "questionType" TEXT NOT NULL DEFAULT 'GENERAL',
-        "mastery" DOUBLE PRECISION NOT NULL DEFAULT 50,
-        "attempts" INTEGER NOT NULL DEFAULT 0,
-        "correct" INTEGER NOT NULL DEFAULT 0,
-        "avgScore" DOUBLE PRECISION NOT NULL DEFAULT 0,
-        "avgResponseMs" DOUBLE PRECISION,
-        "lastSeenAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        "createdAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        "updatedAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-      )
-    `);
-    await (prisma as any).$executeRawUnsafe(`CREATE INDEX IF NOT EXISTS "UserSkill_user_domain_idx" ON "UserSkill" ("userId","domain")`);
-    await (prisma as any).$executeRawUnsafe(`CREATE INDEX IF NOT EXISTS "UserSkill_user_domain_subdomain_idx" ON "UserSkill" ("userId","domain","subdomain")`);
-    await (prisma as any).$executeRawUnsafe(`
-      CREATE TABLE IF NOT EXISTS "QuestionExposure" (
-        "id" TEXT PRIMARY KEY,
-        "userId" TEXT NOT NULL,
-        "questionId" TEXT NOT NULL,
-        "domain" TEXT,
-        "subdomain" TEXT,
-        "questionType" TEXT,
-        "score" DOUBLE PRECISION,
-        "isCorrect" BOOLEAN,
-        "seenAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-      )
-    `);
-    await (prisma as any).$executeRawUnsafe(`CREATE INDEX IF NOT EXISTS "QuestionExposure_user_seen_idx" ON "QuestionExposure" ("userId","seenAt" DESC)`);
-    await (prisma as any).$executeRawUnsafe(`CREATE INDEX IF NOT EXISTS "QuestionExposure_user_question_idx" ON "QuestionExposure" ("userId","questionId","seenAt" DESC)`);
-    await (prisma as any).$executeRawUnsafe(`
-      CREATE TABLE IF NOT EXISTS "QuestionCalibration" (
-        "questionId" TEXT PRIMARY KEY,
-        "timesSeen" INTEGER NOT NULL DEFAULT 0,
-        "correctCount" INTEGER NOT NULL DEFAULT 0,
-        "observedAccuracy" DOUBLE PRECISION NOT NULL DEFAULT 0,
-        "avgResponseMs" DOUBLE PRECISION,
-        "difficultyDrift" DOUBLE PRECISION NOT NULL DEFAULT 0,
-        "updatedAt" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-      )
-    `);
-    await (prisma as any).$executeRawUnsafe(`CREATE INDEX IF NOT EXISTS "QuestionCalibration_updated_idx" ON "QuestionCalibration" ("updatedAt" DESC)`);
-  } catch {}
+export async function getAdaptiveLearningContext(userId?: string | null, options: { scopeKey?: string; questionIds?: string[] } = {}, db: any = prisma) {
+  return loadLearningContext(userId, options, db);
 }
-
-export async function getAdaptiveLearningContext(userId?: string | null) {
-  const safeUserId = String(userId || "").trim();
-  if (!safeUserId) {
-    return {
-      masteryByDomain: {} as Record<string, number>,
-      masteryBySubdomain: {} as Record<string, number>,
-      masteryByQuestionType: {} as Record<string, number>,
-      recentHistory: [] as Array<{ questionId: string; correct: boolean; score: number; seenAt?: string }>,
-      exposureQuestionIds24h: new Set<string>(),
-      recentQuestionIds: new Set<string>(),
-      lastWrongDomain: null as string | null,
-      lastWrongSubdomain: null as string | null,
-      lastWrongQuestionType: null as string | null,
-      weakestDomain: "general",
-      weakestTargetDifficulty: 1 as 1 | 2 | 3 | 4 | 5,
-    };
-  }
-
-  await ensureAdaptiveLearningTables();
-
-  const [skillRows, exposureRows, fallbackMasteries, fallbackRecent] = await Promise.all([
-    (prisma as any).$queryRawUnsafe(`
-      SELECT "domain","subdomain","questionType","mastery","attempts","correct","avgScore","lastSeenAt"
-      FROM "UserSkill"
-      WHERE "userId" = $1
-      ORDER BY "updatedAt" DESC
-      LIMIT 1000
-    `, safeUserId).catch(() => []),
-    (prisma as any).$queryRawUnsafe(`
-      SELECT "questionId","domain","subdomain","questionType","isCorrect","score","seenAt"
-      FROM "QuestionExposure"
-      WHERE "userId" = $1
-      ORDER BY "seenAt" DESC
-      LIMIT 150
-    `, safeUserId).catch(() => []),
-    prisma.userDomain.findMany({ where: { userId: safeUserId }, select: { domain: true, xp: true } }).catch(() => []),
-    (prisma as any).gameSessionQuestion.findMany({
-      where: { session: { userId: safeUserId } },
-      orderBy: { answeredAt: "desc" },
-      take: 120,
-      select: { questionId: true, isCorrect: true, payloadJson: true, answeredAt: true },
-    }).catch(() => []),
-  ]);
-
-  const masteryByDomain: Record<string, number> = {};
-  const masteryBySubdomain: Record<string, number> = {};
-  const masteryByQuestionType: Record<string, number> = {};
-
-  for (const row of (skillRows || []) as any[]) {
-    const domainKey = String(normalizeQuestionDomain(row?.domain || "GENERAL")).toLowerCase();
-    const subKey = `${domainKey}:${normSubdomain(row?.subdomain || "GENERAL").toLowerCase()}`;
-    const typeKey = String(normalizeQuestionType(row?.questionType || "multiple_choice")).toLowerCase();
-    const mastery = Math.max(0, Math.min(100, Number(row?.mastery || 0)));
-    masteryByDomain[domainKey] = masteryByDomain[domainKey] == null ? mastery : Math.min(masteryByDomain[domainKey], mastery);
-    masteryBySubdomain[subKey] = masteryBySubdomain[subKey] == null ? mastery : Math.min(masteryBySubdomain[subKey], mastery);
-    masteryByQuestionType[typeKey] = masteryByQuestionType[typeKey] == null ? mastery : Math.min(masteryByQuestionType[typeKey], mastery);
-  }
-
-  if (!Object.keys(masteryByDomain).length) {
-    for (const row of fallbackMasteries || []) {
-      const domainId = normalizeQuestionDomain(String((row as any).domain || "GENERAL")).toLowerCase();
-      const xp = Number((row as any).xp || 0);
-      masteryByDomain[domainId] = Math.max(0, Math.min(100, Number(((xp / 8000) * 100).toFixed(1))));
-    }
-  }
-
-  const recentHistory: Array<{ questionId: string; correct: boolean; score: number; seenAt?: string }> = [];
-  const exposureQuestionIds24h = new Set<string>();
-  const recentQuestionIds = new Set<string>();
-  let lastWrongDomain: string | null = null;
-  let lastWrongSubdomain: string | null = null;
-  let lastWrongQuestionType: string | null = null;
-
-  const mergedRows = [
-    ...((exposureRows || []) as any[]).map((row) => ({
-      questionId: String(row?.questionId || ""),
-      correct: row?.isCorrect === true,
-      score: Number(row?.score ?? (row?.isCorrect === true ? 1 : 0)),
-      seenAt: row?.seenAt ? new Date(row.seenAt).toISOString() : undefined,
-      domain: row?.domain,
-      subdomain: row?.subdomain,
-      questionType: row?.questionType,
-    })),
-    ...((fallbackRecent || []) as any[]).map((row) => {
-      const payload = row?.payloadJson && typeof row.payloadJson === "object" ? row.payloadJson : {};
-      return {
-        questionId: String(row?.questionId || (payload as any)?.id || ""),
-        correct: row?.isCorrect === true,
-        score: Number((payload as any)?.partialScore ?? (row?.isCorrect === true ? 1 : 0)),
-        seenAt: row?.answeredAt ? new Date(row.answeredAt).toISOString() : undefined,
-        domain: (payload as any)?.domainId || (payload as any)?.data?.domainId,
-        subdomain: (payload as any)?.subdomain || (payload as any)?.data?.subdomain,
-        questionType: (payload as any)?.type,
-      };
-    }),
-  ].filter((row) => row.questionId);
-
-  const now = Date.now();
-  for (const row of mergedRows) {
-    recentHistory.push({ questionId: row.questionId, correct: row.correct, score: row.score, seenAt: row.seenAt });
-    if (recentQuestionIds.size < 20) recentQuestionIds.add(row.questionId);
-    if (now - toMillis(row.seenAt) <= 24 * 60 * 60 * 1000) exposureQuestionIds24h.add(row.questionId);
-    if (!row.correct && !lastWrongDomain) {
-      lastWrongDomain = String(normalizeQuestionDomain(row.domain || "GENERAL")).toLowerCase();
-      lastWrongSubdomain = normSubdomain(row.subdomain || "GENERAL").toLowerCase();
-      lastWrongQuestionType = String(normalizeQuestionType(row.questionType || "multiple_choice")).toLowerCase();
-    }
-  }
-
-  const weakestDomainEntry = Object.entries(masteryByDomain).sort((a, b) => a[1] - b[1])[0];
-  const weakestDomain = String(weakestDomainEntry?.[0] || lastWrongDomain || "general");
-  const weakestTargetDifficulty = masteryToTargetDifficulty(Math.round(Number(weakestDomainEntry?.[1] ?? 35)));
-
-  return {
-    masteryByDomain,
-    masteryBySubdomain,
-    masteryByQuestionType,
-    recentHistory,
-    exposureQuestionIds24h,
-    recentQuestionIds,
-    lastWrongDomain,
-    lastWrongSubdomain,
-    lastWrongQuestionType,
-    weakestDomain,
-    weakestTargetDifficulty,
-  };
-}
-
-export async function getMissedQuestionReview(userId?: string | null) {
-  const safeUserId = String(userId || "").trim();
-  if (!safeUserId) return { questionIds: new Set<string>(), stats: new Map<string, { misses: number; recoveryCorrect: number }>() };
-  await ensureAdaptiveLearningTables();
-  const rows = await (prisma as any).$queryRawUnsafe(
-    `SELECT "questionId","isCorrect","seenAt"
-       FROM "QuestionExposure"
-      WHERE "userId" = $1 AND "isCorrect" IS NOT NULL
-      ORDER BY "seenAt" ASC`,
-    safeUserId
-  ).catch(() => []);
-
-  const stats = new Map<string, { misses: number; recoveryCorrect: number }>();
-  for (const row of (rows || []) as any[]) {
-    const id = String(row?.questionId || "").trim();
-    if (!id) continue;
-    const current = stats.get(id) || { misses: 0, recoveryCorrect: 0 };
-    if (row?.isCorrect === true) {
-      if (current.misses > 0) current.recoveryCorrect += 1;
-    } else {
-      current.misses += 1;
-      // A new miss reopens remediation. Require three later correct exposures
-      // before the question leaves the active missed-question review pool.
-      current.recoveryCorrect = 0;
-    }
-    stats.set(id, current);
-  }
-
-  const questionIds = new Set(
-    Array.from(stats.entries())
-      .filter(([, value]) => value.misses > 0 && value.recoveryCorrect < 3)
-      .map(([id]) => id)
-  );
-  return { questionIds, stats };
+export async function getMissedQuestionReview(userId?: string | null, options: { scopeKey?: string; questionIds?: string[] } = {}, db: any = prisma) {
+  const context = await loadLearningContext(userId, options, db);
+  return { questionIds: context.missedQuestionIds, stats: context.missedStats };
 }
 
 export function isQuestionUnlocked(question: RuntimeQuestion, learning: Awaited<ReturnType<typeof getAdaptiveLearningContext>>) {
@@ -287,12 +81,13 @@ function calibrationDifficultyOffset(row: any) {
   return 0;
 }
 
-export async function getQuestionCalibrationMap(questionIds: string[]) {
+export async function getQuestionCalibrationMap(questionIds: string[], db: any = prisma) {
   const ids = Array.from(new Set((questionIds || []).map((v) => String(v || "").trim()).filter(Boolean)));
   if (!ids.length) return new Map<string, any>();
-  await ensureAdaptiveLearningTables();
-  const rows = await (prisma as any).$queryRawUnsafe(`SELECT * FROM "QuestionCalibration" WHERE "questionId" = ANY($1)`, ids).catch(() => []);
-  return new Map<string, any>((rows || []).map((row: any) => [String(row.questionId), row] as [string, any]));
+  const rows = await db.gameSessionQuestion.findMany({ where: { questionId: { in: ids }, answered: true } });
+  const groups = new Map<string, any[]>();
+  for (const row of rows) { const group = groups.get(row.questionId!) || []; group.push(row); groups.set(row.questionId!,group); }
+  return new Map([...groups].map(([id,rows]) => [id,{ timesSeen:rows.length,observedAccuracy:rows.filter(q=>q.isCorrect).length / rows.length }]));
 }
 
 export function weightedAdaptiveQuestionPlan<T extends RuntimeQuestion>(args: {
@@ -320,6 +115,7 @@ export function weightedAdaptiveQuestionPlan<T extends RuntimeQuestion>(args: {
   for (let stepIndex = 0; stepIndex < blueprint.length && selected.length < args.questionCount; stepIndex += 1) {
     const step = blueprint[stepIndex];
     const remaining = questions.filter((q) => !selectedIds.has(String(q.id)));
+    if (!remaining.length) break;
     const nearestDistance = Math.min(...remaining.map(q => Math.abs(q.level - step.difficulty)));
     const candidates = remaining.filter(q => Math.abs(q.level - step.difficulty) === nearestDistance);
     const scored = candidates.map((q, index) => {
@@ -348,10 +144,10 @@ export function weightedAdaptiveQuestionPlan<T extends RuntimeQuestion>(args: {
         (sameWrongType ? 14 : 0) +
         (sameWrongDomain && !args.learning.recentQuestionIds.has(String(q.id)) ? 24 : 0);
       const weakBonus = step.weakFocus && domainKey === args.learning.weakestDomain ? 30 : 0;
-      const scenarioBonus = step.mode === "scenario" && ["incident", "cli_command", "log_analysis"].includes(typeKey) ? 30 : 0;
-      const reviewBonus = step.mode === "review" && ["multiple_choice", "fill_blank", "multi_select"].includes(typeKey) ? 20 : 0;
+      const scenarioBonus = step.mode === "scenario" && ["multiple_choice", "cli_command"].includes(typeKey) ? 30 : 0;
+      const reviewBonus = step.mode === "review" && ["multiple_choice", "true_false", "cli_command"].includes(typeKey) ? 20 : 0;
       const recoveryMode = inferredRecovery || step.mode === "recovery";
-      const recoveryBonus = recoveryMode && ["multiple_choice", "fill_blank"].includes(typeKey) ? 42 : 0;
+      const recoveryBonus = recoveryMode && ["multiple_choice", "true_false"].includes(typeKey) ? 42 : 0;
       const recoveryDomainBonus = recoveryMode && sameWrongDomain ? 48 : 0;
       const recoveryDifficultyBonus = recoveryMode && Number((q as any).level || 1) <= Math.max(1, args.learning.weakestTargetDifficulty) ? 28 : 0;
       const typePreferenceBonus = step.preferredTypes?.includes(typeKey) ? 18 : 0;
@@ -399,113 +195,4 @@ export function weightedAdaptiveQuestionPlan<T extends RuntimeQuestion>(args: {
   }
 
   return selected as T[];
-}
-
-export async function recordQuestionExposure(input: {
-  userId?: string | null;
-  questionId?: string | null;
-  domain?: string | null;
-  subdomain?: string | null;
-  questionType?: string | null;
-  isCorrect?: boolean | null;
-  score?: number | null;
-}) {
-  const userId = String(input.userId || "").trim();
-  const questionId = String(input.questionId || "").trim();
-  if (!userId || !questionId) return;
-  await ensureAdaptiveLearningTables();
-  await (prisma as any).$executeRawUnsafe(
-    `INSERT INTO "QuestionExposure" ("id","userId","questionId","domain","subdomain","questionType","score","isCorrect","seenAt")
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,CURRENT_TIMESTAMP)`,
-    `qe_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
-    userId,
-    questionId,
-    String(input.domain || "").toUpperCase() || null,
-    normSubdomain(input.subdomain || "GENERAL"),
-    String(normalizeQuestionType(input.questionType || "multiple_choice")).toUpperCase(),
-    input.score == null ? null : Number(input.score),
-    typeof input.isCorrect === "boolean" ? input.isCorrect : null,
-  ).catch(() => null);
-}
-
-export async function upsertQuestionCalibration(input: { questionId?: string | null; isCorrect?: boolean | null; responseMs?: number | null; }) {
-  const questionId = String(input.questionId || "").trim();
-  if (!questionId) return;
-  await ensureAdaptiveLearningTables();
-  const rows = await (prisma as any).$queryRawUnsafe(`SELECT * FROM "QuestionCalibration" WHERE "questionId" = $1 LIMIT 1`, questionId).catch(() => []);
-  const current = Array.isArray(rows) && rows.length ? rows[0] : null;
-  const timesSeen = Number(current?.timesSeen || 0) + 1;
-  const correctCount = Number(current?.correctCount || 0) + (input.isCorrect ? 1 : 0);
-  const observedAccuracy = Number((correctCount / Math.max(1, timesSeen)).toFixed(4));
-  const prevAvg = Number(current?.avgResponseMs || 0);
-  const responseMs = input.responseMs == null ? prevAvg || null : Math.max(0, Number(input.responseMs || 0));
-  const avgResponseMs = responseMs == null ? null : Number((((prevAvg * Math.max(0, timesSeen - 1)) + responseMs) / timesSeen).toFixed(2));
-  const difficultyDrift = Number(((observedAccuracy > 0.85 ? -0.15 : observedAccuracy < 0.40 ? 0.15 : 0) + Number(current?.difficultyDrift || 0) * 0.5).toFixed(3));
-
-  if (current?.questionId) {
-    await (prisma as any).$executeRawUnsafe(
-      `UPDATE "QuestionCalibration" SET "timesSeen" = $2, "correctCount" = $3, "observedAccuracy" = $4, "avgResponseMs" = $5, "difficultyDrift" = $6, "updatedAt" = CURRENT_TIMESTAMP WHERE "questionId" = $1`,
-      questionId, timesSeen, correctCount, observedAccuracy, avgResponseMs, difficultyDrift,
-    ).catch(() => null);
-  } else {
-    await (prisma as any).$executeRawUnsafe(
-      `INSERT INTO "QuestionCalibration" ("questionId","timesSeen","correctCount","observedAccuracy","avgResponseMs","difficultyDrift","updatedAt") VALUES ($1,$2,$3,$4,$5,$6,CURRENT_TIMESTAMP)`,
-      questionId, timesSeen, correctCount, observedAccuracy, avgResponseMs, difficultyDrift,
-    ).catch(() => null);
-  }
-}
-
-export async function upsertUserSkillFromAnswer(input: {
-  userId?: string | null;
-  question?: RuntimeQuestion | null;
-  score?: number | null;
-  isCorrect?: boolean | null;
-  responseMs?: number | null;
-  hintsUsed?: number | null;
-  attempts?: number | null;
-}) {
-  const userId = String(input.userId || "").trim();
-  const question = input.question ? normalizeRuntimeQuestion(input.question) : null;
-  if (!userId || !question) return;
-  await ensureAdaptiveLearningTables();
-
-  const domain = String((question as any).domain || "GENERAL").toUpperCase();
-  const subdomain = normSubdomain((question as any).subdomain || "GENERAL");
-  const questionType = String(normalizeQuestionType(question.type || "multiple_choice")).toUpperCase();
-  const currentRows = await (prisma as any).$queryRawUnsafe(
-    `SELECT "id","mastery","attempts","correct","avgScore","avgResponseMs" FROM "UserSkill"
-     WHERE "userId" = $1 AND "domain" = $2 AND "subdomain" = $3 AND "questionType" = $4
-     LIMIT 1`,
-    userId, domain, subdomain, questionType
-  ).catch(() => []);
-  const current = Array.isArray(currentRows) && currentRows.length ? currentRows[0] : null;
-  const prevMastery = Number(current?.mastery ?? 50);
-  const attempts = Number(current?.attempts ?? 0) + 1;
-  const correct = Number(current?.correct ?? 0) + (input.isCorrect ? 1 : 0);
-  const score = Math.max(0, Math.min(1, Number(input.score ?? (input.isCorrect ? 1 : 0))));
-  const difficulty = Math.max(1, Math.min(3, Number((question as any).level || question.difficulty || 1) || 1));
-  const confidence = calculateConfidenceScore({ correct: input.isCorrect, score, responseMs: input.responseMs, hintsUsed: input.hintsUsed, attempts: input.attempts });
-  const delta = (confidence * (1.35 + difficulty * 0.55)) - ((1 - score) * (0.55 + difficulty * 0.18));
-  const nextMastery = Math.max(0, Math.min(100, Number((prevMastery + delta).toFixed(1))));
-  const avgScore = Number((((Number(current?.avgScore ?? 0) * Math.max(0, attempts - 1)) + score) / attempts).toFixed(4));
-  const responseMs = input.responseMs == null ? null : Math.max(0, Number(input.responseMs || 0));
-  const avgResponseMs = responseMs == null
-    ? Number(current?.avgResponseMs ?? 0) || null
-    : Number((((Number(current?.avgResponseMs ?? 0) * Math.max(0, attempts - 1)) + responseMs) / attempts).toFixed(2));
-
-  if (current?.id) {
-    await (prisma as any).$executeRawUnsafe(
-      `UPDATE "UserSkill"
-       SET "mastery" = $2, "attempts" = $3, "correct" = $4, "avgScore" = $5, "avgResponseMs" = $6, "lastSeenAt" = CURRENT_TIMESTAMP, "updatedAt" = CURRENT_TIMESTAMP
-       WHERE "id" = $1`,
-      current.id, nextMastery, attempts, correct, avgScore, avgResponseMs
-    ).catch(() => null);
-  } else {
-    await (prisma as any).$executeRawUnsafe(
-      `INSERT INTO "UserSkill" ("id","userId","domain","subdomain","questionType","mastery","attempts","correct","avgScore","avgResponseMs","lastSeenAt","createdAt","updatedAt")
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)`,
-      `usk_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
-      userId, domain, subdomain, questionType, nextMastery, attempts, correct, avgScore, avgResponseMs
-    ).catch(() => null);
-  }
 }

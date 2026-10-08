@@ -1,3 +1,6 @@
+import { learningRecommendations } from "@/lib/learningEngine";
+import { loadLearningAttempts } from "@/lib/learningHistory";
+import { SUPPORTED_FORMATS } from "@/lib/contentPipeline";
 import { getAdaptiveLearningContext } from "@/lib/adaptiveEngine";
 
 function titleCase(value: string) {
@@ -15,9 +18,11 @@ function avg(values: number[]) {
   return values.length ? values.reduce((a, b) => a + b, 0) / values.length : 0;
 }
 
-export async function buildPersonalizedLearningPath(userId: string) {
-  const ctx = await getAdaptiveLearningContext(userId);
+export async function buildPersonalizedLearningPath(userId: string, options: { scopeKey?: string } = {}) {
+  const ctx = await getAdaptiveLearningContext(userId, options);
+  const measuredDomains = Object.entries(ctx.masteryByDomain).map(([domain,mastery])=>({domain,mastery:Number(mastery)}));
   const weakestDomains = Object.entries(ctx.masteryByDomain)
+    .filter(([domain,mastery])=>ctx.dimensions.domain[domain]?.attempts >= 2 && mastery < 85)
     .sort((a, b) => Number(a[1]) - Number(b[1]))
     .slice(0, 3)
     .map(([domain, mastery]) => ({ domain, mastery: Number(mastery || 0) }));
@@ -31,6 +36,7 @@ export async function buildPersonalizedLearningPath(userId: string) {
     });
 
   const typeWeakness = Object.entries(ctx.masteryByQuestionType)
+    .filter(([type]) => (SUPPORTED_FORMATS as readonly string[]).includes(type))
     .sort((a, b) => Number(a[1]) - Number(b[1]))
     .slice(0, 3)
     .map(([type, mastery]) => ({ type, mastery: Number(mastery || 0) }));
@@ -43,21 +49,12 @@ export async function buildPersonalizedLearningPath(userId: string) {
     order: index + 1,
     title: `Raise ${titleCase(item.domain)} mastery`,
     target: Math.min(85, Math.max(55, Math.round(item.mastery + 15))),
-    action: `Run a focused session on ${titleCase(item.domain)} with one remediation block and one scenario block.`,
+    action: `Run a focused session on ${titleCase(item.domain)} with one remediation block and one multiple-choice application block.`,
   }));
 
-  const recommendations = [
-    ...weakestDomains.map((item) => item.mastery >= 85
-      ? `${titleCase(item.domain)} is mastered. Maintain it with occasional mixed review.`
-      : item.mastery >= 70
-        ? `${titleCase(item.domain)} is strengthened. Use harder scenario questions to verify durable mastery.`
-        : item.mastery >= 50
-          ? `${titleCase(item.domain)} is improving. Continue targeted practice until mastery reaches at least ${Math.min(75, Math.round(item.mastery + 10))}.`
-          : `Prioritize ${titleCase(item.domain)} until mastery reaches at least ${Math.min(75, Math.round(item.mastery + 10))}.`),
-    ...typeWeakness.slice(0, 2).map((item) => `Mix in more ${titleCase(item.type)} questions to reduce format-specific weakness.`),
-  ].slice(0, 5);
+  const recommendations = learningRecommendations(await loadLearningAttempts(userId,options));
 
-  const primaryFocus = weakestDomains.find((item) => item.mastery < 85) || weakestDomains[0];
+  const primaryFocus = weakestDomains[0] || measuredDomains[0];
   const focusState = primaryFocus ? masteryState(primaryFocus.mastery) : "FOCUS_AREA";
   const nextSessionPlan = {
     warmupDomain: primaryFocus?.domain || ctx.weakestDomain || "general",
@@ -74,8 +71,10 @@ export async function buildPersonalizedLearningPath(userId: string) {
 
   return {
     momentum,
+    dimensions: ctx.dimensions,
+    missedQuestionCount: ctx.missedQuestionIds.size,
     weakestDomains,
-    masteryStates: weakestDomains.map((item) => ({ ...item, state: masteryState(item.mastery) })),
+    masteryStates: measuredDomains.map((item) => ({ ...item, state: masteryState(item.mastery) })),
     subdomainWeakness,
     typeWeakness,
     milestones,
@@ -86,6 +85,6 @@ export async function buildPersonalizedLearningPath(userId: string) {
       state: focusState,
       strategy: focusState === "MASTERED" ? "maintenance" : focusState === "STRENGTHENED" ? "verify" : focusState === "IMPROVING" ? "reinforce" : "remediate",
     },
-    readinessScore: Math.max(0, Math.min(100, Math.round(100 - avg(weakestDomains.map((d) => 100 - d.mastery))))),
+    readinessScore: Math.max(0, Math.min(100, Math.round(avg(measuredDomains.map(d=>d.mastery))))),
   };
 }

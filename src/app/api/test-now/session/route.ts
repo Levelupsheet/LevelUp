@@ -1,3 +1,5 @@
+import { loadLearningContext } from "@/lib/learningHistory";
+import { canonicalTrainingTarget } from "@/lib/contentPools";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { ensureUser } from "@/app/api/_lib/ensureUser";
@@ -5,7 +7,6 @@ import { getSessionUser } from "@/lib/auth/session";
 import { evaluateQuestionAnswer, normalizeDifficultyLevel, shuffleQuestionPayload } from "@/lib/questionTransforms";
 import { normalizeQuestionType } from "@/lib/questionTypes";
 import { buildQuestionBankSelection } from "@/lib/questionBank";
-import { calculateConfidenceScore, recordQuestionExposure, upsertQuestionCalibration, upsertUserSkillFromAnswer } from "@/lib/adaptiveEngine";
 import { getSweepstakesCampaignMetaMap } from "@/lib/sweepstakesCampaignMeta";
 import { awardGoldenQuestion } from "@/lib/goldenRewards";
 import { getOrCreateActiveGoldenSweepstakes } from "@/lib/raffle";
@@ -36,6 +37,7 @@ function mapQuestion(q: any) {
   const correctIndex = typeof q.correctIndex === "number" ? q.correctIndex : typeof (rawData as any)?.correctIndex === "number" ? (rawData as any).correctIndex : null;
   return {
     id: q.id,
+    setId: q.setId,
     type: normalizeQuestionType(q.type),
     prompt: q.prompt,
     choices,
@@ -75,17 +77,19 @@ function serializeSession(session: any) {
   };
 }
 
-async function findActiveSession(userId: string) {
+async function findActiveSession(userId: string, lane = "TEST_NOW") {
   return (prisma as any).gameSession.findFirst({
-    where: { userId, mode: "TEST_NOW", status: "ACTIVE" },
+    where: { userId, lane, status: "ACTIVE" },
     orderBy: { createdAt: "desc" },
     include: { questions: { orderBy: { orderIndex: "asc" } } },
   });
 }
 
-async function buildNewSession(userId: string, questionCount = 15, bankDomain?: string | null, trainingMode = "STANDARD") {
+async function buildNewSession(userId: string, questionCount = 15, bankDomain?: string | null, trainingMode = "STANDARD", filters: any = {}, db: any = prisma) {
+  const lane = filters.lane || "TEST_NOW";
   const bank = await buildQuestionBankSelection({
-    lane: "TEST_NOW",
+    ...filters,
+    lane,
     questionCount,
     shouldShuffle: true,
     bankDomain,
@@ -93,14 +97,16 @@ async function buildNewSession(userId: string, questionCount = 15, bankDomain?: 
     missedQuestionTraining: trainingMode === "MISSED_QUESTIONS",
     userId,
     sessionState: { wrongStreak: 0, inRecovery: false, typeCounts: {} },
-  });
-  if (!bank.placements.length || !bank.questions.length) throw new Error("No active Test Now question bank found");
-  if (!bank.selectedQuestions.length) throw new Error(trainingMode === "MISSED_QUESTIONS" ? "No missed questions in this bank need review. Try Standard training." : trainingMode === "WEAK_DOMAIN" ? "No active questions in this bank match your weakest domain. Try Mixed or Standard training." : "No eligible questions are available in this bank.");
+  }, db);
+  if (!bank.placements.length || !bank.questions.length) throw new Error("No active published question pool found for this selection");
+  if (!filters.questionIds && !bank.selectedQuestions.length) throw new Error(trainingMode === "MISSED_QUESTIONS" ? "No missed questions in this bank need review. Try Standard training." : trainingMode === "WEAK_DOMAIN" ? "No active questions in this bank match your weakest domain. Try Mixed or Standard training." : "No eligible questions are available in this bank.");
 
-  await ensureGoldenQuestionHistoryTable();
   const primaryPlacement = bank.placements[0];
   const pool = bank.questions.map(mapQuestion);
-  const selected = bank.selectedQuestions.map((q: any) => mapQuestion(q));
+  const selected = filters.questionIds
+    ? bank.questions.filter((q:any) => filters.questionIds.includes(q.id) && q.difficulty >= 4).map(mapQuestion)
+    : bank.selectedQuestions.map((q: any) => mapQuestion(q));
+  if (filters.questionIds && selected.length !== filters.questionIds.length) throw new Error("Boss questions must belong to the active pool and be hard tier");
   // Golden questions are always hard and use only active study formats.
   const goldenTypes = new Set(["multiple_choice", "true_false", "cli_command"]);
   const goldenPool = pool.filter((q: any) =>
@@ -112,13 +118,13 @@ async function buildNewSession(userId: string, questionCount = 15, bankDomain?: 
   let goldenQuestionIndex: number | null = null;
   let finalQuestions: any[] = [...selected];
 
-  const currentXp = Number(((await prisma.user.findUnique({ where: { id: userId }, select: { xp: true } }).catch(() => ({ xp: 0 })) as any).xp || 0));
+  const currentXp = Number(((await db.user.findUnique({ where: { id: userId }, select: { xp: true } }).catch(() => ({ xp: 0 })) as any).xp || 0));
   const currentLevel = levelFromXp(currentXp);
-  const alreadyHadGolden = await (prisma as any).$queryRawUnsafe(`SELECT 1 FROM "GoldenQuestionHistory" WHERE "userId" = $1 AND "level" = $2 AND "awarded" = TRUE LIMIT 1`, userId, currentLevel).then((rows: any[]) => Array.isArray(rows) && rows.length > 0).catch(() => false);
+  const alreadyHadGolden = await db.$queryRawUnsafe(`SELECT 1 FROM "GoldenQuestionHistory" WHERE "userId" = $1 AND "level" = $2 AND "awarded" = TRUE LIMIT 1`, userId, currentLevel).then((rows: any[]) => Array.isArray(rows) && rows.length > 0).catch(() => false);
 
   // Mark an eligible question already selected by the unseen cycle. Never inject
   // a seen/duplicate question or convert an easy question into a Golden challenge.
-  if (!alreadyHadGolden && finalQuestions.length >= 6) {
+  if (!filters.questionIds && lane === "TEST_NOW" && !alreadyHadGolden && finalQuestions.length >= 6) {
     const eligibleIds = new Set(goldenPool.map(q => String(q.id)));
     const candidates = finalQuestions.map((q, index) => ({ q, index })).filter(({ q }) => eligibleIds.has(String(q.id)));
     const picked = candidates[Math.floor(Math.random() * candidates.length)];
@@ -130,19 +136,24 @@ async function buildNewSession(userId: string, questionCount = 15, bankDomain?: 
 
   finalQuestions.sort((a, b) => a.level - b.level);
   goldenQuestionIndex = finalQuestions.findIndex(q => q.isGolden);
-  const session = await prisma.$transaction(async (tx: any) => {
+  const save = async (tx: any) => {
     const created = await tx.gameSession.create({
       data: {
         userId,
-        mode: "TEST_NOW",
+        mode: lane === "TEST_NOW" ? "TEST_NOW" : "LEARNING",
         status: "ACTIVE",
-        lane: "TEST_NOW",
+        lane,
+        scopeKey: bank.scopeKey,
+        industry: filters.industry || null,
+        careerPath: filters.careerPath || null,
+        trainingMode,
+        learningCycle: bank.exposureCycle.cycle,
         placementId: primaryPlacement.id,
         setId: primaryPlacement.set.id,
         questionCount: finalQuestions.length,
         goldenSpawned: Boolean(goldenQuestionId),
         currentIndex: 0,
-        stateJson: { idx: 0, playerHP: 100, enemyHP: 100, correctCount: 0, xpEarned: 0, tier: 1, mastery: {}, timeLeft: 25, lastWasCorrect: null, feedback: null, locked: false, selected: null, finished: false, wrongStreak: 0, inRecovery: false, trainingMode: bank.trainingMode || "STANDARD", focusDomain: bank.focusDomain || null, missedQuestionCount: bank.missedQuestionCount || 0, blueprint: bank.blueprint || [], typeCounts: Object.fromEntries((bank.selectedQuestions || []).reduce((acc: Map<string, number>, q: any) => { const t = String(q?.type || "multiple_choice").toLowerCase(); acc.set(t, (acc.get(t) || 0) + 1); return acc; }, new Map())), },
+        stateJson: { idx:0, wrongStreak:0, inRecovery:false, trainingMode: bank.trainingMode, focusDomain:bank.focusDomain, missedQuestionCount:bank.missedQuestionCount, blueprint:bank.blueprint },
       },
     });
     for (let i = 0; i < finalQuestions.length; i += 1) {
@@ -162,8 +173,8 @@ async function buildNewSession(userId: string, questionCount = 15, bankDomain?: 
       await tx.$executeRawUnsafe(`INSERT INTO "GoldenQuestionHistory" ("id","userId","level","sessionId","questionId","awarded","createdAt") VALUES ($1,$2,$3,$4,$5,FALSE,CURRENT_TIMESTAMP)`, `gqh_${Date.now()}_${Math.random().toString(36).slice(2,8)}`, userId, currentLevel, created.id, goldenQuestionId);
     }
     return tx.gameSession.findUnique({ where: { id: created.id }, include: { questions: { orderBy: { orderIndex: "asc" } } } });
-  });
-  return session;
+  };
+  return save(db);
 }
 
 export async function GET(req: Request) {
@@ -171,9 +182,11 @@ export async function GET(req: Request) {
     const sessionUser = await getSessionUser();
     const userId = String(sessionUser?.id || "").trim();
     if (!userId) return NextResponse.json({ error: "Sign in required" }, { status: 401 });
-    const session = await findActiveSession(userId);
+    const lane = new URL(req.url).searchParams.get("lane") || "TEST_NOW";
+    if (!["TEST_NOW","TRAINING","CERTIFICATIONS"].includes(lane)) return NextResponse.json({error:"Unsupported learning lane"},{status:400});
+    const session = await findActiveSession(userId,lane);
     if (!session) return NextResponse.json({ ok: true, session: null, questions: [] });
-    return NextResponse.json(serializeSession(session));
+    return NextResponse.json({ ...serializeSession(session), learning: { masteryByDomain: (await loadLearningContext(userId, session.scopeKey ? {scopeKey:session.scopeKey} : {})).masteryByDomain } });
   } catch (e: any) {
     return NextResponse.json({ error: e?.message || "Failed to load Test Now session" }, { status: 500 });
   }
@@ -184,21 +197,26 @@ export async function POST(req: Request) {
     const body = await req.json().catch(() => ({} as any));
     const sessionUser = await getSessionUser();
     const userId = String(sessionUser?.id || "").trim();
-    const questionCount = Math.max(1, Math.min(25, Number(body?.questionCount || 15) || 15));
+    const questionCount = Math.max(1, Math.min(25, Math.floor(Number(body?.questionCount || 15)) || 15));
     const bankDomain = String(body?.bankDomain || "").trim().toUpperCase() || null;
     if (!userId) return NextResponse.json({ error: "Sign in required" }, { status: 401 });
     await ensureUser(userId);
-    // Starting Test Now from the dashboard is an explicit new run. Do not
-    // restore a stale ACTIVE session (including TIME'S UP/locked feedback).
-    // Preserve old attempts for history, but mark them abandoned first.
-    await (prisma as any).gameSession.updateMany({
-      where: { userId, mode: "TEST_NOW", status: "ACTIVE" },
-      data: { status: "ABANDONED", completedAt: new Date() },
-    });
-    const session = await buildNewSession(userId, questionCount, bankDomain, String(body?.trainingMode || "STANDARD"));
-    return NextResponse.json(serializeSession(session));
+    const lane = String(body.lane || "TEST_NOW").toUpperCase();
+    if (!["TEST_NOW","TRAINING","CERTIFICATIONS"].includes(lane)) return NextResponse.json({error:"Unsupported learning lane"},{status:400});
+    if (body.trainingMode && !['STANDARD','WEAK_DOMAIN','MISSED_QUESTIONS'].includes(body.trainingMode)) return NextResponse.json({error:'Unsupported training mode'},{status:400});
+    const requestedIds = body.encounterType === 'boss' && Array.isArray(body.questionIds) ? [...new Set(body.questionIds.map(String))] : undefined;
+    if (requestedIds && (!requestedIds.length || requestedIds.length > 10)) return NextResponse.json({error:"Invalid boss question count"},{status:400});
+    const filters = { lane, ...canonicalTrainingTarget(body), certExam: body.certExam || null, questionIds: requestedIds };
+    await ensureGoldenQuestionHistoryTable();
+    const session: any = await prisma.$transaction(async (tx:any) => {
+      // Serialize allocation across tabs; selection reads committed earlier sessions.
+      await tx.$queryRawUnsafe('SELECT 1 AS locked FROM pg_advisory_xact_lock(hashtext($1))', `learning:${userId}`);
+      await tx.gameSession.updateMany({ where:{userId,lane,status:"ACTIVE"},data:{status:"ABANDONED",completedAt:new Date()} });
+      return buildNewSession(userId,questionCount,bankDomain,requestedIds ? "BOSS" : String(body.trainingMode || "STANDARD"),filters,tx);
+    },{timeout:30000});
+    return NextResponse.json({ ...serializeSession(session), learning: { masteryByDomain: (await loadLearningContext(userId, session.scopeKey ? {scopeKey:session.scopeKey} : {})).masteryByDomain } });
   } catch (e: any) {
-    return NextResponse.json({ error: e?.message || "Failed to create Test Now session" }, { status: 500 });
+    return NextResponse.json({ error: e?.message || "Failed to create learning session" }, { status: 500 });
   }
 }
 
@@ -209,7 +227,7 @@ export async function PATCH(req: Request) {
     if (!sessionId) return NextResponse.json({ error: "sessionId required" }, { status: 400 });
     const sessionUser = await getSessionUser();
     if (!sessionUser?.id) return NextResponse.json({ error: "Sign in required" }, { status: 401 });
-    const ownedSession = await prisma.gameSession.findFirst({ where: { id: sessionId, userId: sessionUser.id }, select: { id: true } });
+    const ownedSession = await prisma.gameSession.findFirst({ where: { id: sessionId, userId: sessionUser.id } });
     if (!ownedSession) return NextResponse.json({ error: "Session not found" }, { status: 404 });
     const currentIndex = Number(body?.currentIndex);
     const state = body?.state && typeof body.state === "object" ? body.state : undefined;
@@ -217,11 +235,16 @@ export async function PATCH(req: Request) {
     const answered = Array.isArray(body?.answeredQuestions) ? body.answeredQuestions : [];
 
     await prisma.$transaction(async (tx: any) => {
+      await tx.$queryRawUnsafe('SELECT "id" FROM "GameSession" WHERE "id" = $1 FOR UPDATE',sessionId);
+      const latest = await tx.gameSession.findUnique({where:{id:sessionId}});
       if (answered.length) {
         for (const row of answered) {
           const sessionQuestionId = String(row?.sessionQuestionId || "").trim();
           if (!sessionQuestionId) continue;
           const existingQuestion = await tx.gameSessionQuestion.findUnique({ where: { id: sessionQuestionId } });
+          if (!existingQuestion || existingQuestion.sessionId !== sessionId) throw new Error("Question does not belong to this session");
+          if (existingQuestion.answered) continue;
+          if (latest.status !== "ACTIVE") throw new Error("Session is no longer active");
           const payload = existingQuestion?.payloadJson && typeof existingQuestion.payloadJson === "object" ? existingQuestion.payloadJson : {};
           const evaluation = evaluateQuestionAnswer({
             type: (payload as any)?.type,
@@ -257,8 +280,8 @@ export async function PATCH(req: Request) {
       await tx.gameSession.update({
         where: { id: sessionId },
         data: {
-          currentIndex: Number.isFinite(currentIndex) ? Math.max(0, currentIndex) : undefined,
-          stateJson: state,
+          currentIndex: Number.isFinite(currentIndex) ? Math.min(latest.questionCount, Math.max(latest.currentIndex, currentIndex)) : undefined,
+          stateJson: state ? { ...(latest.stateJson || {}), ...state } : undefined,
           status: status === "COMPLETED" ? "COMPLETED" : status === "ABANDONED" ? "ABANDONED" : undefined,
           completedAt: status === "COMPLETED" ? new Date() : undefined,
         },
@@ -267,64 +290,8 @@ export async function PATCH(req: Request) {
     await ensureGoldenQuestionHistoryTable();
     const session = await (prisma as any).gameSession.findUnique({ where: { id: sessionId }, include: { questions: { orderBy: { orderIndex: "asc" } } } });
 
-    if (session && answered.length) {
-      let wrongStreak = Number((session.stateJson as any)?.wrongStreak || 0);
-      let inRecovery = Boolean((session.stateJson as any)?.inRecovery);
-      for (const row of answered) {
-        const sessionQuestionId = String(row?.sessionQuestionId || "").trim();
-        if (!sessionQuestionId) continue;
-        const q = (session.questions || []).find((it: any) => String(it.id) === sessionQuestionId);
-        const payload = q?.payloadJson && typeof q.payloadJson === "object" ? q.payloadJson : {};
-        const evaluation = evaluateQuestionAnswer({
-          type: (payload as any)?.type,
-          prompt: (payload as any)?.prompt,
-          correctIndex: (payload as any)?.correctIndex,
-          choices: Array.isArray((payload as any)?.choices) ? (payload as any).choices : undefined,
-          data: (payload as any)?.data,
-          answer: row?.selectedAnswer,
-        });
-        const responseMs = Number(row?.responseMs || row?.elapsedMs || 0) || null;
-        const hintsUsed = Number(row?.hintsUsed || 0) || 0;
-        const attemptsUsed = Number(row?.attempts || 1) || 1;
-        const rawScore = Number((evaluation as any)?.score ?? (evaluation.correct ? 1 : 0));
-        const confidence = calculateConfidenceScore({ correct: evaluation.correct, score: rawScore, responseMs, hintsUsed, attempts: attemptsUsed });
-        wrongStreak = evaluation.correct ? 0 : wrongStreak + 1;
-        inRecovery = wrongStreak >= 2;
-        await recordQuestionExposure({
-          userId: session.userId,
-          questionId: String(q?.questionId || (payload as any)?.id || sessionQuestionId),
-          domain: String((payload as any)?.domainId || (payload as any)?.data?.domainId || "GENERAL"),
-          subdomain: String((payload as any)?.subdomain || (payload as any)?.data?.subdomain || "GENERAL"),
-          questionType: String((payload as any)?.type || "multiple_choice"),
-          isCorrect: evaluation.correct,
-          score: rawScore,
-        });
-        await upsertQuestionCalibration({
-          questionId: String(q?.questionId || (payload as any)?.id || sessionQuestionId),
-          isCorrect: evaluation.correct,
-          responseMs,
-        });
-        await upsertUserSkillFromAnswer({
-          userId: session.userId,
-          question: {
-            id: String((payload as any)?.id || q?.questionId || sessionQuestionId),
-            type: String((payload as any)?.type || "multiple_choice"),
-            domainId: String((payload as any)?.domainId || (payload as any)?.data?.domainId || "general"),
-            subdomain: String((payload as any)?.subdomain || (payload as any)?.data?.subdomain || "GENERAL"),
-            level: Number((payload as any)?.level || (payload as any)?.difficulty || 1),
-            data: (payload as any)?.data,
-          },
-          isCorrect: evaluation.correct,
-          score: rawScore,
-          responseMs,
-          hintsUsed,
-          attempts: attemptsUsed,
-        });
-        await prisma.gameSession.update({ where: { id: session.id }, data: { stateJson: { ...((session.stateJson as any) || {}), wrongStreak, inRecovery, lastConfidence: confidence, lastPartialScore: Number((evaluation as any)?.partialScore ?? rawScore) } } }).catch(() => null);
-      }
-    }
     let goldenAwarded = false;
-    if (session && answered.length) {
+    if (session?.lane === "TEST_NOW" && answered.length) {
       const activeCampaign = await getOrCreateActiveGoldenSweepstakes(prisma as any).catch(() => null);
       if (activeCampaign) {
         const metaMap = await getSweepstakesCampaignMetaMap().catch(() => new Map());
@@ -334,16 +301,7 @@ export async function PATCH(req: Request) {
             const sessionQuestionId = String(row?.sessionQuestionId || "").trim();
             if (!sessionQuestionId) continue;
             const q = (session.questions || []).find((it: any) => String(it.id) === sessionQuestionId);
-            const payload = q?.payloadJson && typeof q.payloadJson === "object" ? q.payloadJson : {};
-            const evaluation = evaluateQuestionAnswer({
-              type: (payload as any)?.type,
-              prompt: (payload as any)?.prompt,
-              correctIndex: (payload as any)?.correctIndex,
-              choices: Array.isArray((payload as any)?.choices) ? (payload as any).choices : undefined,
-              data: (payload as any)?.data,
-              answer: row?.selectedAnswer,
-            });
-            if (evaluation.correct !== true) continue;
+            if (q?.isCorrect !== true || !q?.answered) continue;
             if (!q?.isGolden) continue;
             const awarded = await prisma.$transaction(tx => awardGoldenQuestion(tx, {
               userId: session.userId, sessionId: session.id,
@@ -354,7 +312,7 @@ export async function PATCH(req: Request) {
         }
       }
     }
-    return NextResponse.json({ ...serializeSession(session), goldenAwarded });
+    return NextResponse.json({ ...serializeSession(session), goldenAwarded, learning: { masteryByDomain: (await loadLearningContext(session.userId, session.scopeKey ? {scopeKey:session.scopeKey} : {})).masteryByDomain } });
   } catch (e: any) {
     console.error("PATCH /api/test-now/session failed", e);
     return NextResponse.json(
@@ -362,7 +320,7 @@ export async function PATCH(req: Request) {
         error: e?.message || "Failed to update Test Now session",
         stack: process.env.NODE_ENV !== "production" ? e?.stack : undefined,
       },
-      { status: 500 }
+      { status: /Question does not belong|Session is no longer active/.test(String(e?.message)) ? 400 : 500 }
     );
   }
 }

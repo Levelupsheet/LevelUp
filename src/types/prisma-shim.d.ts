@@ -3,7 +3,7 @@ declare module "@prisma/client" {
     constructor(...args: any[])
     $connect(): Promise<void>
     $disconnect(): Promise<void>
-    $transaction<T>(arg: any): Promise<T>
+    $transaction<T>(arg: any, options?: { timeout?: number; maxWait?: number }): Promise<T>
     $transaction<T extends any[]>(arg: [...T]): Promise<T>
     [key: string]: any
   }

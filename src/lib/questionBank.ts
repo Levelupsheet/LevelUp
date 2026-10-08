@@ -1,8 +1,9 @@
+import { cycleCandidates, learningScope } from "@/lib/learningEngine";
 import { learnerEligible } from "@/lib/contentPipeline";
 import { trainingPlacementFilter } from "@/lib/contentPools";
 import { prisma } from "@/lib/prisma";
 import { inferDomainFromQuestion } from "@/lib/learningProfile";
-import { getAdaptiveLearningContext, getMissedQuestionReview, getQuestionCalibrationMap, weightedAdaptiveQuestionPlan } from "@/lib/adaptiveEngine";
+import { getAdaptiveLearningContext, getQuestionCalibrationMap, weightedAdaptiveQuestionPlan, isQuestionUnlocked } from "@/lib/adaptiveEngine";
 import { buildSessionBlueprint } from "@/lib/bankRules";
 import { normalizeDifficultyLevel, shuffleQuestionPayload } from "@/lib/questionTransforms";
 import { normalizeQuestionType } from "@/lib/questionTypes";
@@ -19,9 +20,9 @@ function isMissingSubdomainColumnError(error: any) {
   return message.includes("mcqquestion.subdomain") && message.includes("does not exist");
 }
 
-async function loadPlacementsWithQuestions(where: any) {
+async function loadPlacementsWithQuestions(where: any, db: any = prisma) {
   try {
-    return await prisma.questionSetPlacement.findMany({
+    return await db.questionSetPlacement.findMany({
       where,
       orderBy: [{ createdAt: "desc" }],
       include: {
@@ -34,7 +35,7 @@ async function loadPlacementsWithQuestions(where: any) {
     });
   } catch (e: any) {
     if (!isMissingSubdomainColumnError(e)) throw e;
-    const placements = await prisma.questionSetPlacement.findMany({
+    const placements = await db.questionSetPlacement.findMany({
       where,
       orderBy: [{ createdAt: "desc" }],
       include: { set: true },
@@ -42,7 +43,7 @@ async function loadPlacementsWithQuestions(where: any) {
     const setIds = Array.from(new Set(placements.map((p: any) => String(p?.setId || "")).filter(Boolean)));
     const questionsBySet = new Map<string, any[]>();
     for (const setId of setIds) {
-      const rows = await prisma.$queryRawUnsafe(
+      const rows = await db.$queryRawUnsafe(
         `SELECT "id", "setId", "prompt", "type", "data", "choices", "correctIndex", "sortOrder", "explanation", "difficulty", "tags", "testNowEligible", "isGoldenEligible", "goldenWeight", "goldenBonusXp", "createdAt", "updatedAt" FROM "MCQQuestion" WHERE "setId" = $1 ORDER BY "sortOrder" ASC, "createdAt" ASC`,
         setId,
       );
@@ -83,7 +84,7 @@ export function mapDbQuestionToRuntime(q: any) {
     level: normalizeDifficultyLevel(q.difficulty),
     tags: Array.isArray(q.tags) ? q.tags : [],
     sortOrder: Number(q.sortOrder || 0),
-    domainId: domain.toLowerCase(),
+    domainId: String(rawData.domainId || domain).toLowerCase(),
     subdomain: String((q as any).subdomain || (rawData as any)?.subdomain || (rawData as any)?.topic || "GENERAL").toLowerCase(),
     setId: q.setId,
     setName: q.setName,
@@ -102,7 +103,7 @@ export async function loadActiveBank(args: {
   careerPath?: string | null;
   certExam?: string | null;
   bankDomain?: string | null;
-}) {
+}, db: any = prisma) {
   const where: any = { lane: String(args.lane || "").toUpperCase(), isActive: true, set: { status: "PUBLISHED" } };
   const bankDomain = String(args.bankDomain || "").trim().toUpperCase();
   if (bankDomain && bankDomain !== "MIXED") where.set = { status: "PUBLISHED", domain: bankDomain };
@@ -111,14 +112,14 @@ export async function loadActiveBank(args: {
   }
   if (where.lane === "CERTIFICATIONS") where.certExam = args.certExam || null;
 
-  const placements = await loadPlacementsWithQuestions(where);
+  const placements = await loadPlacementsWithQuestions(where, db);
 
   const deduped: any[] = [];
   const seen = new Set<string>();
   for (const placement of placements) {
     for (const raw of placement?.set?.questions || []) {
       const runtime = mapDbQuestionToRuntime({ ...raw, setName: placement.set.name, setDomain: placement.set.domain });
-      
+
       if (!learnerEligible(raw)) continue;
       const signature = stableQuestionSignature(runtime);
       if (seen.has(signature)) continue;
@@ -143,40 +144,13 @@ export async function getLearningContext(userId?: string | null) {
 }
 
 
-async function getUnseenCyclePool(userId: string | null | undefined, lane: string, questions: any[]) {
-  const safeUserId = String(userId || "").trim();
-  if (!safeUserId || !questions.length) return { questions, cycleReset: false, seenCount: 0 };
-  const ids = questions.map((q) => String(q.id || "")).filter(Boolean);
-  if (!ids.length) return { questions, cycleReset: false, seenCount: 0 };
-
-  // A question counts as seen as soon as it has been placed into one of this
-  // learner's prior sessions, even if the learner never submitted an answer.
-  // QuestionExposure remains useful for answer analytics, but session history is
-  // the authoritative anti-memorization source for rotation.
-  const sessionRows = await (prisma as any).$queryRawUnsafe(
-    `SELECT DISTINCT gsq."questionId"
-       FROM "GameSessionQuestion" gsq
-       INNER JOIN "GameSession" gs ON gs."id" = gsq."sessionId"
-      WHERE gs."userId" = $1
-        AND gs."lane" = $2::"ContentLane"
-        AND gsq."questionId" = ANY($3)
-        AND gsq."questionId" IS NOT NULL`,
-    safeUserId, String(lane || "").toUpperCase(), ids
-  ).catch(() => []);
-
-  const exposureRows = await (prisma as any).$queryRawUnsafe(
-    `SELECT DISTINCT "questionId" FROM "QuestionExposure" WHERE "userId" = $1 AND "questionId" = ANY($2)`,
-    safeUserId, ids
-  ).catch(() => []);
-
-  const seen = new Set([
-    ...(sessionRows || []).map((row: any) => String(row.questionId)),
-    ...(exposureRows || []).map((row: any) => String(row.questionId)),
-  ]);
-  const unseen = questions.filter((q) => !seen.has(String(q.id)));
-  // Once every eligible question has appeared, reopen the complete bank for a
-  // new cycle. Historical records stay intact for mastery/calibration analytics.
-  return { questions: unseen.length ? unseen : questions, cycleReset: unseen.length === 0 && seen.size > 0, seenCount: seen.size };
+async function getUnseenCyclePool(userId: string | null | undefined, scopeKey: string, questions: any[], trainingMode: string, db: any = prisma) {
+  if (!userId || !questions.length) return cycleCandidates(questions, new Map());
+  const scope = { userId, OR: [{scopeKey}, {scopeKey:null, lane:JSON.parse(scopeKey)[0]}], trainingMode };
+  const latest = await db.gameSession.findFirst({ where:scope,orderBy:{learningCycle:'desc'},select:{learningCycle:true} });
+  const currentCycle = latest?.learningCycle || 1;
+  const rows = await db.gameSessionQuestion.groupBy({ by: ['questionId'], where: { questionId: { in: questions.map(q => q.id) }, session: { ...scope,learningCycle:currentCycle } }, _count: { questionId: true } });
+  return cycleCandidates(questions,new Map(rows.map((q:any) => [q.questionId!, q._count.questionId])),currentCycle);
 }
 
 export async function buildQuestionBankSelection(args: {
@@ -193,8 +167,8 @@ export async function buildQuestionBankSelection(args: {
   sessionState?: { wrongStreak?: number; inRecovery?: boolean; typeCounts?: Record<string, number> } | null;
   weakDomainTraining?: boolean;
   missedQuestionTraining?: boolean;
-}) {
-  const bank = await loadActiveBank({ lane: args.lane, startingPosition: args.startingPosition, industry: args.industry, careerPath: args.careerPath, certExam: args.certExam, bankDomain: args.bankDomain });
+}, db: any = prisma) {
+  const bank = await loadActiveBank({ lane: args.lane, startingPosition: args.startingPosition, industry: args.industry, careerPath: args.careerPath, certExam: args.certExam, bankDomain: args.bankDomain }, db);
   const excludeSet = new Set((args.excludeIds || []).map((v) => String(v)));
   // For now the live study game supports the three formats that provide the
   // cleanest quiz/combat experience. Legacy formats stay in the DB/admin but
@@ -203,28 +177,30 @@ export async function buildQuestionBankSelection(args: {
   const candidatePool = bank.questions.filter((q) =>
     !excludeSet.has(String(q.id)) && activeTypes.has(normalizeQuestionType(q.type))
   );
-  const cycle = await getUnseenCyclePool(args.userId, args.lane, candidatePool);
-  // Keep an active exposure cycle strictly unseen-first. If only a partial
-  // unseen remainder is left, finish that remainder instead of mixing already-seen
-  // questions back into the same session. The following session starts a fresh cycle.
-  const learning = await getLearningContext(args.userId);
-  const missedReview = args.missedQuestionTraining ? await getMissedQuestionReview(args.userId) : null;
+  const scopeKey = learningScope(args);
+  const options = { scopeKey, questionIds: candidatePool.map(q => q.id) };
+  const learning = await getAdaptiveLearningContext(args.userId, options, db);
+  const unlockedPool = candidatePool.filter(q => isQuestionUnlocked(q, learning));
+  const trainingMode = args.missedQuestionTraining ? 'MISSED_QUESTIONS' : args.weakDomainTraining ? 'WEAK_DOMAIN' : 'STANDARD';
+  const missedReview = args.missedQuestionTraining ? { questionIds: learning.missedQuestionIds } : null;
   // Weak Domain Training deliberately narrows Test Now to the learner's weakest
   // measured domain. Unlike the normal unseen cycle, remediation may revisit
   // previously seen questions because repeated practice is the point of this mode.
-  const weakDomain = String(learning.weakestDomain || "general").toLowerCase();
+  const weakDomain = String(learning.weakestDomain || "").toLowerCase();
   const weakPool = args.weakDomainTraining
-    ? candidatePool.filter((q) => String(q.domainId || "general").toLowerCase() === weakDomain)
+    ? unlockedPool.filter((q) => String(q.domainId || "general").toLowerCase() === weakDomain)
     : [];
   const missedPool = args.missedQuestionTraining && missedReview
-    ? candidatePool.filter((q) => missedReview.questionIds.has(String(q.id)))
+    ? unlockedPool.filter((q) => missedReview.questionIds.has(String(q.id)))
     : [];
-  const sourcePool = args.missedQuestionTraining
+  const applicablePool = args.missedQuestionTraining
     ? missedPool
     : args.weakDomainTraining
       ? weakPool
-      : cycle.questions;
-  const calibrationMap = await getQuestionCalibrationMap(sourcePool.map((q) => String(q.id)));
+      : unlockedPool;
+  const cycle = await getUnseenCyclePool(args.userId, scopeKey, applicablePool, trainingMode, db);
+  const sourcePool = cycle.questions;
+  const calibrationMap = await getQuestionCalibrationMap(sourcePool.map((q) => String(q.id)), db);
   const blueprint = buildSessionBlueprint(args.questionCount, learning.weakestTargetDifficulty);
   const planned = weightedAdaptiveQuestionPlan({
     questions: sourcePool,
@@ -241,9 +217,10 @@ export async function buildQuestionBankSelection(args: {
     ...bank,
     selectedQuestions: questions,
     learning,
+    scopeKey,
     blueprint,
     calibrationMap,
-    exposureCycle: { reset: cycle.cycleReset, previouslySeen: cycle.seenCount, availableUnseen: cycle.questions.length, bankSize: candidatePool.length },
+    exposureCycle: { cycle: cycle.cycle, reset: cycle.cycleReset, previouslySeen: cycle.seenCount, availableUnseen: cycle.questions.length, bankSize: candidatePool.length },
     trainingMode: args.missedQuestionTraining ? "MISSED_QUESTIONS" : args.weakDomainTraining ? "WEAK_DOMAIN" : "STANDARD",
     focusDomain: args.weakDomainTraining ? weakDomain : null,
     missedQuestionCount: missedPool.length,

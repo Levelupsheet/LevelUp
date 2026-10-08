@@ -13,3 +13,5 @@ Migration 20261008040000_content_review adds optional QuestionSet industry/caree
 Validation: content pipeline tests, prior combat/reward/migration tests, TypeScript and full Next.js production build. No combat HUD or dashboard styling changes.
 
 Limitations: certification identifiers and broad legacy domain enums remain existing schema constraints; arbitrary career content can use GENERAL plus data.domainId/subdomain. The JSON importer accepts arrays, individual objects and {questions:[...]}; choose the destination pool explicitly. Near-duplicate and pedagogical quality review remain human decisions. Production content coverage must be reviewed after deployment.
+
+P2 follow-up also completes standalone generator preservation, generated-question archiving/approval validation, review warnings, bulk approval, safe reorder controls and repeated fact-bank generation deduplication. The final combined checkpoint has 27 passing tests and a full production build.

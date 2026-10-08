@@ -460,6 +460,7 @@ enum GeneratedQuestionReviewStatus {
 }
 
 enum GameSessionMode {
+  LEARNING
   TEST_NOW
 }
 
@@ -478,6 +479,11 @@ model GameSession {
   lane           ContentLane       @default(TEST_NOW)
   setId          String?
   placementId    String?
+  scopeKey String?
+  industry String?
+  careerPath String?
+  trainingMode String @default("STANDARD")
+  learningCycle Int @default(1)
   currentIndex   Int               @default(0)
   questionCount  Int               @default(10)
   goldenSpawned  Boolean           @default(false)
@@ -490,6 +496,8 @@ model GameSession {
   questions GameSessionQuestion[]
 
   @@index([userId, mode, status, createdAt])
+  @@index([userId, scopeKey, createdAt])
+  @@index([userId, scopeKey, trainingMode, learningCycle])
 }
 
 model GameSessionQuestion {
@@ -511,6 +519,7 @@ model GameSessionQuestion {
 
   @@unique([sessionId, orderIndex])
   @@index([sessionId, answered, orderIndex])
+  @@index([questionId, answeredAt])
 }
 
 enum LootBoxType {

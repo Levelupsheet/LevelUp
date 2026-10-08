@@ -37,7 +37,7 @@ export async function POST(req: Request) {
         if (reason) { await tx.questionImportIssue.create({ data: { setId, rowIndex: i + 1, reason, payload: raw ?? {} } }); report.issues.push({ row: i + 1, reason }); }
       }
       return report;
-    });
+    }, {timeout:60000,maxWait:10000});
     return NextResponse.json(report);
   } catch (e: any) { return NextResponse.json({ error: e.message }, { status: 400 }); }
 }
@@ -51,7 +51,7 @@ export async function DELETE(req: Request) {
     for (const q of rows) await tx.mCQQuestion.update({ where: { id: q.id }, data: { data: { ...(q.data as any || {}), lifecycleStatus: 'ARCHIVED' } } });
     if (body.clearSet && body.setId) { await tx.questionSetPlacement.updateMany({ where: { setId: body.setId }, data: { isActive: false } }); await tx.questionSet.update({ where: { id: body.setId }, data: { status: 'DRAFT' } }); }
     return rows.length;
-  });
+  }, {timeout:60000,maxWait:10000});
   return NextResponse.json({ ok: true, archived: result, deleted: 0 });
 }
 export async function PATCH(req: Request) {
@@ -83,7 +83,7 @@ export async function PATCH(req: Request) {
         normalized.data.lifecycleStatus = patch.lifecycleStatus || merged.data.lifecycleStatus || 'ACTIVE';
         await tx.mCQQuestion.update({ where: { id: q.id }, data: normalized as any });
       }
-    });
+    }, {timeout:60000,maxWait:10000});
     return NextResponse.json({ ok: true });
   } catch (e: any) { return NextResponse.json({ error: e.message }, { status: 400 }); }
 }

@@ -162,7 +162,7 @@ export default function PracticeMiniGameModal(props: {
     setSessionMastery(summary.masteryByDomain || {});
     setPreviousLearningPath(learningPath);
     setStep("summary");
-    fetch("/api/learning/path", { cache: "no-store" as any })
+    fetch("/api/learning/path" + ((summary as any).learningSessionId ? "?sessionId=" + encodeURIComponent((summary as any).learningSessionId) : ""), { cache: "no-store" as any })
       .then((res) => res.json().catch(() => null))
       .then((json) => { if (json?.learningPath) setLearningPath(json.learningPath); })
       .catch(() => {});
@@ -238,6 +238,10 @@ export default function PracticeMiniGameModal(props: {
               playerPosition={playerPosition ?? defaultPath}
               exitLabel="Back"
               onExit={() => setStep("summary")}
+              industry={kind === "position" ? selectedTrainingPool?.industry : null}
+              careerPath={kind === "position" ? selectedTrainingPool?.careerPath : null}
+              certExam={kind === "cert" ? selectedCertPool?.certExam : null}
+              bankDomain={kind === "test" ? selectedTestBank?.domain : null}
               metaLeft="Bonus boss"
               metaRight="3 questions"
               questionsOverride={bossQuestions}

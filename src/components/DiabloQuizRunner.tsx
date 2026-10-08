@@ -497,6 +497,7 @@ export default function DiabloQuizRunner(props: {
   onComplete?: (summary: DiabloQuizRunSummary) => void;
   onXp?: (xpDelta: number, totalXp: number) => void;
   initialState?: any;
+  learningMastery?: Record<string, number>;
   onStateChange?: (state: any) => void;
   onAdvanceQuestion?: (payload: { question: DiabloQuestion; isCorrect: boolean | null; selectedAnswer?: unknown; nextIndex: number; stateSnapshot?: any }) => Promise<{ goldenAwarded?: boolean } | void> | ({ goldenAwarded?: boolean } | void);
   media?: QuizMediaConfig;
@@ -519,6 +520,7 @@ export default function DiabloQuizRunner(props: {
     onComplete,
     onXp,
     initialState,
+    learningMastery,
     onStateChange,
     onAdvanceQuestion,
     media,
@@ -899,7 +901,7 @@ const showExpandedExplanation = useMemo(() => {
   const displayedXp = Math.max(0, state.xpEarned - hintXpSpent);
   const partialScore = Number(answerInsight?.evaluation?.partialScore ?? answerInsight?.evaluation?.score ?? 0);
   const partialPercent = Math.max(0, Math.min(100, Math.round(partialScore * 100)));
-  const masteryPercent = Math.max(0, Math.min(100, Math.round(currentMastery)));
+  const masteryPercent = Math.max(0, Math.min(100, Math.round(learningMastery?.[currentDomainId] ?? currentMastery)));
 
   const adaptiveCoachText = useMemo(() => {
     if (!state.locked) return "";
@@ -966,19 +968,32 @@ const showExpandedExplanation = useMemo(() => {
     return state.selected;
   }
 
+  const answerSaves = useRef(new Map<string, Promise<any>>());
+  function saveCurrentAnswer() {
+    const id = (question as any)?.sessionQuestionId;
+    if (!id || !onAdvanceQuestion) return Promise.resolve({});
+    const existing = answerSaves.current.get(id);
+    if (existing) return existing;
+    const save = Promise.resolve(onAdvanceQuestion({ question: question!, isCorrect: state.lastWasCorrect, selectedAnswer: deriveSelectedAnswer(), nextIndex: state.idx, stateSnapshot: state })).catch(error => { answerSaves.current.delete(id); throw error; });
+    answerSaves.current.set(id,save);
+    return save;
+  }
+  // Persist feedback immediately, including final and lethal answers. NEXT retries
+  // a failed save before advancing; the server makes replays idempotent.
+  useEffect(() => {
+    if (state.locked && (question as any)?.sessionQuestionId) void saveCurrentAnswer().catch(() => setHintMessage('Could not save your answer. Press NEXT to retry.'));
+  }, [state.locked, (question as any)?.sessionQuestionId]);
+
   async function handleNext() {
     const currentQuestion = question as any;
     let awarded = false;
     if (state.locked && currentQuestion?.sessionQuestionId && onAdvanceQuestion) {
-      const result = await onAdvanceQuestion({
-        question: currentQuestion,
-        isCorrect: state.lastWasCorrect,
-        selectedAnswer: deriveSelectedAnswer(),
-        nextIndex: Math.min(state.idx + 1, combatQuestions.length),
-        stateSnapshot: { ...state, idx: Math.min(state.idx + 1, combatQuestions.length) },
-      });
-      awarded = Boolean((result as any)?.goldenAwarded);
+      try {
+        const result = await saveCurrentAnswer();
+        awarded = Boolean(result?.goldenAwarded);
+      } catch { setHintMessage('Could not save your answer. Press NEXT to retry.'); return; }
     }
+
     if (state.finished && finishFeedbackPending) {
       // The lethal answer has already been reviewed. Complete the run directly
       // from this click instead of briefly re-rendering the finished quiz.

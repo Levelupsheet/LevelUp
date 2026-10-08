@@ -23,3 +23,7 @@ test('imports require review; invalid and archived content cannot reach learners
   row.data.lifecycleStatus='ARCHIVED'; assert.equal(learnerEligible(row),false);
   assert.equal(learnerEligible({...q,difficulty:7}),false);
 });
+test('malformed legacy answer data remains auditable and low-quality content is flagged',()=>{
+ assert.doesNotThrow(()=>auditContent([{...q,id:'bad',choices:{bad:'shape'},data:{expectedCommands:{bad:'shape'}}}]));
+ assert.ok(auditContent([{...q,id:'short',explanation:'A works.'}])[0].review.warnings.length>0);
+});

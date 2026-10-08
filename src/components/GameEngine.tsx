@@ -37,12 +37,6 @@ type Props = {
 };
 
 
-function getRecentKey(lane: GameLane, selection: string) {
-  return `lu_recent_${lane}_${selection}`;
-}
-function readRecentIds(key: string): string[] { try { const raw = localStorage.getItem(key); const parsed = raw ? JSON.parse(raw) : []; return Array.isArray(parsed) ? parsed.map((v) => String(v)) : []; } catch { return []; } }
-function writeRecentIds(key: string, ids: string[]) { try { const unique = Array.from(new Set(ids.map((v) => String(v)))); localStorage.setItem(key, JSON.stringify(unique)); } catch {} }
-
 function mapQuestion(q: any, idx: number): DiabloQuestion {
   const tags = Array.isArray(q?.tags) ? q.tags : [];
   const type = normalizeQuestionType(q?.type);
@@ -75,6 +69,7 @@ export default function GameEngine(props: Props) {
   const [questions, setQuestions] = useState<DiabloQuestion[]>([]);
   const [setLabel, setSetLabel] = useState<string>(subtitle || title);
   const [sessionId, setSessionId] = useState<string>("");
+  const [learningMastery, setLearningMastery] = useState<Record<string, number>>({});
   const [initialState, setInitialState] = useState<any>(null);
   const rewardClaimKeyRef = useRef("");
   const progressSaveRef = useRef<number | null>(null);
@@ -84,66 +79,29 @@ export default function GameEngine(props: Props) {
     [lane, questionCount]
   );
 
-  const loadStandard = useCallback(async () => {
-    const search = new URLSearchParams();
-    search.set("lane", lane);
-    search.set("questionCount", String(effectiveCount));
-    search.set("shuffle", "1");
-    search.set("nonce", String(Date.now()));
-    const recentKey = getRecentKey(lane, careerPath ? `${industry || ""}:${careerPath}` : startingPosition || certExam || bankDomain || "all");
-    const recentIds = readRecentIds(recentKey);
-    if (recentIds.length) search.set("excludeIds", recentIds.join(","));
-    if (careerPath) {
-      search.set("careerPath", careerPath);
-      if (industry) search.set("industry", industry);
-    } else if (startingPosition) search.set("startingPosition", startingPosition);
-    if (certExam) search.set("certExam", certExam);
-    if (bankDomain) search.set("bankDomain", bankDomain);
-    let res = await fetch(`/api/content/active?${search.toString()}`, { cache: "no-store" });
-    let json = await res.json().catch(() => null);
-    if (!res.ok) throw new Error(json?.error || "Could not load published questions");
-    let previousIds = recentIds;
-    // Finish the unseen remainder first. Reopen the bank only when none remain.
-    if (!json?.questions?.length && recentIds.length) {
-      search.delete("excludeIds");
-      res = await fetch(`/api/content/active?${search.toString()}`, { cache: "no-store" });
-      json = await res.json().catch(() => null);
-      if (!res.ok) throw new Error(json?.error || "Could not load published questions");
-      previousIds = [];
-    }
-    const mapped = Array.isArray(json?.questions) ? json.questions.map(mapQuestion) : [];
-    if (mapped.length) {
-      setQuestions(mapped);
-      writeRecentIds(recentKey, [...previousIds, ...mapped.map((q) => String(q.id))]);
-      setSetLabel(json?.set?.name ? `${title} · ${json.set.name}` : subtitle || title);
-    } else {
-      setQuestions([]);
-      setLoadError("No published questions are available for this training selection. Assign a question pool in Admin → Question Pools.");
-    }
-  }, [lane, effectiveCount, startingPosition, industry, careerPath, certExam, bankDomain, title, subtitle]);
-
-  const loadTestNowSession = useCallback(async () => {
+  const loadLearningSession = useCallback(async () => {
     const userId = resolveClientUserId();
-    const res = await fetch("/api/test-now/session", {
+    const res = await fetch("/api/learning/session", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ userId, questionCount: effectiveCount, bankDomain, trainingMode }),
+      body: JSON.stringify({ userId, lane, industry, careerPath, startingPosition, certExam, questionCount: effectiveCount, bankDomain, trainingMode, encounterType, questionIds: encounterType === "boss" ? questionsOverride?.map(q => q.id) : undefined }),
       cache: "no-store" as any,
     });
     const json = await res.json().catch(() => null);
-    if (!res.ok) throw new Error(json?.error || "Failed to create Test Now session");
+    if (!res.ok) throw new Error(json?.error || "Failed to create learning session");
     const mapped = Array.isArray(json?.questions) ? json.questions.map(mapQuestion) : [];
     if (mapped.length) {
-      setQuestions(mapped);
+      setQuestions(questionsOverride?.length ? mapped.map((q:any) => ({ ...q, data: { ...q.data, ...(questionsOverride.find(it=>it.id===q.id)?.data || {}) } })) : mapped);
       setSessionId(String(json?.session?.id || ""));
       setInitialState(json?.session?.state || null);
+      setLearningMastery(json?.learning?.masteryByDomain || {});
       const focus = String(json?.session?.state?.focusDomain || "").replace(/_/g, " ");
       setSetLabel(trainingMode === "WEAK_DOMAIN" ? `${title} · Weak Domain${focus ? `: ${focus}` : ""}` : trainingMode === "MISSED_QUESTIONS" ? `${title} · Missed Question Review` : `${title} · Active Session`);
     } else {
       setQuestions([]);
-      setLoadError("No questions are available for this Test Now selection. Check the published database pools.");
+      setLoadError("No questions are available for this learning selection. Check the published database pools.");
     }
-  }, [effectiveCount, title, bankDomain, trainingMode]);
+  }, [lane, industry, careerPath, startingPosition, certExam, effectiveCount, title, bankDomain, trainingMode, encounterType, questionsOverride]);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -151,33 +109,25 @@ export default function GameEngine(props: Props) {
     rewardClaimKeyRef.current = crypto.randomUUID();
     try {
       await hydrateAuthenticatedUser();
-      if (lane === "TEST_NOW") await loadTestNowSession();
-      else await loadStandard();
+      await loadLearningSession();
     } catch (error: any) {
       setQuestions([]);
       setLoadError(error?.message || "Could not load questions from the database.");
     } finally {
       setLoading(false);
     }
-  }, [lane, loadStandard, loadTestNowSession, title]);
+  }, [lane, loadLearningSession, title]);
 
   useEffect(() => {
-    if (questionsOverride?.length) {
-      rewardClaimKeyRef.current = crypto.randomUUID();
-      setQuestions(questionsOverride);
-      setSetLabel(subtitle || title);
-      setLoading(false);
-      return;
-    }
     load();
   }, [load, questionsOverride, subtitle, title]);
 
   const saveSessionProgress = useCallback((state: any) => {
-    if (lane !== "TEST_NOW" || !sessionId) return;
+    if (!sessionId) return;
     if (progressSaveRef.current) window.clearTimeout(progressSaveRef.current);
     progressSaveRef.current = window.setTimeout(async () => {
       try {
-        await fetch("/api/test-now/session", {
+        await fetch("/api/learning/session", {
           method: "PATCH",
           headers: { "content-type": "application/json" },
           body: JSON.stringify({ sessionId, currentIndex: Number(state?.idx || 0), state }),
@@ -188,9 +138,9 @@ export default function GameEngine(props: Props) {
 
 
   const handleAdvanceQuestion = useCallback(async (payload: { question: any; isCorrect: boolean | null; selectedAnswer?: any; nextIndex: number; stateSnapshot?: any }) => {
-    if (lane !== "TEST_NOW" || !sessionId || !payload?.question?.sessionQuestionId) return { goldenAwarded: false };
+    if (!sessionId || !payload?.question?.sessionQuestionId) return { goldenAwarded: false };
     try {
-      const res = await fetch("/api/test-now/session", {
+      const res = await fetch("/api/learning/session", {
         method: "PATCH",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
@@ -205,9 +155,11 @@ export default function GameEngine(props: Props) {
         }),
       });
       const json = await res.json().catch(() => null);
+      if (!res.ok) throw new Error(json?.error || "Could not save answer");
+      if (json?.learning?.masteryByDomain) setLearningMastery(json.learning.masteryByDomain);
       return { goldenAwarded: Boolean(json?.goldenAwarded) };
-    } catch {
-      return { goldenAwarded: false };
+    } catch (error) {
+      throw error;
     }
   }, [lane, sessionId]);
 
@@ -224,8 +176,8 @@ export default function GameEngine(props: Props) {
       addActivity(localUser.id, { type: `GAME_${lane}_COMPLETE`, title: `${title} complete`, body: `Score ${summary.correctCount}/${summary.totalQuestions} • +${awardedXp} XP` });
     } catch {}
     try {
-      if (lane === "TEST_NOW" && sessionId) {
-        await fetch("/api/test-now/session", { method: "PATCH", headers: { "content-type": "application/json" }, body: JSON.stringify({ sessionId, status: "COMPLETED", currentIndex: summary.totalQuestions, state: { ...initialState, finished: true } }) });
+      if (sessionId) {
+        await fetch("/api/learning/session", { method: "PATCH", headers: { "content-type": "application/json" }, body: JSON.stringify({ sessionId, status: "COMPLETED", currentIndex: summary.totalQuestions, state: { ...initialState, finished: true } }) });
       }
       await fetch("/api/game/session", {
         method: "POST",
@@ -246,10 +198,10 @@ export default function GameEngine(props: Props) {
         }),
       });
     } catch {}
-    onComplete?.({ ...summary, awardedXp });
+    onComplete?.({ ...summary, awardedXp, learningSessionId: sessionId } as any);
   }, [timed, lane, title, onComplete, sessionId, initialState, questions]);
 
-  if (loading) return <div className="page"><div className="container" style={{ maxWidth: 1280 }}><div className="card" style={{ padding: 18 }}><div style={{ fontWeight: 800, fontSize: 18 }}>Loading {title}…</div><div className="muted" style={{ marginTop: 8 }}>{lane === "TEST_NOW" ? "Restoring or creating your saved Test Now session." : "Pulling randomized questions from your active database set."}</div></div></div></div>;
+  if (loading) return <div className="page"><div className="container" style={{ maxWidth: 1280 }}><div className="card" style={{ padding: 18 }}><div style={{ fontWeight: 800, fontSize: 18 }}>Loading {title}…</div><div className="muted" style={{ marginTop: 8 }}>{lane === "TEST_NOW" ? "Creating your saved learning session." : "Creating a practice session from your active database pools."}</div></div></div></div>;
   const activePosition = playerPosition || String((getActiveUser() as any)?.startingPosition || "HELPDESK_SUPPORT");
   const careerPlayerName = careerPath
     ? String(careerPath).trim()
@@ -264,5 +216,5 @@ export default function GameEngine(props: Props) {
 
   if (!questions.length) return <div className="page"><div className="container" style={{ maxWidth: 1120 }}><div className="card" style={{ padding: 18 }}><div style={{ fontWeight: 800, fontSize: 18 }}>No questions available</div><div className="muted" style={{ marginTop: 8 }}>{loadError || "Assign an active question set in Admin."}</div><div style={{ marginTop: 14 }}><Link className="btn" href="/admin">Open Admin</Link></div></div></div></div>;
 
-  return <DiabloQuizRunner title={title} subtitle={setLabel} enemyName={enemyName} playerDisplayName={careerPlayerName} questions={questions} timed={timed} metaLeft={metaLeft || `Adaptive lane: ${lane.replaceAll("_", " ")}`} metaRight={metaRight || `${questions.length} questions loaded`} exitHref={exitHref} exitLabel={exitLabel} onExit={onExit} onComplete={handleComplete} onStateChange={saveSessionProgress} onAdvanceQuestion={handleAdvanceQuestion} initialState={initialState} rules={rulesOverride} encounterType={encounterType} media={{ ...playerMedia, enemyIdleSrc: "/video/enemy-idle.mp4", enemyHitSrc: "/video/enemy-damage.mp4", width: 1600, height: 900 }} />;
+  return <DiabloQuizRunner title={title} subtitle={setLabel} enemyName={enemyName} playerDisplayName={careerPlayerName} questions={questions} timed={timed} metaLeft={metaLeft || `Adaptive lane: ${lane.replaceAll("_", " ")}`} metaRight={metaRight || `${questions.length} questions loaded`} exitHref={exitHref} exitLabel={exitLabel} onExit={onExit} onComplete={handleComplete} onStateChange={saveSessionProgress} onAdvanceQuestion={handleAdvanceQuestion} initialState={initialState} learningMastery={learningMastery} rules={rulesOverride} encounterType={encounterType} media={{ ...playerMedia, enemyIdleSrc: "/video/enemy-idle.mp4", enemyHitSrc: "/video/enemy-damage.mp4", width: 1600, height: 900 }} />;
 }
