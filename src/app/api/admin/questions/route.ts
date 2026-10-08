@@ -71,7 +71,7 @@ function toDbQuestionPayload(input: any, sortOrder: number) {
   const type = normalizeQuestionType(input?.type);
   const prompt = String(input?.prompt || "").trim();
   const explanation = input?.explanation ?? null;
-  const difficulty = Math.max(1, Math.min(3, Number(input?.difficulty ?? 1) || 1));
+  const difficulty = Math.max(1, Math.min(5, Number(input?.difficulty ?? 1) || 1));
   const tags = Array.isArray(input?.tags) ? input.tags : [];
   const sourceData = input?.data && typeof input.data === "object" ? input.data : {};
   const subdomain = String(input?.subdomain ?? (sourceData as any)?.subdomain ?? "").trim();
@@ -436,7 +436,7 @@ export async function PATCH(req: Request) {
       if (!id) return NextResponse.json({ error: "id is required" }, { status: 400 });
       const updateData: any = {};
       if (typeof body.prompt === "string") updateData.prompt = body.prompt.trim();
-      if (body.difficulty !== undefined) updateData.difficulty = Math.max(1, Math.min(3, Number(body.difficulty) || 1));
+      if (body.difficulty !== undefined) updateData.difficulty = Math.max(1, Math.min(5, Number(body.difficulty) || 1));
       if (body.explanation !== undefined) updateData.explanation = body.explanation === null ? null : String(body.explanation);
       if (body.lifecycleStatus !== undefined) updateData.data = { lifecycleStatus: String(body.lifecycleStatus || "ACTIVE").toUpperCase() } as any;
       if (Array.isArray(body.tags)) updateData.tags = body.tags.map((v: any) => String(v).trim()).filter(Boolean);
@@ -475,7 +475,7 @@ export async function PATCH(req: Request) {
       }
       if (body.patch.goldenWeight !== undefined) patch.goldenWeight = Math.max(1, Number(body.patch.goldenWeight) || 1);
       if (body.patch.goldenBonusXp !== undefined) patch.goldenBonusXp = Math.max(0, Number(body.patch.goldenBonusXp) || 0);
-      if (body.patch.difficulty !== undefined) patch.difficulty = Math.max(1, Math.min(3, Number(body.patch.difficulty) || 1));
+      if (body.patch.difficulty !== undefined) patch.difficulty = Math.max(1, Math.min(5, Number(body.patch.difficulty) || 1));
       if (body.patch.bossEligible !== undefined) {
         const rows = await prisma.mCQQuestion.findMany({ where: { id: { in: ids } }, select: { id: true, data: true } });
         await prisma.$transaction(rows.map((row: any) => prisma.mCQQuestion.update({
