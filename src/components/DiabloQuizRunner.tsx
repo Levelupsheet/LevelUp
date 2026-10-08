@@ -1039,7 +1039,12 @@ const showExpandedExplanation = useMemo(() => {
     if (!state.finished && state.locked) {
       const nextQuestion = combatQuestions[state.idx + 1];
       if (nextQuestion) {
-        const nextStage = inferLevel(nextQuestion);
+        const authoredNextStage = inferLevel(nextQuestion);
+        // A standard enemy reaching 0 HP is a real stage clear. Advance one
+        // stage even when the following authored question has the same tier.
+        const nextStage = encounterType === "standard" && state.enemyHP <= 0
+          ? Math.min(maxStages, Math.max(sessionStage + 1, authoredNextStage))
+          : authoredNextStage;
         if (nextStage !== sessionStage) {
           setSessionStage(nextStage);
           setStageAnswered(0);
