@@ -95,6 +95,14 @@ function stageEnemyName(base: string, stage: number, maxStages: number, encounte
   return `${base}`;
 }
 
+/** A wrong answer costs more health against later-stage enemies. */
+function incomingEnemyDamage(stageDamage: number, shielded: boolean, multiplier: unknown): number {
+  if (shielded) return 0;
+  const abilityMultiplier = Number(multiplier);
+  const scale = Number.isFinite(abilityMultiplier) && abilityMultiplier > 0 ? Math.min(3, abilityMultiplier) : 1;
+  return Math.max(1, Math.round(stageDamage * scale));
+}
+
 type EnemyPowerupKey = "shield" | "fury" | "restore" | "time";
 type StageConfig = { name: string; hp: number; playerDamage: number; healChance: number; healMin: number; healMax: number; powerups: EnemyPowerupKey[] };
 
@@ -605,7 +613,7 @@ export default function DiabloQuizRunner(props: {
       furyActive: powerups.furyActive && furyQuestionRef.current === state.idx,
     }),
     getQuestionLevel: () => (Math.max(effectiveQuestionTier, Math.min(3, Math.ceil(sessionStage / 2))) as DifficultyTier),
-    getPlayerDamageTaken: ({ usedShield }) => usedShield ? 0 : Math.max(34, currentStageConfig.playerDamage),
+    getPlayerDamageTaken: ({ usedShield, question: hitQuestion }) => incomingEnemyDamage(currentStageConfig.playerDamage, usedShield, (hitQuestion.data as any)?.playerDamageMultiplier),
     getEnemyDamageDealt: ({ correct }) => correct ? Math.ceil(currentStageConfig.hp / 3) : 0,
     getHealOnCorrect: () => (Math.random() < currentStageConfig.healChance ? (currentStageConfig.healMin + Math.floor(Math.random() * (currentStageConfig.healMax - currentStageConfig.healMin + 1))) : 0),
     getXpMultiplier: ({ correct }) => (correct && xpBoostRemaining > 0 ? 1.25 : 1),
@@ -638,7 +646,7 @@ export default function DiabloQuizRunner(props: {
         setStageEnemyHP((hp) => Math.max(0, hp - damage));
         setDamageFloat({ enemy: `-${damage} HP` });
       } else {
-        setDamageFloat({ player: `-${currentStageConfig.playerDamage} HP` });
+        setDamageFloat({ player: `-${incomingEnemyDamage(currentStageConfig.playerDamage, powerups.shieldActive && shieldQuestionRef.current === state.idx, (question?.data as any)?.playerDamageMultiplier)} HP` });
       }
       window.setTimeout(() => setDamageFloat({}), 2200);
       window.setTimeout(() => {
