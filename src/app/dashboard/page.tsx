@@ -617,31 +617,18 @@ async function analyzeResumeStage12() {
   }, []);
 
   useEffect(() => {
-    if (!userId) return;
-    const prev = Number(prevLevelRef.current ?? 0);
-    const next = Number(localLevel ?? 1);
-    // On initial mount, just sync the ref so refresh doesn't re-grant loot.
-    if (prev === 0) {
-      prevLevelRef.current = next;
-      return;
-    }
-    if (next <= prev) {
-      prevLevelRef.current = next;
-      return;
-    }
-
-    prevLevelRef.current = next;
-
-    // Server-backed loot + persistent notification (single source of truth)
+    if (!userId || !Number.isFinite(xp)) return;
+    // The server tracks lootGrantedUpToLevel, so this call is idempotent.
+    // Run on hydration as well as live XP changes so a level earned on another
+    // page still receives its chest when the player returns to Dashboard.
+    prevLevelRef.current = Number(localLevel ?? 1);
     fetch("/api/loot/earn", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ userId, xpAfter: xp, source: "level_up" }),
+      body: JSON.stringify({ xpAfter: xp, source: "level_up" }),
     })
-      .then(() => {
-        // refresh notifications so server notices appear without reload
-        try { userId && refresh(userId); } catch {}
-      })
+      .then((r) => r.json().catch(() => null))
+      .then(() => { try { userId && refresh(userId); } catch {} })
       .catch(() => {});
   }, [localLevel, userId, xp]);
 
@@ -955,19 +942,31 @@ async function analyzeResumeStage12() {
               <button className="secondaryBtn gdCloseButton" type="button" onClick={() => setCareerPickerOpen(false)}>EXIT</button>
             </div>
             <div className="luModalBody" style={{ display:"grid", gap:14 }}>
-              {Array.from(new Set(careerPaths.map((p) => p.industry))).map((industry) => (
-                <div key={industry}>
-                  <div style={{ fontWeight:900, marginBottom:8 }}>{industry}</div>
-                  <div className="luGrid3">
-                    {careerPaths.filter((p) => p.industry === industry).map((path) => (
-                      <button key={industry + path.careerPath} className="luRoleCard gdModalChoice gdModalChoiceOrange" type="button" onClick={() => chooseCareerPath(path)}>
-                        <div className="luRoleTitle">{path.careerPath}</div>
-                        <div className="luRoleDesc">{path.poolCount} published question pool{path.poolCount === 1 ? "" : "s"}</div>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              ))}
+              <label style={{ display:"grid", gap:8 }}>
+                <b>Career training path</b>
+                <select
+                  value={selectedCareer ? selectedCareer.industry + "::" + selectedCareer.careerPath : ""}
+                  onChange={(e) => {
+                    const next = careerPaths.find((p) => p.industry + "::" + p.careerPath === e.target.value) || null;
+                    setSelectedCareer(next);
+                  }}
+                  style={{ minHeight:48 }}
+                >
+                  <option value="">Choose a career path...</option>
+                  {Array.from(new Set(careerPaths.map((p) => p.industry))).map((industry) => (
+                    <optgroup key={industry} label={industry}>
+                      {careerPaths.filter((p) => p.industry === industry).map((path) => (
+                        <option key={industry + path.careerPath} value={industry + "::" + path.careerPath}>
+                          {path.careerPath} — {path.poolCount} pool{path.poolCount === 1 ? "" : "s"}
+                        </option>
+                      ))}
+                    </optgroup>
+                  ))}
+                </select>
+              </label>
+              <button className="gold gdActionOrange" type="button" disabled={!selectedCareer} onClick={() => selectedCareer && chooseCareerPath(selectedCareer)}>
+                START CAREER TRAINING
+              </button>
             </div>
           </div>
         </div>
