@@ -74,7 +74,7 @@ export default function PositionTrainingPage() {
 
   return (
     <div className="page paidAssetPage positionTrainingAssetPage">
-      <div className="container" style={{ maxWidth: 1280 }}>
+      <div className="container positionTrainingGameContainer">
         {selectionError ? <p role="alert">{selectionError} <a href="/dashboard">Choose career</a></p> : ready ? <GameEngine lane="TRAINING" playerPosition={startingPosition || null} industry={industry} careerPath={careerPath} title="Career Training" subtitle={`Career training • ${careerPath}`} metaLeft={`Path: ${industry} • ${careerPath}`} exitHref="/dashboard" exitLabel="Close" onExit={() => void exitTraining()} /> : <p>Loading your selected training path…</p>}
       </div>
     </div>
