@@ -1354,6 +1354,32 @@ export default function AdminPage(){
     await refreshQuestions(set.id);
   }
 
+  const [clearingSet, setClearingSet] = useState(false);
+
+  async function clearSelectedSet() {
+    if (!selectedSet || !selectedSetObj || clearingSet) return;
+    const name = selectedSetObj.name;
+    if (!window.confirm(`Permanently delete all ${questions.length} questions in "${name}"? This also affects any active placement using this set. This cannot be undone.`)) return;
+    if (window.prompt(`To confirm deletion, type the exact pool name: ${name}`) !== name) return;
+    setClearingSet(true);
+    setErr(null);
+    try {
+      const response = await fetch("/api/admin/questions", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ setId: selectedSet, clearSet: true }),
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.error || "Could not clear question pool");
+      await Promise.all([refreshQuestions(selectedSet), refreshSets()]);
+      popToast(`Cleared ${result.deleted ?? 0} questions from ${name}`);
+    } catch (error: any) {
+      setErr(error?.message || "Failed to clear pool");
+    } finally {
+      setClearingSet(false);
+    }
+  }
+
   async function saveSingleQuestion(){
     setErr(null);
     if (!selectedSet) { setErr("Select a set first"); return; }
@@ -1727,6 +1753,7 @@ export default function AdminPage(){
           <div className="adminQuestionMetrics">
             <div><small>Selected set</small><b>{selectedSetObj?.name || "None selected"}</b></div>
             <div><small>Questions</small><b>{questions.length}</b></div>
+            <div><small>Other difficulty (4–5)</small><b>{questions.filter(q => Number(q.difficulty) > 3).length}</b></div>
             <div><small>Easy / Medium / Hard</small><b>{[1,2,3].map(level => questions.filter(q => Number(q.difficulty) === level).length).join(" / ")}</b></div>
             <div><small>Quality ready</small><b>{questionQualitySummary.passing}</b></div>
             <div><small>Needs review</small><b>{questionQualitySummary.needsReview}</b></div>
@@ -1865,6 +1892,7 @@ export default function AdminPage(){
                 </div>
                 <div className="row" style={{ gap: 8, flexWrap:"wrap" }}>
                   <button onClick={saveOrder} disabled={!dirtyOrder || !selectedSet}>Save order</button>
+                  <button className="danger" onClick={clearSelectedSet} disabled={!selectedSet || questions.length === 0 || clearingSet}>{clearingSet ? "Clearing..." : "Clear all questions"}</button>
                   <span className="badge">Total: {questions.length}</span>
                 </div>
               </div>
