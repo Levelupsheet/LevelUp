@@ -962,7 +962,7 @@ const showExpandedExplanation = useMemo(() => {
         ...safeArray<string>(hintData.expectedFindings),
         String(hintData.correctAnswer ?? "").trim(),
       ].filter(Boolean);
-      setHintMessage(`${partialExplanation(question.explanation, protectedAnswers)} (−${cost} XP)`);
+      setHintMessage(`${partialExplanation(safeArray<string>(hintData.hints)[0] || question.explanation, protectedAnswers)} (−${cost} XP)`);
       return;
     }
     setHintMessage(`${domainHintLabel(question.domainId || currentDomainId)} focus — use the strongest core concept first. (−${cost} XP)`);

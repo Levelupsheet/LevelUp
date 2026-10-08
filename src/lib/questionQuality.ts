@@ -1,5 +1,5 @@
-import { contentSignature } from "@/lib/contentPipeline";
-import { normalizeQuestionType, normalizeText, safeArray, uniqueSortedNumbers } from "@/lib/questionTypes";
+import { contentSignature } from "./contentPipeline";
+import { normalizeQuestionType, normalizeText, safeArray, uniqueSortedNumbers } from "./questionTypes";
 
 export function promptSignature(input: { prompt?: string | null; type?: string | null; subdomain?: string | null; choices?: any[] | null; data?: any }) {
   return contentSignature(input);

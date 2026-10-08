@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState, useRef } from 'react';
 import { DIFFICULTY_TIERS } from '@/lib/contentPipeline';
+import { importEnvelope } from '@/lib/contentImport';
 import { canonicalTrainingTarget } from '@/lib/contentPools';
 import { trainingDestinations, certificationLabel } from '@/lib/publishDestinations';
 import { contentRequest } from '@/lib/contentRequest';
@@ -10,6 +11,7 @@ export default function QuestionPipelineAdmin({ view, onViewChange }: { view: st
   const [catalog, setCatalog] = useState<any[]>([]), [placements, setPlacements] = useState<any[]>([]), [message, setMessage] = useState(''), [json, setJson] = useState(''), [editing, setEditing] = useState('');
   const [certifications, setCertifications] = useState<string[]>([]);
   const destinations = trainingDestinations(catalog, placements, sets);
+  const [preview, setPreview] = useState<any>(null);
   const request = contentRequest;
   const [loadedSetId, setLoadedSetId] = useState('');
   const generation = useRef(0);
@@ -33,7 +35,7 @@ export default function QuestionPipelineAdmin({ view, onViewChange }: { view: st
   useEffect(() => { void refresh().catch(e => setMessage(e.message)); }, [setId]);
   useEffect(() => { void request('/api/admin/careers').then(d => setCatalog(d.careers || [])).catch(() => {}); }, []);
   const choose = (id: string) => {
-    setRows([]); setIssues([]); setLoadedSetId(''); setMessage(''); setEditing(''); setSetId(id);
+    setPreview(null); setRows([]); setIssues([]); setLoadedSetId(''); setMessage(''); setEditing(''); setSetId(id);
     const pool = sets.find(s => s.id === id);
     const destination = placements.find(p => p.setId === id && p.isActive) || placements.find(p => p.setId === id);
     const target = canonicalTrainingTarget(destination?.lane === 'TRAINING' ? destination : pool || {});
@@ -54,7 +56,8 @@ export default function QuestionPipelineAdmin({ view, onViewChange }: { view: st
     {selected && loadedSetId === setId && <p>{rows.filter(q => q.review.eligible).length} learner-ready / {rows.length} stored • {issues.length} import issues preserved</p>}
     {setId && (view === 'import' || view === 'review') && <>
       <p>Accepts question arrays and knowledge blocks (facts, definitions, commands and scenarios). Supported formats: multiple_choice, true_false, cli_command. Every import enters review. Invalid rows and duplicates are preserved in the import report.</p>
-      {view === 'import' && <><input type="file" accept=".json,application/json" onChange={e => { const f = e.target.files?.[0]; if (f) void f.text().then(setJson); }} /><textarea rows={12} style={{ width: '100%' }} value={json} onChange={e => setJson(e.target.value)} placeholder={'[{"prompt":"Which action resolves this problem?","type":"multiple_choice","choices":["A","B"],"correctIndex":0,"difficulty":3,"explanation":"Explain why A resolves the problem."}]'} /><button onClick={() => act(async () => { const parsed = JSON.parse(json); if (editing) return request('/api/admin/questions','PATCH',{ ...parsed, id: editing }); const questions = Array.isArray(parsed) ? parsed : parsed.questions || [parsed]; return request('/api/admin/questions','POST',{ setId, questions }); })}>{editing ? 'Save edited question for review' : 'Import JSON / add question'}</button>{editing && <button onClick={() => { setEditing(''); setJson(''); }}>Cancel edit</button>}</>}
+      {view === 'import' && <><input type="file" accept=".json,application/json" onChange={e => { const f = e.target.files?.[0]; if (f) { setPreview(null); setEditing(''); void f.text().then(setJson); } }} /><textarea rows={12} style={{ width: '100%' }} value={json} onChange={e => { setPreview(null); setJson(e.target.value); }} placeholder={'[{"prompt":"Which action resolves this problem?","type":"multiple_choice","choices":["A","B"],"correctIndex":0,"difficulty":3,"explanation":"Explain why A resolves the problem."}]'} /><button disabled={!json.trim() || !!editing} onClick={async () => { try { setPreview(await request('/api/admin/content-preview','POST',{setId,questions:importEnvelope(JSON.parse(json))})); setMessage('Preview only: nothing has been saved.'); } catch (e:any) { setMessage(e.message); } }}>Preview generation & duplicates</button><button onClick={() => act(async () => { const parsed = JSON.parse(json); if (editing) return request('/api/admin/questions','PATCH',{ ...parsed, id: editing }); const questions = importEnvelope(parsed); return request('/api/admin/questions','POST',{ setId, questions }); })}>{editing ? 'Save edited question for review' : 'Import JSON / add question'}</button>{editing && <button onClick={() => { setEditing(''); setJson(''); }}>Cancel edit</button>}</>}
+      {preview && <details open><summary>Preview: {preview.willInsert} new questions · {preview.duplicates} duplicates · {preview.issues.length} review issues</summary><pre style={{whiteSpace:'pre-wrap'}}>{JSON.stringify({byDifficulty:preview.byDifficulty,byFormat:preview.byFormat,issues:preview.issues},null,2)}</pre>{preview.questions.slice(0,100).map((q:any,i:number)=><div className="card" key={i}><b>{q.prompt}</b><p>{q.type} · Tier {q.difficulty}</p><pre style={{whiteSpace:'pre-wrap'}}>{JSON.stringify({choices:q.choices,correctIndex:q.correctIndex,expectedCommands:q.data?.expectedCommands,explanation:q.explanation,hints:q.data?.hints},null,2)}</pre></div>)}</details>}
       <p>{DIFFICULTY_TIERS.map(t => `${t.value}: ${t.label}`).join(' • ')}. Golden and Boss require tier 4–5; difficulty is authored, never raised by eligibility.</p>
       {view === 'review' && <button onClick={() => { const ids=rows.filter(q=>!q.review.issues.length&&!q.review.duplicateOf&&(!q.data?.lifecycleStatus||q.data.lifecycleStatus==='ACTIVE')).map(q=>q.id); if (ids.length && window.confirm('Approve these valid active questions after reviewing their warnings?')) void act(()=>request('/api/admin/questions','PATCH',{ids,patch:{reviewStatus:'APPROVED'}})); }}>Approve reviewed valid questions</button>}
       <button onClick={() => { if (window.confirm('Archive all questions and unpublish this pool? Stored questions and history will be preserved.')) void act(() => request('/api/admin/questions','DELETE',{ setId, clearSet: true })); }}>Clear pool safely</button>

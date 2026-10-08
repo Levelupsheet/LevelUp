@@ -1,3 +1,4 @@
+import { duplicateContentReason } from '@/lib/contentGeneration';
 import { validateContent } from "@/lib/contentPipeline";
 import { NextResponse } from "next/server";
 import { requireAdminRequest } from "@/app/api/_lib/adminGuard";
@@ -25,9 +26,12 @@ export async function POST(req: Request) {
     const setId = targetSet?.id || defaultSetId;
     const setName = targetSet?.name || block.setName;
     const setDomain = targetSet?.domain || block.domain;
-    const trainingTarget = block.lane === "TRAINING" ? canonicalTrainingTarget(block) : { industry: null, careerPath: null, startingPosition: null };
+    const sourceTarget = {...(block.contentJson as any || {}), startingPosition:block.startingPosition};
+    const trainingTarget = block.lane === "TRAINING" ? canonicalTrainingTarget(sourceTarget) : { industry: null, careerPath: null, startingPosition: null };
+    if (block.lane === "TRAINING" && !trainingTarget.careerPath) return NextResponse.json({error:"Provide industry and careerPath before publishing training content"},{status:400});
+    if (block.lane === "CERTIFICATIONS" && !block.certExam) return NextResponse.json({error:"Provide a certification destination before publishing"},{status:400});
     const placementFilter: any = { lane: block.lane, isActive: true };
-    if (block.lane === "TRAINING") Object.assign(placementFilter, trainingPlacementFilter(block));
+    if (block.lane === "TRAINING") Object.assign(placementFilter, trainingPlacementFilter(trainingTarget));
     if (block.lane === "CERTIFICATIONS") placementFilter.certExam = block.certExam;
     if (block.lane === "TEST_NOW") placementFilter.set = { domain: setDomain };
 
@@ -44,7 +48,7 @@ export async function POST(req: Request) {
     const publishableQuestions = block.generatedQuestions;
 
     const incoming = publishableQuestions.map((q: any, index: number) => {
-      const mapped = mapCandidateToDbQuestion({ prompt: q.prompt, type: q.type.toLowerCase() as any, difficulty: q.difficulty, explanation: q.explanation, tags: q.tags, data: (q.data as any) || {}, choices: Array.isArray(q.choices) ? (q.choices as string[]) : null, correctIndex: q.correctIndex }, index);
+      const mapped = mapCandidateToDbQuestion({ prompt: q.prompt, type: q.type.toLowerCase() as any, difficulty: q.difficulty, explanation: q.explanation, tags: q.tags, data: (q.data as any) || {}, goldenEligible:Boolean(q.data?.goldenEligible), testNowEligible:block.lane === "TEST_NOW", choices: Array.isArray(q.choices) ? (q.choices as string[]) : null, correctIndex: q.correctIndex }, index);
       const quality = validateQuestionQuality(mapped as any);
       return {
         ...mapped,
@@ -62,7 +66,8 @@ export async function POST(req: Request) {
       skippedDuplicateCount: number;
       activeQuestionCount: number;
     } = await prisma.$transaction(async (tx: any) => {
-      await tx.questionSet.upsert({ where: { id: setId }, update: { status: QuestionSetStatus.PUBLISHED }, create: { id: setId, name: setName, domain: setDomain, status: QuestionSetStatus.PUBLISHED } });
+      await tx.questionSet.upsert({ where: { id: setId }, update: { status: QuestionSetStatus.PUBLISHED }, create: { id: setId, name: setName, domain: setDomain, status: QuestionSetStatus.PUBLISHED,industry:trainingTarget.industry,careerPath:trainingTarget.careerPath } });
+      await tx.$queryRaw`SELECT "id" FROM "QuestionSet" WHERE "id" = ${setId} FOR UPDATE`;
       if (replaceExisting) await tx.questionSetPlacement.updateMany({ where: placementFilter, data: { isActive: false } });
       const existingPlacement = await tx.questionSetPlacement.findFirst({ where: { setId, lane: block.lane, ...trainingTarget, certExam: block.lane === "CERTIFICATIONS" ? block.certExam : null } });
       if (!existingPlacement) {
@@ -72,18 +77,18 @@ export async function POST(req: Request) {
       }
 
       const existingQuestions = await tx.mCQQuestion.findMany({ where: { setId }, select: { prompt: true, type: true, choices: true, correctIndex: true, data: true } });
-      const seen = new Set(existingQuestions.map((row: any) => promptSignature(row)));
+      const seen = replaceExisting ? [] : [...existingQuestions];
       const toInsert = incoming.filter((row: any) => {
-        const sig = promptSignature(row);
-        if (seen.has(sig)) return false;
-        seen.add(sig);
+        const duplicate = duplicateContentReason(row,seen);
+        if (duplicate) return false;
+        seen.push(row);
         return true;
       });
 
       if (replaceExisting) {
         const previous = await tx.mCQQuestion.findMany({ where: { setId } });
         for (const q of previous) await tx.mCQQuestion.update({ where: { id: q.id }, data: { data: { ...(q.data || {}), lifecycleStatus: "ARCHIVED" } } });
-        if (incoming.length) await tx.mCQQuestion.createMany({ data: incoming.map((row: any) => ({ setId, ...row })) });
+        if (toInsert.length) await tx.mCQQuestion.createMany({ data: toInsert.map((row: any) => ({ setId, ...row })) });
       } else if (toInsert.length) {
         const max = await tx.mCQQuestion.aggregate({ where: { setId }, _max: { sortOrder: true } });
         let nextOrder = Number(max?._max?.sortOrder ?? -1) + 1;
@@ -92,10 +97,10 @@ export async function POST(req: Request) {
 
       await tx.generatedQuestion.updateMany({ where: { knowledgeBlockId: block.id, reviewStatus: { in: ["APPROVED", "EDITED"] } }, data: { publishedAt: new Date() } });
       await tx.knowledgeBlock.update({ where: { id: block.id }, data: { status: "APPROVED" } });
-      const activeQuestionCount = await tx.mCQQuestion.count({ where: { setId } });
+      const activeQuestionCount = (await tx.mCQQuestion.findMany({where:{setId}})).filter((q:any)=>q.data?.lifecycleStatus !== "ARCHIVED").length;
       return {
-        insertedCount: replaceExisting ? incoming.length : toInsert.length,
-        skippedDuplicateCount: replaceExisting ? 0 : Math.max(0, incoming.length - toInsert.length),
+        insertedCount: toInsert.length,
+        skippedDuplicateCount: Math.max(0, incoming.length - toInsert.length),
         activeQuestionCount,
       };
     });

@@ -1,4 +1,5 @@
-import { expandContentImport } from '@/lib/contentImport';
+import { duplicateContentReason } from '@/lib/contentGeneration';
+import { contentImportReport, importEnvelope } from '@/lib/contentImport';
 import { contentApiError } from '@/lib/contentApiError';
 import { NextResponse } from 'next/server';
 import { requireAdminRequest } from '@/app/api/_lib/adminGuard';
@@ -24,20 +25,27 @@ export async function POST(req: Request) {
   try {
     const body = await req.json(); const setId = String(body.setId || '');
     if (!await prisma.questionSet.findUnique({ where: { id: setId } })) return NextResponse.json({ error: 'Pool not found' }, { status: 404 });
-    const source = Array.isArray(body.questions) ? body.questions : [body];
-    const incoming = source.flatMap((raw: any) => { try { return expandContentImport(raw); } catch { return [raw]; } });
+    const source = importEnvelope(body.questions ?? body);
+    const expanded = source.map((raw: any) => { try { return contentImportReport(raw); } catch (error: any) { return { questions: [], issues: [{ section: 'block', row: 1, reason: error.message, payload: raw }] }; } });
+    const incoming = expanded.flatMap(r => r.questions);
+    const generationIssues = expanded.flatMap(r => r.issues);
     const report = await prisma.$transaction(async tx => {
+      await tx.$queryRaw`SELECT "id" FROM "QuestionSet" WHERE "id" = ${setId} FOR UPDATE`;
       const existing = await tx.mCQQuestion.findMany({ where: { setId } });
-      const seen = new Set(existing.map(contentSignature)); let order = Math.max(-1, ...existing.map(q => q.sortOrder)) + 1;
+      const seen = [...existing]; let order = Math.max(-1, ...existing.map(q => q.sortOrder)) + 1;
       const report = { inserted: 0, skippedDuplicates: 0, quarantined: 0, issues: [] as any[] };
+      for (const issue of generationIssues) {
+        await tx.questionImportIssue.create({data:{setId,rowIndex:issue.row,reason:`${issue.section}: ${issue.reason}`,payload:issue.payload ?? {originalPayload:null}}});
+        report.quarantined++; report.issues.push({row:issue.row,section:issue.section,reason:issue.reason});
+      }
       for (let i = 0; i < incoming.length; i++) {
         const raw = incoming[i]; let reason = '';
         try {
-          const payload = authorQuestion(raw, order++); const signature = contentSignature(payload);
-          if (seen.has(signature)) { reason = 'Duplicate question (same prompt, choices and answer)'; report.skippedDuplicates++; }
-          else { await tx.mCQQuestion.create({ data: { ...payload, setId } as any }); seen.add(signature); report.inserted++; }
+          const payload = authorQuestion(raw, order++); const duplicate = duplicateContentReason(payload, seen);
+          if (duplicate) { reason = duplicate; report.skippedDuplicates++; }
+          else { await tx.mCQQuestion.create({ data: { ...payload, setId } as any }); seen.push(payload); report.inserted++; }
         } catch (e: any) { reason = e.message; report.quarantined++; }
-        if (reason) { await tx.questionImportIssue.create({ data: { setId, rowIndex: i + 1, reason, payload: raw ?? {} } }); report.issues.push({ row: i + 1, reason }); }
+        if (reason) { await tx.questionImportIssue.create({ data: { setId, rowIndex: i + 1, reason, payload: raw ?? {originalPayload:null} } }); report.issues.push({ row: i + 1, reason }); }
       }
       return report;
     }, {timeout:60000,maxWait:10000});

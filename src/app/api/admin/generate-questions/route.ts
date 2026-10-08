@@ -1,3 +1,4 @@
+import { duplicateContentReason, generateContentReport } from '@/lib/contentGeneration';
 import { contentSignature, validateContent } from "@/lib/contentPipeline";
 import { NextResponse } from "next/server";
 import { requireAdminRequest } from "@/app/api/_lib/adminGuard";
@@ -22,6 +23,8 @@ export async function POST(req: Request) {
     const touched: string[] = [];
 
     for (const blockRecord of blocks) {
+      await prisma.$transaction(async (tx: any) => {
+      await tx.$queryRaw`SELECT "id" FROM "KnowledgeBlock" WHERE "setName" = ${blockRecord.setName} AND "domain"::text = ${blockRecord.domain} AND "lane"::text = ${blockRecord.lane} ORDER BY "id" FOR UPDATE`;
       const normalized = normalizeKnowledgeBlock({
         ...(blockRecord.contentJson as any),
         id: blockRecord.sourceBlockId,
@@ -36,22 +39,24 @@ export async function POST(req: Request) {
         tags: blockRecord.tags,
         source: blockRecord.source,
       });
-      const rawCandidates = generateQuestionsFromBlock(normalized);
+      const generation = generateContentReport(normalized);
+      const rawCandidates = generation.questions;
       const setId = `kb-${blockRecord.sourceBlockId}`;
-      await prisma.questionSet.upsert({ where: {id:setId}, update:{}, create:{id:setId,name:blockRecord.setName,domain:blockRecord.domain,status:'DRAFT'} });
-      const existing = await prisma.generatedQuestion.findMany({where:{knowledgeBlockId:blockRecord.id}});
-      const seen = new Set(existing.map(contentSignature));
+      await tx.questionSet.upsert({ where: {id:setId}, update:{}, create:{id:setId,name:blockRecord.setName,domain:blockRecord.domain,status:'DRAFT',industry:(normalized.contentJson as any).industry || null,careerPath:(normalized.contentJson as any).careerPath || null} });
+      for (const issue of generation.issues) { rejectedCount++; await tx.questionImportIssue.create({data:{setId,rowIndex:issue.row,reason:`${issue.section}: ${issue.reason}`,payload:issue.payload ?? {originalPayload:null}}}); }
+      const existing = await tx.generatedQuestion.findMany({where:{knowledgeBlock:{setName:blockRecord.setName,domain:blockRecord.domain,lane:blockRecord.lane}}});
+      const seen = [...existing];
       const candidates: typeof rawCandidates = [];
       for (let rowIndex=0;rowIndex<rawCandidates.length;rowIndex++) {
-        const q=rawCandidates[rowIndex]; const errors=validateContent(q);const signature=contentSignature(q);
-        const reason=errors.length ? errors.join('; ') : seen.has(signature) ? 'Duplicate generated content' : '';
-        if (reason) { rejectedCount++; await prisma.questionImportIssue.create({data:{setId,rowIndex:rowIndex+1,reason,payload:q as any}}); continue; }
-        seen.add(signature);candidates.push(q);
+        const q=rawCandidates[rowIndex]; const errors=validateContent(q);const duplicate=duplicateContentReason(q,seen);
+        const reason=errors.length ? errors.join('; ') : duplicate || '';
+        if (reason) { rejectedCount++; await tx.questionImportIssue.create({data:{setId,rowIndex:rowIndex+1,reason,payload:q as any}}); continue; }
+        seen.push(q);candidates.push(q);
       }
 
       for (let i = 0; i < candidates.length; i += 1) {
         const q = candidates[i];
-        await prisma.generatedQuestion.create({
+        await tx.generatedQuestion.create({
           data: {
             knowledgeBlockId: blockRecord.id,
             prompt: q.prompt,
@@ -68,9 +73,10 @@ export async function POST(req: Request) {
         });
       }
 
-      await prisma.knowledgeBlock.update({ where: { id: blockRecord.id }, data: { status: "PROCESSED" } });
+      await tx.knowledgeBlock.update({ where: { id: blockRecord.id }, data: { status: "PROCESSED" } });
       generatedCount += candidates.length;
       touched.push(blockRecord.id);
+      }, {timeout:60000,maxWait:10000});
     }
 
     return NextResponse.json({ ok: true, generatedCount, rejectedCount, autoApproved: autoApprove ? generatedCount : 0, knowledgeBlockIds: touched });

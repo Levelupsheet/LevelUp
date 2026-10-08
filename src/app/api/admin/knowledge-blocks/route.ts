@@ -1,3 +1,4 @@
+import { importEnvelope } from '@/lib/contentImport';
 import { NextResponse } from "next/server";
 import { requireAdminRequest } from "@/app/api/_lib/adminGuard";
 import { prisma } from "@/lib/prisma";
@@ -25,7 +26,7 @@ export async function POST(req: Request) {
   if (!admin.ok) return admin.response;
   try {
     const body = await req.json();
-    const incoming = Array.isArray(body?.blocks) ? body.blocks : [body];
+    const incoming = importEnvelope(body);
     if (!incoming.length) return NextResponse.json({ error: "No knowledge blocks provided" }, { status: 400 });
 
     const saved = [];

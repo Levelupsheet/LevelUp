@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 2,
+  "blocks": [
+    {
+      "schemaVersion": 2,
+      "id": "sales-discovery-foundations",
+      "title": "Sales Discovery",
+      "setName": "Sales Discovery Practice",
+      "industry": "Sales",
+      "careerPath": "Sales Representative",
+      "domain": "GENERAL",
+      "domainId": "customer-discovery",
+      "subdomain": "requirements",
+      "lane": "TRAINING",
+      "difficulty": 3,
+      "questions": [
+        {
+          "objectiveId": "confirm-customer-requirements",
+          "assessment": "requirements-scenario",
+          "type": "multiple_choice",
+          "prompt": "In this exercise, a customer requests a replacement system but has not stated the problem with the current one. What should you clarify before proposing a product?",
+          "choices": ["The current problem and the outcome the customer needs", "The most expensive product that can be quoted immediately", "A delivery date before establishing the customer requirements", "A contract signature before asking about the current problem"],
+          "correctIndex": 0,
+          "difficulty": 3,
+          "explanation": "Clarifying the current problem and desired outcome establishes the requirements. Price, delivery and contracts follow a proposal that addresses those requirements.",
+          "hints": ["Identify which information is still missing before a suitable proposal can be made."]
+        }
+      ]
+    }
+  ],
+  "authoringNotes": {
+    "careerExamples": ["Healthcare → Clinic Administrator", "Software Development → Software Engineer", "Real Estate → Real Estate Agent", "Transportation → Dispatcher", "Industrial/Skilled Trades → Maintenance Technician"],
+    "instructions": "Copy a block and change its industry, careerPath, domainId and authored content. No application code change is needed for another career. Clinical, legal and other specialist content requires qualified review. Tier 4–5 items additionally require evidence or constraints and a teaching explanation."
+  }
+}

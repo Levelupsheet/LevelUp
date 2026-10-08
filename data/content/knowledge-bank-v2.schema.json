@@ -1,0 +1,426 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://levelup.local/schemas/knowledge-bank-v2.json",
+  "title": "LevelUp Pro knowledge bank version 2",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "blocks"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 2
+    },
+    "blocks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/block"
+      }
+    }
+  },
+  "$defs": {
+    "block": {
+      "type": "object",
+      "required": [
+        "id",
+        "setName",
+        "lane"
+      ],
+      "properties": {
+        "schemaVersion": {
+          "const": 2
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "setName": {
+          "type": "string",
+          "minLength": 1
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "industry": {
+          "type": "string",
+          "minLength": 1
+        },
+        "careerPath": {
+          "type": "string",
+          "minLength": 1
+        },
+        "domain": {
+          "enum": [
+            "GENERAL",
+            "IDENTITY",
+            "NETWORKING",
+            "SECURITY",
+            "COMPUTE",
+            "STORAGE",
+            "AZURE",
+            "AWS",
+            "WINDOWS"
+          ]
+        },
+        "domainId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "subdomain": {
+          "type": "string",
+          "minLength": 1
+        },
+        "lane": {
+          "enum": [
+            "TRAINING",
+            "TEST_NOW",
+            "CERTIFICATIONS"
+          ]
+        },
+        "certExam": {
+          "enum": [
+            "A_PLUS",
+            "SECURITY_PLUS",
+            "AZ_900",
+            "AWS",
+            "AZURE",
+            null
+          ]
+        },
+        "difficulty": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "questions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/question"
+          }
+        },
+        "facts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "subject",
+              "statement",
+              "answer",
+              "distractors",
+              "explanation"
+            ],
+            "properties": {
+              "objectiveId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "difficulty": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 5
+              },
+              "explanation": {
+                "type": "string",
+                "minLength": 12
+              },
+              "hints": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "domainId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "subdomain": {
+                "type": "string",
+                "minLength": 1
+              },
+              "evidence": {
+                "type": "string",
+                "minLength": 1
+              },
+              "constraints": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "bossEligible": {
+                "type": "boolean"
+              },
+              "isGoldenEligible": {
+                "type": "boolean"
+              },
+              "subject": {
+                "type": "string",
+                "minLength": 1
+              },
+              "statement": {
+                "type": "string",
+                "minLength": 1
+              },
+              "answer": {
+                "type": "string",
+                "minLength": 1
+              },
+              "distractors": {
+                "type": "array",
+                "minItems": 3,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "questionTypes": {
+                "type": "array",
+                "items": {
+                  "enum": [
+                    "multiple_choice",
+                    "true_false"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "definitions": {
+          "type": "array"
+        },
+        "commands": {
+          "type": "array"
+        },
+        "procedures": {
+          "type": "array"
+        },
+        "scenarios": {
+          "type": "array"
+        },
+        "logs": {
+          "type": "array"
+        },
+        "referenceMaterial": {
+          "type": "object"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "lane": {
+                "const": "TRAINING"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "industry",
+              "careerPath"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "lane": {
+                "const": "CERTIFICATIONS"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "certExam"
+            ],
+            "properties": {
+              "certExam": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "question": {
+      "type": "object",
+      "required": [
+        "prompt",
+        "type",
+        "difficulty",
+        "explanation"
+      ],
+      "properties": {
+        "objectiveId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "difficulty": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "explanation": {
+          "type": "string",
+          "minLength": 12
+        },
+        "hints": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "domainId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "subdomain": {
+          "type": "string",
+          "minLength": 1
+        },
+        "evidence": {
+          "type": "string",
+          "minLength": 1
+        },
+        "constraints": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "bossEligible": {
+          "type": "boolean"
+        },
+        "isGoldenEligible": {
+          "type": "boolean"
+        },
+        "prompt": {
+          "type": "string",
+          "minLength": 12
+        },
+        "type": {
+          "enum": [
+            "multiple_choice",
+            "true_false",
+            "cli_command"
+          ]
+        },
+        "choices": {
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 6,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "correctIndex": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "correctAnswer": {
+          "type": "boolean"
+        },
+        "data": {
+          "type": "object"
+        },
+        "expectedCommands": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "multiple_choice"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "choices",
+              "correctIndex"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "true_false"
+              }
+            }
+          },
+          "then": {
+            "anyOf": [
+              {
+                "required": [
+                  "correctAnswer"
+                ]
+              },
+              {
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "required": [
+                      "correctAnswer"
+                    ],
+                    "properties": {
+                      "correctAnswer": {
+                        "type": "boolean"
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "const": "cli_command"
+              }
+            }
+          },
+          "then": {
+            "anyOf": [
+              {
+                "required": [
+                  "expectedCommands"
+                ]
+              },
+              {
+                "required": [
+                  "data"
+                ],
+                "properties": {
+                  "data": {
+                    "required": [
+                      "expectedCommands"
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

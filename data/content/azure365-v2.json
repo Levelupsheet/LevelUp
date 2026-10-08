@@ -1,0 +1,1622 @@
+{
+  "schemaVersion": 2,
+  "blocks": [
+    {
+      "id": "azure-m365-101",
+      "title": "Azure M365 Identity Foundations",
+      "setName": "Azure M365 Fundamentals",
+      "domain": "AZURE",
+      "track": "CLOUD",
+      "lane": "TEST_NOW",
+      "difficulty": 1,
+      "stage": 1,
+      "tags": [
+        "azure",
+        "m365",
+        "entra",
+        "intune",
+        "identity",
+        "fundamentals"
+      ],
+      "defaultXp": 10,
+      "defaultTimer": 25,
+      "facts": [
+        {
+          "statement": "Microsoft Entra ID provides cloud identity and access management",
+          "answer": "Cloud identity and access management",
+          "subject": "Microsoft Entra ID",
+          "category": "identity",
+          "distractors": [
+            "Disk encryption service",
+            "Cloud file storage service",
+            "Database backup tool"
+          ],
+          "questionTypes": [
+            "multiple_choice"
+          ],
+          "objectiveId": "concept:microsoft entra id",
+          "difficulty": 1,
+          "explanation": "Microsoft Entra ID provides cloud identity and access management",
+          "subdomain": "identity",
+          "hints": [
+            "Identify the function required by the task, then eliminate services that perform a different function."
+          ]
+        },
+        {
+          "statement": "Multi-Factor Authentication requires an additional verification factor beyond a password",
+          "answer": "Additional verification factor",
+          "subject": "MFA",
+          "category": "security",
+          "distractors": [
+            "Only a stronger password",
+            "A DNS record",
+            "A storage key"
+          ],
+          "questionTypes": [
+            "multiple_choice"
+          ],
+          "objectiveId": "concept:mfa",
+          "difficulty": 1,
+          "explanation": "Multi-Factor Authentication requires an additional verification factor beyond a password",
+          "subdomain": "security",
+          "hints": [
+            "Identify the function required by the task, then eliminate services that perform a different function."
+          ]
+        },
+        {
+          "statement": "Conditional Access evaluates signals like user, location, device, and risk before allowing access",
+          "answer": "Evaluates access conditions before sign-in is allowed",
+          "subject": "Conditional Access",
+          "category": "security",
+          "distractors": [
+            "Only resets passwords",
+            "Only manages printers",
+            "Only creates VMs"
+          ],
+          "questionTypes": [
+            "multiple_choice"
+          ],
+          "objectiveId": "concept:conditional access",
+          "difficulty": 1,
+          "explanation": "Conditional Access evaluates signals like user, location, device, and risk before allowing access",
+          "subdomain": "security",
+          "hints": [
+            "Identify the function required by the task, then eliminate services that perform a different function."
+          ]
+        },
+        {
+          "statement": "Intune is used to manage devices, applications, compliance, and endpoint policies",
+          "answer": "Device and endpoint management",
+          "subject": "Intune",
+          "category": "endpoint",
+          "distractors": [
+            "DNS management",
+            "Load balancing",
+            "SQL tuning"
+          ],
+          "questionTypes": [
+            "multiple_choice"
+          ],
+          "objectiveId": "concept:intune",
+          "difficulty": 1,
+          "explanation": "Intune is used to manage devices, applications, compliance, and endpoint policies",
+          "subdomain": "endpoint",
+          "hints": [
+            "Identify the function required by the task, then eliminate services that perform a different function."
+          ]
+        },
+        {
+          "statement": "RBAC assigns permissions based on roles instead of assigning every permission individually",
+          "answer": "Role-based access control",
+          "subject": "RBAC",
+          "category": "iam",
+          "distractors": [
+            "Randomized backup access control",
+            "Regional bandwidth allocation control",
+            "Routing-based admin configuration"
+          ],
+          "questionTypes": [
+            "multiple_choice"
+          ],
+          "objectiveId": "concept:rbac",
+          "difficulty": 1,
+          "explanation": "RBAC assigns permissions based on roles instead of assigning every permission individually",
+          "subdomain": "iam",
+          "hints": [
+            "Identify the function required by the task, then eliminate services that perform a different function."
+          ]
+        },
+        {
+          "statement": "Power Automate is used to create automated workflows between apps and services",
+          "answer": "Workflow automation",
+          "subject": "Power Automate",
+          "category": "automation",
+          "distractors": [
+            "Patch management only",
+            "Identity federation only",
+            "Disk quota reporting only"
+          ],
+          "questionTypes": [
+            "multiple_choice"
+          ],
+          "objectiveId": "concept:power automate",
+          "difficulty": 1,
+          "explanation": "Power Automate is used to create automated workflows between apps and services",
+          "subdomain": "automation",
+          "hints": [
+            "Identify the function required by the task, then eliminate services that perform a different function."
+          ]
+        }
+      ],
+      "definitions": [],
+      "procedures": [
+        {
+          "title": "Enroll a device into Intune",
+          "objectiveId": "procedure:enroll a device into intune",
+          "question": "According to the supplied checklist for 'Enroll a device into Intune', what should follow 'Confirm user has required license'?",
+          "answer": "Verify device is supported",
+          "distractors": [
+            "Confirm user has required license",
+            "Register or join device to tenant",
+            "Apply enrollment policy"
+          ],
+          "difficulty": 2,
+          "subdomain": "operational-procedures",
+          "explanation": "The supplied checklist places 'Verify device is supported' immediately after 'Confirm user has required license'. Complete that prerequisite before advancing to subsequent steps.",
+          "hints": [
+            "Use the prerequisite immediately before the next checklist step."
+          ]
+        }
+      ],
+      "commands": [
+        {
+          "platform": "powershell",
+          "purpose": "Connect to Azure",
+          "command": "Connect-AzAccount",
+          "acceptedCommands": [],
+          "caseSensitive": false,
+          "objectiveId": "command:connect-azaccount",
+          "difficulty": 1,
+          "subdomain": "powershell"
+        },
+        {
+          "platform": "powershell",
+          "purpose": "Review users in Azure AD / Entra",
+          "command": "Get-AzADUser",
+          "acceptedCommands": [],
+          "caseSensitive": false,
+          "objectiveId": "command:get-azaduser",
+          "difficulty": 1,
+          "subdomain": "powershell"
+        },
+        {
+          "platform": "powershell",
+          "purpose": "Connect this PowerShell session to Microsoft Graph",
+          "command": "Connect-MgGraph",
+          "acceptedCommands": [],
+          "caseSensitive": false,
+          "objectiveId": "command:connect-mggraph",
+          "difficulty": 2,
+          "subdomain": "graph-powershell",
+          "explanation": "Connect-MgGraph authenticates Microsoft Graph PowerShell. It is a separate task from authenticating Az PowerShell with Connect-AzAccount.",
+          "source": "https://learn.microsoft.com/en-us/powershell/module/microsoft.graph.authentication/connect-mggraph"
+        },
+        {
+          "platform": "powershell",
+          "purpose": "List users using Microsoft Graph PowerShell",
+          "command": "Get-MgUser",
+          "acceptedCommands": [],
+          "caseSensitive": false,
+          "objectiveId": "command:get-mguser",
+          "difficulty": 2,
+          "subdomain": "graph-powershell",
+          "explanation": "Get-MgUser retrieves users through Microsoft Graph PowerShell. The task explicitly specifies Graph rather than the Az module.",
+          "source": "https://learn.microsoft.com/en-us/powershell/module/microsoft.graph.users/get-mguser"
+        }
+      ],
+      "scenarios": [
+        {
+          "scenario": "A user can sign in to Microsoft 365 without completing MFA.",
+          "bestAction": "Review MFA registration and Conditional Access policy assignments.",
+          "options": [
+            "Review MFA registration and Conditional Access policy assignments",
+            "Review only password expiry and leave the authentication policy scope unchanged",
+            "Review only Office installation health before inspecting authentication controls",
+            "Review only mailbox storage settings before inspecting authentication requirements"
+          ],
+          "correctAnswer": "Review MFA registration and Conditional Access policy assignments",
+          "explanation": "Missing or excluded Conditional Access and MFA settings are common causes.",
+          "objectiveId": "azure-m365-101:scenarios:1",
+          "difficulty": 3,
+          "subdomain": "troubleshooting",
+          "hints": [
+            "Identify the scope of the failure and choose the least disruptive check supported by the evidence."
+          ]
+        },
+        {
+          "scenario": "A managed laptop is not receiving compliance policies from Intune.",
+          "bestAction": "Check device enrollment status, group assignment, and last sync time.",
+          "options": [
+            "Check device enrollment status, group assignment, and last sync time",
+            "Change only mailbox quota before inspecting device enrollment and policy targeting",
+            "Change only endpoint antivirus settings before checking Intune assignment and sync",
+            "Change only licensing groups without inspecting the device enrollment or policy status"
+          ],
+          "correctAnswer": "Check device enrollment status, group assignment, and last sync time",
+          "explanation": "Policy targeting and sync status are the first things to validate.",
+          "objectiveId": "azure-m365-101:scenarios:2",
+          "difficulty": 3,
+          "subdomain": "troubleshooting",
+          "hints": [
+            "Identify the scope of the failure and choose the least disruptive check supported by the evidence."
+          ]
+        }
+      ],
+      "logs": [
+        {
+          "log": "Sign-in status: Failure | Requirement: MFA | Result: User not registered for MFA",
+          "question": "What is the most likely issue?",
+          "answer": "The user is not enrolled for MFA",
+          "distractors": [
+            "The device lost internet",
+            "The mailbox is full",
+            "The DNS server is offline"
+          ],
+          "objectiveId": "azure-m365-101:logs:1",
+          "difficulty": 3,
+          "subdomain": "troubleshooting",
+          "hints": [
+            "Identify the scope of the failure and choose the least disruptive check supported by the evidence."
+          ],
+          "explanation": "The finding 'The user is not enrolled for MFA' follows from the supplied log evidence. Resolve the recorded requirement before changing unrelated services."
+        }
+      ],
+      "matching": [],
+      "distractors": [
+        "DNS zone replication",
+        "Database sharding",
+        "VM host patching",
+        "Anonymous guest root login"
+      ],
+      "schemaVersion": 2,
+      "industry": "Information Technology",
+      "careerPath": "Cloud Engineer",
+      "domainId": "azure",
+      "subdomain": "m365-administration",
+      "referenceMaterial": {
+        "originalBlock": {
+          "id": "azure-m365-101",
+          "title": "Azure M365 Identity Foundations",
+          "setName": "Azure M365 Fundamentals",
+          "domain": "AZURE",
+          "track": "CLOUD",
+          "lane": "TEST_NOW",
+          "difficulty": 1,
+          "stage": 1,
+          "tags": [
+            "azure",
+            "m365",
+            "entra",
+            "intune",
+            "identity",
+            "fundamentals"
+          ],
+          "defaultXp": 10,
+          "defaultTimer": 25,
+          "facts": [
+            {
+              "statement": "Microsoft Entra ID provides cloud identity and access management",
+              "answer": "Cloud identity and access management",
+              "subject": "Microsoft Entra ID",
+              "category": "identity",
+              "distractors": [
+                "Disk encryption service",
+                "Cloud file storage service",
+                "Database backup tool"
+              ],
+              "questionTypes": [
+                "multiple_choice",
+                "fill_blank",
+                "true_false"
+              ]
+            },
+            {
+              "statement": "Multi-Factor Authentication requires an additional verification factor beyond a password",
+              "answer": "Additional verification factor",
+              "subject": "MFA",
+              "category": "security",
+              "distractors": [
+                "Only a stronger password",
+                "A DNS record",
+                "A storage key"
+              ],
+              "questionTypes": [
+                "multiple_choice",
+                "fill_blank",
+                "true_false"
+              ]
+            },
+            {
+              "statement": "Conditional Access evaluates signals like user, location, device, and risk before allowing access",
+              "answer": "Evaluates access conditions before sign-in is allowed",
+              "subject": "Conditional Access",
+              "category": "security",
+              "distractors": [
+                "Only resets passwords",
+                "Only manages printers",
+                "Only creates VMs"
+              ],
+              "questionTypes": [
+                "multiple_choice",
+                "fill_blank"
+              ]
+            },
+            {
+              "statement": "Intune is used to manage devices, applications, compliance, and endpoint policies",
+              "answer": "Device and endpoint management",
+              "subject": "Intune",
+              "category": "endpoint",
+              "distractors": [
+                "DNS management",
+                "Load balancing",
+                "SQL tuning"
+              ],
+              "questionTypes": [
+                "multiple_choice",
+                "fill_blank",
+                "true_false"
+              ]
+            },
+            {
+              "statement": "RBAC assigns permissions based on roles instead of assigning every permission individually",
+              "answer": "Role-based access control",
+              "subject": "RBAC",
+              "category": "iam",
+              "distractors": [
+                "Randomized backup access control",
+                "Regional bandwidth allocation control",
+                "Routing-based admin configuration"
+              ],
+              "questionTypes": [
+                "multiple_choice",
+                "fill_blank"
+              ]
+            },
+            {
+              "statement": "Power Automate is used to create automated workflows between apps and services",
+              "answer": "Workflow automation",
+              "subject": "Power Automate",
+              "category": "automation",
+              "distractors": [
+                "Patch management only",
+                "Identity federation only",
+                "Disk quota reporting only"
+              ],
+              "questionTypes": [
+                "multiple_choice",
+                "fill_blank"
+              ]
+            }
+          ],
+          "definitions": [
+            {
+              "term": "Microsoft Entra ID",
+              "definition": "Microsoft cloud service for identity and access management",
+              "aliases": [
+                "Azure AD"
+              ]
+            },
+            {
+              "term": "MFA",
+              "definition": "A sign-in method that requires more than one authentication factor",
+              "aliases": [
+                "Multi-Factor Authentication"
+              ]
+            },
+            {
+              "term": "Conditional Access",
+              "definition": "Policies that control access based on contextual conditions"
+            },
+            {
+              "term": "Intune",
+              "definition": "Microsoft cloud service for managing devices, apps, and compliance"
+            },
+            {
+              "term": "RBAC",
+              "definition": "Role-Based Access Control that grants permissions according to assigned roles"
+            }
+          ],
+          "procedures": [
+            {
+              "title": "Enroll a device into Intune",
+              "steps": [
+                "Confirm user has required license",
+                "Verify device is supported",
+                "Register or join device to tenant",
+                "Apply enrollment policy",
+                "Sync device with Intune",
+                "Confirm compliance and policy application"
+              ]
+            }
+          ],
+          "commands": [
+            {
+              "platform": "powershell",
+              "purpose": "Connect to Azure",
+              "command": "Connect-AzAccount",
+              "aliases": [
+                "Connect-MgGraph"
+              ]
+            },
+            {
+              "platform": "powershell",
+              "purpose": "Review users in Azure AD / Entra",
+              "command": "Get-AzADUser",
+              "aliases": [
+                "Get-MgUser"
+              ]
+            }
+          ],
+          "scenarios": [
+            {
+              "scenario": "A user can sign in to Microsoft 365 without completing MFA.",
+              "bestAction": "Review MFA registration and Conditional Access policy assignments.",
+              "options": [
+                "Delete the user account",
+                "Review MFA registration and Conditional Access policy assignments",
+                "Disable all sign-in logs",
+                "Reinstall Office"
+              ],
+              "correctAnswer": "Review MFA registration and Conditional Access policy assignments",
+              "explanation": "Missing or excluded Conditional Access and MFA settings are common causes."
+            },
+            {
+              "scenario": "A managed laptop is not receiving compliance policies from Intune.",
+              "bestAction": "Check device enrollment status, group assignment, and last sync time.",
+              "options": [
+                "Increase mailbox quota",
+                "Check device enrollment status, group assignment, and last sync time",
+                "Disable Defender",
+                "Remove all security groups"
+              ],
+              "correctAnswer": "Check device enrollment status, group assignment, and last sync time",
+              "explanation": "Policy targeting and sync status are the first things to validate."
+            }
+          ],
+          "logs": [
+            {
+              "log": "Sign-in status: Failure | Requirement: MFA | Result: User not registered for MFA",
+              "question": "What is the most likely issue?",
+              "answer": "The user is not enrolled for MFA",
+              "distractors": [
+                "The device lost internet",
+                "The mailbox is full",
+                "The DNS server is offline"
+              ]
+            }
+          ],
+          "matching": [
+            {
+              "prompt": "Match the Azure/M365 service to its function",
+              "pairs": [
+                {
+                  "left": "Microsoft Entra ID",
+                  "right": "Identity and access management"
+                },
+                {
+                  "left": "Intune",
+                  "right": "Device and application management"
+                },
+                {
+                  "left": "Power Automate",
+                  "right": "Workflow automation"
+                },
+                {
+                  "left": "Conditional Access",
+                  "right": "Policy-based access control"
+                }
+              ]
+            }
+          ],
+          "distractors": [
+            "DNS zone replication",
+            "Database sharding",
+            "VM host patching",
+            "Anonymous guest root login"
+          ]
+        },
+        "note": "Preserved source reference. Repeated recall concepts, unsupported matching, and unverified command aliases are not regenerated as extra questions."
+      },
+      "questions": [
+        {
+          "prompt": "True or false: MFA means that a user only needs a stronger password, without an additional verification factor.",
+          "type": "true_false",
+          "correctAnswer": false,
+          "difficulty": 1,
+          "objectiveId": "mfa-authentication-factors",
+          "explanation": "The supplied source defines MFA as requiring an additional verification factor beyond a password. A stronger password alone does not add a second factor.",
+          "hints": [
+            "Distinguish password strength from the number of verification factors."
+          ],
+          "subdomain": "identity"
+        }
+      ]
+    },
+    {
+      "id": "azure-m365-201",
+      "title": "Azure M365 Security and Administration",
+      "setName": "Azure M365 Administration",
+      "domain": "AZURE",
+      "track": "CLOUD",
+      "lane": "TEST_NOW",
+      "difficulty": 2,
+      "stage": 2,
+      "tags": [
+        "azure",
+        "m365",
+        "entra",
+        "intune",
+        "security",
+        "administration"
+      ],
+      "defaultXp": 15,
+      "defaultTimer": 30,
+      "facts": [
+        {
+          "statement": "Privileged Identity Management provides just-in-time elevation for privileged roles",
+          "answer": "Just-in-time privileged access",
+          "subject": "PIM",
+          "category": "identity",
+          "distractors": [
+            "Permanent unrestricted admin access",
+            "Password vault for local accounts only",
+            "A backup retention service"
+          ],
+          "questionTypes": [
+            "multiple_choice"
+          ],
+          "objectiveId": "concept:pim",
+          "difficulty": 2,
+          "explanation": "Privileged Identity Management provides just-in-time elevation for privileged roles",
+          "subdomain": "identity",
+          "hints": [
+            "Identify the function required by the task, then eliminate services that perform a different function."
+          ]
+        },
+        {
+          "statement": "Microsoft Sentinel is used for SIEM, analytics, alerting, and incident investigation",
+          "answer": "Security monitoring and incident analysis",
+          "subject": "Sentinel",
+          "category": "security",
+          "distractors": [
+            "Domain registrar",
+            "Printer spooler",
+            "Software packaging utility"
+          ],
+          "questionTypes": [
+            "multiple_choice"
+          ],
+          "objectiveId": "concept:sentinel",
+          "difficulty": 2,
+          "explanation": "Microsoft Sentinel is used for SIEM, analytics, alerting, and incident investigation",
+          "subdomain": "security",
+          "hints": [
+            "Identify the function required by the task, then eliminate services that perform a different function."
+          ]
+        },
+        {
+          "statement": "Least privilege reduces attack surface by granting only the permissions needed for a task",
+          "answer": "Grant only necessary permissions",
+          "subject": "Least Privilege",
+          "category": "iam",
+          "distractors": [
+            "Grant all users Global Admin",
+            "Disable audit logging",
+            "Share one admin account"
+          ],
+          "questionTypes": [
+            "multiple_choice"
+          ],
+          "objectiveId": "concept:least privilege",
+          "difficulty": 2,
+          "explanation": "Least privilege reduces attack surface by granting only the permissions needed for a task",
+          "subdomain": "iam",
+          "hints": [
+            "Identify the function required by the task, then eliminate services that perform a different function."
+          ]
+        },
+        {
+          "statement": "GCC High is a Microsoft cloud environment designed for organizations with stricter compliance requirements",
+          "answer": "Government-focused high-compliance cloud environment",
+          "subject": "GCC High",
+          "category": "compliance",
+          "distractors": [
+            "An on-premises backup appliance for restoring local servers",
+            "A desktop VPN application for establishing remote connections",
+            "A hypervisor edition for hosting local virtual machines"
+          ],
+          "questionTypes": [
+            "multiple_choice"
+          ],
+          "objectiveId": "concept:gcc high",
+          "difficulty": 2,
+          "explanation": "GCC High is a Microsoft cloud environment designed for organizations with stricter compliance requirements",
+          "subdomain": "compliance",
+          "hints": [
+            "Identify the function required by the task, then eliminate services that perform a different function."
+          ]
+        }
+      ],
+      "definitions": [],
+      "procedures": [
+        {
+          "title": "Secure privileged access in Azure/M365",
+          "objectiveId": "procedure:secure privileged access in azure/m365",
+          "question": "According to the supplied checklist for 'Secure privileged access in Azure/M365', what should follow 'Review privileged roles and memberships'?",
+          "answer": "Reduce standing admin permissions",
+          "distractors": [
+            "Review privileged roles and memberships",
+            "Enable PIM for privileged roles",
+            "Require MFA for elevation"
+          ],
+          "difficulty": 2,
+          "subdomain": "operational-procedures",
+          "explanation": "The supplied checklist places 'Reduce standing admin permissions' immediately after 'Review privileged roles and memberships'. Complete that prerequisite before advancing to subsequent steps.",
+          "hints": [
+            "Use the prerequisite immediately before the next checklist step."
+          ]
+        },
+        {
+          "title": "Deploy an app with Intune",
+          "objectiveId": "procedure:deploy an app with intune",
+          "question": "According to the supplied checklist for 'Deploy an app with Intune', what should follow 'Package or upload application'?",
+          "answer": "Configure install behavior and detection rules",
+          "distractors": [
+            "Package or upload application",
+            "Assign app to device or user groups",
+            "Monitor deployment results"
+          ],
+          "difficulty": 2,
+          "subdomain": "operational-procedures",
+          "explanation": "The supplied checklist places 'Configure install behavior and detection rules' immediately after 'Package or upload application'. Complete that prerequisite before advancing to subsequent steps.",
+          "hints": [
+            "Use the prerequisite immediately before the next checklist step."
+          ]
+        }
+      ],
+      "commands": [
+        {
+          "platform": "powershell",
+          "purpose": "List Azure role assignments",
+          "command": "Get-AzRoleAssignment",
+          "acceptedCommands": [],
+          "caseSensitive": false,
+          "objectiveId": "command:get-azroleassignment",
+          "difficulty": 2,
+          "subdomain": "powershell"
+        },
+        {
+          "platform": "powershell",
+          "purpose": "Review managed devices with Graph",
+          "command": "Get-MgDeviceManagementManagedDevice",
+          "acceptedCommands": [],
+          "caseSensitive": false,
+          "objectiveId": "command:get-mgdevicemanagementmanageddevice",
+          "difficulty": 2,
+          "subdomain": "powershell"
+        }
+      ],
+      "scenarios": [
+        {
+          "scenario": "A user has permanent Global Administrator access but only needs occasional elevation.",
+          "bestAction": "Move the user to an eligible role with PIM and require MFA for activation.",
+          "options": [
+            "Leave Global Admin assigned permanently",
+            "Move the user to an eligible role with PIM and require MFA for activation",
+            "Disable auditing for that account",
+            "Create a shared admin account"
+          ],
+          "correctAnswer": "Move the user to an eligible role with PIM and require MFA for activation",
+          "explanation": "PIM supports just-in-time elevation and reduces standing privilege.",
+          "objectiveId": "azure-m365-201:scenarios:1",
+          "difficulty": 3,
+          "subdomain": "troubleshooting",
+          "hints": [
+            "Identify the scope of the failure and choose the least disruptive check supported by the evidence."
+          ]
+        },
+        {
+          "scenario": "Users on unmanaged personal devices are accessing sensitive cloud apps.",
+          "bestAction": "Create a Conditional Access policy requiring compliant or approved devices.",
+          "options": [
+            "Remove all licenses",
+            "Create a Conditional Access policy requiring compliant or approved devices",
+            "Turn off sign-in logs",
+            "Delete all security groups"
+          ],
+          "correctAnswer": "Create a Conditional Access policy requiring compliant or approved devices",
+          "explanation": "Conditional Access can enforce device state and app access requirements.",
+          "objectiveId": "azure-m365-201:scenarios:2",
+          "difficulty": 3,
+          "subdomain": "troubleshooting",
+          "hints": [
+            "Identify the scope of the failure and choose the least disruptive check supported by the evidence."
+          ]
+        },
+        {
+          "scenario": "An endpoint is marked noncompliant and cannot access company resources.",
+          "bestAction": "Review the device compliance policy result and remediate the failed setting.",
+          "options": [
+            "Review the device compliance policy result and remediate the failed setting",
+            "Change the access rule to ignore noncompliant devices without reviewing the failure",
+            "Grant the user a privileged role without inspecting the device compliance result",
+            "Reinstall all managed applications without identifying the failed compliance setting"
+          ],
+          "correctAnswer": "Review the device compliance policy result and remediate the failed setting",
+          "explanation": "The policy result shows exactly which requirement failed.",
+          "objectiveId": "azure-m365-201:scenarios:3",
+          "difficulty": 3,
+          "subdomain": "troubleshooting",
+          "hints": [
+            "Identify the scope of the failure and choose the least disruptive check supported by the evidence."
+          ]
+        }
+      ],
+      "logs": [
+        {
+          "log": "Conditional Access | Result: Failure | Policy: Require compliant device | Device state: Not compliant",
+          "question": "Why was the sign-in blocked?",
+          "answer": "The device did not meet the required compliance state",
+          "distractors": [
+            "The user entered the correct password too quickly",
+            "The mailbox exceeded quota",
+            "The printer mapping failed"
+          ],
+          "objectiveId": "azure-m365-201:logs:1",
+          "difficulty": 3,
+          "subdomain": "troubleshooting",
+          "hints": [
+            "Identify the scope of the failure and choose the least disruptive check supported by the evidence."
+          ],
+          "explanation": "The finding 'The device did not meet the required compliance state' follows from the supplied log evidence. Resolve the recorded requirement before changing unrelated services."
+        },
+        {
+          "log": "PIM activation request | Status: Denied | Reason: MFA requirement not satisfied",
+          "question": "What prevented role activation?",
+          "answer": "MFA was not completed",
+          "distractors": [
+            "The DNS record was missing",
+            "The Intune app was uninstalled",
+            "The device had low disk space"
+          ],
+          "objectiveId": "azure-m365-201:logs:2",
+          "difficulty": 3,
+          "subdomain": "troubleshooting",
+          "hints": [
+            "Identify the scope of the failure and choose the least disruptive check supported by the evidence."
+          ],
+          "explanation": "The finding 'MFA was not completed' follows from the supplied log evidence. Resolve the recorded requirement before changing unrelated services."
+        }
+      ],
+      "matching": [],
+      "distractors": [
+        "Permanent Global Admin for all users",
+        "Shared local administrator password for everyone",
+        "Disable device compliance",
+        "Turn off audit logs"
+      ],
+      "schemaVersion": 2,
+      "industry": "Information Technology",
+      "careerPath": "Cloud Engineer",
+      "domainId": "azure",
+      "subdomain": "m365-administration",
+      "referenceMaterial": {
+        "originalBlock": {
+          "id": "azure-m365-201",
+          "title": "Azure M365 Security and Administration",
+          "setName": "Azure M365 Administration",
+          "domain": "AZURE",
+          "track": "CLOUD",
+          "lane": "TEST_NOW",
+          "difficulty": 2,
+          "stage": 2,
+          "tags": [
+            "azure",
+            "m365",
+            "entra",
+            "intune",
+            "security",
+            "administration"
+          ],
+          "defaultXp": 15,
+          "defaultTimer": 30,
+          "facts": [
+            {
+              "statement": "Privileged Identity Management provides just-in-time elevation for privileged roles",
+              "answer": "Just-in-time privileged access",
+              "subject": "PIM",
+              "category": "identity",
+              "distractors": [
+                "Permanent unrestricted admin access",
+                "Password vault for local accounts only",
+                "A backup retention service"
+              ],
+              "questionTypes": [
+                "multiple_choice",
+                "fill_blank",
+                "true_false"
+              ]
+            },
+            {
+              "statement": "Conditional Access can block sign-in from unsupported devices or risky locations",
+              "answer": "Block or control access based on device and location conditions",
+              "subject": "Conditional Access",
+              "category": "security",
+              "distractors": [
+                "Only changes desktop wallpaper",
+                "Only restarts endpoints",
+                "Only updates BIOS settings"
+              ],
+              "questionTypes": [
+                "multiple_choice",
+                "fill_blank",
+                "multi_select"
+              ]
+            },
+            {
+              "statement": "Intune can deploy applications, configuration profiles, compliance policies, and scripts",
+              "answer": "Deploy apps, policies, and scripts",
+              "subject": "Intune",
+              "category": "endpoint",
+              "distractors": [
+                "Only create storage accounts",
+                "Only manage VLANs",
+                "Only rotate certificates manually"
+              ],
+              "questionTypes": [
+                "multiple_choice",
+                "fill_blank",
+                "multi_select"
+              ]
+            },
+            {
+              "statement": "Microsoft Sentinel is used for SIEM, analytics, alerting, and incident investigation",
+              "answer": "Security monitoring and incident analysis",
+              "subject": "Sentinel",
+              "category": "security",
+              "distractors": [
+                "Domain registrar",
+                "Printer spooler",
+                "Software packaging utility"
+              ],
+              "questionTypes": [
+                "multiple_choice",
+                "fill_blank"
+              ]
+            },
+            {
+              "statement": "Least privilege reduces attack surface by granting only the permissions needed for a task",
+              "answer": "Grant only necessary permissions",
+              "subject": "Least Privilege",
+              "category": "iam",
+              "distractors": [
+                "Grant all users Global Admin",
+                "Disable audit logging",
+                "Share one admin account"
+              ],
+              "questionTypes": [
+                "multiple_choice",
+                "fill_blank",
+                "true_false"
+              ]
+            },
+            {
+              "statement": "GCC High is a Microsoft cloud environment designed for organizations with stricter compliance requirements",
+              "answer": "Government-focused high-compliance cloud environment",
+              "subject": "GCC High",
+              "category": "compliance",
+              "distractors": [
+                "A backup appliance",
+                "A VPN client",
+                "A hypervisor edition"
+              ],
+              "questionTypes": [
+                "multiple_choice",
+                "fill_blank"
+              ]
+            }
+          ],
+          "definitions": [
+            {
+              "term": "PIM",
+              "definition": "Privileged Identity Management that provides temporary elevated access to roles and resources",
+              "aliases": [
+                "Privileged Identity Management"
+              ]
+            },
+            {
+              "term": "Least Privilege",
+              "definition": "Granting only the permissions required to complete a task"
+            },
+            {
+              "term": "Microsoft Sentinel",
+              "definition": "Cloud-native SIEM and SOAR platform for security monitoring and response",
+              "aliases": [
+                "Sentinel"
+              ]
+            },
+            {
+              "term": "Compliance Policy",
+              "definition": "A policy that evaluates whether a managed device meets organization security requirements"
+            },
+            {
+              "term": "GCC High",
+              "definition": "Microsoft 365 and Azure environment designed to support higher regulatory and compliance needs"
+            }
+          ],
+          "procedures": [
+            {
+              "title": "Secure privileged access in Azure/M365",
+              "steps": [
+                "Review privileged roles and memberships",
+                "Reduce standing admin permissions",
+                "Enable PIM for privileged roles",
+                "Require MFA for elevation",
+                "Set approval and activation duration",
+                "Review audit logs and access history"
+              ]
+            },
+            {
+              "title": "Deploy an app with Intune",
+              "steps": [
+                "Package or upload application",
+                "Configure install behavior and detection rules",
+                "Assign app to device or user groups",
+                "Monitor deployment results",
+                "Validate successful install on target devices"
+              ]
+            }
+          ],
+          "commands": [
+            {
+              "platform": "powershell",
+              "purpose": "List Azure role assignments",
+              "command": "Get-AzRoleAssignment"
+            },
+            {
+              "platform": "powershell",
+              "purpose": "Review managed devices with Graph",
+              "command": "Get-MgDeviceManagementManagedDevice"
+            }
+          ],
+          "scenarios": [
+            {
+              "scenario": "A user has permanent Global Administrator access but only needs occasional elevation.",
+              "bestAction": "Move the user to an eligible role with PIM and require MFA for activation.",
+              "options": [
+                "Leave Global Admin assigned permanently",
+                "Move the user to an eligible role with PIM and require MFA for activation",
+                "Disable auditing for that account",
+                "Create a shared admin account"
+              ],
+              "correctAnswer": "Move the user to an eligible role with PIM and require MFA for activation",
+              "explanation": "PIM supports just-in-time elevation and reduces standing privilege."
+            },
+            {
+              "scenario": "Users on unmanaged personal devices are accessing sensitive cloud apps.",
+              "bestAction": "Create a Conditional Access policy requiring compliant or approved devices.",
+              "options": [
+                "Remove all licenses",
+                "Create a Conditional Access policy requiring compliant or approved devices",
+                "Turn off sign-in logs",
+                "Delete all security groups"
+              ],
+              "correctAnswer": "Create a Conditional Access policy requiring compliant or approved devices",
+              "explanation": "Conditional Access can enforce device state and app access requirements."
+            },
+            {
+              "scenario": "An endpoint is marked noncompliant and cannot access company resources.",
+              "bestAction": "Review the device compliance policy result and remediate the failed setting.",
+              "options": [
+                "Wipe every device in the tenant",
+                "Review the device compliance policy result and remediate the failed setting",
+                "Disable RBAC",
+                "Assign Global Admin to the user"
+              ],
+              "correctAnswer": "Review the device compliance policy result and remediate the failed setting",
+              "explanation": "The policy result shows exactly which requirement failed."
+            }
+          ],
+          "logs": [
+            {
+              "log": "Conditional Access | Result: Failure | Policy: Require compliant device | Device state: Not compliant",
+              "question": "Why was the sign-in blocked?",
+              "answer": "The device did not meet the required compliance state",
+              "distractors": [
+                "The user entered the correct password too quickly",
+                "The mailbox exceeded quota",
+                "The printer mapping failed"
+              ]
+            },
+            {
+              "log": "PIM activation request | Status: Denied | Reason: MFA requirement not satisfied",
+              "question": "What prevented role activation?",
+              "answer": "MFA was not completed",
+              "distractors": [
+                "The DNS record was missing",
+                "The Intune app was uninstalled",
+                "The device had low disk space"
+              ]
+            }
+          ],
+          "matching": [
+            {
+              "prompt": "Match the security control to its purpose",
+              "pairs": [
+                {
+                  "left": "PIM",
+                  "right": "Temporary elevated privilege"
+                },
+                {
+                  "left": "Conditional Access",
+                  "right": "Context-based sign-in control"
+                },
+                {
+                  "left": "Sentinel",
+                  "right": "Security monitoring and incident investigation"
+                },
+                {
+                  "left": "Least Privilege",
+                  "right": "Minimum permissions required"
+                }
+              ]
+            }
+          ],
+          "distractors": [
+            "Permanent Global Admin for all users",
+            "Shared local administrator password for everyone",
+            "Disable device compliance",
+            "Turn off audit logs"
+          ]
+        },
+        "note": "Preserved source reference. Repeated recall concepts, unsupported matching, and unverified command aliases are not regenerated as extra questions."
+      }
+    },
+    {
+      "id": "azure-m365-301",
+      "title": "Azure M365 Advanced Operations and Compliance",
+      "setName": "Azure M365 Advanced",
+      "domain": "AZURE",
+      "track": "CLOUD",
+      "lane": "TEST_NOW",
+      "difficulty": 3,
+      "stage": 3,
+      "tags": [
+        "azure",
+        "m365",
+        "entra",
+        "intune",
+        "sentinel",
+        "compliance",
+        "advanced"
+      ],
+      "defaultXp": 20,
+      "defaultTimer": 40,
+      "facts": [
+        {
+          "statement": "A layered Azure security model commonly includes MFA, Conditional Access, RBAC, PIM, logging, and continuous monitoring",
+          "answer": "Layered identity and access security model",
+          "subject": "Azure Security Model",
+          "category": "security",
+          "distractors": [
+            "Single shared admin account",
+            "Only endpoint antivirus with no identity controls",
+            "Disabling sign-in logs to improve performance"
+          ],
+          "questionTypes": [
+            "multiple_choice"
+          ],
+          "objectiveId": "concept:azure security model",
+          "difficulty": 2,
+          "explanation": "A layered Azure security model commonly includes MFA, Conditional Access, RBAC, PIM, logging, and continuous monitoring",
+          "subdomain": "security",
+          "hints": [
+            "Identify the function required by the task, then eliminate services that perform a different function."
+          ]
+        },
+        {
+          "statement": "Compliance frameworks such as CMMC, NIST 800-171, and ISO 27001 influence access controls, auditing, and device security requirements",
+          "answer": "Compliance frameworks guide cloud security controls",
+          "subject": "Compliance",
+          "category": "compliance",
+          "distractors": [
+            "They replace the need for security policies",
+            "They only apply to printers",
+            "They eliminate the need for MFA"
+          ],
+          "questionTypes": [
+            "multiple_choice"
+          ],
+          "objectiveId": "concept:compliance",
+          "difficulty": 2,
+          "explanation": "Compliance frameworks such as CMMC, NIST 800-171, and ISO 27001 influence access controls, auditing, and device security requirements",
+          "subdomain": "compliance",
+          "hints": [
+            "Identify the function required by the task, then eliminate services that perform a different function."
+          ]
+        },
+        {
+          "statement": "PowerShell and automation reduce manual configuration drift and improve repeatability in cloud administration",
+          "answer": "Improve repeatability and reduce manual errors",
+          "subject": "Automation",
+          "category": "automation",
+          "distractors": [
+            "Increase manual effort",
+            "Disable logging",
+            "Replace all RBAC roles"
+          ],
+          "questionTypes": [
+            "multiple_choice"
+          ],
+          "objectiveId": "concept:automation",
+          "difficulty": 2,
+          "explanation": "PowerShell and automation reduce manual configuration drift and improve repeatability in cloud administration",
+          "subdomain": "automation",
+          "hints": [
+            "Identify the function required by the task, then eliminate services that perform a different function."
+          ]
+        },
+        {
+          "statement": "Device compliance and identity controls work together to protect access to sensitive Microsoft 365 resources",
+          "answer": "Identity and device posture jointly control access",
+          "subject": "Zero Trust",
+          "category": "security",
+          "distractors": [
+            "Only password length matters",
+            "Only local admin rights matter",
+            "Only printer permissions matter"
+          ],
+          "questionTypes": [
+            "multiple_choice"
+          ],
+          "objectiveId": "concept:zero trust",
+          "difficulty": 2,
+          "explanation": "Device compliance and identity controls work together to protect access to sensitive Microsoft 365 resources",
+          "subdomain": "security",
+          "hints": [
+            "Identify the function required by the task, then eliminate services that perform a different function."
+          ]
+        }
+      ],
+      "definitions": [],
+      "procedures": [
+        {
+          "title": "Investigate suspicious tenant activity",
+          "objectiveId": "procedure:investigate suspicious tenant activity",
+          "question": "According to the supplied checklist for 'Investigate suspicious tenant activity', what should follow 'Review sign-in logs and audit logs'?",
+          "answer": "Identify affected user, device, and application",
+          "distractors": [
+            "Review sign-in logs and audit logs",
+            "Correlate alerts in Sentinel",
+            "Validate Conditional Access and MFA outcomes"
+          ],
+          "difficulty": 2,
+          "subdomain": "operational-procedures",
+          "explanation": "The supplied checklist places 'Identify affected user, device, and application' immediately after 'Review sign-in logs and audit logs'. Complete that prerequisite before advancing to subsequent steps.",
+          "hints": [
+            "Use the prerequisite immediately before the next checklist step."
+          ]
+        },
+        {
+          "title": "Harden Azure/M365 access for sensitive environments",
+          "objectiveId": "procedure:harden azure/m365 access for sensitive environments",
+          "question": "According to the supplied checklist for 'Harden Azure/M365 access for sensitive environments', what should follow 'Identify privileged roles and sensitive apps'?",
+          "answer": "Apply least privilege and RBAC",
+          "distractors": [
+            "Identify privileged roles and sensitive apps",
+            "Convert standing admins to eligible PIM roles",
+            "Require MFA and strong authentication"
+          ],
+          "difficulty": 2,
+          "subdomain": "operational-procedures",
+          "explanation": "The supplied checklist places 'Apply least privilege and RBAC' immediately after 'Identify privileged roles and sensitive apps'. Complete that prerequisite before advancing to subsequent steps.",
+          "hints": [
+            "Use the prerequisite immediately before the next checklist step."
+          ]
+        }
+      ],
+      "commands": [
+        {
+          "platform": "powershell",
+          "purpose": "Review Azure sign-in related data via Microsoft Graph modules",
+          "command": "Get-MgAuditLogSignIn",
+          "acceptedCommands": [],
+          "caseSensitive": false,
+          "objectiveId": "command:get-mgauditlogsignin",
+          "difficulty": 3,
+          "subdomain": "powershell"
+        }
+      ],
+      "scenarios": [
+        {
+          "scenario": "A privileged user account shows unusual sign-ins from unexpected locations and recently activated elevated access.",
+          "bestAction": "Review sign-in logs, PIM activation history, Conditional Access results, and investigate correlated Sentinel alerts.",
+          "options": [
+            "Ignore the activity if the password still works",
+            "Review sign-in logs, PIM activation history, Conditional Access results, and investigate correlated Sentinel alerts",
+            "Disable all users in the tenant immediately without review",
+            "Reinstall Office on the admin workstation"
+          ],
+          "correctAnswer": "Review sign-in logs, PIM activation history, Conditional Access results, and investigate correlated Sentinel alerts",
+          "explanation": "This combines identity, privilege, and monitoring data for a proper investigation.",
+          "objectiveId": "azure-m365-301:scenarios:1",
+          "difficulty": 3,
+          "subdomain": "troubleshooting",
+          "hints": [
+            "Identify the scope of the failure and choose the least disruptive check supported by the evidence."
+          ]
+        },
+        {
+          "scenario": "Executives need access to sensitive Microsoft 365 resources only from approved devices and locations with auditable privileged access.",
+          "bestAction": "Use Conditional Access, compliant-device enforcement, RBAC, and PIM with logging and review.",
+          "options": [
+            "Grant permanent Global Admin to executives",
+            "Use Conditional Access, compliant-device enforcement, RBAC, and PIM with logging and review",
+            "Disable MFA to reduce friction",
+            "Allow unmanaged devices and rely only on passwords"
+          ],
+          "correctAnswer": "Use Conditional Access, compliant-device enforcement, RBAC, and PIM with logging and review",
+          "explanation": "This is the layered control approach appropriate for sensitive access.",
+          "objectiveId": "azure-m365-301:scenarios:2",
+          "difficulty": 3,
+          "subdomain": "troubleshooting",
+          "hints": [
+            "Identify the scope of the failure and choose the least disruptive check supported by the evidence."
+          ]
+        },
+        {
+          "objectiveId": "diagnose-policy-exclusion",
+          "scenario": "In this training tenant, a policy requires MFA for the pilot group. A pilot user signs in without an MFA prompt. The sign-in log shows the policy was not applied.",
+          "evidence": "The user is a pilot-group member and is also in a group explicitly excluded from the policy.",
+          "constraints": [
+            "Preserve access for unaffected users",
+            "Do not disable MFA globally"
+          ],
+          "options": [
+            "Review the exclusion membership and test the policy with the affected pilot user",
+            "Disable MFA globally and ask every user to change their password",
+            "Delete the pilot user and recreate the account before inspecting policy scope",
+            "Reinstall Office on every pilot device without checking policy exclusions"
+          ],
+          "correctAnswer": "Review the exclusion membership and test the policy with the affected pilot user",
+          "explanation": "The log indicates that the policy was not applied, and the supplied membership evidence identifies an exclusion. Review that targeted exclusion and test the affected user before changing unrelated controls.",
+          "difficulty": 4,
+          "subdomain": "conditional-access",
+          "hints": [
+            "Separate a policy that was not applied from an authentication challenge that failed."
+          ],
+          "bossEligible": true,
+          "isGoldenEligible": true
+        },
+        {
+          "objectiveId": "constrained-policy-rollout",
+          "scenario": "An exercise requires a new access rule to protect a pilot group while keeping a documented recovery account available. Choose a rollout that satisfies every stated constraint.",
+          "evidence": "Pilot sign-ins can be inspected before enforcement; the recovery account has separate monitoring.",
+          "constraints": [
+            "Validate the pilot impact before broad enforcement",
+            "Preserve the documented recovery path",
+            "Maintain monitoring for recovery-account activity"
+          ],
+          "options": [
+            "Validate the scoped pilot rule, retain the documented recovery exception, and monitor both paths before expanding",
+            "Enforce the rule for every account immediately and remove the recovery exception",
+            "Exclude all pilot users permanently and stop monitoring their sign-ins",
+            "Disable the access rule globally and rely only on password changes"
+          ],
+          "correctAnswer": "Validate the scoped pilot rule, retain the documented recovery exception, and monitor both paths before expanding",
+          "explanation": "The scoped pilot rollout satisfies all three exercise constraints: staged validation, a retained recovery path, and monitoring. The other plans respectively risk lockout, abandon pilot protection, or remove the required access control.",
+          "difficulty": 5,
+          "subdomain": "access-change-management",
+          "hints": [
+            "Check each option against all three constraints; satisfying only one is insufficient."
+          ],
+          "bossEligible": true,
+          "isGoldenEligible": true
+        }
+      ],
+      "logs": [
+        {
+          "log": "Alert: Impossible travel detected | User: admin@tenant | PIM role activated: Global Administrator | Conditional Access: MFA satisfied | Device: Unmanaged",
+          "question": "What is the biggest immediate concern?",
+          "answer": "Privileged access was used from an unmanaged device with suspicious sign-in activity",
+          "distractors": [
+            "The user changed their wallpaper",
+            "A Teams meeting was missed",
+            "The device battery is low"
+          ],
+          "objectiveId": "azure-m365-301:logs:1",
+          "difficulty": 3,
+          "subdomain": "troubleshooting",
+          "hints": [
+            "Identify the scope of the failure and choose the least disruptive check supported by the evidence."
+          ],
+          "explanation": "The finding 'Privileged access was used from an unmanaged device with suspicious sign-in activity' follows from the supplied log evidence. Resolve the recorded requirement before changing unrelated services."
+        },
+        {
+          "log": "Audit: App deployment failed | Intune assignment present | Detection rule mismatch | Install status: Failed",
+          "question": "What is the most likely cause of the failed deployment?",
+          "answer": "The detection rule is not matching the installed application state",
+          "distractors": [
+            "The assigned group is missing even though the log records an assignment",
+            "The application is waiting for assignment rather than failing detection",
+            "The device has not received the assignment rather than failing the detection test"
+          ],
+          "objectiveId": "azure-m365-301:logs:2",
+          "difficulty": 3,
+          "subdomain": "troubleshooting",
+          "hints": [
+            "Identify the scope of the failure and choose the least disruptive check supported by the evidence."
+          ],
+          "explanation": "The finding 'The detection rule is not matching the installed application state' follows from the supplied log evidence. Resolve the recorded requirement before changing unrelated services."
+        }
+      ],
+      "matching": [],
+      "distractors": [
+        "Disable audit trails for privileged actions",
+        "Use unmanaged personal devices for all admin work",
+        "Assign permanent unrestricted admin rights",
+        "Rely on passwords only for sensitive access"
+      ],
+      "schemaVersion": 2,
+      "industry": "Information Technology",
+      "careerPath": "Cloud Engineer",
+      "domainId": "azure",
+      "subdomain": "m365-administration",
+      "referenceMaterial": {
+        "originalBlock": {
+          "id": "azure-m365-301",
+          "title": "Azure M365 Advanced Operations and Compliance",
+          "setName": "Azure M365 Advanced",
+          "domain": "AZURE",
+          "track": "CLOUD",
+          "lane": "TEST_NOW",
+          "difficulty": 3,
+          "stage": 3,
+          "tags": [
+            "azure",
+            "m365",
+            "entra",
+            "intune",
+            "sentinel",
+            "compliance",
+            "advanced"
+          ],
+          "defaultXp": 20,
+          "defaultTimer": 40,
+          "facts": [
+            {
+              "statement": "A layered Azure security model commonly includes MFA, Conditional Access, RBAC, PIM, logging, and continuous monitoring",
+              "answer": "Layered identity and access security model",
+              "subject": "Azure Security Model",
+              "category": "security",
+              "distractors": [
+                "Single shared admin account",
+                "Only endpoint antivirus with no identity controls",
+                "Disabling sign-in logs to improve performance"
+              ],
+              "questionTypes": [
+                "multiple_choice",
+                "fill_blank",
+                "multi_select"
+              ]
+            },
+            {
+              "statement": "Compliance frameworks such as CMMC, NIST 800-171, and ISO 27001 influence access controls, auditing, and device security requirements",
+              "answer": "Compliance frameworks guide cloud security controls",
+              "subject": "Compliance",
+              "category": "compliance",
+              "distractors": [
+                "They replace the need for security policies",
+                "They only apply to printers",
+                "They eliminate the need for MFA"
+              ],
+              "questionTypes": [
+                "multiple_choice",
+                "fill_blank",
+                "true_false"
+              ]
+            },
+            {
+              "statement": "Sentinel can correlate events from multiple data sources to support threat detection and investigation",
+              "answer": "Correlate events for detection and investigation",
+              "subject": "Sentinel",
+              "category": "security",
+              "distractors": [
+                "Only stores desktop wallpapers",
+                "Only manages Azure costs",
+                "Only provisions Office licenses"
+              ],
+              "questionTypes": [
+                "multiple_choice",
+                "fill_blank"
+              ]
+            },
+            {
+              "statement": "PowerShell and automation reduce manual configuration drift and improve repeatability in cloud administration",
+              "answer": "Improve repeatability and reduce manual errors",
+              "subject": "Automation",
+              "category": "automation",
+              "distractors": [
+                "Increase manual effort",
+                "Disable logging",
+                "Replace all RBAC roles"
+              ],
+              "questionTypes": [
+                "multiple_choice",
+                "fill_blank",
+                "true_false"
+              ]
+            },
+            {
+              "statement": "Device compliance and identity controls work together to protect access to sensitive Microsoft 365 resources",
+              "answer": "Identity and device posture jointly control access",
+              "subject": "Zero Trust",
+              "category": "security",
+              "distractors": [
+                "Only password length matters",
+                "Only local admin rights matter",
+                "Only printer permissions matter"
+              ],
+              "questionTypes": [
+                "multiple_choice",
+                "fill_blank"
+              ]
+            }
+          ],
+          "definitions": [
+            {
+              "term": "Zero Trust",
+              "definition": "A security model that continuously verifies identity, device, and access conditions before granting access"
+            },
+            {
+              "term": "CMMC",
+              "definition": "Cybersecurity compliance framework used to assess and enforce security practices"
+            },
+            {
+              "term": "NIST 800-171",
+              "definition": "Security requirements for protecting controlled unclassified information in nonfederal systems"
+            },
+            {
+              "term": "ISO 27001",
+              "definition": "International standard for information security management systems"
+            },
+            {
+              "term": "Configuration Drift",
+              "definition": "Unintended changes that cause systems to differ from the desired configuration state"
+            }
+          ],
+          "procedures": [
+            {
+              "title": "Investigate suspicious tenant activity",
+              "steps": [
+                "Review sign-in logs and audit logs",
+                "Identify affected user, device, and application",
+                "Correlate alerts in Sentinel",
+                "Validate Conditional Access and MFA outcomes",
+                "Review privileged role use and PIM history",
+                "Contain and remediate affected accounts or devices",
+                "Document findings and control improvements"
+              ]
+            },
+            {
+              "title": "Harden Azure/M365 access for sensitive environments",
+              "steps": [
+                "Identify privileged roles and sensitive apps",
+                "Apply least privilege and RBAC",
+                "Convert standing admins to eligible PIM roles",
+                "Require MFA and strong authentication",
+                "Enforce Conditional Access with device and location controls",
+                "Enable logging, monitoring, and review processes",
+                "Validate compliance against required frameworks"
+              ]
+            }
+          ],
+          "commands": [
+            {
+              "platform": "powershell",
+              "purpose": "Review Azure sign-in related data via Microsoft Graph modules",
+              "command": "Get-MgAuditLogSignIn"
+            },
+            {
+              "platform": "powershell",
+              "purpose": "Review Intune compliance policy states",
+              "command": "Get-MgDeviceManagementManagedDevice"
+            }
+          ],
+          "scenarios": [
+            {
+              "scenario": "A privileged user account shows unusual sign-ins from unexpected locations and recently activated elevated access.",
+              "bestAction": "Review sign-in logs, PIM activation history, Conditional Access results, and investigate correlated Sentinel alerts.",
+              "options": [
+                "Ignore the activity if the password still works",
+                "Review sign-in logs, PIM activation history, Conditional Access results, and investigate correlated Sentinel alerts",
+                "Disable all users in the tenant immediately without review",
+                "Reinstall Office on the admin workstation"
+              ],
+              "correctAnswer": "Review sign-in logs, PIM activation history, Conditional Access results, and investigate correlated Sentinel alerts",
+              "explanation": "This combines identity, privilege, and monitoring data for a proper investigation."
+            },
+            {
+              "scenario": "Executives need access to sensitive Microsoft 365 resources only from approved devices and locations with auditable privileged access.",
+              "bestAction": "Use Conditional Access, compliant-device enforcement, RBAC, and PIM with logging and review.",
+              "options": [
+                "Grant permanent Global Admin to executives",
+                "Use Conditional Access, compliant-device enforcement, RBAC, and PIM with logging and review",
+                "Disable MFA to reduce friction",
+                "Allow unmanaged devices and rely only on passwords"
+              ],
+              "correctAnswer": "Use Conditional Access, compliant-device enforcement, RBAC, and PIM with logging and review",
+              "explanation": "This is the layered control approach appropriate for sensitive access."
+            }
+          ],
+          "logs": [
+            {
+              "log": "Alert: Impossible travel detected | User: admin@tenant | PIM role activated: Global Administrator | Conditional Access: MFA satisfied | Device: Unmanaged",
+              "question": "What is the biggest immediate concern?",
+              "answer": "Privileged access was used from an unmanaged device with suspicious sign-in activity",
+              "distractors": [
+                "The user changed their wallpaper",
+                "A Teams meeting was missed",
+                "The device battery is low"
+              ]
+            },
+            {
+              "log": "Audit: App deployment failed | Intune assignment present | Detection rule mismatch | Install status: Failed",
+              "question": "What is the most likely cause of the failed deployment?",
+              "answer": "The detection rule is not matching the installed application state",
+              "distractors": [
+                "The user needs a new monitor",
+                "MFA was disabled",
+                "Azure region capacity is full"
+              ]
+            }
+          ],
+          "matching": [
+            {
+              "prompt": "Match the control or framework to its role",
+              "pairs": [
+                {
+                  "left": "Conditional Access",
+                  "right": "Enforce sign-in requirements based on context"
+                },
+                {
+                  "left": "PIM",
+                  "right": "Provide just-in-time privileged role activation"
+                },
+                {
+                  "left": "Sentinel",
+                  "right": "Correlate and investigate security events"
+                },
+                {
+                  "left": "CMMC",
+                  "right": "Compliance framework influencing security controls"
+                },
+                {
+                  "left": "Intune Compliance",
+                  "right": "Validate whether devices meet required posture"
+                }
+              ]
+            }
+          ],
+          "distractors": [
+            "Disable audit trails for privileged actions",
+            "Use unmanaged personal devices for all admin work",
+            "Assign permanent unrestricted admin rights",
+            "Rely on passwords only for sensitive access"
+          ]
+        },
+        "note": "Preserved source reference. Repeated recall concepts, unsupported matching, and unverified command aliases are not regenerated as extra questions."
+      }
+    }
+  ]
+}
