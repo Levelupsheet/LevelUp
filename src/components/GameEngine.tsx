@@ -99,7 +99,10 @@ export default function GameEngine(props: Props) {
     if (mapped.length) {
       setQuestions(mapped);
       setSessionId(String(json?.session?.id || ""));
-      setInitialState(json?.session?.state || null);
+      // A newly allocated run must always begin from pristine combat state.
+      // The server state contains learning metadata (focus/blueprint) as well as
+      // combat state, so only hydrate combat progress when resume was requested.
+      setInitialState(null);
       setLearningMastery(json?.learning?.masteryByDomain || {});
       const focus = String(json?.session?.state?.focusDomain || "").replace(/_/g, " ");
       setSetLabel(trainingMode === "WEAK_DOMAIN" ? `${title} · Weak Domain${focus ? `: ${focus}` : ""}` : trainingMode === "MISSED_QUESTIONS" ? `${title} · Missed Question Review` : `${title} · Active Session`);
