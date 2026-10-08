@@ -1494,7 +1494,7 @@ const showExpandedExplanation = useMemo(() => {
               <div className="mobileEnemyHud">
                 <div className="mobileEnemyHealth">
                   <div className="mobileEnemyOrbClone" aria-label={`${currentStageEnemyName} health ${stageEnemyHP} of ${currentStageConfig.hp}`}>
-                    <img className="mobileEnemyOrbFrame" src="/ui/grimdark/flow_main_panel_player.png" alt="" aria-hidden="true" />
+                    <img className="mobileEnemyOrbFrame" src="/ui/grimdark/flow_main_panel_enemy.png" alt="" aria-hidden="true" />
                     <div className="mobileEnemyOrbEnergy" aria-hidden="true">
                       <img className="mobileEnemyOrbEnergyBase" src="/ui/grimdark/flow_energy_ball_001.png" alt="" />
                       <div className="mobileEnemyOrbEnergyMask" style={{ clipPath: `inset(${100 - Math.max(0, Math.min(100, (stageEnemyHP / Math.max(1, currentStageConfig.hp)) * 100))}% 0 0 0)` }}>
@@ -1506,7 +1506,7 @@ const showExpandedExplanation = useMemo(() => {
                       {Math.max(0, Math.min(100, (stageEnemyHP / Math.max(1, currentStageConfig.hp)) * 100)).toFixed(0)}%
                     </div>
                   </div>
-                  <div className="mobileEnemyName">{currentStageEnemyName.toUpperCase().slice(0, 18)}</div>
+                  
                 </div>
                 <div className="mobileEnemyPortrait">
                   <ModelPanel title="" src={enemyVideo} loop={!isEnemyHitVideo} onEnded={isEnemyHitVideo ? () => setHitPulse(null) : undefined} height={92} damageText={damageFloat.enemy || null} damageTone="enemy" />
@@ -1514,10 +1514,10 @@ const showExpandedExplanation = useMemo(() => {
               </div>
             </div>
 
-            <div className="mobileQuizTopMeta">
-              <div className="mobileQuizProgress">Q{Math.min(state.idx + 1, combatQuestions.length)} / {combatQuestions.length}</div>
+            <div className="mobileQuizTopMeta" style={{ position: "sticky", top: "env(safe-area-inset-top, 0px)", zIndex: 60, background: "#100d0b", border: "1px solid #77502e", borderRadius: 4, padding: "8px 10px" }}>
+              <div className="mobileQuizProgress">Q{Math.min(state.idx + 1, combatQuestions.length)} / {combatQuestions.length}</div><span className="mobileEnemyName" style={{ flex: "1 1 auto", textAlign: "center", fontSize: 12, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{currentStageEnemyName.toUpperCase().slice(0, 18)}</span>
               <div className="mobileQuizBadges">
-                {timed ? <span className="badge" style={{ fontVariantNumeric: "tabular-nums" }}>⏱ {Math.max(0, state.timeLeft)}s</span> : null}
+                {timed ? <span className={`badge quizCountdownTimer ${state.timeLeft <= 5 ? "critical" : state.timeLeft <= 10 ? "warning" : "safe"}`} style={{ fontVariantNumeric: "tabular-nums", flexShrink: 0, whiteSpace: "nowrap" }} role="timer" aria-label={`${Math.max(0, state.timeLeft)} seconds remaining`}>⏱ {state.timeLeft <= 0 ? "TIME’S UP" : `${Math.max(0, state.timeLeft)}s`}</span> : null}
                 <span className="badge">XP +{displayedXp}</span>
                 <span className="badge">Streak {streak}</span>
               </div>
