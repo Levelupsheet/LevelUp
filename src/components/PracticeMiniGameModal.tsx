@@ -1,5 +1,6 @@
 "use client";
 
+import { useDialogFocus } from "@/lib/useDialogFocus";
 import React, { useEffect, useState } from "react";
 import GameEngine from "@/components/GameEngine";
 import type { DiabloQuestion, DiabloQuizRunSummary } from "@/components/DiabloQuizRunner";
@@ -70,6 +71,8 @@ export default function PracticeMiniGameModal(props: {
     setRunNonce((value) => value + 1);
     onClose();
   }
+
+  const dialogRef = useDialogFocus(open, () => { void exitRun(); });
 
   useEffect(() => {
     if (!open) return;
@@ -197,7 +200,7 @@ export default function PracticeMiniGameModal(props: {
 
   return (
     <div className={`luModalOverlay practiceGameOverlay practiceGameOverlay--${kind}`} onMouseDown={() => void exitRun()}>
-      <div className={`luModal practiceGameModal practiceGameModal--${step}`} role="dialog" aria-modal="true" aria-label={title} onMouseDown={(e) => e.stopPropagation()} style={{ width: (step === "quiz" || step === "boss") ? "min(96vw, 1800px)" : "min(92vw, 980px)", maxWidth: (step === "quiz" || step === "boss") ? 1800 : 980 }}>
+      <div className={`luModal practiceGameModal practiceGameModal--${step}`} ref={dialogRef} tabIndex={-1} role="dialog" aria-modal="true" aria-label={title} onMouseDown={(e) => e.stopPropagation()} style={{ width: (step === "quiz" || step === "boss") ? "min(96vw, 1800px)" : "min(92vw, 980px)", maxWidth: (step === "quiz" || step === "boss") ? 1800 : 980 }}>
         <div className="luVideoBg" aria-hidden="true">
           <video className="luVideoEl" autoPlay loop muted playsInline preload="metadata"><source src="/video/blackhole-loop.mp4" type="video/mp4" /></video>
           <div className="luVideoVignette" />

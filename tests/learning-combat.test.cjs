@@ -132,13 +132,13 @@ test('enemy inventory is finite, independent, and Ticket Gremlin cannot gain low
   assert.equal(profile.inventory.shield, 1, 'consumption does not mutate configured loadout');
 });
 
-test('separate maximum HP and stage changes preserve player damage without regenerating dead same-tier enemies', async () => {
+test('separate maximum HP and stage changes preserve player damage while loading the next opponent', async () => {
   const combat = await mountCombat({ questions: [question(1,'one'),question(1,'two'),question(2,'three')], finishOnEnemyDefeat: false,
     rules: { playerMaxHP: 80 }, getEnemyProfile: q => createEnemyProfile('Enemy', q.level, q.level * 60),
     getEnemyDamageDealt: () => 1000 });
   assert.equal(combat.value.state.playerHP,80); assert.equal(combat.value.state.enemyHP,60);
   await combat.run(c => c.select(0)); await combat.run(c => c.submit()); await combat.run(c => c.next());
-  assert.equal(combat.value.state.enemyHP,0);
+  assert.equal(combat.value.state.enemyHP,60, "defeated opponent is replaced for the next question");
   await combat.run(c => c.select(1)); await combat.run(c => c.submit()); await combat.run(c => c.next());
   assert.equal(combat.value.state.enemyHP,120); assert.equal(combat.value.state.playerHP,72);
   await combat.close();

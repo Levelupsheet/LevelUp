@@ -52,14 +52,14 @@ export default function PayPalSuccessClient({ orderId = '', subscriptionId = '' 
   }, [orderId, subscriptionId, router]);
 
   return (
-    <main style={{ minHeight: '100vh', display: 'grid', placeItems: 'center', background: '#050914', color: '#fff', padding: 24 }}>
-      <div style={{ width: 'min(560px, 100%)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 24, padding: 24, background: 'rgba(9,14,28,0.92)' }}>
+    <main className="paidAssetPage billingResultPage" style={{ minHeight: '100vh', display: 'grid', placeItems: 'center', background: '#050914', color: '#fff', padding: 24 }}>
+      <div className="card paidAssetHero" style={{ width: 'min(560px, 100%)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 24, padding: 24, background: 'rgba(9,14,28,0.92)' }}>
         <h1 style={{ margin: 0, fontSize: 28 }}>PayPal checkout</h1>
         <p style={{ opacity: 0.86, marginTop: 12 }}>{message}</p>
         {status === 'loading' ? <div style={{ opacity: 0.72 }}>Please wait…</div> : null}
-        <div style={{ display: 'flex', gap: 10, marginTop: 18 }}>
-          <button onClick={() => router.replace('/dashboard')} style={{ padding: '10px 16px', borderRadius: 12, border: '1px solid rgba(255,255,255,0.16)', background: 'transparent', color: '#fff' }}>Go to dashboard</button>
-          <button onClick={() => router.replace('/start#pricing')} style={{ padding: '10px 16px', borderRadius: 12, border: '1px solid rgba(255,255,255,0.16)', background: 'transparent', color: '#fff' }}>Back to pricing</button>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginTop: 18 }}>
+          <button className="secondaryBtn gdActionBlue" onClick={() => router.replace('/dashboard')} style={{ padding: '10px 16px', borderRadius: 12, border: '1px solid rgba(255,255,255,0.16)', background: 'transparent', color: '#fff' }}>Go to dashboard</button>
+          <button className="secondaryBtn gdActionBlue" onClick={() => router.replace('/start#pricing')} style={{ padding: '10px 16px', borderRadius: 12, border: '1px solid rgba(255,255,255,0.16)', background: 'transparent', color: '#fff' }}>Back to pricing</button>
         </div>
       </div>
     </main>

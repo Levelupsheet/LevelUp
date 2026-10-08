@@ -8,7 +8,7 @@ export default function ProDevelopmentPage() {
           <p>Connect formal education, certifications, and LevelUp practice to the role you want next.</p>
           <div className="careerPathActions">
             <a className="btn gold" href="/training">Continue training</a>
-            <a className="secondaryBtn gdActionBlue" href="/admin/insights">Open Insights</a>
+            <a className="secondaryBtn gdActionBlue" href="/insights">Open Insights</a>
             <a className="secondaryBtn gdActionBlue" href="/dashboard">Dashboard</a>
           </div>
         </section>

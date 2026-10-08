@@ -30,16 +30,16 @@ export default async function PublicProfilePage({ params }: Props) {
     : [];
 
   return (
-    <main className="page">
+    <main className="page paidAssetPage publicProfilePage">
       <div
         className="container"
         style={{ maxWidth: 960, paddingTop: 24, paddingBottom: 32 }}
       >
-        <a className="secondaryBtn" href="/leaderboard">
+        <a className="secondaryBtn gdActionBlue" href="/leaderboard">
           ← Back to leaderboard
         </a>
 
-        <div className="card" style={{ marginTop: 14, padding: 18 }}>
+        <div className="card paidAssetHero" style={{ marginTop: 14, padding: 18 }}>
           <div
             style={{
               display: "flex",

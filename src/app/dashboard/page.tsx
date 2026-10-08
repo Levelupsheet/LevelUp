@@ -1,5 +1,6 @@
 "use client";
 
+import { useDialogFocus } from "@/lib/useDialogFocus";
 import { useEffect, useMemo, useRef, useState } from "react";
 import ProgressBar from "@/components/ProgressBar";
 import MerchModal from "@/components/MerchModal";
@@ -235,6 +236,8 @@ export default function Dashboard() {
   const [stage10Leaderboards, setStage10Leaderboards] = useState<Stage10Leaderboards | null>(null);
   const [leaderboardOpen, setLeaderboardOpen] = useState(false);
   const [selectedLeaderboardPlayer, setSelectedLeaderboardPlayer] = useState<Stage10LeaderboardRow | null>(null);
+  const leaderboardDialogRef = useDialogFocus(leaderboardOpen && !selectedLeaderboardPlayer, () => setLeaderboardOpen(false));
+  const playerStatsDialogRef = useDialogFocus(Boolean(selectedLeaderboardPlayer), () => setSelectedLeaderboardPlayer(null));
   const [selectedPlayerStats, setSelectedPlayerStats] = useState<PlayerProfileStats | null>(null);
   const [playerStatsLoading, setPlayerStatsLoading] = useState(false);
 
@@ -934,11 +937,11 @@ async function analyzeResumeStage12() {
         }}
       />
 
-      {leaderboardOpen ? <div className="modalBackdrop" onMouseDown={() => setLeaderboardOpen(false)}><div className="card dashboardLeaderboardModal" onMouseDown={(e) => e.stopPropagation()}>
+      {leaderboardOpen ? <div className="modalBackdrop" onMouseDown={() => setLeaderboardOpen(false)}><div className="card dashboardLeaderboardModal" ref={leaderboardDialogRef} tabIndex={-1} role="dialog" aria-modal="true" aria-label="Leaderboard" onMouseDown={(e) => e.stopPropagation()}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:12}}><div><div className="dashboardUtilityEyebrow">WEEKLY COMPETITION</div><h2 style={{margin:"2px 0"}}>Leaderboard</h2><small>XP earned from completed sessions in the last 7 days.</small></div><button className="secondaryBtn gdActionRed" type="button" onClick={() => setLeaderboardOpen(false)}>CLOSE</button></div>
         <div style={{display:"grid",gap:10,marginTop:16}}>{(stage10Leaderboards?.weekly || []).slice(0,20).map((row,idx)=><button key={`modal_lb_${row.userId}`} type="button" onClick={()=>openPlayerStats(row)} className="leaderboardMiniRow dashboardLeaderboardPlayer dashboardLeaderboardModalRow" style={{...(leaderboardTone(idx) as any),color:"inherit",textAlign:"left"}}><span className="badge leaderboardMiniRank">{idx+1}</span><span className="dashboardLeaderboardIdentity"><b>{row.displayName}</b><small>{row.rank || levelTitleFromLevel(Number(row.level || 1))} • Lvl {row.level || 1}</small></span><b>{row.xp || 0} XP</b></button>)}</div>
       </div></div> : null}
-      {selectedLeaderboardPlayer ? <div className="modalBackdrop" onMouseDown={() => setSelectedLeaderboardPlayer(null)}><div className="card dashboardPlayerStatsModal" onMouseDown={(e)=>e.stopPropagation()}>
+      {selectedLeaderboardPlayer ? <div className="modalBackdrop" onMouseDown={() => setSelectedLeaderboardPlayer(null)}><div className="card dashboardPlayerStatsModal" ref={playerStatsDialogRef} tabIndex={-1} role="dialog" aria-modal="true" aria-label="Player statistics" onMouseDown={(e)=>e.stopPropagation()}>
         <div style={{display:"flex",justifyContent:"space-between",gap:12,alignItems:"center"}}><div><div className="dashboardUtilityEyebrow">PLAYER PROFILE</div><h2 style={{margin:"2px 0"}}>{selectedLeaderboardPlayer.displayName}</h2></div><button className="secondaryBtn gdActionRed" type="button" onClick={()=>setSelectedLeaderboardPlayer(null)}>CLOSE</button></div>
         <div className="playerStatsHero"><div><small>RANK</small><b>{selectedLeaderboardPlayer.rank || levelTitleFromLevel(Number(selectedLeaderboardPlayer.level || 1))}</b></div><div><small>LEVEL</small><b>{selectedLeaderboardPlayer.level || 1}</b></div><div><small>WEEKLY XP</small><b>{selectedLeaderboardPlayer.xp || 0}</b></div><div><small>BOSS WINS</small><b>{stage10Leaderboards?.bossWins?.find(x=>x.userId===selectedLeaderboardPlayer.userId)?.wins || 0}</b></div></div>
         {playerStatsLoading ? <div className="playerStatsDetail"><b>Loading performance…</b></div> : selectedPlayerStats?.performance ? <>
@@ -1251,14 +1254,14 @@ async function analyzeResumeStage12() {
   </div>
   <div style={{ marginTop: 12, display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 10 }}>
     <div className="featureCard">
-      <div><small>Daily streak</small></div>
+      <div><small>Reward claim streak</small></div>
       <div style={{ fontWeight: 900, fontSize: 22 }}>{dailyStreak.streakDays} day{dailyStreak.streakDays === 1 ? "" : "s"}</div>
     </div>
     <div className="featureCard">
       <div><small>Learning progress</small></div>
       <div style={{ fontWeight: 900, fontSize: 20 }}>{learningProgress?.weakestDomain || "Building profile"}</div>
-      <div style={{ marginTop: 4 }}><small>{Number(learningProgress?.questionsToMaster || 0)} questions to master • {Number(learningProgress?.weakestDomainMastery || 0).toFixed(1)}% weakest-domain mastery</small></div>
-      <div style={{ marginTop: 8 }}><a href="/admin/insights" style={{ color: "inherit", textDecoration: "none", fontWeight: 800 }}>Open learning insights →</a></div>
+      <div style={{ marginTop: 4 }}><small>{learningProgress ? `${learningProgress.questionsToMaster || 0} questions to reinforce${learningProgress.weakestDomain ? ` • ${Number(learningProgress.weakestDomainMastery || 0).toFixed(1)}% weakest-domain mastery` : " • Build a baseline through practice"}` : "Learning history unavailable or loading"}</small></div>
+      <div style={{ marginTop: 8 }}><a href="/insights" style={{ color: "inherit", textDecoration: "none", fontWeight: 800 }}>Open learning insights →</a></div>
     </div>
   </div>
   <div style={{ marginTop: 10, opacity: 0.86 }}><small>Your adaptive profile updates as you train, review missed questions, and strengthen weak domains.</small></div>

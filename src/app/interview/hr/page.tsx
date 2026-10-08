@@ -83,8 +83,8 @@ export default function HRInterviewPage() {
     <>
       <div className="bgPattern" />
       <div className="heroBlur" />
-    <main className="interviewPage"><div className="interviewWorkspace">
-      <section className="card interviewMain">
+    <main className="interviewPage paidAssetPage"><div className="interviewWorkspace">
+      <section className="card interviewMain paidAssetHero">
         <div className="dashboardEyebrow">INTERVIEW READINESS</div>
         <h1>HR Battle</h1>
         <p className="interviewIntro">Practice a structured hiring-manager screen. Use clear examples and the STAR method when it fits.</p>
@@ -112,7 +112,7 @@ export default function HRInterviewPage() {
         )}
       </section>
 
-      <aside className="card interviewLog">
+      <aside className="card interviewLog paidAssetPanel">
         <h3 style={{ marginTop: 0 }}>Session log</h3>
         {log.length ? log.map((x, i) => <p key={i} style={{ margin: "6px 0" }}><small>{x}</small></p>) : <p><small>No session yet.</small></p>}
       </aside>
