@@ -12283,3 +12283,22 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,te
     max-height:92%!important;
   }
 }
+
+
+/* 2026-10-08 Career Training regression repair.
+   The dedicated training route owns the full combat viewport; do not constrain
+   the 1600px game shell with the generic 1280px content container. */
+.positionTrainingAssetPage .positionTrainingGameContainer{
+  width:100%!important;
+  max-width:none!important;
+  margin:0 auto!important;
+  padding-left:0!important;
+  padding-right:0!important;
+  display:flex!important;
+  justify-content:center!important;
+  align-items:flex-start!important;
+}
+.positionTrainingAssetPage .positionTrainingGameContainer > .d2QuizShell{
+  margin-left:auto!important;
+  margin-right:auto!important;
+}
