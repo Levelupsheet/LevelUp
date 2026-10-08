@@ -957,7 +957,7 @@ async function analyzeResumeStage12() {
       </div></div> : null}
 
       {careerPickerOpen && (
-        <div className="luModalBackdrop" onMouseDown={() => setCareerPickerOpen(false)}>
+        <div className="luModalOverlay careerPickerOverlay" onMouseDown={() => setCareerPickerOpen(false)}>
           <div className="luModal" role="dialog" aria-modal="true" aria-label="Choose career path" onMouseDown={(e) => e.stopPropagation()}>
             <div className="luModalHeader" style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
               <div><b style={{ fontSize:18 }}>Choose Your Career Path</b><div><small className="luHint">Only paths with published training pools appear here.</small></div></div>
