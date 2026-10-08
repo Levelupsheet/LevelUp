@@ -1,4 +1,5 @@
 import { GAME_CONFIG } from "@/engine/constants/gameConfig";
+import { getMicroReward } from "@/engine/stage8/RetentionSystem";
 import { createEnemyProfile, nextEnemyAbility, consumeEnemyAbility, incomingEnemyDamage, outgoingEnemyDamage, combatDamageScale } from "@/engine/systems/EnemyAbilities";
 
 /** Replay immutable server-graded answers and durable item uses, never client HP/XP/outcome. */
@@ -7,6 +8,7 @@ export function settleCombat(session: any, itemUses: any[]) {
   const rows = [...(session.questions || [])].sort((a,b) => a.orderIndex - b.orderIndex);
   let playerHP = 100, enemyHP = 0, tier = 0, correctCount = 0, xpEarned = 0, bestStreak = 0, streak = 0, answeredCount = 0;
   let enemy = createEnemyProfile("Enemy", 1, 90);
+  let momentumBoost = 0;
   for (const row of rows) {
     if (!row.answered || playerHP <= 0 || (boss && enemyHP <= 0 && answeredCount > 0)) break;
     const q = row.payloadJson || {};
@@ -24,9 +26,12 @@ export function settleCombat(session: any, itemUses: any[]) {
       correctCount++; streak++; bestStreak = Math.max(bestStreak,streak);
       const base = boss ? boss.rules.enemyDamageByTier[level] : Math.ceil(enemy.maxHP / 3);
       enemyHP = Math.max(0,enemyHP - outgoingEnemyDamage(base,used("fury_charge"),ability === "shield" || Boolean(q.data?.blockNextCorrect)));
-      xpEarned += Math.round((boss ? boss.rules.xpByTier[level] : GAME_CONFIG.xpByTier[level]) * (used("xp_surge") ? 1.5 : 1));
+      xpEarned += Math.round((boss ? boss.rules.xpByTier[level] : GAME_CONFIG.xpByTier[level]) * (used("xp_surge") ? 1.5 : 1) * (used("fury_charge") ? 1.5 : 1) * (momentumBoost > 0 ? 1.25 : 1))
+        + (getMicroReward({streak,questionIndex:answeredCount,totalQuestions:rows.length,correct:true})?.xp || 0);
+      momentumBoost = streak % 3 === 0 ? 3 : Math.max(0,momentumBoost - 1);
     } else {
       streak = 0;
+      momentumBoost = Math.max(0,momentumBoost - 1);
       const base = boss ? boss.rules.playerDamageByTier[level] : GAME_CONFIG.playerDamageByTier[tier as 1|2|3|4|5];
       playerHP = Math.max(0,playerHP - incomingEnemyDamage(base,used("shield_charge"),combatDamageScale(level,tier) * Number(q.data?.playerDamageMultiplier || 1) * (ability === "fury" ? 1.5 : 1)));
       if (ability === "restore" && enemyHP > 0) enemyHP = Math.min(enemy.maxHP,enemyHP + Math.ceil(enemy.maxHP * .1));

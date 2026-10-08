@@ -72,6 +72,8 @@ model User {
   authProvider     AuthProvider      @default(LOCAL)
   authProviderId   String?           @unique
   startingPosition StartingPosition?
+  selectedIndustry String?
+  selectedCareerPath String?
   moduleChoice     ModuleChoice?
   xp               Int               @default(0)
   lootGrantedUpToLevel Int           @default(0)

@@ -56,7 +56,8 @@ export async function POST(req: Request) {
       if (!facts.finished) throw new Error("Session is not finished");
       const { correctCount, totalQuestions, outcome, bestStreak } = facts;
       const encounterType = facts.boss ? "boss" : "standard";
-      const xpEarned = facts.xpEarned + (facts.boss && outcome === "victory" ? BOSS_BONUS_XP : 0);
+      const hintPenalty = Math.min(facts.xpEarned,Math.max(0,Math.floor(Number(body.hintXpSpent) || 0)));
+      const xpEarned = facts.xpEarned - hintPenalty + (facts.boss && outcome === "victory" ? BOSS_BONUS_XP : 0);
       const masteryByDomain = {}; // Learning mastery is derived from answer history, not client gauges.
       const questionDomains = saved.questions.filter((q: any) => q.answered).map((q: any) => ({ domainId: q.payloadJson?.domainId, level: q.payloadJson?.level }));
       await tx.rewardClaim.create({ data: { userId, claimKey, kind: "GAME_SESSION", meta: { xpEarned, correctCount, totalQuestions, outcome, encounterType, bestStreak } } });

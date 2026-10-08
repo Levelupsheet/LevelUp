@@ -4,6 +4,8 @@ import { readCareerMatches } from "@/lib/careerMatches";
 export async function GET(req: Request) {
   const url = new URL(req.url);
   const level = Math.max(1, Number(url.searchParams.get("level") || 1));
+  const industry = url.searchParams.get("industry");
+  const careerPath = url.searchParams.get("careerPath");
   const domains = (url.searchParams.get("domains") || "")
     .split(",")
     .map((v) => v.trim().toUpperCase())
@@ -17,6 +19,8 @@ export async function GET(req: Request) {
 
   const filtered = rows
     .filter((row) => row.isActive !== false)
+    .filter(row => !industry || row.industry === industry)
+    .filter(row => !careerPath || !row.careerPath || row.careerPath === careerPath)
     .filter((row) => level >= row.minLevel)
     .filter((row) => domains.includes(String(row.domain).toUpperCase()))
     .filter((row) => {

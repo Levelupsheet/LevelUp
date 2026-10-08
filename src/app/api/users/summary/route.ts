@@ -92,6 +92,8 @@ export async function GET(req: Request) {
         rank: (user as any).rank ?? "STUDENT",
         drawingEligibleUntil: (user as any).drawingEligibleUntil ?? null,
         startingPosition: user.startingPosition,
+        selectedIndustry: user.selectedIndustry,
+        selectedCareerPath: user.selectedCareerPath,
         moduleChoice: user.moduleChoice,
         subscriptionTier,
         subscriptionStatus,

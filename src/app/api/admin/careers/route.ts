@@ -6,6 +6,7 @@ const STARTERS = [
   ["Information Technology","Help Desk"],["Information Technology","Desktop Technician"],["Information Technology","Cloud Engineer"],
   ["Healthcare","CNA"],["Healthcare","LPN"],["Healthcare","RN"],
   ["Transportation","CDL Driver"],
+  ["Industrial/Skilled Trades","Electrician"],["Industrial/Skilled Trades","HVAC Technician"],["Industrial/Skilled Trades","Industrial Maintenance Technician"],
   ["Sales","Sales Representative"],["Sales","Account Executive"],["Sales","SDR / BDR"],["Sales","Sales Manager"],
   ["Software Development","Front-End Developer"],["Software Development","Back-End Developer"],["Software Development","Full-Stack Developer"],["Software Development","Software Engineer"],
   ["Real Estate","Real Estate Agent"],["Real Estate","Real Estate Broker"],["Real Estate","Property Manager"],["Real Estate","Leasing Agent"],
@@ -20,7 +21,7 @@ export async function POST(req: Request) {
   const body = await req.json();
   const industry = String(body?.industry || "").trim();
   const careerPath = String(body?.careerPath || "").trim();
-  if (!industry || !careerPath) return NextResponse.json({error:"Industry and career path are required."},{status:400});
+  if (!industry || !careerPath || industry.length > 160 || careerPath.length > 160) return NextResponse.json({error:"Industry and career path are required (maximum 160 characters each)."},{status:400});
   const row = await prisma.careerCatalog.upsert({
     where:{ industry_careerPath:{industry,careerPath} },
     update:{isActive:true},

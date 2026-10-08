@@ -248,7 +248,7 @@ export default function Home() {
           <div className="brandMark brandMark--logo"><img src="/levelup-pro-icon.png" alt="LevelUp Pro" className="brandMarkImg" /></div>
           <div className="brandText">
             <b>LevelUp Pro</b>
-            <small>Gamified IT training</small>
+            <small>Gamified career training</small>
           </div>
         </div>
 
@@ -327,7 +327,7 @@ export default function Home() {
         <div className="heroContent">
           <div data-reveal data-delay="0">
             <div className="heroGlowWrap">
-              <h1 className="heroH1">Level up your IT career — EARN while you LEARN!</h1>
+              <h1 className="heroH1">Level up your career — EARN while you LEARN!</h1>
             </div>
             <p className="heroP">
               Earn real experience (XP) through real-world scenario challenges, unlock interview simulations, and master
@@ -481,7 +481,7 @@ export default function Home() {
           <div className="featureCard" data-reveal data-delay="0">
             <b>1) Choose your path</b>
             <p className="muted" style={{ margin: "8px 0 0 0" }}>
-              Helpdesk Support → Desktop Technician → Cloud Engineer. Your plan adapts as you improve.
+              Choose an industry, build career skills, and master tougher challenges. Your plan adapts as you improve.
             </p>
           </div>
           <div className="featureCard" data-reveal data-delay="90">
@@ -507,7 +507,7 @@ export default function Home() {
           <div className="featureCard" data-reveal data-delay="90"><b>Certification prep</b><p className="muted" style={{ marginTop: 8 }}>Practice tests for A+, Security+, and AZ-900.</p></div>
           <div className="featureCard" data-reveal data-delay="180"><b>Career outlook</b><p className="muted" style={{ marginTop: 8 }}>See next roles, salary ranges, and recommended certs.</p></div>
           <div className="featureCard" data-reveal data-delay="270"><b>XP + levels</b><p className="muted" style={{ marginTop: 8 }}>Progress you can feel: XP bars, ranks, and badges.</p></div>
-          <div className="featureCard" data-reveal data-delay="360"><b>Personalized path</b><p className="muted" style={{ marginTop: 8 }}>Start where you are, and grow into Desktop and Cloud.</p></div>
+          <div className="featureCard" data-reveal data-delay="360"><b>Personalized path</b><p className="muted" style={{ marginTop: 8 }}>Start where you are, and grow within your chosen career.</p></div>
           <div className="featureCard" data-reveal data-delay="450"><b>Offer PDFs</b><p className="muted" style={{ marginTop: 8 }}>Generate downloadable mock offer letters (Premium).</p></div>
         </div>
       </section>
@@ -522,7 +522,7 @@ export default function Home() {
             <div className="priceTag">$0</div>
             <div className="muted">For getting started</div>
             <ul style={{ marginTop: 12 }}>
-              <li>Basic IT Support question bank</li>
+              <li>Published career question pools</li>
               <li>XP tracking</li>
               <li>Career path preview</li>
               <li>Limited interview practice</li>
@@ -671,7 +671,7 @@ export default function Home() {
 
       <section id="about" className="section" data-reveal data-delay="0">
         <h2 className="sectionTitle">About Us</h2>
-        <p className="sectionSub">LevelUp Pro is built to turn IT training into measurable progress — skills, proof, and real outcomes.</p>
+        <p className="sectionSub">LevelUp Pro is built to turn career training into measurable progress — skills, proof, and real outcomes.</p>
 
         <div className="grid3" style={{ marginTop: 12 }}>
           <button className={aboutOpen === "company" ? "featureCard aboutCard selected" : "featureCard aboutCard"} type="button" onClick={() => setAboutOpen((v) => (v === "company" ? null : "company"))}>
@@ -693,7 +693,7 @@ export default function Home() {
             {aboutOpen === "company" && (
               <div>
                 <b>Our mission</b>
-                <p className="muted" style={{ marginTop: 8 }}>Make IT career growth feel like a game — but with real hiring outcomes. Build skills, earn proof, and show recruiters you can deliver.</p>
+                <p className="muted" style={{ marginTop: 8 }}>Make career growth feel like a game. Build skills, earn proof, and show recruiters what you have learned.</p>
               </div>
             )}
             {aboutOpen === "product" && (
@@ -721,7 +721,7 @@ export default function Home() {
         <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
           <div>
             <b>LevelUp Pro</b>
-            <div className="muted" style={{ fontSize: 13, marginTop: 4 }}>Gamified IT training platform • 2026</div>
+            <div className="muted" style={{ fontSize: 13, marginTop: 4 }}>Gamified career training platform • 2026</div>
           </div>
           <div className="muted" style={{ fontSize: 13 }}>
             © {new Date().getFullYear()} LevelUp Pro • <span style={{ opacity: 0.85 }}>All rights reserved</span>

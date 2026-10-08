@@ -70,9 +70,9 @@ function getFreeSessionCooldownKey(userId: string | null) {
 }
 
 function labelPos(p: string){
-  if (p === "HELPDESK_SUPPORT") return "Help Desk Wizard";
-  if (p === "DESKTOP_TECHNICIAN") return "Desktop Barbarian";
-  if (p === "CLOUD_ENGINEER") return "Cloud Assassin";
+  if (p === "HELPDESK_SUPPORT") return "Wizard";
+  if (p === "DESKTOP_TECHNICIAN") return "Barbarian";
+  if (p === "CLOUD_ENGINEER") return "Assassin";
   return p;
 }
 
@@ -169,6 +169,10 @@ export default function Dashboard() {
   const [careerPaths, setCareerPaths] = useState<Array<{ industry: string; careerPath: string; poolCount: number }>>([]);
   const [selectedCareer, setSelectedCareer] = useState<{ industry: string; careerPath: string } | null>(null);
   const [careerPickerOpen, setCareerPickerOpen] = useState(false);
+  const [careerSaveError, setCareerSaveError] = useState<string | null>(null);
+  const [careerSaving, setCareerSaving] = useState(false);
+  const [careerDraft, setCareerDraft] = useState<{industry:string;careerPath:string} | null>(null);
+  useEffect(() => {if(careerPickerOpen){setCareerDraft(selectedCareer);setCareerSaveError(null);}},[careerPickerOpen]);
 
   const [notes, setNotes] = useState<Notification[]>([]);
   const [tokenBalance, setTokenBalance] = useState<number>(0);
@@ -189,20 +193,30 @@ export default function Dashboard() {
   const [subscriptionTier, setSubscriptionTier] = useState<string>("FREE");
 
   useEffect(() => {
-    fetch("/api/career-paths", { cache: "no-store" as any })
-      .then((r) => r.json())
-      .then((json) => {
+    Promise.all([fetch("/api/career-paths", { cache: "no-store" as any }).then(r=>r.json()),fetch("/api/users/career",{cache:"no-store" as any}).then(r=>r.json())])
+      .then(([json, preference]) => {
         const paths = Array.isArray(json?.paths) ? json.paths : [];
         setCareerPaths(paths);
         try {
           const raw = localStorage.getItem("lu_selected_career_path_v1");
-          const saved = raw ? JSON.parse(raw) : null;
-          if (saved?.careerPath && paths.some((p: any) => p.industry === saved.industry && p.careerPath === saved.careerPath)) setSelectedCareer(saved);
+          const saved = preference?.career || (raw ? JSON.parse(raw) : null);
+          if (saved?.careerPath && paths.some((p: any) => p.industry === saved.industry && p.careerPath === saved.careerPath)) {
+            setSelectedCareer(saved);
+            localStorage.setItem("lu_selected_career_path_v1",JSON.stringify(saved));
+            if (!preference?.career) void fetch("/api/users/career",{method:"PATCH",headers:{"content-type":"application/json"},body:JSON.stringify(saved)});
+          }
         } catch {}
       }).catch(() => {});
   }, []);
 
-  function chooseCareerPath(path: { industry: string; careerPath: string }) {
+  async function chooseCareerPath(path: { industry: string; careerPath: string }) {
+    if (careerSaving) return;
+    setCareerSaving(true); setCareerSaveError(null);
+    try {
+      const response = await fetch("/api/users/career",{method:"PATCH",headers:{"content-type":"application/json"},body:JSON.stringify(path)});
+      const saved = await response.json();
+      if (!response.ok) throw new Error(saved.error || "Could not save career selection");
+    } catch (error: any) {setCareerSaveError(error.message);setCareerSaving(false);return;}
     setSelectedCareer(path);
     try { localStorage.setItem("lu_selected_career_path_v1", JSON.stringify(path)); } catch {}
     setCareerPickerOpen(false);
@@ -449,6 +463,8 @@ useEffect(() => {
             const params = new URLSearchParams();
             params.set('level', String(localLevel || (getActiveUser() as any)?.level || 1));
             params.set('domains', domains.join(','));
+            if (data.user?.selectedIndustry) params.set('industry',data.user.selectedIndustry);
+            if (data.user?.selectedCareerPath) params.set('careerPath',data.user.selectedCareerPath);
             for (const row of rows) params.set(`m_${String(row.domain || '').toUpperCase()}`, String(Number(row?.mastery || 0)));
             const cmRes = await fetch(`/api/career-matches?${params.toString()}`, { cache: 'no-store' as any });
             const cmData = await cmRes.json().catch(() => null);
@@ -951,10 +967,10 @@ async function analyzeResumeStage12() {
               <label style={{ display:"grid", gap:8 }}>
                 <b>Career training path</b>
                 <select
-                  value={selectedCareer ? selectedCareer.industry + "::" + selectedCareer.careerPath : ""}
+                  value={careerDraft ? careerDraft.industry + "::" + careerDraft.careerPath : ""}
                   onChange={(e) => {
                     const next = careerPaths.find((p) => p.industry + "::" + p.careerPath === e.target.value) || null;
-                    setSelectedCareer(next);
+                    setCareerDraft(next);
                   }}
                   style={{ minHeight:48 }}
                 >
@@ -970,7 +986,8 @@ async function analyzeResumeStage12() {
                   ))}
                 </select>
               </label>
-              <button className="gold gdActionOrange" type="button" disabled={!selectedCareer} onClick={() => selectedCareer && chooseCareerPath(selectedCareer)}>
+              {careerSaveError ? <p role="alert">{careerSaveError}</p> : null}
+              <button className="gold gdActionOrange" type="button" disabled={!careerDraft || careerSaving} onClick={() => careerDraft && chooseCareerPath(careerDraft)}>
                 START CAREER TRAINING
               </button>
             </div>
@@ -984,8 +1001,8 @@ async function analyzeResumeStage12() {
             <div className="luModalHeader" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12 }}>
               
               <div>
-                <b style={{ fontSize: 18 }}>Choose Your Starting Position</b>
-                <div><small className="luHint">This personalizes your learning path. You can change it later.</small></div>
+                <b style={{ fontSize: 18 }}>Choose Your Character</b>
+                <div><small className="luHint">Shared character artwork. Your career path is chosen separately.</small></div>
               </div>
               {positionChangeMode && (
                 <button className="secondaryBtn positionModalExit gdCloseButton" aria-label="Close" title="Close" type="button" onClick={() => setShowPositionModal(false)}>EXIT</button>
@@ -995,24 +1012,24 @@ async function analyzeResumeStage12() {
             <div className="luModalBody">
               <div className="luGrid3">
                 <RoleCard
-                  title="Help Desk Wizard"
-                  desc="Entry-level IT support: tickets, troubleshooting, user support."
+                  title={selectedCareer ? `${selectedCareer.careerPath} • Wizard` : "Wizard"}
+                  desc="Wizard character appearance for any industry."
                   icon="🧑‍💻"
                   videoSrc="/video/helpdesk-wizard-idle.mp4"
                   selected={pendingPos === "HELPDESK_SUPPORT"}
                   onClick={() => setPendingPos("HELPDESK_SUPPORT")}
                 />
                 <RoleCard
-                  title="Desktop Barbarian"
-                  desc="Hardware, imaging, endpoint tooling, onsite escalations."
+                  title={selectedCareer ? `${selectedCareer.careerPath} • Barbarian` : "Barbarian"}
+                  desc="Barbarian character appearance for any industry."
                   icon="🛠️"
                   videoSrc="/video/desktop-barbarian-idle.mp4"
                   selected={pendingPos === "DESKTOP_TECHNICIAN"}
                   onClick={() => setPendingPos("DESKTOP_TECHNICIAN")}
                 />
                 <RoleCard
-                  title="Cloud Assassin"
-                  desc="Cloud fundamentals, IAM, networking, services, and automation."
+                  title={selectedCareer ? `${selectedCareer.careerPath} • Assassin` : "Assassin"}
+                  desc="Assassin character appearance for any industry."
                   icon="☁️"
                   videoSrc="/video/T2V diablo 4 assassin Idle.mp4"
                   selected={pendingPos === "CLOUD_ENGINEER"}
@@ -1082,7 +1099,7 @@ async function analyzeResumeStage12() {
         <aside className="sidebar dashboardSidebar dashboardGrimdarkSidebar">
           <div className="dashboardSidebarMobileTitle">Progress & shortcuts</div>
           {user?.startingPosition === "HELPDESK_SUPPORT" ? (
-            <button className="dashboardSelectedPlayer dashboardSelectedPlayerButton" type="button" aria-label="Change selected player: Help Desk Wizard" onClick={() => {
+            <button className="dashboardSelectedPlayer dashboardSelectedPlayerButton" type="button" aria-label={`Change selected player: ${careerCharacterName(selectedCareer?.careerPath,user.startingPosition)}`} onClick={() => {
               setPendingPos(user.startingPosition);
               setPositionChangeMode(true);
               setShowPositionModal(true);
@@ -1090,7 +1107,7 @@ async function analyzeResumeStage12() {
               <span className="dashboardGrimdarkPortrait dashboardPlayerOnly"><img className="dashboardCharacterTitleFrame" src="/ui/grimdark/character-rarity-border-4-transparent.png?v=20260927k" alt="" aria-hidden="true" /><video src="/video/helpdesk-wizard-idle.mp4" autoPlay loop muted playsInline disablePictureInPicture controlsList="nodownload noremoteplayback" aria-label="Help Desk Wizard player" /></span>
             </button>
           ) : user?.startingPosition === "DESKTOP_TECHNICIAN" ? (
-            <button className="dashboardSelectedPlayer dashboardSelectedPlayerButton" type="button" aria-label="Change selected player: Desktop Barbarian" onClick={() => {
+            <button className="dashboardSelectedPlayer dashboardSelectedPlayerButton" type="button" aria-label={`Change selected player: ${careerCharacterName(selectedCareer?.careerPath,user.startingPosition)}`} onClick={() => {
               setPendingPos(user.startingPosition);
               setPositionChangeMode(true);
               setShowPositionModal(true);
@@ -1098,7 +1115,7 @@ async function analyzeResumeStage12() {
               <span className="dashboardGrimdarkPortrait dashboardPlayerOnly"><img className="dashboardCharacterTitleFrame" src="/ui/grimdark/character-rarity-border-4-transparent.png?v=20260927k" alt="" aria-hidden="true" /><video src="/video/desktop-barbarian-idle.mp4" autoPlay loop muted playsInline disablePictureInPicture controlsList="nodownload noremoteplayback" aria-label="Desktop Barbarian player" /></span>
             </button>
           ) : user?.startingPosition === "CLOUD_ENGINEER" ? (
-            <button className="dashboardSelectedPlayer dashboardSelectedPlayerButton" type="button" aria-label="Change selected player: Cloud Assassin" onClick={() => {
+            <button className="dashboardSelectedPlayer dashboardSelectedPlayerButton" type="button" aria-label={`Change selected player: ${careerCharacterName(selectedCareer?.careerPath,user.startingPosition)}`} onClick={() => {
               setPendingPos(user.startingPosition);
               setPositionChangeMode(true);
               setShowPositionModal(true);

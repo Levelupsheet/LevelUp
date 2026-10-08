@@ -201,6 +201,30 @@ test('raffle credits retain capped balances and redeem only the actual awarded q
 const { awardGoldenQuestion } = require('../src/lib/goldenRewards.ts');
 const { buildBossProfile, bossCombatRules, selectBossQuestions, applyBossAbilitiesToQuestions } = require('../src/lib/bossBattle.ts');
 const { settleCombat } = require('../src/lib/combatSettlement.ts');
+test('arbitrary career names remain valid but only active published training content is selectable', () => {
+  const {normalizeCareerTarget,isPublishedCareer}=require('../src/lib/careerPreference.ts');
+  const target=normalizeCareerTarget({industry:' Aerospace ',careerPath:' Flight Systems Technician '});
+  assert.deepEqual(target,{industry:'Aerospace',careerPath:'Flight Systems Technician'});
+  assert.equal(isPublishedCareer(target,[{...target,lane:'TRAINING',questionCount:4}]),true);
+  assert.equal(isPublishedCareer(target,[{...target,lane:'TEST_NOW',questionCount:4}]),false);
+  assert.equal(isPublishedCareer(target,[{...target,lane:'TRAINING',questionCount:0}]),false);
+  assert.equal(normalizeCareerTarget({industry:'x'.repeat(161),careerPath:'Role'}),null);
+});
+test('saved independent HP, finite loadout and remaining timer resume without reset', async () => {
+  const combat=await mountCombat({questions:[question(4,'a'),question(4,'b')],timed:true,finishOnEnemyDefeat:false,
+    initialState:{idx:1,playerHP:33,enemyHP:70,enemyMaxHP:150,enemyTier:4,timeLeft:7,enemyInventory:{shield:0,fury:1,restore:0,time:0}},
+    getEnemyProfile:q=>createEnemyProfile('Reaper',q.level,150)});
+  assert.equal(combat.value.state.playerHP,33);assert.equal(combat.value.state.enemyHP,70);assert.equal(combat.value.state.timeLeft,7);assert.equal(combat.value.state.enemyInventory.fury,1);
+  await combat.run(c=>c.select(0));await combat.run(c=>{c.submit();c.submit();});
+  assert.equal(combat.value.state.correctCount,1);assert.equal(combat.value.state.enemyInventory.fury,0);
+  await combat.close();
+});
+test('verified rewards retain deterministic streak bonuses, momentum and purchased fury XP', () => {
+  const questions=Array.from({length:4},(_,index)=>({id:`sq${index}`,orderIndex:index,answered:true,isCorrect:true,payloadJson:{level:1,data:{}}}));
+  const session={userId:'u',questions};
+  assert.equal(settleCombat(session,[]).xpEarned,77);
+  assert.equal(settleCombat(session,[{claimKey:'use-item:u:sq0:fury_charge:',meta:{itemId:'fury_charge'}}]).xpEarned,85);
+});
 test('bosses require curated hard content and three correct answers beat a shielded boss', () => {
   assert.equal(selectBossQuestions([{difficulty:5,type:'multiple_choice',data:{}}]).length,0);
   assert.equal(selectBossQuestions([{difficulty:3,type:'multiple_choice',data:{bossEligible:true}}]).length,0);

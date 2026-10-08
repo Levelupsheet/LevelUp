@@ -9,6 +9,7 @@ import { getActiveUser } from "@/lib/userStore";
 import { resolveClientUserId } from "@/lib/activeUser";
 import { useCombatQuiz } from "@/engine/useCombatQuiz";
 import { inferLevel } from "@/engine/CombatQuizEngine";
+import { GAME_CONFIG } from "@/engine/constants/gameConfig";
 import { createEnemyProfile, nextEnemyAbility, combatDamageScale, incomingEnemyDamage, outgoingEnemyDamage } from "@/engine/systems/EnemyAbilities";
 import type { CombatQuestion, DifficultyTier } from "@/engine/CombatQuizEngine";
 import {
@@ -566,19 +567,19 @@ export default function DiabloQuizRunner(props: {
   const [answerInsight, setAnswerInsight] = useState<any>(null);
   const [isExplaining, setIsExplaining] = useState(false);
   const [damageFloat, setDamageFloat] = useState<{ player?: string | null; enemy?: string | null }>({});
-  const [streak, setStreak] = useState(0);
-  const [bestStreak, setBestStreak] = useState(0);
-  const [powerups, setPowerups] = useState<Stage7PowerupState>({ shieldActive: false, furyActive: false, shieldUses: 0, furyUses: 0 });
+  const [streak, setStreak] = useState(Number(initialState?.streak || 0));
+  const [bestStreak, setBestStreak] = useState(Number(initialState?.bestStreak || 0));
+  const [powerups, setPowerups] = useState<Stage7PowerupState>({ shieldActive: Boolean(initialState?.playerModifiers?.shieldActive), furyActive: Boolean(initialState?.playerModifiers?.furyActive), shieldUses: 0, furyUses: 0 });
   const [stage9Inventory, setStage9Inventory] = useState<{ shield: number; fury: number; restore: number; xpSurge: number; hintDiscount: number; extraLife: number }>({ shield: 0, fury: 0, restore: 0, xpSurge: 0, hintDiscount: 0, extraLife: 0 });
   const userIdRef = useRef<string>("");
   const itemRunKeyRef = useRef<string>("");
   const itemPendingRef = useRef(new Set<string>());
-  const itemAppliedRef = useRef(new Set<string>());
+  const itemAppliedRef = useRef(new Set<string>(initialState?.itemAppliedKeys || []));
   const activeQuestionKeyRef = useRef("");
-  const xpSurgeQuestionRef = useRef<number | null>(null);
+  const xpSurgeQuestionRef = useRef<number | null>(initialState?.xpSurgeQuestion ?? null);
   const consumedInventoryRef = useRef({ shield: 0, fury: 0, restore: 0, xpSurge: 0, extraLife: 0 });
   const [stage8History, setStage8History] = useState<Stage8QuestionResult[]>([]);
-  const [xpBoostRemaining, setXpBoostRemaining] = useState(0);
+  const [xpBoostRemaining, setXpBoostRemaining] = useState(Number(initialState?.xpBoostRemaining || 0));
   const [microRewardFlash, setMicroRewardFlash] = useState<string | null>(null);
   const [showSessionIntel, setShowSessionIntel] = useState(false);
   const [achievementFlash, setAchievementFlash] = useState<string | null>(null);
@@ -589,8 +590,8 @@ export default function DiabloQuizRunner(props: {
   const [stageBanner, setStageBanner] = useState<string | null>(null);
   const questionStartRef = useRef(Date.now());
   const timeSlowActiveRef = useRef(false);
-  const shieldQuestionRef = useRef<number | null>(null);
-  const furyQuestionRef = useRef<number | null>(null);
+  const shieldQuestionRef = useRef<number | null>(initialState?.playerModifiers?.shieldActive ? Number(initialState.idx || 0) : null);
+  const furyQuestionRef = useRef<number | null>(initialState?.playerModifiers?.furyActive ? Number(initialState.idx || 0) : null);
 
   const finishedOnceRef = useRef(false);
   const feedbackRevealRef = useRef<HTMLDivElement | null>(null);
@@ -617,7 +618,7 @@ export default function DiabloQuizRunner(props: {
         encounterType === "boss" ? (rules?.enemyMaxHP ?? rules?.startHP ?? 100) : config.hp);
     },
     getPlayerDamageTaken: ({ usedShield, question: hitQuestion, tier, state: hitState }) => incomingEnemyDamage(
-      encounterType === "boss" ? (rules?.playerDamageByTier?.[tier] ?? currentStageConfig.playerDamage) : currentStageConfig.playerDamage,
+      encounterType === "boss" ? (rules?.playerDamageByTier?.[tier] ?? 24) : GAME_CONFIG.playerDamageByTier[hitState.enemyTier as DifficultyTier],
       usedShield, combatDamageScale(inferLevel(hitQuestion), hitState.enemyTier) * Number((hitQuestion.data as any)?.playerDamageMultiplier || 1) * (nextEnemyAbility(hitState.enemyInventory) === "fury" ? 1.5 : 1)),
     getEnemyDamageDealt: ({ correct, usedFury, question: hitQuestion, tier, state: hitState }) => correct ? outgoingEnemyDamage(
       encounterType === "boss" ? (rules?.enemyDamageByTier?.[tier] ?? 34) : Math.ceil(hitState.enemyMaxHP / 3) * combatDamageScale(inferLevel(hitQuestion), hitState.enemyTier),
@@ -706,8 +707,15 @@ export default function DiabloQuizRunner(props: {
       }
     },
     initialState,
-    onStateChange,
+    onStateChange: undefined,
   });
+
+  function stateSnapshot() {
+    return {...state,streak,bestStreak,xpBoostRemaining,xpSurgeQuestion:xpSurgeQuestionRef.current,
+      playerModifiers:{shieldActive:powerups.shieldActive && shieldQuestionRef.current === state.idx,furyActive:powerups.furyActive && furyQuestionRef.current === state.idx},
+      itemAppliedKeys:[...itemAppliedRef.current]};
+  }
+  useEffect(()=>{onStateChange?.(stateSnapshot());},[state,powerups,streak,bestStreak,xpBoostRemaining,onStateChange]);
 
   const stage8Momentum = useMemo(
     () => getSessionMomentum({ streak, currentIndex: Math.max(0, state.idx || 0), totalQuestions: combatQuestions.length, xpBoostRemaining }),
@@ -730,7 +738,7 @@ export default function DiabloQuizRunner(props: {
   const stageEnemyHP = state.enemyHP;
   const playerHealthPercent = Math.max(0, Math.min(100, state.playerHP / maxPlayerHP * 100));
   const currentStageEnemyName = useMemo(() => encounterType === "boss" ? enemyName : currentStageConfig.name, [currentStageConfig, enemyName, encounterType]);
-  const isGoldenBoss = encounterType === "boss" && sessionStage >= maxStages;
+  const isGoldenBoss = encounterType === "boss" && enemyName.toLowerCase().includes("golden");
 
   const questionType = normalizeQuestionType(question?.type);
   const usesManualSubmit = questionType !== "multiple_choice" && questionType !== "incident" && questionType !== "true_false";
@@ -765,11 +773,11 @@ const showExpandedExplanation = useMemo(() => {
   useEffect(() => {
     finishedOnceRef.current = false;
     setFinishFeedbackPending(false);
-    setStreak(0);
-    setBestStreak(0);
-    setPowerups({ shieldActive: false, furyActive: false, shieldUses: 0, furyUses: 0 });
+    setStreak(Number(initialState?.streak || 0));
+    setBestStreak(Number(initialState?.bestStreak || 0));
+    setPowerups({ shieldActive: Boolean(initialState?.playerModifiers?.shieldActive), furyActive: Boolean(initialState?.playerModifiers?.furyActive), shieldUses: 0, furyUses: 0 });
     setStage8History([]);
-    setXpBoostRemaining(0);
+    setXpBoostRemaining(Number(initialState?.xpBoostRemaining || 0));
     setMicroRewardFlash(null);
     setAchievementFlash(null);
     setFatigueState({ fatigued: false, reason: null, suggestion: null });
@@ -984,7 +992,7 @@ const showExpandedExplanation = useMemo(() => {
     if (!id || !onAdvanceQuestion) return Promise.resolve({});
     const existing = answerSaves.current.get(id);
     if (existing) return existing;
-    const save = Promise.resolve(onAdvanceQuestion({ question: question!, isCorrect: state.lastWasCorrect, selectedAnswer: deriveSelectedAnswer(), nextIndex: state.idx, stateSnapshot: state })).catch(error => { answerSaves.current.delete(id); throw error; });
+    const save = Promise.resolve(onAdvanceQuestion({ question: question!, isCorrect: state.lastWasCorrect, selectedAnswer: deriveSelectedAnswer(), nextIndex: state.idx, stateSnapshot: stateSnapshot() })).catch(error => { answerSaves.current.delete(id); throw error; });
     answerSaves.current.set(id,save);
     return save;
   }
@@ -1240,6 +1248,7 @@ const showExpandedExplanation = useMemo(() => {
   }
 
   function triggerPrimaryAction() {
+    if (itemPendingRef.current.size) return;
     if (!question) return;
     if (state.locked) {
       void handleNext();
@@ -1590,6 +1599,10 @@ const showExpandedExplanation = useMemo(() => {
                     <span className="badge">Difficulty {effectiveQuestionTier}</span>
                   </div>
                   {fatigueState.fatigued ? <div className="muted stage8AssistText">💡 Easier question incoming.</div> : null}
+                  <button type="button" className="d2Btn power" disabled={state.playerHP <= 0 ? encounterType !== "boss" || stage9Inventory.extraLife <= 0 : state.locked || state.playerHP >= maxPlayerHP || stage9Inventory.restore <= 0} onClick={activateRestore}>
+                    {encounterType === "boss" && state.playerHP <= 0 ? `Extra Life x${stage9Inventory.extraLife}` : `Restore Health x${stage9Inventory.restore}`}
+                  </button>
+                  <button type="button" className="d2Btn power" disabled={state.locked || stage9Inventory.xpSurge <= 0 || xpSurgeQuestionRef.current === state.idx} onClick={activateXpSurge}>XP Surge x{stage9Inventory.xpSurge}</button>
                 </div>
               ) : null}
             </div>

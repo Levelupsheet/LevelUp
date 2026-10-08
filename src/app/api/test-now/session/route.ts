@@ -78,8 +78,8 @@ function serializeSession(session: any) {
   };
 }
 
-async function findActiveSession(userId: string, lane = "TEST_NOW") {
-  return (prisma as any).gameSession.findFirst({
+async function findActiveSession(userId: string, lane = "TEST_NOW", db: any = prisma) {
+  return db.gameSession.findFirst({
     where: { userId, lane, status: "ACTIVE" },
     orderBy: { createdAt: "desc" },
     include: { questions: { orderBy: { orderIndex: "asc" } } },
@@ -165,7 +165,7 @@ async function buildNewSession(userId: string, questionCount = 15, bankDomain?: 
         questionCount: finalQuestions.length,
         goldenSpawned: Boolean(goldenQuestionId),
         currentIndex: 0,
-        stateJson: { idx:0, wrongStreak:0, inRecovery:false, trainingMode, boss, focusDomain:bank.focusDomain, missedQuestionCount:bank.missedQuestionCount, blueprint:bank.blueprint },
+        stateJson: { idx:0, wrongStreak:0, inRecovery:false, trainingMode, bankDomain: bankDomain || null, certExam: filters.certExam || null, boss, focusDomain:bank.focusDomain, missedQuestionCount:bank.missedQuestionCount, blueprint:bank.blueprint },
       },
     });
     for (let i = 0; i < finalQuestions.length; i += 1) {
@@ -223,6 +223,17 @@ export async function POST(req: Request) {
     const session: any = await prisma.$transaction(async (tx:any) => {
       // Serialize allocation across tabs; selection reads committed earlier sessions.
       await tx.$queryRawUnsafe('SELECT 1 AS locked FROM pg_advisory_xact_lock(hashtext($1))', `learning:${userId}`);
+      if (body.resume === true) {
+        const active = await findActiveSession(userId,lane,tx);
+        const mode = requestedIds ? "BOSS" : String(body.trainingMode || "STANDARD");
+        if (active && active.trainingMode === mode && active.industry === (filters.industry || null) && active.careerPath === (filters.careerPath || null)
+          && (active.stateJson?.bankDomain || null) === bankDomain && (active.stateJson?.certExam || null) === (filters.certExam || null)
+          && (!requestedIds || active.questions.length === requestedIds.length && active.questions.every((q: any)=>requestedIds.includes(String(q.questionId))))) {
+          const currentPool = await buildQuestionBankSelection({...filters,lane,questionCount:1,userId,shouldShuffle:false,bankDomain},tx);
+          const allowed = new Set(currentPool.questions.map((q: any)=>String(q.id)));
+          if (active.questions.every((q: any)=>allowed.has(String(q.questionId)))) return active;
+        }
+      }
       await tx.gameSession.updateMany({ where:{userId,lane,status:"ACTIVE"},data:{status:"ABANDONED",completedAt:new Date()} });
       return buildNewSession(userId,questionCount,bankDomain,requestedIds ? "BOSS" : String(body.trainingMode || "STANDARD"),filters,tx);
     },{timeout:30000});

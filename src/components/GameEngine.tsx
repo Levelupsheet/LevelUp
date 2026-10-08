@@ -72,6 +72,7 @@ export default function GameEngine(props: Props) {
   const [learningMastery, setLearningMastery] = useState<Record<string, number>>({});
   const [initialState, setInitialState] = useState<any>(null);
   const [failedSummary, setFailedSummary] = useState<DiabloQuizRunSummary | null>(null);
+  const [savedCareerName, setSavedCareerName] = useState<string | null>(null);
   const rewardClaimKeyRef = useRef("");
   const progressSaveRef = useRef<number | null>(null);
 
@@ -85,12 +86,16 @@ export default function GameEngine(props: Props) {
     const res = await fetch("/api/learning/session", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ userId, lane, industry, careerPath, startingPosition, certExam, questionCount: effectiveCount, bankDomain, trainingMode, encounterType, questionIds: encounterType === "boss" ? questionsOverride?.map(q => q.id) : undefined }),
+      body: JSON.stringify({ userId, lane, industry, careerPath, startingPosition, certExam, questionCount: effectiveCount, bankDomain, trainingMode, encounterType, resume: true, questionIds: encounterType === "boss" ? questionsOverride?.map(q => q.id) : undefined }),
       cache: "no-store" as any,
     });
     const json = await res.json().catch(() => null);
     if (!res.ok) throw new Error(json?.error || "Failed to create learning session");
     const mapped = Array.isArray(json?.questions) ? json.questions.map(mapQuestion) : [];
+    try {
+      const preference = await fetch("/api/users/career",{cache:"no-store" as any}).then(response=>response.json());
+      setSavedCareerName(preference?.career?.careerPath || null);
+    } catch {}
     if (mapped.length) {
       setQuestions(mapped);
       setSessionId(String(json?.session?.id || ""));
@@ -193,6 +198,7 @@ export default function GameEngine(props: Props) {
           correctCount: summary.correctCount,
           totalQuestions: summary.totalQuestions,
           xpEarned: awardedXp,
+          hintXpSpent: summary.hintXpSpent || 0,
           outcome: summary.outcome,
           bestStreak: summary.bestStreak || 0,
           encounterType,
@@ -219,11 +225,11 @@ export default function GameEngine(props: Props) {
   if (loading) return <div className="page"><div className="container" style={{ maxWidth: 1280 }}><div className="card" style={{ padding: 18 }}><div style={{ fontWeight: 800, fontSize: 18 }}>Loading {title}…</div><div className="muted" style={{ marginTop: 8 }}>{lane === "TEST_NOW" ? "Creating your saved learning session." : "Creating a practice session from your active database pools."}</div></div></div></div>;
   if (failedSummary) return <div className="card" role="alert"><p>{loadError}</p><button type="button" className="d2Btn" onClick={() => handleComplete(failedSummary)}>Retry reward settlement</button></div>;
   const activePosition = playerPosition || String((getActiveUser() as any)?.startingPosition || "HELPDESK_SUPPORT");
-  const careerPlayerName = careerPath
-    ? String(careerPath).trim()
-    : activePosition === "CLOUD_ENGINEER" ? "Cloud Assassin"
-      : activePosition === "DESKTOP_TECHNICIAN" ? "Desktop Barbarian"
-        : "Help Desk Wizard";
+  const careerPlayerName = careerPath || savedCareerName
+    ? String(careerPath || savedCareerName).trim()
+    : activePosition === "CLOUD_ENGINEER" ? "Assassin"
+      : activePosition === "DESKTOP_TECHNICIAN" ? "Barbarian"
+        : "Wizard";
   const playerMedia = activePosition === "CLOUD_ENGINEER"
     ? { playerIdleSrc: "/video/T2V diablo 4 assassin Idle.mp4", playerAttackSrc: "/video/I2V diablo 4 assassin attack.mp4", playerHitSrc: "/video/T2V diablo 4 assassin damage.mp4" }
     : activePosition === "DESKTOP_TECHNICIAN"

@@ -2,6 +2,8 @@ import fs from "fs/promises";
 import path from "path";
 
 export type CareerMatch = {
+  industry?: string;
+  careerPath?: string;
   id: string;
   title: string;
   domain: string;
@@ -30,6 +32,8 @@ const DATA_FILE = path.join(DATA_DIR, "career-matches.json");
 function normalizeCareerMatch(row: any, index = 0): CareerMatch {
   return {
     id: String(row?.id || `career-${index + 1}`),
+    industry: String(row?.industry || "Information Technology"), // Preserve legacy IT match metadata.
+    careerPath: row?.careerPath ? String(row.careerPath) : undefined,
     title: String(row?.title || "Untitled role"),
     company: row?.company ? String(row.company) : undefined,
     domain: String(row?.domain || "GENERAL").toUpperCase(),

@@ -216,7 +216,7 @@ export async function purchaseStage9Item(userId: string, itemId: string, options
 }
 
 
-export async function useStage9Item(userId: string, itemId: string, actionKey: string) {
+export async function useStage9Item(userId: string, itemId: string, actionKey: string, context?: {sessionQuestionId:string}) {
   const key = String(userId || "").trim();
   if (!key) return { ok: false as const, error: "userId required" };
   if (!STORE.some(item => item.id === itemId)) return { ok: false as const, error: "Unsupported item" };
@@ -229,6 +229,11 @@ export async function useStage9Item(userId: string, itemId: string, actionKey: s
   if (prior) {
     if (prior.meta?.itemId !== itemId) return { ok: false as const, error: "Action key already used for another item" };
     return { ok: true as const, remaining: Number(prior.meta.remaining || 0), replayed: true };
+  }
+  if (context) {
+    await tx.$queryRawUnsafe('SELECT "id" FROM "GameSessionQuestion" WHERE "id" = $1 FOR UPDATE',context.sessionQuestionId);
+    const question = await tx.gameSessionQuestion.findUnique({where:{id:context.sessionQuestionId},include:{session:true}});
+    if (!question || question.session.userId !== key || question.session.status !== "ACTIVE" || (question.answered && itemId !== "extra_life") || (itemId === "extra_life" && question.session.trainingMode !== "BOSS")) return {ok:false,error:"Active owned battle question required"};
   }
   const existing = await tx.inventoryItem.findFirst({
     where: { userId: key, itemRef: itemId, quantity: { gt: 0 } },

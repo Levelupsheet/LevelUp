@@ -7,3 +7,15 @@ test('content and learning migrations preserve existing rows and apply repeatedl
  await db.exec(`INSERT INTO "QuestionImportIssue" ("id","setId","rowIndex","reason","payload") VALUES ('i','pool',1,'Unsupported format','{"original":"preserved"}')`);assert.equal((await db.query('SELECT "payload" FROM "QuestionImportIssue"')).rows[0].payload.original,'preserved');
  }finally{await db.close();}
 });
+test('career preference migration is additive, repeatable, and preserves existing catalogs and XP',async()=>{
+ const db=new PGlite();try{
+ await db.exec(`CREATE TABLE "User" ("id" TEXT PRIMARY KEY,"xp" INTEGER); INSERT INTO "User" VALUES ('u',9999);
+ CREATE TABLE "CareerCatalog" ("id" TEXT PRIMARY KEY,"industry" TEXT,"careerPath" TEXT,"isActive" BOOLEAN,"sortOrder" INTEGER,"createdAt" TIMESTAMP,"updatedAt" TIMESTAMP, UNIQUE("industry","careerPath"));
+ INSERT INTO "CareerCatalog" VALUES ('custom','Aerospace','Flight Systems Technician',FALSE,42,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);`);
+ const sql=fs.readFileSync(path.join(__dirname,'../prisma/migrations/20261008060000_career_preferences/migration.sql'),'utf8');await db.exec(sql);await db.exec(sql);
+ const user=(await db.query('SELECT * FROM "User"')).rows[0];assert.equal(user.xp,9999);assert.equal(user.selectedIndustry,null);assert.equal(user.selectedCareerPath,null);
+ assert.equal((await db.query(`SELECT "isActive" FROM "CareerCatalog" WHERE "id"='custom'`)).rows[0].isActive,false);
+ const industries=(await db.query('SELECT DISTINCT "industry" FROM "CareerCatalog"')).rows.map(row=>row.industry);
+ for(const name of ['Information Technology','Healthcare','Sales','Software Development','Real Estate','Transportation','Industrial/Skilled Trades'])assert.ok(industries.includes(name));
+ }finally{await db.close();}
+});

@@ -19,7 +19,7 @@ export async function POST(req: Request) {
     if (!prior && (!question || question.session.userId !== userId || question.session.status !== "ACTIVE" || (question.answered && itemId !== "extra_life") || (itemId === "extra_life" && question.session.trainingMode !== "BOSS"))) {
       return NextResponse.json({ ok: false, error: "Active owned battle question required" }, { status: 400 });
     }
-    const result = await useStage9Item(userId, itemId, actionKey);
+    const result = await useStage9Item(userId, itemId, actionKey, {sessionQuestionId:questionId});
     return NextResponse.json(result, { status: result.ok ? 200 : 400 });
   } catch (err: any) {
     return NextResponse.json({ ok: false, error: "Failed to use item", detail: String(err?.message ?? err) }, { status: 500 });

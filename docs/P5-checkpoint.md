@@ -3,7 +3,7 @@
 ## Defined rewards
 
 - Each reached level, including level-one welcome, grants one Bronze chest. Existing LEVEL_UP:n chests count regardless of opened/claimed status.
-- Correct answers earn tier XP (15/25/40/55/75), or server-owned boss tier XP. XP Surge multiplies that answer by 1.5. Boss victory adds 100 XP. Server settlement rejects client-supplied XP/count/outcome. Client-only speed/micro bonuses do not mint unverified XP.
+- Correct answers earn tier XP (15/25/40/55/75), or server-owned boss tier XP. XP Surge multiplies that answer by 1.5. Boss victory adds 100 XP. Server settlement rejects client-supplied XP/count/outcome. Final cross-checkpoint verification also retains deterministic micro/streak bonuses, momentum and Fury XP by replaying graded history; client-only speed bonuses do not mint unverified XP. Reported hint penalties can reduce, never increase, the earned total.
 - Tokens: 2 per correct answer, 10 for a perfect run, 8 for surviving completion/victory, 12 extra for boss victory, 6 for a streak of at least 5.
 - Boss guaranteed chest, powers and entries remain as defined in P4. Defeat never grants boss victory rewards or Golden-question entries.
 - Subscription caps constrain new XP; existing earned XP is never reduced. Active account subscription state determines earning cap; administrators remain uncapped/free for testing.
