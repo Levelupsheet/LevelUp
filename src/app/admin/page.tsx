@@ -1706,11 +1706,12 @@ export default function AdminPage(){
               </div>
               <div style={{ display:"grid", gap:8, marginTop:12 }}>
                 {placements.filter((p:any)=>p.isActive && p.lane===poolViewLane).map((p:any)=>(
-                  <button key={p.id} className="card" style={{ padding:12, textAlign:"left", background: selectedSet===p.setId ? "rgba(64,160,210,.12)" : "rgba(0,0,0,.18)" }} onClick={()=>setSelectedSet(p.setId)}>
+                  <button key={p.id} className="card" style={{ padding:12, textAlign:"left", background: selectedSet===p.setId ? "rgba(64,160,210,.12)" : "rgba(0,0,0,.18)" }} onClick={()=>{setSelectedSet(p.setId);setQuestionView("manage");}}>
                     <div style={{ display:"flex", justifyContent:"space-between", gap:10, flexWrap:"wrap" }}>
                       <b>{p.set?.name || "Question pool"}</b>
                       <span className="badge">{p.set?.domain || "GENERAL"}</span>
                     </div>
+                    <span className="badge">View deployed questions →</span>
                     <small>
                       {poolViewLane==="TRAINING" ? `${p.industry || "Legacy"} → ${p.careerPath || p.startingPosition || "Training"}` :
                        poolViewLane==="CERTIFICATIONS" ? `Exam: ${String(p.certExam || "").replaceAll("_"," ")}` :
@@ -1726,6 +1727,7 @@ export default function AdminPage(){
           <div className="adminQuestionMetrics">
             <div><small>Selected set</small><b>{selectedSetObj?.name || "None selected"}</b></div>
             <div><small>Questions</small><b>{questions.length}</b></div>
+            <div><small>Easy / Medium / Hard</small><b>{[1,2,3].map(level => questions.filter(q => Number(q.difficulty) === level).length).join(" / ")}</b></div>
             <div><small>Quality ready</small><b>{questionQualitySummary.passing}</b></div>
             <div><small>Needs review</small><b>{questionQualitySummary.needsReview}</b></div>
             <div><small>Avg. quality</small><b>{questions.length ? `${questionQualitySummary.average}/100` : "—"}</b></div>
