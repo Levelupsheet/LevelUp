@@ -108,7 +108,7 @@ const SAMPLE_BLOCK = `[
     "stage": 1,
     "tags": ["networking", "fundamentals"],
     "facts": [
-      { "statement": "HTTPS uses port 443", "answer": "443", "subject": "HTTPS", "category": "port", "distractors": ["80", "22", "53"], "questionTypes": ["multiple_choice", "fill_blank", "multi_select"] },
+      { "statement": "HTTPS uses port 443", "answer": "443", "subject": "HTTPS", "category": "port", "distractors": ["80", "22", "53"], "questionTypes": ["multiple_choice", "true_false"] },
       { "statement": "DNS translates hostnames to IP addresses", "answer": "Translates hostnames to IP addresses" }
     ],
     "definitions": [
@@ -789,7 +789,7 @@ export default function AdminContentStudioPage() {
                 <div style={{ display: "grid", gap: 12, marginTop: 16 }}>
                   <div className="card" style={{ padding: 14, background: "rgba(255,255,255,0.03)" }}>
                     <div style={{ fontWeight: 900, fontSize: 16 }}>Boss Question Manager & Bank Health</div>
-                    <div style={{ fontSize: 12, opacity: 0.72, marginTop: 4 }}>Boss and Golden pools should be Hard and use Multiple Choice, True/False, or CLI. Counts below expose thin pools before they affect battles.</div>
+                    <div style={{ fontSize: 12, opacity: 0.72, marginTop: 4 }}>Boss and Golden pools should use advanced tiers (4–5) and use Multiple Choice, True/False, or CLI. Counts below expose thin pools before they affect battles.</div>
                     <div style={{ display: "grid", gap: 8, marginTop: 12 }}>
                       {bankSummary.map((bank) => {
                         const hard = bank.byDifficulty?.hard || 0;

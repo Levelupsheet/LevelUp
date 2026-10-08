@@ -4,6 +4,8 @@ import React, { useEffect, useState } from "react";
 import GameEngine from "@/components/GameEngine";
 import type { DiabloQuestion, DiabloQuizRunSummary } from "@/components/DiabloQuizRunner";
 import { applyBossAbilitiesToQuestions, bossCombatRules, bossVisualMeta, buildBossProfile, mapBossQuestion, selectBossQuestions } from "@/lib/bossBattle";
+import { useContentPools } from "@/lib/useContentPools";
+import { testNowBanks } from "@/lib/contentPools";
 import { getActiveUser } from "@/lib/userStore";
 
 type Kind = "position" | "cert" | "test";
@@ -23,8 +25,16 @@ export default function PracticeMiniGameModal(props: {
   const [path, setPath] = useState<PositionPath>(defaultPath ?? "HELPDESK_SUPPORT");
   const [cert, setCert] = useState<CertTrack>("A_PLUS");
   const [testMode, setTestMode] = useState<"STANDARD" | "WEAK_DOMAIN" | "MISSED_QUESTIONS">("STANDARD");
-  const [testBank, setTestBank] = useState<string>("GENERAL");
-  const [testBanks, setTestBanks] = useState<Array<{domain:string;label:string;questionCount:number;setCount:number}>>([{domain:"GENERAL",label:"Mixed",questionCount:0,setCount:0}]);
+  const [testBank, setTestBank] = useState<string>("MIXED");
+  const { pools, loading: poolsLoading, error: poolsError } = useContentPools(open);
+  const [trainingPoolKey, setTrainingPoolKey] = useState("");
+  const trainingPools = pools.filter(p => p.lane === "TRAINING");
+  const certPools = pools.filter(p => p.lane === "CERTIFICATIONS");
+  const selectedTrainingPool = trainingPools.find(p => p.key === trainingPoolKey) || trainingPools.find(p => p.startingPosition === path) || trainingPools[0];
+  const selectedCertPool = certPools.find(p => p.certExam === cert) || certPools[0];
+  const testBanks = testNowBanks(pools).filter(b => b.questionCount > 0);
+  const selectedTestBank = testBanks.find(b => b.domain === testBank) || testBanks[0];
+  const selectionReady = !poolsLoading && !poolsError && Boolean(kind === "position" ? selectedTrainingPool : kind === "cert" ? selectedCertPool : selectedTestBank);
   const [finalScore, setFinalScore] = useState<{ correct: number; total: number; xp: number; timeLeft?: number; bestStreak?: number; outcome?: "victory" | "defeat" | "complete" | null; playerHP?: number }>({ correct: 0, total: 0, xp: 0, outcome: null });
   const [learningPath, setLearningPath] = useState<any | null>(null);
   const [sessionMastery, setSessionMastery] = useState<Record<string, number>>({});
@@ -56,13 +66,6 @@ export default function PracticeMiniGameModal(props: {
     setBossReward(null);
   }, [open]);
 
-  useEffect(() => {
-    if (!open || kind !== "test") return;
-    fetch("/api/test-now/banks", { cache:"no-store" as any })
-      .then((r)=>r.json())
-      .then((json)=>{ if (Array.isArray(json?.banks) && json.banks.length) setTestBanks(json.banks); })
-      .catch(()=>{});
-  }, [open, kind]);
 
   if (!open) return null;
 
@@ -105,11 +108,16 @@ export default function PracticeMiniGameModal(props: {
       search.set("lane", lane);
       search.set("questionCount", "12");
       search.set("shuffle", "1");
-      if (kind === "position") search.set("startingPosition", path);
-      if (kind === "cert") search.set("certExam", cert);
+      if (kind === "position" && selectedTrainingPool) {
+        search.set("careerPath", selectedTrainingPool.careerPath!);
+        search.set("industry", selectedTrainingPool.industry!);
+      }
+      if (kind === "cert") search.set("certExam", selectedCertPool?.certExam || cert);
+      if (kind === "test" && selectedTestBank?.domain !== "MIXED") search.set("bankDomain", selectedTestBank?.domain || "");
       const res = await fetch(`/api/content/active?${search.toString()}`, { cache: "no-store" as any });
       const json = await res.json().catch(() => null);
       const sourceQuestions = Array.isArray(json?.questions) ? json.questions : [];
+      if (!sourceQuestions.length) throw new Error("No boss questions available");
       const activeUser = getActiveUser();
       const weakestDomain = learningPath?.weakAreas?.[0]?.domain || learningPath?.predictedWeaknesses?.[0]?.domain || learningPath?.focusDomain || "general";
       const isGolden = summary.correctCount === summary.totalQuestions && Math.random() < 0.12;
@@ -122,6 +130,7 @@ export default function PracticeMiniGameModal(props: {
         isGolden,
       });
       const picked = selectBossQuestions(sourceQuestions, 3, weakestDomain).map((q: any) => mapBossQuestion(q, weakestDomain));
+      if (!picked.length) throw new Error("No advanced boss questions available");
       const applied = applyBossAbilitiesToQuestions(picked, profile);
       const visual = bossVisualMeta(isGolden);
       setBossQuestions(applied.map((q: any) => ({
@@ -178,8 +187,9 @@ export default function PracticeMiniGameModal(props: {
         <div className="luModalBody">
           {step === "setup" && (
             <div className="card practiceGameSetupCard" style={{ padding: 14 }}>
-              {kind === "position" && <div style={{ display: "grid", gap: 10 }}><div style={{ fontWeight: 800 }}>Choose your path</div><div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>{([ ["HELPDESK_SUPPORT", "Helpdesk"], ["DESKTOP_TECHNICIAN", "Desktop"], ["CLOUD_ENGINEER", "Cloud"] ] as const).map(([k, label]) => <button key={k} className={"trackBtn gdActionBlue gdTrackChoice" + (path === k ? " active gdTrackChoiceActive" : "")} type="button" onClick={() => setPath(k)}>{label}</button>)}</div><small className="luHint">12 questions • 4 stages • 3 questions per stage</small></div>}
-              {kind === "cert" && <div style={{ display: "grid", gap: 10 }}><div style={{ fontWeight: 800 }}>Choose a certification pack</div><div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>{([ ["A_PLUS", "A+"], ["SECURITY_PLUS", "Security+"], ["AZ_900", "AZ-900"], ["AWS", "AWS"], ["AZURE", "Azure"] ] as const).map(([k, label]) => <button key={k} className={"trackBtn gdActionBlue gdTrackChoice" + (cert === k ? " active gdTrackChoiceActive" : "")} type="button" onClick={() => setCert(k)}>{label}</button>)}</div><small className="luHint">12 questions • 4 stages • 3 questions per stage</small></div>}
+              {poolsLoading ? <p role="status">Loading active question pools…</p> : poolsError ? <p role="alert">{poolsError}</p> : !selectionReady ? <p>No active questions for this mode. Publish a pool in Admin → Question Pools.</p> : null}
+              {kind === "position" && <div style={{ display: "grid", gap: 10 }}><b>Choose your path</b><div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>{trainingPools.map(pool => <button key={pool.key} className={"trackBtn gdActionBlue gdTrackChoice" + (selectedTrainingPool?.key === pool.key ? " active gdTrackChoiceActive" : "")} type="button" onClick={() => setTrainingPoolKey(pool.key)}>{pool.label} ({pool.questionCount})</button>)}</div><small className="luHint">Up to 15 questions • five difficulty tiers • available database questions only</small></div>}
+              {kind === "cert" && <div style={{ display: "grid", gap: 10 }}><b>Choose a certification pack</b><div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>{certPools.map(pool => <button key={pool.key} className={"trackBtn gdActionBlue gdTrackChoice" + (selectedCertPool?.key === pool.key ? " active gdTrackChoiceActive" : "")} type="button" onClick={() => setCert(pool.certExam as CertTrack)}>{pool.label} ({pool.questionCount})</button>)}</div><small className="luHint">Up to 15 questions • five difficulty tiers • available database questions only</small></div>}
               {kind === "test" && <div style={{ display: "grid", gap: 14 }}>
                 <div style={{ fontWeight: 800 }}>Choose training mode</div>
                 <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
@@ -187,12 +197,12 @@ export default function PracticeMiniGameModal(props: {
                 </div>
                 <div style={{ fontWeight: 800, marginTop: 4 }}>Choose a question bank</div>
                 <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-                  {testBanks.map((bank) => <button key={bank.domain} className={"trackBtn gdActionBlue gdTrackChoice" + (testBank === bank.domain ? " active gdTrackChoiceActive" : "")} type="button" onClick={() => setTestBank(bank.domain)}>{bank.label}{bank.domain !== "GENERAL" && bank.questionCount ? ` (${bank.questionCount})` : ""}</button>)}
+                  {testBanks.map((bank) => <button key={bank.domain} className={"trackBtn gdActionBlue gdTrackChoice" + (selectedTestBank?.domain === bank.domain ? " active gdTrackChoiceActive" : "")} type="button" onClick={() => setTestBank(bank.domain)}>{bank.label}{bank.domain !== "MIXED" && bank.questionCount ? ` (${bank.questionCount})` : ""}</button>)}
                 </div>
                 <div className="muted">15 questions • unseen questions first • adaptive modes use your personal learning history</div>
               </div>}
               <div style={{ marginTop: 14, display: "flex", justifyContent: "flex-end" }}>
-                <button className="primaryBtn gdActionOrange" type="button" onClick={() => setStep("quiz")}>START →</button>
+                <button className="primaryBtn gdActionOrange" type="button" disabled={!selectionReady} onClick={() => setStep("quiz")}>START →</button>
               </div>
             </div>
           )}
@@ -203,15 +213,17 @@ export default function PracticeMiniGameModal(props: {
               title={title}
               subtitle={subtitle}
               timed={kind === "test"}
-              startingPosition={kind === "position" ? path : undefined}
+              startingPosition={undefined}
+              careerPath={kind === "position" ? selectedTrainingPool?.careerPath : undefined}
+              industry={kind === "position" ? selectedTrainingPool?.industry : undefined}
               playerPosition={playerPosition ?? defaultPath}
-              certExam={kind === "cert" ? cert : undefined}
-              bankDomain={kind === "test" && testBank !== "GENERAL" ? testBank : undefined}
+              certExam={kind === "cert" ? selectedCertPool?.certExam : undefined}
+              bankDomain={kind === "test" && selectedTestBank?.domain !== "MIXED" ? selectedTestBank?.domain : undefined}
               trainingMode={kind === "test" ? testMode : "STANDARD"}
               exitLabel="EXIT"
               onExit={onClose}
-              metaLeft={kind === "position" ? `Path: ${path.replaceAll("_", " ")}` : kind === "cert" ? `Exam: ${cert.replaceAll("_", " ")}` : `Bank: ${testBank === "GENERAL" ? "Mixed" : testBank}`}
-              questionCount={kind === "test" ? 15 : 12}
+              metaLeft={kind === "position" ? `Path: ${selectedTrainingPool?.label || ""}` : kind === "cert" ? `Exam: ${selectedCertPool?.label || ""}` : `Bank: ${selectedTestBank?.label || "Mixed"}`}
+              questionCount={15}
               onComplete={finishRun as any}
             />
           )}

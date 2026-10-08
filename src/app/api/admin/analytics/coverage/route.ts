@@ -24,7 +24,7 @@ export async function GET(req: Request) {
       where.setId = setId;
     } else if (lane) {
       const placements = await prisma.questionSetPlacement.findMany({
-        where: { lane: lane as any, isActive: true },
+        where: { lane: lane as any, isActive: true, set: { status: "PUBLISHED" } },
         select: { setId: true },
       });
       where.setId = { in: placements.map((row) => row.setId) };
@@ -49,7 +49,7 @@ export async function GET(req: Request) {
     });
 
     const byType = asBucket(questions, (row) => String(normalizeQuestionType(row?.type)).toLowerCase());
-    const byDifficulty = asBucket(questions, (row) => String(Math.max(1, Math.min(3, Number(row?.difficulty || 1) || 1))));
+    const byDifficulty = asBucket(questions, (row) => String(Math.max(1, Math.min(5, Number(row?.difficulty || 1) || 1))));
     const byLifecycle = asBucket(questions, (row) => {
       const raw = row?.data && typeof row.data === "object" ? row.data : {};
       return String((raw as any)?.lifecycleStatus || "ACTIVE").trim().toUpperCase();
@@ -62,10 +62,10 @@ export async function GET(req: Request) {
     const duplicateClusters = clusters.filter((c) => c.ids.length > 1);
 
     const warnings: string[] = [];
-    for (const type of ["multiple_choice", "multi_select", "fill_blank", "sequence_order", "incident", "cli_command", "log_analysis"]) {
+    for (const type of ["multiple_choice", "true_false", "cli_command"]) {
       if (!byType[type]) warnings.push(`Missing question type coverage: ${type}`);
     }
-    for (const level of ["1", "2", "3"]) {
+    for (const level of ["1", "2", "3", "4", "5"]) {
       if (!byDifficulty[level]) warnings.push(`Missing difficulty tier: ${level}`);
     }
     if (duplicateClusters.length) warnings.push(`${duplicateClusters.length} possible duplicate/similar question clusters detected`);

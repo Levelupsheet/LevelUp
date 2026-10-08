@@ -17,8 +17,8 @@ export type BossQuestion = {
   correctIndex: number | null;
   data: Record<string, unknown>;
   explanation: string | null;
-  difficulty: 1 | 2 | 3;
-  level: 1 | 2 | 3;
+  difficulty: 1 | 2 | 3 | 4 | 5;
+  level: 1 | 2 | 3 | 4 | 5;
   domainId: string;
   domain: string;
   tags?: string[];
@@ -148,7 +148,7 @@ export function selectBossQuestions(inputQuestions: any[], count = BOSS_QUESTION
   // questions just to reach the requested count.
   const allowedTypes = new Set(["multiple_choice", "true_false", "cli_command"]);
   const hard = [...inputQuestions]
-    .filter((q) => normalizeDifficultyLevel(q?.difficulty) === 3)
+    .filter((q) => normalizeDifficultyLevel(q?.difficulty ?? q?.level) >= 4)
     .filter((q) => allowedTypes.has(normalizeQuestionType(q?.type)))
     .sort((a, b) => Number(b?.difficulty || 1) - Number(a?.difficulty || 1));
 
@@ -192,18 +192,22 @@ export function bossCombatRules(profile?: BossProfile | null) {
   const basePlayerDamage = Math.max(18, Math.round((profile?.attackPower || 22) * 0.9));
   return {
     startHP,
-    enemyDamageByTier: { 1: baseEnemyDamage, 2: baseEnemyDamage, 3: baseEnemyDamage },
+    enemyDamageByTier: { 1: baseEnemyDamage, 2: baseEnemyDamage, 3: baseEnemyDamage, 4: baseEnemyDamage, 5: baseEnemyDamage },
     playerDamageByTier: {
       1: basePlayerDamage,
       2: Math.max(basePlayerDamage + 4, Math.round(basePlayerDamage * 1.1)),
       3: Math.max(basePlayerDamage + 8, Math.round(basePlayerDamage * 1.25)),
+      4: Math.round(basePlayerDamage * 1.4),
+      5: Math.round(basePlayerDamage * 1.6),
     },
     xpByTier: {
       1: Math.round(20 * scale),
       2: Math.round(30 * scale),
       3: Math.round(45 * scale),
+      4: Math.round(60 * scale),
+      5: Math.round(80 * scale),
     },
-    timePerQuestionByTier: { 1: 35, 2: 30, 3: 25 },
+    timePerQuestionByTier: { 1: 35, 2: 30, 3: 25, 4: 22, 5: 20 },
   } as const;
 }
 

@@ -41,7 +41,12 @@ export type CombatEngineOptions = {
 };
 
 export function useCombatQuiz(opts: CombatEngineOptions) {
-  const rules: CombatRules = useMemo(() => ({ ...DEFAULT_RULES, ...(opts.rules || {}) }), [opts.rules]);
+  const rules: CombatRules = useMemo(() => ({ ...DEFAULT_RULES, ...(opts.rules || {}),
+    playerDamageByTier: { ...DEFAULT_RULES.playerDamageByTier, ...opts.rules?.playerDamageByTier },
+    enemyDamageByTier: { ...DEFAULT_RULES.enemyDamageByTier, ...opts.rules?.enemyDamageByTier },
+    xpByTier: { ...DEFAULT_RULES.xpByTier, ...opts.rules?.xpByTier },
+    timePerQuestionByTier: { ...DEFAULT_RULES.timePerQuestionByTier, ...opts.rules?.timePerQuestionByTier },
+  }), [opts.rules]);
   const timed = Boolean(opts.timed);
   const finishOnEnemyDefeat = opts.finishOnEnemyDefeat !== false;
   const questionsKey = useMemo(() => opts.questions.map((question) => question.id).join("|"), [opts.questions]);
@@ -83,7 +88,7 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
   const resolveQuestionLevel = useCallback((question: CombatQuestion | undefined, combatState: CombatState) => {
     if (!question) return 1 as DifficultyTier;
     const resolved = getQuestionLevelRef.current?.(question, combatState);
-    return (resolved === 1 || resolved === 2 || resolved === 3) ? resolved : inferLevel(question);
+    return (resolved === 1 || resolved === 2 || resolved === 3 || resolved === 4 || resolved === 5) ? resolved : inferLevel(question);
   }, []);
 
   const q = opts.questions[state.idx];
@@ -128,7 +133,7 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
     }
 
     const lvl = resolveQuestionLevel(q, state);
-    const eff: DifficultyTier = Math.max(state.tier, lvl) as DifficultyTier;
+    const eff: DifficultyTier = lvl;
     const seconds = rules.timePerQuestionByTier[eff];
     startTimer(seconds);
   }, [q?.id, state.tier, state.locked, state.finished, timed, rules.timePerQuestionByTier, startTimer, stopTimer, resolveQuestionLevel]);
@@ -143,7 +148,7 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
       if (s.locked || s.finished) return s;
       const domainId = inferDomainId(q);
       const lvl = resolveQuestionLevel(q, s);
-      const effTier: DifficultyTier = Math.max(s.tier, lvl) as DifficultyTier;
+      const effTier: DifficultyTier = lvl;
 
       const correct = false;
       const xpDelta = 0;
@@ -181,10 +186,15 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
           tier,
           domainId,
           masteryValue: nextMastery,
+          playerDamage: Math.max(0, s.playerHP - playerHP),
+          enemyDamage: Math.max(0, s.enemyHP - enemyHP),
+          playerHealing: Math.max(0, playerHP - s.playerHP),
+          usedShield,
+          usedFury: false,
         });
       });
 
-      return next;
+      return playerHP <= 0 ? { ...next, finished: true } : next;
     });
   }, [timed, q, state.timeLeft, state.locked, state.finished, rules, resolveQuestionLevel]);
 
@@ -205,7 +215,7 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
 
       const domainId = inferDomainId(q);
       const lvl = resolveQuestionLevel(q, s);
-      const effTier: DifficultyTier = Math.max(s.tier, lvl) as DifficultyTier;
+      const effTier: DifficultyTier = lvl;
       const correct = s.selected === q.correctIndex;
       const modifiers = getActiveModifiersRef.current?.() || {};
       const usedShield = !correct && Boolean(modifiers.shieldActive);
@@ -254,6 +264,11 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
           tier,
           domainId,
           masteryValue: nextMastery,
+          playerDamage: Math.max(0, s.playerHP - playerHP),
+          enemyDamage: Math.max(0, s.enemyHP - enemyHP),
+          playerHealing: Math.max(0, playerHP - s.playerHP),
+          usedShield,
+          usedFury,
         });
       });
 
@@ -270,7 +285,7 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
 
       return next;
     });
-  }, [q, rules, resolveQuestionLevel]);
+  }, [q, rules, resolveQuestionLevel, finishOnEnemyDefeat, stopTimer]);
 
   const submitManual = useCallback((manual: {
     correct: boolean;
@@ -285,7 +300,7 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
 
       const domainId = manual.domainId ?? inferDomainId(q);
       const lvl = (manual.level ?? resolveQuestionLevel(q, s)) as DifficultyTier;
-      const effTier: DifficultyTier = Math.max(s.tier, lvl) as DifficultyTier;
+      const effTier: DifficultyTier = lvl;
       const correct = manual.correct;
       const modifiers = getActiveModifiersRef.current?.() || {};
       const usedShield = !correct && Boolean(modifiers.shieldActive);
@@ -333,6 +348,11 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
           tier,
           domainId,
           masteryValue: nextMastery,
+          playerDamage: Math.max(0, s.playerHP - playerHP),
+          enemyDamage: Math.max(0, s.enemyHP - enemyHP),
+          playerHealing: Math.max(0, playerHP - s.playerHP),
+          usedShield,
+          usedFury,
         });
       });
 
@@ -349,12 +369,12 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
 
       return next;
     });
-  }, [q, rules, resolveQuestionLevel]);
+  }, [q, rules, resolveQuestionLevel, finishOnEnemyDefeat, stopTimer]);
 
   const next = useCallback(() => {
     stopTimer();
     setState((s) => {
-      if (s.finished) return s;
+      if (s.finished || !s.locked) return s;
       if (s.playerHP <= 0 || (finishOnEnemyDefeat && s.enemyHP <= 0)) return { ...s, finished: true };
 
       const nextIdx = s.idx + 1;
@@ -362,7 +382,7 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
 
       const nextQ = opts.questions[nextIdx];
       const nextLvl = nextQ ? resolveQuestionLevel(nextQ, s) : 1;
-      const effNextTier: DifficultyTier = Math.max(s.tier, nextLvl) as DifficultyTier;
+      const effNextTier: DifficultyTier = nextLvl;
       return {
         ...s,
         idx: nextIdx,
@@ -382,7 +402,11 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
 
   const restorePlayerHP = useCallback((amount: number) => {
     if (!amount) return;
-    setState((s) => ({ ...s, playerHP: clamp(s.playerHP + Math.floor(amount), 0, rules.startHP) }));
+    setState((s) => s.finished || s.playerHP <= 0 ? s : ({ ...s, playerHP: clamp(s.playerHP + Math.floor(amount), 0, rules.startHP) }));
+  }, [rules.startHP]);
+
+  const restoreEnemyHP = useCallback((amount: number) => {
+    setState(s => s.finished ? s : { ...s, enemyHP: clamp(s.enemyHP + amount, 0, rules.startHP) });
   }, [rules.startHP]);
 
   const reset = useCallback(() => {
@@ -412,6 +436,7 @@ export function useCombatQuiz(opts: CombatEngineOptions) {
     next,
     addTime,
     restorePlayerHP,
+    restoreEnemyHP,
     reset,
     timed,
     currentDomainId,

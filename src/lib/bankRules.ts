@@ -9,7 +9,7 @@ export type SessionBlueprintStepMode =
 
 export type SessionBlueprintStep = {
   mode: SessionBlueprintStepMode;
-  difficulty: 1 | 2 | 3;
+  difficulty: 1 | 2 | 3 | 4 | 5;
   preferredTypes?: string[];
   weakFocus?: boolean;
 };
@@ -24,41 +24,17 @@ const DEFAULT_RULES: Record<string, BankCompositionRule> = {
   TEST_NOW: {
     lane: "TEST_NOW",
     domainQuota: { weakness: 40, balanced: 25, review: 15, stretch: 20 },
-    typeTargets: {
-      multiple_choice: 35,
-      multi_select: 15,
-      fill_blank: 10,
-      sequence_order: 10,
-      incident: 10,
-      cli_command: 10,
-      log_analysis: 10,
-    },
+    typeTargets: { multiple_choice: 60, true_false: 20, cli_command: 20 },
   },
   TRAINING: {
     lane: "TRAINING",
     domainQuota: { weakness: 45, balanced: 25, review: 20, stretch: 10 },
-    typeTargets: {
-      multiple_choice: 40,
-      multi_select: 15,
-      fill_blank: 10,
-      sequence_order: 10,
-      incident: 10,
-      cli_command: 10,
-      log_analysis: 5,
-    },
+    typeTargets: { multiple_choice: 60, true_false: 20, cli_command: 20 },
   },
   CERTIFICATIONS: {
     lane: "CERTIFICATIONS",
     domainQuota: { weakness: 30, balanced: 30, review: 20, stretch: 20 },
-    typeTargets: {
-      multiple_choice: 45,
-      multi_select: 20,
-      fill_blank: 10,
-      sequence_order: 8,
-      incident: 7,
-      cli_command: 5,
-      log_analysis: 5,
-    },
+    typeTargets: { multiple_choice: 60, true_false: 20, cli_command: 20 },
   },
 };
 
@@ -66,21 +42,14 @@ export function getBankRule(lane?: string | null): BankCompositionRule {
   return DEFAULT_RULES[String(lane || "TEST_NOW").toUpperCase()] || DEFAULT_RULES.TEST_NOW;
 }
 
-export function buildSessionBlueprint(questionCount: number, weakestTargetDifficulty: 1 | 2 | 3): SessionBlueprintStep[] {
-  const steps: SessionBlueprintStep[] = [];
-  const base: SessionBlueprintStep[] = [
-    { mode: "weakness", difficulty: 1, preferredTypes: ["multiple_choice", "fill_blank"], weakFocus: true },
-    { mode: "weakness", difficulty: weakestTargetDifficulty, preferredTypes: ["multiple_choice", "multi_select"], weakFocus: true },
-    { mode: "balanced", difficulty: Math.min(3, weakestTargetDifficulty + 0) as 1 | 2 | 3, preferredTypes: ["multiple_choice", "incident"] },
-    { mode: "review", difficulty: 1, preferredTypes: ["multiple_choice", "fill_blank"], weakFocus: true },
-    { mode: "balanced", difficulty: 2, preferredTypes: ["multi_select", "sequence_order"] },
-    { mode: "stretch", difficulty: 3, preferredTypes: ["incident", "cli_command", "log_analysis"] },
-    { mode: "scenario", difficulty: 3, preferredTypes: ["incident", "cli_command", "log_analysis"] },
-    { mode: "review", difficulty: 2, preferredTypes: ["multiple_choice", "multi_select"] },
-  ];
-
-  for (let i = 0; i < Math.max(1, questionCount); i += 1) {
-    steps.push(base[i % base.length]);
-  }
-  return steps.slice(0, questionCount);
+export function buildSessionBlueprint(questionCount: number, weakestTargetDifficulty: 1 | 2 | 3 | 4 | 5): SessionBlueprintStep[] {
+  // Three questions per tier in a full 15-question run. Short banks use only
+  // their available content; selecting a target never changes an authored tier.
+  const count = Math.max(0, Math.floor(questionCount));
+  return Array.from({ length: count }, (_, index): SessionBlueprintStep => ({
+    mode: index < Math.ceil(count / 5) ? "weakness" : index >= Math.floor(count * 0.8) ? "challenge" : "balanced",
+    difficulty: Math.min(5, Math.floor(index * 5 / Math.max(1, count)) + 1) as 1 | 2 | 3 | 4 | 5,
+    weakFocus: index < Math.ceil(count / 5),
+    preferredTypes: ["multiple_choice", "true_false", "cli_command"],
+  }));
 }

@@ -1,7 +1,9 @@
 import { GAME_CONFIG } from "@/engine/constants/gameConfig";
 import { levelFromXp } from "@/lib/progression";
 
-export function normalizeDifficultyTier(input?: number | null): 1 | 2 | 3 {
+export function normalizeDifficultyTier(input?: number | null): 1 | 2 | 3 | 4 | 5 {
+  if (input === 5) return 5;
+  if (input === 4) return 4;
   if (input === 3) return 3;
   if (input === 2) return 2;
   return 1;

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireAdminRequest } from "@/app/api/_lib/adminGuard";
+import { buildContentPoolCatalog, testNowBanks, canonicalTrainingTarget, trainingPlacementFilter } from "@/lib/contentPools";
 import { prisma } from "@/lib/prisma";
 
 /**
@@ -19,14 +20,12 @@ export async function POST(req: Request) {
     const body = await req.json();
     const setId = String(body?.setId || "");
     const lane = body?.lane as "TEST_NOW" | "TRAINING" | "CERTIFICATIONS" | "INTERVIEW";
-    const startingPosition = body?.startingPosition ?? null;
-    const industry = String(body?.industry || "").trim() || null;
-    const careerPath = String(body?.careerPath || "").trim() || null;
+    const { startingPosition, industry, careerPath } = canonicalTrainingTarget(body);
     const certExam = body?.certExam ?? null;
     const exclusive = Boolean(body?.exclusive);
     const isActive = body?.isActive === false ? false : true;
 
-    if (!setId || !lane) {
+    if (!setId || !["TEST_NOW", "TRAINING", "CERTIFICATIONS", "INTERVIEW"].includes(lane)) {
       return NextResponse.json({ error: "setId and lane are required" }, { status: 400 });
     }
     if (lane === "TRAINING" && !careerPath && !startingPosition) {
@@ -36,17 +35,23 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "certExam is required for CERTIFICATIONS" }, { status: 400 });
     }
 
+    const set = await prisma.questionSet.findUnique({ where: { id: setId }, select: { status: true, domain: true, _count: { select: { questions: true } } } });
+    if (!set) return NextResponse.json({ error: "Question pool not found" }, { status: 404 });
+    if (isActive && !set._count.questions) return NextResponse.json({ error: "Add questions before publishing this pool" }, { status: 400 });
+
     const whereDeactivate: any = { lane, isActive: true };
     if (lane === "TRAINING") {
       if (careerPath) { whereDeactivate.industry = industry; whereDeactivate.careerPath = careerPath; }
-      else whereDeactivate.startingPosition = startingPosition;
+      else { whereDeactivate.startingPosition = startingPosition; whereDeactivate.careerPath = null; }
     }
     if (lane === "CERTIFICATIONS") whereDeactivate.certExam = certExam;
     if (lane === "TEST_NOW") {
-      // nothing extra
+      whereDeactivate.set = { domain: set.domain };
     }
 
     const created = await prisma.$transaction(async (tx: any) => {
+      // The Admin Publish pool action publishes the set and placement together.
+      if (isActive) await tx.questionSet.update({ where: { id: setId }, data: { status: "PUBLISHED" } });
       if (exclusive) {
         await tx.questionSetPlacement.updateMany({
           where: whereDeactivate,
@@ -63,18 +68,18 @@ export async function POST(req: Request) {
         certExam: lane === "CERTIFICATIONS" ? certExam : null,
       };
       // Reactivate a previously unpublished placement rather than creating duplicates.
+      const matchingTarget = lane === "TRAINING"
+        ? { setId, lane, certExam: null, ...trainingPlacementFilter({ industry, careerPath, startingPosition }) }
+        : placementFilter;
       const existing = await tx.questionSetPlacement.findFirst({
-        where: placementFilter,
+        where: matchingTarget,
         orderBy: { createdAt: "desc" },
       });
       if (existing) {
-        if (existing.isActive !== isActive) {
-          return tx.questionSetPlacement.update({
-            where: { id: existing.id },
-            data: { isActive },
-          });
-        }
-        return existing;
+        if (isActive) await tx.questionSetPlacement.updateMany({ where: { ...matchingTarget, id: { not: existing.id }, isActive: true }, data: { isActive: false } });
+        return tx.questionSetPlacement.update({
+          where: { id: existing.id }, data: { ...placementFilter, isActive },
+        });
       }
       return tx.questionSetPlacement.create({
         data: { ...placementFilter, isActive },
@@ -83,6 +88,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ ok: true, placement: created, mode: exclusive ? "replaced" : "added_to_bank" });
   } catch (e: any) {
+    if (e?.code === "P2002") return NextResponse.json({ error: "This pool is already live for that destination. Refresh Live Pools." }, { status: 409 });
     return NextResponse.json({ error: e?.message || "Failed to assign placement" }, { status: 500 });
   }
 }
@@ -92,20 +98,10 @@ export async function GET() {
   if (!admin.ok) return admin.response;
   const placements = await prisma.questionSetPlacement.findMany({
     orderBy: { createdAt: "desc" },
-    take: 200,
     include: { set: { include: { _count: { select: { questions: true } } } } },
   });
-  const activeTestNowBanks = Array.from(new Map(
-    placements
-      .filter((p: any) => p.lane === "TEST_NOW" && p.isActive)
-      .map((p: any) => [String(p.set?.domain || "GENERAL"), {
-        domain: String(p.set?.domain || "GENERAL"),
-        setId: p.setId,
-        setName: p.set?.name || "Question pool",
-        questionCount: Number((p.set as any)?._count?.questions || 0),
-      }])
-  ).values());
-  return NextResponse.json({ placements, activeTestNowBanks });
+  const activePools = buildContentPoolCatalog(placements);
+  return NextResponse.json({ placements, activePools, activeTestNowBanks: testNowBanks(activePools) });
 }
 
 /** Deactivate one exact placement without deleting its question set. */

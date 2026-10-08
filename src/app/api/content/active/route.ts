@@ -30,6 +30,7 @@ export async function GET(req: Request) {
     industry,
     careerPath,
     certExam,
+    bankDomain: url.searchParams.get("bankDomain"),
     questionCount: requestedCount,
     shouldShuffle,
     excludeIds,

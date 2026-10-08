@@ -37,11 +37,11 @@ type Props = {
 };
 
 
-function getRecentKey(lane: GameLane, startingPosition?: string | null, certExam?: string | null) {
-  return `lu_recent_${lane}_${startingPosition || "all"}_${certExam || "all"}`;
+function getRecentKey(lane: GameLane, selection: string) {
+  return `lu_recent_${lane}_${selection}`;
 }
 function readRecentIds(key: string): string[] { try { const raw = localStorage.getItem(key); const parsed = raw ? JSON.parse(raw) : []; return Array.isArray(parsed) ? parsed.map((v) => String(v)) : []; } catch { return []; } }
-function writeRecentIds(key: string, ids: string[]) { try { const unique = Array.from(new Set(ids.map((v) => String(v)))).slice(-100); localStorage.setItem(key, JSON.stringify(unique)); } catch {} }
+function writeRecentIds(key: string, ids: string[]) { try { const unique = Array.from(new Set(ids.map((v) => String(v)))); localStorage.setItem(key, JSON.stringify(unique)); } catch {} }
 
 function mapQuestion(q: any, idx: number): DiabloQuestion {
   const tags = Array.isArray(q?.tags) ? q.tags : [];
@@ -76,10 +76,11 @@ export default function GameEngine(props: Props) {
   const [setLabel, setSetLabel] = useState<string>(subtitle || title);
   const [sessionId, setSessionId] = useState<string>("");
   const [initialState, setInitialState] = useState<any>(null);
+  const rewardClaimKeyRef = useRef("");
   const progressSaveRef = useRef<number | null>(null);
 
   const effectiveCount = useMemo(
-    () => questionCount || (lane === "TEST_NOW" ? 10 : lane === "CERTIFICATIONS" ? GAME_CONFIG.questionCount.certification : GAME_CONFIG.questionCount.training),
+    () => questionCount || (lane === "TEST_NOW" ? GAME_CONFIG.questionCount.testNow : lane === "CERTIFICATIONS" ? GAME_CONFIG.questionCount.certification : GAME_CONFIG.questionCount.training),
     [lane, questionCount]
   );
 
@@ -89,27 +90,37 @@ export default function GameEngine(props: Props) {
     search.set("questionCount", String(effectiveCount));
     search.set("shuffle", "1");
     search.set("nonce", String(Date.now()));
-    const recentKey = getRecentKey(lane, startingPosition, certExam);
-    const excludeIds = readRecentIds(recentKey);
-    if (excludeIds.length) search.set("excludeIds", excludeIds.join(","));
+    const recentKey = getRecentKey(lane, careerPath ? `${industry || ""}:${careerPath}` : startingPosition || certExam || bankDomain || "all");
+    const recentIds = readRecentIds(recentKey);
+    if (recentIds.length) search.set("excludeIds", recentIds.join(","));
     if (careerPath) {
       search.set("careerPath", careerPath);
       if (industry) search.set("industry", industry);
     } else if (startingPosition) search.set("startingPosition", startingPosition);
     if (certExam) search.set("certExam", certExam);
-    const res = await fetch(`/api/content/active?${search.toString()}`, { cache: "no-store" as any });
-    const json = await res.json().catch(() => null);
+    if (bankDomain) search.set("bankDomain", bankDomain);
+    let res = await fetch(`/api/content/active?${search.toString()}`, { cache: "no-store" });
+    let json = await res.json().catch(() => null);
     if (!res.ok) throw new Error(json?.error || "Could not load published questions");
+    let previousIds = recentIds;
+    // Finish the unseen remainder first. Reopen the bank only when none remain.
+    if (!json?.questions?.length && recentIds.length) {
+      search.delete("excludeIds");
+      res = await fetch(`/api/content/active?${search.toString()}`, { cache: "no-store" });
+      json = await res.json().catch(() => null);
+      if (!res.ok) throw new Error(json?.error || "Could not load published questions");
+      previousIds = [];
+    }
     const mapped = Array.isArray(json?.questions) ? json.questions.map(mapQuestion) : [];
     if (mapped.length) {
       setQuestions(mapped);
-      writeRecentIds(recentKey, mapped.map((q) => String(q.id)));
+      writeRecentIds(recentKey, [...previousIds, ...mapped.map((q) => String(q.id))]);
       setSetLabel(json?.set?.name ? `${title} · ${json.set.name}` : subtitle || title);
     } else {
       setQuestions([]);
       setLoadError("No published questions are available for this training selection. Assign a question pool in Admin → Question Pools.");
     }
-  }, [lane, effectiveCount, startingPosition, industry, careerPath, certExam, title, subtitle]);
+  }, [lane, effectiveCount, startingPosition, industry, careerPath, certExam, bankDomain, title, subtitle]);
 
   const loadTestNowSession = useCallback(async () => {
     const userId = resolveClientUserId();
@@ -137,6 +148,7 @@ export default function GameEngine(props: Props) {
   const load = useCallback(async () => {
     setLoading(true);
     setLoadError(null);
+    rewardClaimKeyRef.current = crypto.randomUUID();
     try {
       await hydrateAuthenticatedUser();
       if (lane === "TEST_NOW") await loadTestNowSession();
@@ -151,6 +163,7 @@ export default function GameEngine(props: Props) {
 
   useEffect(() => {
     if (questionsOverride?.length) {
+      rewardClaimKeyRef.current = crypto.randomUUID();
       setQuestions(questionsOverride);
       setSetLabel(subtitle || title);
       setLoading(false);
@@ -198,7 +211,10 @@ export default function GameEngine(props: Props) {
     }
   }, [lane, sessionId]);
 
+  useEffect(() => () => { if (progressSaveRef.current) window.clearTimeout(progressSaveRef.current); }, []);
+
   const handleComplete = useCallback(async (summary: DiabloQuizRunSummary) => {
+    if (progressSaveRef.current) { window.clearTimeout(progressSaveRef.current); progressSaveRef.current = null; }
     const speedBonus = timed ? calculateSpeedBonus(summary.timeLeft || 0) : 0;
     const awardedXp = summary.xpEarned + speedBonus;
     const local = awardXp(awardedXp);
@@ -216,6 +232,7 @@ export default function GameEngine(props: Props) {
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
           userId: activeUserId,
+          rewardClaimKey: sessionId || rewardClaimKeyRef.current,
           lane,
           title,
           correctCount: summary.correctCount,
@@ -230,7 +247,7 @@ export default function GameEngine(props: Props) {
       });
     } catch {}
     onComplete?.({ ...summary, awardedXp });
-  }, [timed, lane, title, onComplete, sessionId, initialState]);
+  }, [timed, lane, title, onComplete, sessionId, initialState, questions]);
 
   if (loading) return <div className="page"><div className="container" style={{ maxWidth: 1280 }}><div className="card" style={{ padding: 18 }}><div style={{ fontWeight: 800, fontSize: 18 }}>Loading {title}…</div><div className="muted" style={{ marginTop: 8 }}>{lane === "TEST_NOW" ? "Restoring or creating your saved Test Now session." : "Pulling randomized questions from your active database set."}</div></div></div></div>;
   const activePosition = playerPosition || String((getActiveUser() as any)?.startingPosition || "HELPDESK_SUPPORT");

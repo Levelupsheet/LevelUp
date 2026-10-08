@@ -31,7 +31,7 @@ function normalizeRuntimeQuestion(input: RuntimeQuestion) {
   const domain = normalizeQuestionDomain(String(input.domainId || (data as any).domainId || (data as any).domain || ""));
   const subdomain = normSubdomain(String(input.subdomain || (data as any).subdomain || (data as any).topic || ""));
   const type = String(normalizeQuestionType(input.type) || "multiple_choice").toLowerCase();
-  const level = Math.max(1, Math.min(3, Number(input.level ?? input.difficulty ?? 1) || 1));
+  const level = Math.max(1, Math.min(5, Number(input.level ?? input.difficulty ?? 1) || 1));
   const prerequisites = Array.isArray((data as any).prerequisites) ? (data as any).prerequisites.map((v: any) => normSubdomain(String(v))).filter(Boolean) : [];
   const minMastery = Math.max(0, Math.min(100, Number((data as any).minMastery ?? 0) || 0));
   const lifecycleStatus = String((data as any).lifecycleStatus || "ACTIVE").toUpperCase();
@@ -104,7 +104,7 @@ export async function getAdaptiveLearningContext(userId?: string | null) {
       lastWrongSubdomain: null as string | null,
       lastWrongQuestionType: null as string | null,
       weakestDomain: "general",
-      weakestTargetDifficulty: 1 as 1 | 2 | 3,
+      weakestTargetDifficulty: 1 as 1 | 2 | 3 | 4 | 5,
     };
   }
 
@@ -319,7 +319,9 @@ export function weightedAdaptiveQuestionPlan<T extends RuntimeQuestion>(args: {
 
   for (let stepIndex = 0; stepIndex < blueprint.length && selected.length < args.questionCount; stepIndex += 1) {
     const step = blueprint[stepIndex];
-    const candidates = questions.filter((q) => !selectedIds.has(String(q.id)));
+    const remaining = questions.filter((q) => !selectedIds.has(String(q.id)));
+    const nearestDistance = Math.min(...remaining.map(q => Math.abs(q.level - step.difficulty)));
+    const candidates = remaining.filter(q => Math.abs(q.level - step.difficulty) === nearestDistance);
     const scored = candidates.map((q, index) => {
       const domainKey = String((q as any).domain).toLowerCase();
       const subKey = `${domainKey}:${String((q as any).subdomain).toLowerCase()}`;
@@ -329,7 +331,7 @@ export function weightedAdaptiveQuestionPlan<T extends RuntimeQuestion>(args: {
       const typeMastery = Number(args.learning.masteryByQuestionType[typeKey] ?? 50);
       const targetDifficultyBase = masteryToTargetDifficulty(Math.round((domainMastery + subMastery) / 2));
       const calibration = args.calibrationMap?.get(String(q.id));
-      const targetDifficulty = Math.max(1, Math.min(3, step.difficulty + calibrationDifficultyOffset(calibration))) as 1 | 2 | 3;
+      const targetDifficulty = Math.max(1, Math.min(5, step.difficulty + calibrationDifficultyOffset(calibration))) as 1 | 2 | 3 | 4 | 5;
       const weaknessWeight = ((100 - domainMastery) * 0.55) + ((100 - subMastery) * 0.30) + ((100 - typeMastery) * 0.15);
       const difficultyFit = Math.max(0, 100 - Math.abs(((q as any).level || targetDifficultyBase || 1) - targetDifficulty) * 35);
       const typeTarget = Number(rule.typeTargets[typeKey] ?? 5);
@@ -380,7 +382,7 @@ export function weightedAdaptiveQuestionPlan<T extends RuntimeQuestion>(args: {
     const picked = scored[0];
     if (!picked) continue;
     selectedIds.add(String(picked.q.id));
-    selected.push({ ...(picked.q as any), level: picked.targetDifficulty });
+    selected.push(picked.q as any);
     const dk = String((picked.q as any).domain).toLowerCase();
     const tk = String((picked.q as any).type).toLowerCase();
     perDomainCount.set(dk, (perDomainCount.get(dk) || 0) + 1);

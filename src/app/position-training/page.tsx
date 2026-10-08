@@ -7,6 +7,7 @@ import { hydrateAuthenticatedUser, resolveClientUserId } from "@/lib/activeUser"
 
 export default function PositionTrainingPage() {
   const router = useRouter();
+  const [ready, setReady] = useState(false);
   const [startingPosition, setStartingPosition] = useState<string>("HELPDESK_SUPPORT");
   const [industry, setIndustry] = useState<string | null>(null);
   const [careerPath, setCareerPath] = useState<string | null>(null);
@@ -45,6 +46,7 @@ export default function PositionTrainingPage() {
         const sp = sJson?.user?.startingPosition || "HELPDESK_SUPPORT";
         if (mounted) setStartingPosition(sp);
       } catch {}
+      if (mounted) setReady(true);
     })();
     return () => { mounted = false; };
   }, [router]);
@@ -52,7 +54,7 @@ export default function PositionTrainingPage() {
   return (
     <div className="page paidAssetPage positionTrainingAssetPage">
       <div className="container" style={{ maxWidth: 1280 }}>
-        <GameEngine lane="TRAINING" startingPosition={careerPath ? null : startingPosition} industry={industry} careerPath={careerPath} title="Position Training" subtitle={`Role-based training • ${careerPath || startingPosition.replaceAll("_", " ")}`} metaLeft={`Path: ${industry ? industry + " • " : ""}${careerPath || startingPosition.replaceAll("_", " ")}`} exitHref="/dashboard" exitLabel="Close" />
+        {ready ? <GameEngine lane="TRAINING" startingPosition={careerPath ? null : startingPosition} industry={industry} careerPath={careerPath} title="Position Training" subtitle={`Role-based training • ${careerPath || startingPosition.replaceAll("_", " ")}`} metaLeft={`Path: ${industry ? industry + " • " : ""}${careerPath || startingPosition.replaceAll("_", " ")}`} exitHref="/dashboard" exitLabel="Close" /> : <p>Loading your selected training path…</p>}
       </div>
     </div>
   );

@@ -7,7 +7,8 @@ import { normalizeQuestionType } from "@/lib/questionTypes";
 import { buildQuestionBankSelection } from "@/lib/questionBank";
 import { calculateConfidenceScore, recordQuestionExposure, upsertQuestionCalibration, upsertUserSkillFromAnswer } from "@/lib/adaptiveEngine";
 import { getSweepstakesCampaignMetaMap } from "@/lib/sweepstakesCampaignMeta";
-import { awardRaffleEntries, getOrCreateActiveGoldenSweepstakes } from "@/lib/raffle";
+import { awardGoldenQuestion } from "@/lib/goldenRewards";
+import { getOrCreateActiveGoldenSweepstakes } from "@/lib/raffle";
 import { buildQuestionExplanation } from "@/lib/explanations";
 import { levelFromXp } from "@/lib/progression";
 
@@ -82,16 +83,19 @@ async function findActiveSession(userId: string) {
   });
 }
 
-async function buildNewSession(userId: string, questionCount = 10, bankDomain?: string | null) {
+async function buildNewSession(userId: string, questionCount = 15, bankDomain?: string | null, trainingMode = "STANDARD") {
   const bank = await buildQuestionBankSelection({
     lane: "TEST_NOW",
     questionCount,
     shouldShuffle: true,
     bankDomain,
+    weakDomainTraining: trainingMode === "WEAK_DOMAIN",
+    missedQuestionTraining: trainingMode === "MISSED_QUESTIONS",
     userId,
     sessionState: { wrongStreak: 0, inRecovery: false, typeCounts: {} },
   });
   if (!bank.placements.length || !bank.questions.length) throw new Error("No active Test Now question bank found");
+  if (!bank.selectedQuestions.length) throw new Error(trainingMode === "MISSED_QUESTIONS" ? "No missed questions in this bank need review. Try Standard training." : trainingMode === "WEAK_DOMAIN" ? "No active questions in this bank match your weakest domain. Try Mixed or Standard training." : "No eligible questions are available in this bank.");
 
   await ensureGoldenQuestionHistoryTable();
   const primaryPlacement = bank.placements[0];
@@ -101,7 +105,7 @@ async function buildNewSession(userId: string, questionCount = 10, bankDomain?: 
   const goldenTypes = new Set(["multiple_choice", "true_false", "cli_command"]);
   const goldenPool = pool.filter((q: any) =>
     q.isGoldenEligible &&
-    normalizeDifficultyLevel(q.difficulty) === 3 &&
+    normalizeDifficultyLevel(q.difficulty) >= 4 &&
     goldenTypes.has(normalizeQuestionType(q.type))
   );
   let goldenQuestionId: string | null = null;
@@ -112,23 +116,20 @@ async function buildNewSession(userId: string, questionCount = 10, bankDomain?: 
   const currentLevel = levelFromXp(currentXp);
   const alreadyHadGolden = await (prisma as any).$queryRawUnsafe(`SELECT 1 FROM "GoldenQuestionHistory" WHERE "userId" = $1 AND "level" = $2 AND "awarded" = TRUE LIMIT 1`, userId, currentLevel).then((rows: any[]) => Array.isArray(rows) && rows.length > 0).catch(() => false);
 
+  // Mark an eligible question already selected by the unseen cycle. Never inject
+  // a seen/duplicate question or convert an easy question into a Golden challenge.
   if (!alreadyHadGolden && finalQuestions.length >= 6) {
-    const replacementIndex = Math.min(5, Math.max(0, finalQuestions.length - 1));
-    goldenQuestionIndex = replacementIndex;
-    if (goldenPool.length > 0) {
-      const selectedIds = new Set(finalQuestions.map((q: any) => String(q.id || "")));
-      const availableGolden = goldenPool.filter((q: any) => !selectedIds.has(String(q.id || "")));
-      const weighted = (availableGolden.length ? availableGolden : goldenPool).flatMap((q: any) => Array.from({ length: Math.max(1, Number(q.goldenWeight || 1)) }, () => q));
-      const picked = weighted[Math.floor(Math.random() * weighted.length)] || goldenPool[0];
-      if (picked) {
-        finalQuestions[replacementIndex] = { ...shuffleQuestionPayload(picked), isGolden: true, goldenBonusXp: picked.goldenBonusXp || 50 } as any;
-      }
-    } else {
-      finalQuestions[replacementIndex] = { ...finalQuestions[replacementIndex], isGolden: true } as any;
+    const eligibleIds = new Set(goldenPool.map(q => String(q.id)));
+    const candidates = finalQuestions.map((q, index) => ({ q, index })).filter(({ q }) => eligibleIds.has(String(q.id)));
+    const picked = candidates[Math.floor(Math.random() * candidates.length)];
+    if (picked) {
+      finalQuestions[picked.index] = { ...picked.q, isGolden: true };
+      goldenQuestionId = String(picked.q.id);
     }
-    goldenQuestionId = String((finalQuestions[replacementIndex] as any).id || `inline-golden-${replacementIndex}`);
   }
 
+  finalQuestions.sort((a, b) => a.level - b.level);
+  goldenQuestionIndex = finalQuestions.findIndex(q => q.isGolden);
   const session = await prisma.$transaction(async (tx: any) => {
     const created = await tx.gameSession.create({
       data: {
@@ -183,7 +184,7 @@ export async function POST(req: Request) {
     const body = await req.json().catch(() => ({} as any));
     const sessionUser = await getSessionUser();
     const userId = String(sessionUser?.id || "").trim();
-    const questionCount = Math.max(1, Math.min(25, Number(body?.questionCount || 10) || 10));
+    const questionCount = Math.max(1, Math.min(25, Number(body?.questionCount || 15) || 15));
     const bankDomain = String(body?.bankDomain || "").trim().toUpperCase() || null;
     if (!userId) return NextResponse.json({ error: "Sign in required" }, { status: 401 });
     await ensureUser(userId);
@@ -194,7 +195,7 @@ export async function POST(req: Request) {
       where: { userId, mode: "TEST_NOW", status: "ACTIVE" },
       data: { status: "ABANDONED", completedAt: new Date() },
     });
-    const session = await buildNewSession(userId, questionCount, bankDomain);
+    const session = await buildNewSession(userId, questionCount, bankDomain, String(body?.trainingMode || "STANDARD"));
     return NextResponse.json(serializeSession(session));
   } catch (e: any) {
     return NextResponse.json({ error: e?.message || "Failed to create Test Now session" }, { status: 500 });
@@ -328,7 +329,7 @@ export async function PATCH(req: Request) {
       if (activeCampaign) {
         const metaMap = await getSweepstakesCampaignMetaMap().catch(() => new Map());
         const meta = metaMap.get(String(activeCampaign.id));
-        if (meta?.allowGoldenQuestion || true) {
+        if (meta?.allowGoldenQuestion !== false) {
           for (const row of answered) {
             const sessionQuestionId = String(row?.sessionQuestionId || "").trim();
             if (!sessionQuestionId) continue;
@@ -344,25 +345,11 @@ export async function PATCH(req: Request) {
             });
             if (evaluation.correct !== true) continue;
             if (!q?.isGolden) continue;
-            const already = await (prisma as any).$queryRawUnsafe(`SELECT 1 FROM "GoldenQuestionHistory" WHERE "sessionId" = $1 AND "questionId" = $2 AND "awarded" = TRUE LIMIT 1`, session.id, String(q.questionId || q.id)).then((rows: any[]) => Array.isArray(rows) && rows.length > 0).catch(() => false);
-            if (already) continue;
-            await prisma.$transaction(async (tx: any) => {
-              const award = await awardRaffleEntries(tx as any, {
-                userId: session.userId,
-                source: "GOLDEN_QUESTION",
-                quantity: 1,
-                campaignId: activeCampaign.id,
-                sourceRefType: "QUESTION",
-                sourceRefId: String(q.questionId || q.id),
-                auditKey: `golden-question:${String(q.questionId || q.id)}:${String(session.id)}`,
-                meta: { sessionId: session.id, questionId: q.questionId } as any,
-              });
-              if (Number(award?.awarded || 0) > 0) {
-                await tx.notification.create({ data: { userId: session.userId, type: 'SWEEPSTAKES_ENTRY', title: 'Golden sweepstakes entry added', body: `+${Number(award.awarded || 0)} golden entry added to the active golden sweepstakes.` } }).catch(() => null);
-              }
-              await tx.$executeRawUnsafe(`UPDATE "GoldenQuestionHistory" SET "awarded" = TRUE WHERE "sessionId" = $1 AND "questionId" = $2`, session.id, String(q.questionId || q.id));
-            }).catch(() => null);
-            goldenAwarded = true;
+            const awarded = await prisma.$transaction(tx => awardGoldenQuestion(tx, {
+              userId: session.userId, sessionId: session.id,
+              questionId: String(q.questionId || q.id), campaignId: activeCampaign.id,
+            })).catch(error => { console.error("Golden question reward failed", error); return false; });
+            goldenAwarded = goldenAwarded || Boolean(awarded);
           }
         }
       }

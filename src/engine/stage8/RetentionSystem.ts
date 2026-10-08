@@ -33,7 +33,7 @@ export type Stage8MicroReward = {
 
 function clampTier(value: number): DifficultyTier {
   if (value <= 1) return 1;
-  if (value >= 3) return 3;
+  if (value >= 5) return 5;
   return value as DifficultyTier;
 }
 

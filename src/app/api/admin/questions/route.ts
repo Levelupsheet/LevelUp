@@ -443,8 +443,7 @@ export async function PATCH(req: Request) {
       if (body.testNowEligible !== undefined) updateData.testNowEligible = Boolean(body.testNowEligible);
       if (body.isGoldenEligible !== undefined) {
         updateData.isGoldenEligible = Boolean(body.isGoldenEligible);
-        // Golden questions are always hard.
-        if (Boolean(body.isGoldenEligible)) updateData.difficulty = 3;
+        // Eligibility never relabels the authored difficulty. Runtime requires tiers 4–5.
       }
       if (body.bossEligible !== undefined) updateData.data = { bossEligible: Boolean(body.bossEligible) } as any;
       if (body.goldenWeight !== undefined) updateData.goldenWeight = Math.max(1, Number(body.goldenWeight) || 1);
@@ -471,7 +470,7 @@ export async function PATCH(req: Request) {
       if (body.patch.testNowEligible !== undefined) patch.testNowEligible = Boolean(body.patch.testNowEligible);
       if (body.patch.isGoldenEligible !== undefined) {
         patch.isGoldenEligible = Boolean(body.patch.isGoldenEligible);
-        if (Boolean(body.patch.isGoldenEligible)) patch.difficulty = 3;
+
       }
       if (body.patch.goldenWeight !== undefined) patch.goldenWeight = Math.max(1, Number(body.patch.goldenWeight) || 1);
       if (body.patch.goldenBonusXp !== undefined) patch.goldenBonusXp = Math.max(0, Number(body.patch.goldenBonusXp) || 0);

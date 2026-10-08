@@ -77,7 +77,9 @@ export function inferDomainFromQuestion(input: {
   return "GENERAL";
 }
 
-export function masteryToTargetDifficulty(mastery: number): 1 | 2 | 3 {
+export function masteryToTargetDifficulty(mastery: number): 1 | 2 | 3 | 4 | 5 {
+  if (mastery >= 90) return 5;
+  if (mastery >= 80) return 4;
   if (mastery >= 70) return 3;
   if (mastery >= 40) return 2;
   return 1;
@@ -121,7 +123,7 @@ export function buildAdaptiveQuestionPlan<T extends { id: string; domainId?: str
     const domain = domainEnumToId(question.domainId || "general");
     const mastery = Number(masteryByDomain[domain] ?? 0);
     const targetDifficulty = masteryToTargetDifficulty(mastery);
-    const level = Math.max(1, Math.min(3, Number(question.level || 1))) as 1 | 2 | 3;
+    const level = Math.max(1, Math.min(5, Number(question.level || 1))) as 1 | 2 | 3 | 4 | 5;
     const recent = recency.get(question.id);
     const recentPenalty = recent ? (recent.correct ? 28 + recent.seen * 6 : 10 + recent.seen * 4) : 0;
     const weaknessBonus = (100 - mastery) * 0.8;
@@ -142,7 +144,7 @@ export function buildAdaptiveQuestionPlan<T extends { id: string; domainId?: str
     if (currentDomainCount >= quota && selected.length + 2 < args.questionCount) continue;
     selected.push({
       ...item.question,
-      level: item.targetDifficulty,
+      level: item.question.level,
     });
     perDomainCount.set(item.domain, currentDomainCount + 1);
   }

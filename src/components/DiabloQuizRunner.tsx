@@ -8,6 +8,8 @@ import DomainRuneBar from "@/components/DomainRuneBar";
 import { getActiveUser } from "@/lib/userStore";
 import { resolveClientUserId } from "@/lib/activeUser";
 import { useCombatQuiz } from "@/engine/useCombatQuiz";
+import { inferLevel } from "@/engine/CombatQuizEngine";
+import { enemyAbilityForQuestion, incomingEnemyDamage, outgoingEnemyDamage } from "@/engine/systems/EnemyAbilities";
 import type { CombatQuestion, DifficultyTier } from "@/engine/CombatQuizEngine";
 import {
   normalizeQuestionType,
@@ -83,25 +85,13 @@ function labelForType(type: QuestionType) {
   return "Question";
 }
 
-function inferMaxStages(title: string, totalQuestions: number) {
-  const upper = String(title || "").toUpperCase();
-  if (upper.includes("TEST NOW")) return 5;
-  if (upper.includes("POSITION TRAINING") || upper.includes("PRACTICE") || upper.includes("CERT")) return 4;
-  return Math.max(1, Math.min(5, Math.ceil(totalQuestions / 3)));
-}
+function inferMaxStages(_title: string, _totalQuestions: number) { return 5; }
 
 function stageEnemyName(base: string, stage: number, maxStages: number, encounterType: "standard" | "boss") {
   if (encounterType === "boss" && stage >= maxStages) return `Golden ${base}`;
   return `${base}`;
 }
 
-/** A wrong answer costs more health against later-stage enemies. */
-function incomingEnemyDamage(stageDamage: number, shielded: boolean, multiplier: unknown): number {
-  if (shielded) return 0;
-  const abilityMultiplier = Number(multiplier);
-  const scale = Number.isFinite(abilityMultiplier) && abilityMultiplier > 0 ? Math.min(3, abilityMultiplier) : 1;
-  return Math.max(1, Math.round(stageDamage * scale));
-}
 
 type EnemyPowerupKey = "shield" | "fury" | "restore" | "time";
 type StageConfig = { name: string; hp: number; playerDamage: number; healChance: number; healMin: number; healMax: number; powerups: EnemyPowerupKey[] };
@@ -538,7 +528,7 @@ export default function DiabloQuizRunner(props: {
 
   const combatQuestions: CombatQuestion[] = useMemo(
     () =>
-      [...questions].sort((a, b) => encounterType === "boss" ? 0 : (Math.max(1, Math.min(3, Number(a.level || 1))) - Math.max(1, Math.min(3, Number(b.level || 1))))).map((q, i) => ({
+      [...questions].sort((a, b) => encounterType === "boss" || questions.some(q => q.sessionQuestionId) ? 0 : (Math.max(1, Math.min(5, Number(a.level || 1))) - Math.max(1, Math.min(5, Number(b.level || 1))))).map((q, i) => ({
         id: q.id || `q_${i}`,
         prompt: q.prompt,
         type: normalizeQuestionType(q.type),
@@ -554,6 +544,7 @@ export default function DiabloQuizRunner(props: {
     [questions, encounterType]
   );
 
+  const combatQuestionsKey = combatQuestions.map(q => q.id).join("|");
   const [hitPulse, setHitPulse] = useState<null | "player" | "enemy">(null);
   const [fillValue, setFillValue] = useState("");
   const [cliValue, setCliValue] = useState("");
@@ -585,12 +576,10 @@ export default function DiabloQuizRunner(props: {
   const [showSessionIntel, setShowSessionIntel] = useState(false);
   const [achievementFlash, setAchievementFlash] = useState<string | null>(null);
   const [fatigueState, setFatigueState] = useState<Stage8Fatigue>({ fatigued: false, reason: null, suggestion: null });
-  const [sessionStage, setSessionStage] = useState(1);
+  const [sessionStage, setSessionStage] = useState(() => inferLevel(combatQuestions[Number(initialState?.idx || 0)] || combatQuestions[0] || { id: "", prompt: "" }));
   const [stageAnswered, setStageAnswered] = useState(0);
-  const [stageCorrect, setStageCorrect] = useState(0);
   const [questionResults, setQuestionResults] = useState<Array<"correct" | "partial" | "wrong" | null>>([]);
   const [stageBanner, setStageBanner] = useState<string | null>(null);
-  const [stageEnemyHP, setStageEnemyHP] = useState(90);
   const questionStartRef = useRef(Date.now());
   const timeSlowActiveRef = useRef(false);
   const shieldQuestionRef = useRef<number | null>(null);
@@ -604,7 +593,9 @@ export default function DiabloQuizRunner(props: {
   const stageConfigs = useMemo(() => buildStageConfigs(title, maxStages, encounterType), [title, maxStages, encounterType]);
   const currentStageConfig = useMemo(() => stageConfigs[Math.min(stageConfigs.length - 1, Math.max(0, sessionStage - 1))] || buildStageConfigs(title, 1, encounterType)[0], [stageConfigs, sessionStage, title, encounterType]);
 
-  const { state, question, select, clear, submit, submitManual, next, addTime, restorePlayerHP, reset, currentDomainId, currentMastery, outcome } = useCombatQuiz({    questions: combatQuestions,
+  const activeEnemyAbility = encounterType === "boss" ? null : enemyAbilityForQuestion(sessionStage, stageAnswered);
+  const maxPlayerHP = rules?.startHP ?? 100;
+  const { state, question, select, clear, submit, submitManual, next, addTime, restorePlayerHP, restoreEnemyHP, reset, currentDomainId, currentMastery, outcome } = useCombatQuiz({    questions: combatQuestions,
     rules,
     timed,
     onXp,
@@ -612,10 +603,14 @@ export default function DiabloQuizRunner(props: {
       shieldActive: powerups.shieldActive && shieldQuestionRef.current === state.idx,
       furyActive: powerups.furyActive && furyQuestionRef.current === state.idx,
     }),
-    getQuestionLevel: () => (Math.max(effectiveQuestionTier, Math.min(3, Math.ceil(sessionStage / 2))) as DifficultyTier),
-    getPlayerDamageTaken: ({ usedShield, question: hitQuestion }) => incomingEnemyDamage(currentStageConfig.playerDamage, usedShield, (hitQuestion.data as any)?.playerDamageMultiplier),
-    getEnemyDamageDealt: ({ correct }) => correct ? Math.ceil(currentStageConfig.hp / 3) : 0,
-    getHealOnCorrect: () => (Math.random() < currentStageConfig.healChance ? (currentStageConfig.healMin + Math.floor(Math.random() * (currentStageConfig.healMax - currentStageConfig.healMin + 1))) : 0),
+    getQuestionLevel: (q) => inferLevel(q),
+    getPlayerDamageTaken: ({ usedShield, question: hitQuestion, tier }) => incomingEnemyDamage(
+      encounterType === "boss" ? (rules?.playerDamageByTier?.[tier] ?? currentStageConfig.playerDamage) : currentStageConfig.playerDamage,
+      usedShield, Number((hitQuestion.data as any)?.playerDamageMultiplier || 1) * (activeEnemyAbility === "fury" ? 1.5 : 1)),
+    getEnemyDamageDealt: ({ correct, usedFury, question: hitQuestion, tier }) => correct ? outgoingEnemyDamage(
+      encounterType === "boss" ? (rules?.enemyDamageByTier?.[tier] ?? 34) : Math.ceil(maxPlayerHP / 3),
+      usedFury, activeEnemyAbility === "shield" || Boolean((hitQuestion.data as any)?.blockNextCorrect)) : 0,
+    getHealOnCorrect: () => (encounterType === "boss" ? 0 : Math.random() < currentStageConfig.healChance ? (currentStageConfig.healMin + Math.floor(Math.random() * (currentStageConfig.healMax - currentStageConfig.healMin + 1))) : 0),
     getXpMultiplier: ({ correct }) => (correct && xpBoostRemaining > 0 ? 1.25 : 1),
     getXpBonus: ({ correct }) => {
       if (!correct) return 0;
@@ -642,43 +637,17 @@ export default function DiabloQuizRunner(props: {
       const baseTier = ((question?.level || 1) as DifficultyTier);
       setHitPulse(r.correct ? "enemy" : "player");
       if (r.correct) {
-        const damage = Math.ceil(currentStageConfig.hp / 3);
-        setStageEnemyHP((hp) => Math.max(0, hp - damage));
-        setDamageFloat({ enemy: `-${damage} HP` });
+        const damage = encounterType === "boss" ? r.enemyDamage : Math.round(r.enemyDamage / maxPlayerHP * currentStageConfig.hp);
+        setDamageFloat({ enemy: `-${damage} HP`, player: r.playerHealing > 0 ? `+${r.playerHealing} HP` : null });
       } else {
-        setDamageFloat({ player: `-${incomingEnemyDamage(currentStageConfig.playerDamage, powerups.shieldActive && shieldQuestionRef.current === state.idx, (question?.data as any)?.playerDamageMultiplier)} HP` });
+        setDamageFloat({ player: r.usedShield ? "Blocked" : `-${r.playerDamage} HP` });
+        if (activeEnemyAbility === "restore") restoreEnemyHP(Math.ceil(maxPlayerHP * 0.1));
       }
+      setStageAnswered(count => count + 1);
       window.setTimeout(() => setDamageFloat({}), 2200);
       window.setTimeout(() => {
         feedbackRevealRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
       }, 140);
-
-      setStageAnswered((answered) => {
-        const nextAnswered = answered + 1;
-        setStageCorrect((correctCount) => {
-          const nextCorrect = correctCount + (r.correct ? 1 : 0);
-          if (nextAnswered >= 3) {
-            if (nextCorrect >= 2) {
-              setSessionStage((current) => {
-                const nextStage = Math.min(maxStages, current + 1);
-                if (nextStage > current) {
-                  const nextConfig = stageConfigs[Math.min(stageConfigs.length - 1, nextStage - 1)];
-                  setStageEnemyHP(nextConfig?.hp || currentStageConfig.hp);
-                  setStageBanner(`Stage ${nextStage} • ${nextConfig?.name || "Enemy Rising"}`);
-                  window.setTimeout(() => setStageBanner(null), 2200);
-                } else {
-                  setStageEnemyHP(currentStageConfig.hp);
-                }
-                return nextStage;
-              });
-            }
-            return 0;
-          }
-          return nextCorrect;
-        });
-        if (nextAnswered >= 3) { return 0; }
-        return nextAnswered;
-      });
 
       const nextHistory = [...stage8History, { correct: Boolean(r.correct), responseTimeMs, baseTier }].slice(-8);
       setStage8History(nextHistory);
@@ -744,7 +713,9 @@ export default function DiabloQuizRunner(props: {
     [state.tier, question?.level, fatigueState, stage8History]
   );
 
-  const effectiveQuestionTier = stage8Difficulty.adjustedTier as DifficultyTier;
+  const effectiveQuestionTier: DifficultyTier = question ? inferLevel(question) : 1;
+  const stageEnemyHP = encounterType === "boss" ? state.enemyHP : Math.round(state.enemyHP / maxPlayerHP * currentStageConfig.hp);
+  const playerHealthPercent = Math.max(0, Math.min(100, state.playerHP / maxPlayerHP * 100));
   const currentStageEnemyName = useMemo(() => currentStageConfig?.name || stageEnemyName(enemyName, sessionStage, maxStages, encounterType), [currentStageConfig, enemyName, sessionStage, maxStages, encounterType]);
   const isGoldenBoss = encounterType === "boss" && sessionStage >= maxStages;
 
@@ -789,14 +760,12 @@ const showExpandedExplanation = useMemo(() => {
     setMicroRewardFlash(null);
     setAchievementFlash(null);
     setFatigueState({ fatigued: false, reason: null, suggestion: null });
-    setSessionStage(1);
+    setSessionStage(inferLevel(combatQuestions[Number(initialState?.idx || 0)] || combatQuestions[0] || { id: "", prompt: "" }));
     setStageAnswered(0);
-    setStageCorrect(0);
     setQuestionResults(Array.from({ length: combatQuestions.length }, () => null));
     setStageBanner(null);
-    setStageEnemyHP(stageConfigs[0]?.hp || 90);
     questionStartRef.current = Date.now();
-  }, [combatQuestions.length, timed, title]);
+  }, [combatQuestionsKey, timed, title]);
 
   useEffect(() => {
     const apply = () => setIsMobileLayout(window.innerWidth < 860);
@@ -809,9 +778,13 @@ const showExpandedExplanation = useMemo(() => {
     questionStartRef.current = Date.now();
   }, [question?.id]);
 
+
   useEffect(() => {
-    setStageEnemyHP(currentStageConfig?.hp || 90);
-  }, [sessionStage]);
+    if (activeEnemyAbility === "time" && timed && !state.locked) {
+      const seconds = rules?.timePerQuestionByTier?.[effectiveQuestionTier] ?? [0, 35, 30, 25, 22, 20][effectiveQuestionTier];
+      addTime(-Math.ceil(seconds * 0.2));
+    }
+  }, [question?.id]);
 
   useEffect(() => {
     const data = (question?.data || {}) as Record<string, unknown>;
@@ -994,6 +967,18 @@ const showExpandedExplanation = useMemo(() => {
   }
 
   async function handleNext() {
+    const currentQuestion = question as any;
+    let awarded = false;
+    if (state.locked && currentQuestion?.sessionQuestionId && onAdvanceQuestion) {
+      const result = await onAdvanceQuestion({
+        question: currentQuestion,
+        isCorrect: state.lastWasCorrect,
+        selectedAnswer: deriveSelectedAnswer(),
+        nextIndex: Math.min(state.idx + 1, combatQuestions.length),
+        stateSnapshot: { ...state, idx: Math.min(state.idx + 1, combatQuestions.length) },
+      });
+      awarded = Boolean((result as any)?.goldenAwarded);
+    }
     if (state.finished && finishFeedbackPending) {
       // The lethal answer has already been reviewed. Complete the run directly
       // from this click instead of briefly re-rendering the finished quiz.
@@ -1017,17 +1002,19 @@ const showExpandedExplanation = useMemo(() => {
       }
       return;
     }
-    const currentQuestion = question as any;
-    let awarded = false;
-    if (state.locked && currentQuestion?.sessionQuestionId && onAdvanceQuestion) {
-      const result = await onAdvanceQuestion({
-        question: currentQuestion,
-        isCorrect: state.lastWasCorrect,
-        selectedAnswer: deriveSelectedAnswer(),
-        nextIndex: Math.min(state.idx + 1, combatQuestions.length),
-        stateSnapshot: { ...state, idx: Math.min(state.idx + 1, combatQuestions.length) },
-      });
-      awarded = Boolean((result as any)?.goldenAwarded);
+    if (!state.finished && state.locked) {
+      const nextQuestion = combatQuestions[state.idx + 1];
+      if (nextQuestion) {
+        const nextStage = inferLevel(nextQuestion);
+        if (nextStage !== sessionStage || state.enemyHP <= 0) {
+          setSessionStage(nextStage);
+          setStageAnswered(0);
+          restoreEnemyHP(maxPlayerHP);
+          const config = stageConfigs[nextStage - 1];
+          setStageBanner(`Stage ${nextStage} • ${config.name}`);
+          window.setTimeout(() => setStageBanner(null), 2200);
+        }
+      }
     }
     next();
     if (awarded) {
@@ -1260,16 +1247,17 @@ const showExpandedExplanation = useMemo(() => {
 
       <div className="modalBody d2QuizBody" style={{ flex: 1, paddingTop: 0 }}>
         {stageBanner ? <div className="stageTransitionBanner">{stageBanner}</div> : null}
+        {activeEnemyAbility && !state.locked ? <div className="badge" role="status">Enemy {activeEnemyAbility === "shield" ? "Shield: next hit reduced by half" : activeEnemyAbility === "fury" ? "Fury: wrong answer deals 50% more damage" : activeEnemyAbility === "restore" ? "Restore: wrong answer heals enemy 10%" : "Time pressure: 20% less answer time"}</div> : null}
         {!isMobileLayout ? (
           <div className="d2InterviewGrid d2QuizGrid stage8CompactGrid batch8DesktopQuizGrid" style={{ height: "100%", alignItems: "stretch", minWidth: 0, minHeight: 0, overflow: "hidden" }}>
             <div className="quizPlayerRail batch8CombatRail batch8PlayerRail" style={{ display: "grid", gap: 10, alignContent: "start", minHeight: 0 }}>
-              <div className={"playerOrbComposite " + (hitPulse === "player" ? "d2Shake" : "")} aria-label={`${playerName} health ${state.playerHP}%`}>
+              <div className={"playerOrbComposite " + (hitPulse === "player" ? "d2Shake" : "")} aria-label={`${playerName} health ${state.playerHP} of ${maxPlayerHP}`}>
                 <img className="playerOrbFrameAsset" src="/ui/grimdark/flow_main_panel_player.png" alt="" aria-hidden="true" />
                 <div className="playerOrbBlood" aria-hidden="true">
                   <img className="playerOrbBloodBase" src="/ui/blood-orb.webp" alt="" />
                   <div
                     className="playerOrbBloodMask"
-                    style={{ clipPath: `inset(${100 - Math.max(0, Math.min(100, state.playerHP))}% 0 0 0)` }}
+                    style={{ clipPath: `inset(${100 - playerHealthPercent}% 0 0 0)` }}
                   >
                     <img src="/ui/blood-orb.webp" alt="" />
                   </div>
@@ -1317,7 +1305,7 @@ const showExpandedExplanation = useMemo(() => {
 
                   <div className="quizDomainMasteryLine">
                     <span>DOMAIN MASTERY: {domainLabel}</span>
-                    <span>Lv{state.tier} • {masteryPercent}%</span>
+                    <span>Tier {effectiveQuestionTier}/5 • {masteryPercent}%</span>
                   </div>
                   <div className="quizQuestionTrack" aria-label={`Question ${Math.min(state.idx + 1, combatQuestions.length)} of ${combatQuestions.length}`}>
                     {combatQuestions.map((_, idx) => {
@@ -1570,7 +1558,7 @@ const showExpandedExplanation = useMemo(() => {
                   <div className="mobileQuizPrompt quizPrompt">{question.prompt}</div>
                   <div className="quizDomainMasteryLine">
                     <span>DOMAIN MASTERY: {domainLabel}</span>
-                    <span>Lv{state.tier} • {masteryPercent}%</span>
+                    <span>Tier {effectiveQuestionTier}/5 • {masteryPercent}%</span>
                   </div>
                   {renderQuestionInput({
                     question,
@@ -1668,7 +1656,7 @@ const showExpandedExplanation = useMemo(() => {
 
             <div className="mobileCombatCard">
               <div className={hitPulse === "player" ? "d2Shake" : ""}>
-                <D2LifeOrb value={state.playerHP} name={playerName} />
+                <D2LifeOrb value={playerHealthPercent} name={playerName} />
               </div>
               <div style={{ marginTop: 10 }}>
                 <ModelPanel key={playerVideoKey} title="" src={playerVideo} forceReload={hitPulse === "player"} loop={!isPlayerHitVideo} onEnded={isPlayerHitVideo ? () => setHitPulse(null) : undefined} height="clamp(180px, 22vh, 280px)" damageText={damageFloat.player || null} damageTone="player" />

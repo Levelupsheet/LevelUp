@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireAdminRequest } from "@/app/api/_lib/adminGuard";
+import { canonicalTrainingTarget, trainingPlacementFilter } from "@/lib/contentPools";
 import { prisma } from "@/lib/prisma";
 import { generateQuestionsFromBlock, mapCandidateToDbQuestion, normalizeKnowledgeBlock } from "@/lib/contentEngine";
 import { QuestionSetStatus } from "@prisma/client";
@@ -32,9 +33,11 @@ export async function POST(req: Request) {
         return true;
       });
       const setId = `kb-${block.sourceBlockId}`;
+      const trainingTarget = block.lane === "TRAINING" ? canonicalTrainingTarget(block) : { industry: null, careerPath: null, startingPosition: null };
       const placementFilter: any = { lane: block.lane, isActive: true };
-      if (block.lane === "TRAINING") placementFilter.startingPosition = block.startingPosition;
+      if (block.lane === "TRAINING") Object.assign(placementFilter, trainingPlacementFilter(block));
       if (block.lane === "CERTIFICATIONS") placementFilter.certExam = block.certExam;
+      if (block.lane === "TEST_NOW") placementFilter.set = { domain: block.domain };
       await prisma.$transaction(async (tx: any) => {
         const savedBlock = await tx.knowledgeBlock.upsert({ where: { sourceBlockId: block.sourceBlockId }, update: { title: block.title, setName: block.setName, domain: block.domain, lane: block.lane, startingPosition: block.startingPosition, certExam: block.certExam, difficulty: block.difficulty, stage: block.stage, tags: block.tags, source: block.source, contentJson: block.contentJson, status: "APPROVED" }, create: { sourceBlockId: block.sourceBlockId, title: block.title, setName: block.setName, domain: block.domain, lane: block.lane, startingPosition: block.startingPosition, certExam: block.certExam, difficulty: block.difficulty, stage: block.stage, tags: block.tags, source: block.source, contentJson: block.contentJson, status: "APPROVED" } });
         await tx.generatedQuestion.deleteMany({ where: { knowledgeBlockId: savedBlock.id } });
@@ -44,7 +47,7 @@ export async function POST(req: Request) {
         }
         await tx.questionSet.upsert({ where: { id: setId }, update: { name: block.setName, domain: block.domain, status: QuestionSetStatus.PUBLISHED }, create: { id: setId, name: block.setName, domain: block.domain, status: QuestionSetStatus.PUBLISHED } });
         await tx.questionSetPlacement.updateMany({ where: placementFilter, data: { isActive: false } });
-        await tx.questionSetPlacement.create({ data: { setId, lane: block.lane, startingPosition: block.lane === "TRAINING" ? block.startingPosition : null, certExam: block.lane === "CERTIFICATIONS" ? block.certExam : null, isActive: true } });
+        await tx.questionSetPlacement.create({ data: { setId, lane: block.lane, ...trainingTarget, certExam: block.lane === "CERTIFICATIONS" ? block.certExam : null, isActive: true } });
         const existing = await tx.mCQQuestion.findMany({ where: { setId }, select: { prompt: true, type: true, choices: true, data: true } });
         const seen = new Set(existing.map((q: any) => promptSignature(q)));
         const rows: any[] = [];

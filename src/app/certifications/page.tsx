@@ -1,9 +1,12 @@
-export default function CertificationsCatalog() {
-  const tracks = [
-    { title: "CompTIA A+", tag: "CORE IT", body: "Hardware, operating systems, networking, troubleshooting, security, and support fundamentals." },
-    { title: "Security+", tag: "SECURITY", body: "Threats, architecture, operations, identity, governance, risk, and practical security concepts." },
-    { title: "AZ-900", tag: "CLOUD", body: "Azure fundamentals, cloud concepts, core services, security, governance, pricing, and support." },
-  ];
+import { getActiveContentPools } from "@/lib/activePools";
+export const dynamic = "force-dynamic";
+export default async function CertificationsCatalog() {
+  let tracks: Array<{ title: string; tag: string; body: string }> = [];
+  let loadError = false;
+  try {
+    tracks = (await getActiveContentPools()).filter(pool => pool.lane === "CERTIFICATIONS" && pool.questionCount > 0)
+      .map(pool => ({ title: pool.label, tag: `${pool.questionCount} questions`, body: "Practice published certification questions with explanations and domain feedback." }));
+  } catch { loadError = true; }
   return (
     <main className="learningCatalog page paidAssetPage certificationsAssetPage">
       <div className="container learningCatalogInner">
@@ -16,6 +19,7 @@ export default function CertificationsCatalog() {
           <a href="/dashboard" className="learningPrimaryLink gdActionOrange">Start from Dashboard →</a>
         </section>
         <section className="learningTrackGrid">
+          {loadError ? <p>Certification pools could not be loaded. Please try again.</p> : !tracks.length ? <p>No certification pools are currently published.</p> : null}
           {tracks.map((track) => (
             <article className="card learningTrackCard paidAssetPanel" key={track.title}>
               <span className="badge">{track.tag}</span>

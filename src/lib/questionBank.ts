@@ -1,3 +1,4 @@
+import { trainingPlacementFilter } from "@/lib/contentPools";
 import { prisma } from "@/lib/prisma";
 import { inferDomainFromQuestion } from "@/lib/learningProfile";
 import { getAdaptiveLearningContext, getMissedQuestionReview, getQuestionCalibrationMap, weightedAdaptiveQuestionPlan } from "@/lib/adaptiveEngine";
@@ -101,18 +102,11 @@ export async function loadActiveBank(args: {
   certExam?: string | null;
   bankDomain?: string | null;
 }) {
-  const where: any = { lane: String(args.lane || "").toUpperCase(), isActive: true };
+  const where: any = { lane: String(args.lane || "").toUpperCase(), isActive: true, set: { status: "PUBLISHED" } };
   const bankDomain = String(args.bankDomain || "").trim().toUpperCase();
-  if (bankDomain) where.set = { domain: bankDomain };
+  if (bankDomain && bankDomain !== "MIXED") where.set = { status: "PUBLISHED", domain: bankDomain };
   if (where.lane === "TRAINING") {
-    const careerPath = String(args.careerPath || "").trim();
-    const industry = String(args.industry || "").trim();
-    if (careerPath) {
-      where.careerPath = careerPath;
-      if (industry) where.industry = industry;
-    } else {
-      where.startingPosition = args.startingPosition || null;
-    }
+    Object.assign(where, trainingPlacementFilter(args));
   }
   if (where.lane === "CERTIFICATIONS") where.certExam = args.certExam || null;
 
@@ -228,9 +222,9 @@ export async function buildQuestionBankSelection(args: {
   const missedPool = args.missedQuestionTraining && missedReview
     ? candidatePool.filter((q) => missedReview.questionIds.has(String(q.id)))
     : [];
-  const sourcePool = args.missedQuestionTraining && missedPool.length
+  const sourcePool = args.missedQuestionTraining
     ? missedPool
-    : args.weakDomainTraining && weakPool.length
+    : args.weakDomainTraining
       ? weakPool
       : cycle.questions;
   const calibrationMap = await getQuestionCalibrationMap(sourcePool.map((q) => String(q.id)));

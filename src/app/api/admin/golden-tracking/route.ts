@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireAdminRequest } from "@/app/api/_lib/adminGuard";
+import { normalizeQuestionType } from "@/lib/questionTypes";
 import { prisma } from "@/lib/prisma";
 
 export async function GET(req: Request) {
@@ -29,7 +30,7 @@ export async function GET(req: Request) {
       },
     });
 
-    const goldenEligibleIds = liveQuestions.filter((q) => q.isGoldenEligible).map((q) => q.id);
+    const goldenEligibleIds = liveQuestions.filter((q) => q.isGoldenEligible && q.difficulty >= 4 && ["multiple_choice", "true_false", "cli_command"].includes(normalizeQuestionType(q.type))).map((q) => q.id);
     const goldenSpawnRows = goldenEligibleIds.length
       ? await (prisma as any).gameSessionQuestion.findMany({
           where: { questionId: { in: goldenEligibleIds }, isGolden: true },
@@ -64,13 +65,13 @@ export async function GET(req: Request) {
         lane: block.lane,
         totalLiveQuestions: liveQuestions.length,
         testNowEligibleCount: liveQuestions.filter((q) => q.testNowEligible).length,
-        goldenEligibleCount: liveQuestions.filter((q) => q.isGoldenEligible).length,
+        goldenEligibleCount: liveQuestions.filter((q) => q.isGoldenEligible && q.difficulty >= 4 && ["multiple_choice", "true_false", "cli_command"].includes(normalizeQuestionType(q.type))).length,
         totalGoldenSpawns,
         correctGoldenAnswers,
         missedGoldenAnswers,
         unansweredGoldenSpawns,
         liveGoldenQuestions: liveQuestions
-          .filter((q) => q.isGoldenEligible)
+          .filter((q) => q.isGoldenEligible && q.difficulty >= 4 && ["multiple_choice", "true_false", "cli_command"].includes(normalizeQuestionType(q.type)))
           .map((q) => ({
             id: q.id,
             prompt: q.prompt,

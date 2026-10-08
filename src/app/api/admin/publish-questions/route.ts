@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireAdminRequest } from "@/app/api/_lib/adminGuard";
 import { QuestionSetStatus } from "@prisma/client";
+import { canonicalTrainingTarget, trainingPlacementFilter } from "@/lib/contentPools";
 import { prisma } from "@/lib/prisma";
 import { mapCandidateToDbQuestion } from "@/lib/contentEngine";
 import { clusterQuestionsBySimilarity, validateQuestionQuality, promptSignature } from "@/lib/questionQuality";
@@ -23,9 +24,11 @@ export async function POST(req: Request) {
     const setId = targetSet?.id || defaultSetId;
     const setName = targetSet?.name || block.setName;
     const setDomain = targetSet?.domain || block.domain;
+    const trainingTarget = block.lane === "TRAINING" ? canonicalTrainingTarget(block) : { industry: null, careerPath: null, startingPosition: null };
     const placementFilter: any = { lane: block.lane, isActive: true };
-    if (block.lane === "TRAINING") placementFilter.startingPosition = block.startingPosition;
+    if (block.lane === "TRAINING") Object.assign(placementFilter, trainingPlacementFilter(block));
     if (block.lane === "CERTIFICATIONS") placementFilter.certExam = block.certExam;
+    if (block.lane === "TEST_NOW") placementFilter.set = { domain: setDomain };
 
     const reviewedQuality = block.generatedQuestions.map((q: any) => ({ id: q.id, prompt: q.prompt, quality: validateQuestionQuality(q as any) }));
     const blockedQuality = reviewedQuality.filter((row: any) => row.quality.issues.length > 0 || row.quality.qualityScore < 70);
@@ -66,9 +69,9 @@ export async function POST(req: Request) {
     } = await prisma.$transaction(async (tx: any) => {
       await tx.questionSet.upsert({ where: { id: setId }, update: { status: QuestionSetStatus.PUBLISHED }, create: { id: setId, name: setName, domain: setDomain, status: QuestionSetStatus.PUBLISHED } });
       if (replaceExisting) await tx.questionSetPlacement.updateMany({ where: placementFilter, data: { isActive: false } });
-      const existingPlacement = await tx.questionSetPlacement.findFirst({ where: { setId, lane: block.lane, startingPosition: block.lane === "TRAINING" ? block.startingPosition : null, certExam: block.lane === "CERTIFICATIONS" ? block.certExam : null } });
+      const existingPlacement = await tx.questionSetPlacement.findFirst({ where: { setId, lane: block.lane, ...trainingTarget, certExam: block.lane === "CERTIFICATIONS" ? block.certExam : null } });
       if (!existingPlacement) {
-        await tx.questionSetPlacement.create({ data: { setId, lane: block.lane, startingPosition: block.lane === "TRAINING" ? block.startingPosition : null, certExam: block.lane === "CERTIFICATIONS" ? block.certExam : null, isActive: true } });
+        await tx.questionSetPlacement.create({ data: { setId, lane: block.lane, ...trainingTarget, certExam: block.lane === "CERTIFICATIONS" ? block.certExam : null, isActive: true } });
       } else if (!existingPlacement.isActive) {
         await tx.questionSetPlacement.update({ where: { id: existingPlacement.id }, data: { isActive: true } });
       }

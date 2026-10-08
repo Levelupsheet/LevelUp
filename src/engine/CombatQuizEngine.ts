@@ -2,7 +2,7 @@
 
 import type { QuestionData, QuestionType } from "@/lib/questionTypes";
 
-export type DifficultyTier = 1 | 2 | 3;
+export type DifficultyTier = 1 | 2 | 3 | 4 | 5;
 
 export type CombatQuestion = {
   id: string;
@@ -14,7 +14,7 @@ export type CombatQuestion = {
   explanation?: string | null;
   /** Optional domain id used for mastery tracking (e.g. "identity", "networking") */
   domainId?: string;
-  /** Optional difficulty tier for the question (1..3). */
+  /** Optional difficulty tier for the question (1..5). */
   level?: DifficultyTier;
 };
 
@@ -25,8 +25,12 @@ export type CombatRules = {
   /** Promotion thresholds based on overall mastery average (0..100). */
   promoteTo2At: number;
   promoteTo3At: number;
+  promoteTo4At: number;
+  promoteTo5At: number;
 
   /** Demotion thresholds (hysteresis) */
+  demoteTo4Below: number;
+  demoteTo3Below: number;
   demoteTo2Below: number;
   demoteTo1Below: number;
 
@@ -48,23 +52,27 @@ export type CombatRules = {
 export const DEFAULT_RULES: CombatRules = {
   startHP: 100,
 
-  promoteTo2At: 70,
-  promoteTo3At: 85,
+  promoteTo2At: 40,
+  promoteTo3At: 70,
+  promoteTo4At: 85,
+  promoteTo5At: 95,
 
   // add a little hysteresis so tiers don't jitter
-  demoteTo2Below: 80,
-  demoteTo1Below: 65,
+  demoteTo4Below: 90,
+  demoteTo3Below: 80,
+  demoteTo2Below: 65,
+  demoteTo1Below: 35,
 
   masteryGainBase: 4,
   masteryLossWrong: 2,
 
-  playerDamageByTier: { 1: 10, 2: 15, 3: 20 },
-  enemyDamageByTier: { 1: 12, 2: 18, 3: 25 },
+  playerDamageByTier: { 1: 8, 2: 12, 3: 16, 4: 20, 5: 24 },
+  enemyDamageByTier: { 1: 12, 2: 18, 3: 25, 4: 32, 5: 40 },
 
-  xpByTier: { 1: 15, 2: 25, 3: 40 },
+  xpByTier: { 1: 15, 2: 25, 3: 40, 4: 55, 5: 75 },
 
   // "slow -> faster as questions get harder" but still fair
-  timePerQuestionByTier: { 1: 25, 2: 18, 3: 12 },
+  timePerQuestionByTier: { 1: 35, 2: 30, 3: 25, 4: 22, 5: 20 },
 };
 
 export type CombatState = {
@@ -78,7 +86,7 @@ export type CombatState = {
   correctCount: number;
   xpEarned: number;
 
-  /** Current overall tier (1..3) derived from mastery average */
+  /** Current overall tier (1..5) derived from mastery average */
   tier: DifficultyTier;
 
   /** domain mastery values (0..100) */
@@ -102,6 +110,11 @@ export type SubmitResult = {
   tier: DifficultyTier;
   domainId: string;
   masteryValue: number;
+  playerDamage: number;
+  enemyDamage: number;
+  playerHealing: number;
+  usedShield: boolean;
+  usedFury: boolean;
 };
 
 export function clamp(n: number, a: number, b: number) {
@@ -122,20 +135,17 @@ export function inferDomainId(q: CombatQuestion): string {
 
 export function inferLevel(q: CombatQuestion): DifficultyTier {
   const lvl = q.level;
-  if (lvl === 1 || lvl === 2 || lvl === 3) return lvl;
+  if (lvl === 1 || lvl === 2 || lvl === 3 || lvl === 4 || lvl === 5) return lvl;
   return 1;
 }
 
 export function computeTierFromMasteryAvg(avg: number, currentTier: DifficultyTier, rules: CombatRules): DifficultyTier {
-  // Promote
-  if (avg >= rules.promoteTo3At) return 3;
-  if (avg >= rules.promoteTo2At) return 2;
-
-  // Demote with hysteresis
-  if (currentTier === 3 && avg < rules.demoteTo2Below) return 2;
-  if (currentTier === 2 && avg < rules.demoteTo1Below) return 1;
-
-  return 1;
+  const promote = [0, rules.promoteTo2At, rules.promoteTo3At, rules.promoteTo4At, rules.promoteTo5At];
+  const demote = [0, rules.demoteTo1Below, rules.demoteTo2Below, rules.demoteTo3Below, rules.demoteTo4Below];
+  let tier = currentTier;
+  while (tier < 5 && avg >= promote[tier]) tier = (tier + 1) as DifficultyTier;
+  while (tier > 1 && avg < demote[tier - 1]) tier = (tier - 1) as DifficultyTier;
+  return tier;
 }
 
 export function masteryAverage(mastery: Record<string, number>): number {

@@ -1750,11 +1750,11 @@ export default function AdminPage(){
                 )}
               </div>
               <div style={{ display:"grid", gap:8, marginTop:12 }}>
-                {placements.filter((p:any)=>p.isActive && p.lane===poolViewLane).map((p:any)=>(
+                {placements.filter((p:any)=>p.isActive && p.set?.status === "PUBLISHED" && p.lane===poolViewLane).map((p:any)=>(
                   <div key={p.id} className="card" style={{ padding:12, background: selectedSet===p.setId ? "rgba(64,160,210,.12)" : "rgba(0,0,0,.18)" }}>
                     <div style={{ display:"flex", justifyContent:"space-between", gap:10, flexWrap:"wrap" }}>
                       <b>{p.set?.name || "Question pool"}</b>
-                      <span className="badge">{p.set?.domain || "GENERAL"}</span>
+                      <span className="badge">{p.set?.domain || "GENERAL"} • {p.set?._count?.questions || 0} questions</span>
                     </div>
                     <small>
                       {poolViewLane==="TRAINING" ? `${p.industry || "Legacy"} → ${p.careerPath || p.startingPosition || "Training"}` :
@@ -1767,7 +1767,7 @@ export default function AdminPage(){
                     </div>
                   </div>
                 ))}
-                {!placements.some((p:any)=>p.isActive && p.lane===poolViewLane) ? <small>No active pools in this area.</small> : null}
+                {!placements.some((p:any)=>p.isActive && p.set?.status === "PUBLISHED" && p.lane===poolViewLane) ? <small>No active pools in this area.</small> : null}
               </div>
             </div>
           ) : null}
@@ -1775,7 +1775,7 @@ export default function AdminPage(){
           <div className="adminQuestionMetrics">
             <div><small>Selected set</small><b>{selectedSetObj?.name || "None selected"}</b></div>
             <div><small>Questions</small><b>{questions.length}</b></div>
-            <div><small>Other difficulty (4–5)</small><b>{questions.filter(q => Number(q.difficulty) > 3).length}</b></div>
+            <div><small>Advanced tiers (4–5)</small><b>{questions.filter(q => Number(q.difficulty) > 3).length}</b></div>
             <div><small>Easy / Medium / Hard</small><b>{[1,2,3].map(level => questions.filter(q => Number(q.difficulty) === level).length).join(" / ")}</b></div>
             <div><small>Quality ready</small><b>{questionQualitySummary.passing}</b></div>
             <div><small>Needs review</small><b>{questionQualitySummary.needsReview}</b></div>
