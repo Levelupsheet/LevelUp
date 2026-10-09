@@ -71,3 +71,47 @@ test('Security+ conversion accounts for all 90 source entries and imports 115 di
  const round=generateContentReport(normalizeKnowledgeBlock({...source,questions:r.questions}));assert.deepEqual(round.issues,[]);assert.equal(round.questions.length,115);
  const imported=contentImportReport(source);assert.equal(imported.issues.length,0);assert.equal(imported.questions.length,115);
 });
+
+test('Test 2 supplements preserve source accounting, route to the intended certification and reimport deterministically',()=>{
+ const cases=[['security-plus-sy0-701-test2',90,79,'SECURITY_PLUS','SY0-701'],['azure-az104-test2',80,56,'AZURE','AZ-104']];
+ for(const [name,sourceCount,questionCount,certExam,examCode] of cases){
+  const raw=JSON.parse(fs.readFileSync(require.resolve('../data/content/'+name+'-v2.json'),'utf8'));
+  const [b]=importEnvelope(raw);assert.equal(b.lane,'CERTIFICATIONS');assert.equal(b.certExam,certExam);
+  const audit=b.referenceMaterial.conversionAudit;
+  const standaloneAudit=JSON.parse(fs.readFileSync(require.resolve('../data/content/'+name+'-conversion-report.json'),'utf8'));
+  assert.deepEqual(audit,standaloneAudit);assert.equal(audit.sourceQuestionCount,sourceCount);assert.equal(audit.importQuestionCount,questionCount);
+  assert.deepEqual(audit.sourceMapping.map(x=>x.sourceQuestionNumber),Array.from({length:sourceCount},(_,i)=>i+1));
+  assert.match(audit.sourceSha256,/^[a-f0-9]{64}$/);
+  const generated=generateContentReport(normalizeKnowledgeBlock(b));assert.deepEqual(generated.issues,[]);assert.equal(generated.questions.length,questionCount);
+  const imported=contentImportReport(b);assert.deepEqual(imported.issues,[]);assert.equal(imported.questions.length,questionCount);
+  assert.deepEqual([...new Set(generated.questions.map(q=>q.difficulty))].sort(),[1,2,3,4,5]);
+  assert.ok(generated.questions.every(q=>q.type==='multiple_choice' && q.data.examCode===examCode && q.data.requiresEditorialReview===true && q.explanation && q.data.hints.length && !q.goldenEligible && !q.data.bossEligible));
+  for(const q of generated.questions){assert.deepEqual(validateContent(q),[]);assert.equal(duplicateContentReason(q,generated.questions.filter(x=>x!==q)),'',q.prompt);assert.match(duplicateContentReason(q,[q]),/duplicate/i);}
+  const roundtrip=generateContentReport(normalizeKnowledgeBlock({...b,questions:generated.questions}));assert.deepEqual(roundtrip.issues,[]);assert.equal(roundtrip.questions.length,questionCount);
+  for(const row of audit.sourceMapping.filter(x=>x.targetObjectiveId && x.status!=='consolidated-existing'))assert.ok(generated.questions.some(q=>q.data.objectiveId===row.targetObjectiveId),JSON.stringify(row));
+  assert.equal(new Set(generated.questions.map(q=>q.correctIndex)).size,4);
+ }
+});
+
+test('Security+ supplement maps repeated concepts to the earlier bank instead of emitting duplicate assessments',()=>{
+ const read=name=>importEnvelope(JSON.parse(fs.readFileSync(require.resolve('../data/content/'+name+'.json'),'utf8')))[0];
+ const earlier=contentImportReport(read('security-plus-sy0-701-v2')).questions;
+ const source=read('security-plus-sy0-701-test2-v2');const supplement=contentImportReport(source).questions;
+ for(const row of source.referenceMaterial.conversionAudit.sourceMapping.filter(x=>x.status==='consolidated-existing'))assert.ok(earlier.some(q=>q.data.objectiveId===row.targetObjectiveId),row.targetObjectiveId);
+ for(const q of supplement)assert.equal(duplicateContentReason(q,earlier),'',q.prompt);
+ assert.equal(source.referenceMaterial.conversionAudit.sourceMapping.filter(x=>x.status==='consolidated-existing').length,10);
+ assert.equal(source.referenceMaterial.conversionAudit.sourceMapping.filter(x=>x.status==='withheld-review').length,1);
+});
+
+test('AZ-104 corrects known source errors without guessing missing named machines or routing to AZ-900',()=>{
+ const [source]=importEnvelope(JSON.parse(fs.readFileSync(require.resolve('../data/content/azure-az104-test2-v2.json'),'utf8')));
+ const rows=contentImportReport(source).questions;const find=topic=>rows.find(q=>q.data.subdomain===topic);
+ const answer=q=>q.choices[q.correctIndex];
+ assert.equal(answer(find('role-assignment-permission')),'User Access Administrator at the resource-group scope');
+ assert.match(answer(find('azcopy-container-endpoint')),/exampleaccount\.blob\.core\.windows\.net/);
+ assert.match(answer(find('modern-guest-monitoring')),/Azure Monitor Agent/);
+ assert.equal(answer(find('nva-next-hop')),'Virtual appliance');
+ assert.match(answer(find('notactions-not-deny')),/not an explicit deny/);
+ assert.ok(rows.every(q=>!/(following|below)\s+(table|diagram)|VM-[ABCDE]|\bAZ-900\b/i.test(q.prompt)));
+ assert.equal(source.referenceMaterial.conversionAudit.sourceMapping.filter(x=>x.status==='withheld-review').length,11);
+});

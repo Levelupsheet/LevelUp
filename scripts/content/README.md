@@ -77,3 +77,31 @@ The original sample mixed Connect-MgGraph with Connect-AzAccount as aliases. The
 - https://learn.microsoft.com/en-us/powershell/module/microsoft.graph.users/get-mguser
 
 Repeated managed-device retrieval is retained once; the original compliance-state wording is preserved as reference rather than regenerated as another command task. Published regulatory or specialist content still requires source-owner review. The generator makes no claim that the uploaded content was comprehensively fact-checked.
+
+## Practice Test 2 imports
+
+Two supplementary v2 JSON imports are available:
+
+| File | Import count | Destination |
+| --- | ---: | --- |
+| `data/content/security-plus-sy0-701-test2-v2.json` | 79 | Existing Security+ pool, `CERTIFICATIONS` / `SECURITY_PLUS` |
+| `data/content/azure-az104-test2-v2.json` | 56 | Dedicated **AZ-104 Practice Test 2** pool, `CERTIFICATIONS` / `AZURE` |
+
+The current certification enum has an `AZURE` category rather than a separate `AZ_104` value. Every Azure question carries `data.examCode: "AZ-104"`; do not select an AZ-900 pool. These content fixtures do not create or publish production placements or modify existing questions.
+
+Each bank uses supported single-answer MCQ, distributed answer positions, explanations, hints, domain/subdomain/objective metadata and five authored difficulty tiers. Diagnosis and complex-judgment questions include evidence or constraints. Golden/Boss eligibility stays off pending separate curation. Import creates pending-review questions; the source flag `requiresEditorialReview` does not substitute for the application’s review process.
+
+Security+ Test 2 accounts for all 90 provided entries: 79 imported assessments, ten concepts mapped to the earlier bank and one ambiguous risk-appetite item withheld. The supplement assumes the earlier bank is already available; its conversion report identifies exact existing objectives for consolidated items. Automated cross-bank checks do not replace reviewing the actual deployed pool in Preview.
+
+AZ-104 accounts for all 80 provided entries: 69 map to 56 standalone replacements after related variants are consolidated; eleven require further review and are withheld. Missing tables/diagrams are not reconstructed, and these replacements are not asserted to solve the original named-machine cases. Corrected topics include RBAC access administration, NotActions versus deny, NAT subnet association, current load balancer/monitoring choices, alert user-response states, blob endpoint syntax and NVA forwarding. The source export contains related Azure topics beyond explicitly listed current AZ-104 objectives; this is supplementary practice, not complete exam coverage or weighting.
+
+The matching `*-conversion-report.json` files are **reports, not import files**. Reports preserve source hashes, complete source-number accounting, consolidation/withholding reasons and references; the identical report is embedded in each bank’s `referenceMaterial`. Original uploads remain untouched. Primary documentation supports targeted corrections; retained Security+ source material still needs editorial fact-checking.
+
+In Admin: select the destination pool → Preview the `*-v2.json` file → inspect duplicate/quality results → Import → Review → Publish. Do not clear the existing pool merely to add a supplement. No database migration or automatic publishing is required.
+
+Validation commands:
+
+```sh
+node scripts/content/validateQuestions.mjs data/content/security-plus-sy0-701-test2-v2.json
+node scripts/content/validateQuestions.mjs data/content/azure-az104-test2-v2.json
+```

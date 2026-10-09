@@ -1,0 +1,2911 @@
+{
+  "schemaVersion": 2,
+  "blocks": [
+    {
+      "id": "azure-az104-test2-v2",
+      "title": "AZ-104 — Azure Administrator Practice Test 2",
+      "setName": "AZ-104 Practice Test 2",
+      "lane": "CERTIFICATIONS",
+      "certExam": "AZURE",
+      "industry": "Information Technology",
+      "careerPath": "Cloud Engineer",
+      "domain": "AZURE",
+      "domainId": "azure-az104",
+      "difficulty": 1,
+      "tags": [
+        "azure",
+        "az-104",
+        "practice-test-2"
+      ],
+      "questions": [
+        {
+          "objectiveId": "az-104.test2.department-membership",
+          "type": "multiple_choice",
+          "difficulty": 2,
+          "prompt": "A licensed Microsoft Entra tenant needs group membership to update automatically when a user’s department attribute becomes Finance. Which group configuration meets this requirement?",
+          "choices": [
+            "A manually assigned security group with no automation",
+            "An Azure resource tag named Finance",
+            "A dynamic user group with a department-based membership rule",
+            "A device group based only on operating system"
+          ],
+          "correctIndex": 2,
+          "explanation": "A dynamic user membership rule evaluates supported user attributes. Resource tags and device rules do not evaluate user departments.",
+          "hints": [
+            "Identify what evaluates user attributes and updates membership."
+          ],
+          "domainId": "az104-identity-governance",
+          "subdomain": "department-membership",
+          "tags": [
+            "azure",
+            "az-104",
+            "practice-test-2",
+            "identity-governance"
+          ],
+          "isGoldenEligible": false,
+          "data": {
+            "examCode": "AZ-104",
+            "sourceTest": "AZ-104 Practice Test 2",
+            "sourceQuestionNumbers": [
+              1
+            ],
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/entra/identity/users/groups-dynamic-membership"
+            ],
+            "bossEligible": false
+          }
+        },
+        {
+          "objectiveId": "az-104.test2.export-role-definition",
+          "type": "multiple_choice",
+          "difficulty": 2,
+          "prompt": "An administrator must retrieve the built-in Contributor role definition for inspection before designing a custom role. Which PowerShell cmdlet retrieves that definition?",
+          "choices": [
+            "Remove-AzRoleDefinition -Name \"Contributor\"",
+            "Get-AzResourceGroup -Name \"Contributor\"",
+            "Get-AzRoleDefinition -Name \"Contributor\"",
+            "Get-AzRoleAssignment -RoleDefinitionName \"Contributor\""
+          ],
+          "correctIndex": 2,
+          "explanation": "Get-AzRoleDefinition retrieves the role’s permissions and scopes. Get-AzRoleAssignment retrieves grants of roles, not the definition itself. Export or serialization can then save the retrieved object.",
+          "hints": [
+            "Distinguish a role definition from an assignment of that role."
+          ],
+          "domainId": "az104-identity-governance",
+          "subdomain": "export-role-definition",
+          "tags": [
+            "azure",
+            "az-104",
+            "practice-test-2",
+            "identity-governance"
+          ],
+          "isGoldenEligible": false,
+          "data": {
+            "examCode": "AZ-104",
+            "sourceTest": "AZ-104 Practice Test 2",
+            "sourceQuestionNumbers": [
+              2
+            ],
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/azure/role-based-access-control/custom-roles-powershell"
+            ],
+            "bossEligible": false
+          }
+        },
+        {
+          "objectiveId": "az-104.test2.ip-flow-diagnosis",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "A VM cannot receive an expected TCP connection. You need to identify which effective security rule allows or denies the proposed source address, destination address and port. Which Network Watcher capability should you use?",
+          "choices": [
+            "IP flow verify",
+            "A storage inventory report",
+            "Connection Monitor as a replacement for rule evaluation",
+            "A billing cost export"
+          ],
+          "correctIndex": 0,
+          "explanation": "IP flow verify evaluates the proposed TCP or UDP flow against applicable security rules and identifies the allowing or denying rule. It does not prove application health.",
+          "hints": [
+            "Choose a security-rule evaluation tool rather than a long-term connectivity monitor."
+          ],
+          "domainId": "az104-networking",
+          "subdomain": "ip-flow-diagnosis",
+          "tags": [
+            "azure",
+            "az-104",
+            "practice-test-2",
+            "networking"
+          ],
+          "isGoldenEligible": false,
+          "data": {
+            "examCode": "AZ-104",
+            "sourceTest": "AZ-104 Practice Test 2",
+            "sourceQuestionNumbers": [
+              3
+            ],
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/azure/network-watcher/ip-flow-verify-overview"
+            ],
+            "bossEligible": false
+          }
+        },
+        {
+          "objectiveId": "az-104.test2.outbound-nsg-rule",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "An application VM initiates TCP connections to an approved external service on destination port 8080. An NSG currently denies that outbound traffic. Which change addresses this requirement?",
+          "choices": [
+            "Allow inbound TCP 8080 from every internet address",
+            "Add an appropriately scoped, higher-priority outbound allow rule for the service and TCP destination port 8080",
+            "Allow outbound UDP 8080 instead of TCP",
+            "Disable the NSG on every subnet"
+          ],
+          "correctIndex": 1,
+          "explanation": "The VM initiates the connection, so the relevant direction is outbound. The rule must match TCP, the destination and effective priority, while preserving other protections.",
+          "hints": [
+            "Follow the initiating endpoint and the stated protocol."
+          ],
+          "domainId": "az104-networking",
+          "subdomain": "outbound-nsg-rule",
+          "tags": [
+            "azure",
+            "az-104",
+            "practice-test-2",
+            "networking"
+          ],
+          "isGoldenEligible": false,
+          "data": {
+            "examCode": "AZ-104",
+            "sourceTest": "AZ-104 Practice Test 2",
+            "sourceQuestionNumbers": [
+              4
+            ],
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/azure/virtual-network/network-security-groups-overview"
+            ],
+            "bossEligible": false
+          }
+        },
+        {
+          "objectiveId": "az-104.test2.zone-resilience",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "A regional application has three interchangeable VM replicas and must tolerate loss of one datacenter-scale availability zone. Which deployment most directly separates their zone failure domains?",
+          "choices": [
+            "Put all replicas on one VM with more memory",
+            "Put all replicas in one zone with different names",
+            "Place replicas across three supported availability zones",
+            "Use one availability set and assume it spans three zones"
+          ],
+          "correctIndex": 2,
+          "explanation": "Availability zones provide separate datacenter-scale failure domains within a supported region. An availability set distributes fault and update domains but does not itself establish cross-zone placement.",
+          "hints": [
+            "Match the required failure boundary to the deployment boundary."
+          ],
+          "domainId": "az104-compute",
+          "subdomain": "zone-resilience",
+          "tags": [
+            "azure",
+            "az-104",
+            "practice-test-2",
+            "compute"
+          ],
+          "isGoldenEligible": false,
+          "data": {
+            "examCode": "AZ-104",
+            "sourceTest": "AZ-104 Practice Test 2",
+            "sourceQuestionNumbers": [
+              5
+            ],
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/azure/reliability/availability-zones-overview"
+            ],
+            "bossEligible": false
+          }
+        },
+        {
+          "objectiveId": "az-104.test2.backup-os-support",
+          "type": "multiple_choice",
+          "difficulty": 2,
+          "prompt": "An administrator is evaluating supported Windows and Linux Azure VMs for backup. Which conclusion should guide the assessment?",
+          "choices": [
+            "Azure VM Backup supports eligible Windows and Linux VMs; verify the support matrix and VM configuration",
+            "Operating system and configuration support never need checking",
+            "Any automatically shut down VM is always ineligible",
+            "Azure VM Backup supports only Windows VMs"
+          ],
+          "correctIndex": 0,
+          "explanation": "Azure VM Backup supports eligible Windows and Linux configurations. Disk, encryption, networking and other limits still need checking; an omitted table cannot establish eligibility for named machines.",
+          "hints": [
+            "Distinguish broad OS support from the exact configuration support matrix."
+          ],
+          "domainId": "az104-monitoring-recovery",
+          "subdomain": "backup-os-support",
+          "tags": [
+            "azure",
+            "az-104",
+            "practice-test-2",
+            "monitoring-recovery"
+          ],
+          "isGoldenEligible": false,
+          "data": {
+            "examCode": "AZ-104",
+            "sourceTest": "AZ-104 Practice Test 2",
+            "sourceQuestionNumbers": [
+              6
+            ],
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/azure/backup/backup-support-matrix-iaas"
+            ],
+            "bossEligible": false
+          }
+        },
+        {
+          "objectiveId": "az-104.test2.alert-user-response",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "An operator has investigated a fired Azure Monitor alert and wants to record that someone is handling it without claiming that the monitored condition has resolved. Which field and value should be changed?",
+          "choices": [
+            "Set the alert’s user response to Acknowledged",
+            "Force the monitor condition to Resolved",
+            "Change the resource’s region",
+            "Delete the alert instance"
+          ],
+          "correctIndex": 0,
+          "explanation": "User response tracks human handling with New, Acknowledged or Closed. Monitor condition reflects the monitored signal and is separate from the user’s handling state.",
+          "hints": [
+            "Separate human handling status from the monitored condition."
+          ],
+          "domainId": "az104-monitoring-recovery",
+          "subdomain": "alert-user-response",
+          "tags": [
+            "azure",
+            "az-104",
+            "practice-test-2",
+            "monitoring-recovery"
+          ],
+          "isGoldenEligible": false,
+          "data": {
+            "examCode": "AZ-104",
+            "sourceTest": "AZ-104 Practice Test 2",
+            "sourceQuestionNumbers": [
+              7,
+              8
+            ],
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/azure/azure-monitor/alerts/alerts-manage-alert-instances"
+            ],
+            "bossEligible": false
+          }
+        },
+        {
+          "objectiveId": "az-104.test2.alert-signal-types",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "A storage account needs one alert for a management-plane deletion event and another for a capacity metric threshold. Which design matches these two different signal types?",
+          "choices": [
+            "Use an activity-log rule to evaluate every numeric metric",
+            "Replace both alert rules with one email contact",
+            "Use a metric rule to evaluate every management operation",
+            "Use an activity-log alert rule and a metric alert rule"
+          ],
+          "correctIndex": 3,
+          "explanation": "Activity-log rules evaluate management events; metric rules evaluate numeric metrics. Notifications are configured through action groups rather than replacing signal evaluation.",
+          "hints": [
+            "Identify the source and type of each signal."
+          ],
+          "domainId": "az104-monitoring-recovery",
+          "subdomain": "alert-signal-types",
+          "tags": [
+            "azure",
+            "az-104",
+            "practice-test-2",
+            "monitoring-recovery"
+          ],
+          "isGoldenEligible": false,
+          "data": {
+            "examCode": "AZ-104",
+            "sourceTest": "AZ-104 Practice Test 2",
+            "sourceQuestionNumbers": [
+              9
+            ],
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/azure/azure-monitor/alerts/alerts-types"
+            ],
+            "bossEligible": false
+          }
+        },
+        {
+          "objectiveId": "az-104.test2.action-groups",
+          "type": "multiple_choice",
+          "difficulty": 2,
+          "prompt": "Two Azure Monitor alert rules must notify the same operations team by email. What reusable notification component can both rules reference?",
+          "choices": [
+            "A custom DNS zone",
+            "An action group containing the required receivers",
+            "A VM availability set",
+            "A storage lifecycle policy"
+          ],
+          "correctIndex": 1,
+          "explanation": "An action group defines notification and action receivers and can be reused by alert rules. Exact receiver counts in the missing source table are not assumed.",
+          "hints": [
+            "Choose the reusable alert notification component."
+          ],
+          "domainId": "az104-monitoring-recovery",
+          "subdomain": "action-groups",
+          "tags": [
+            "azure",
+            "az-104",
+            "practice-test-2",
+            "monitoring-recovery"
+          ],
+          "isGoldenEligible": false,
+          "data": {
+            "examCode": "AZ-104",
+            "sourceTest": "AZ-104 Practice Test 2",
+            "sourceQuestionNumbers": [
+              10
+            ],
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/azure/azure-monitor/alerts/action-groups"
+            ],
+            "bossEligible": false
+          }
+        },
+        {
+          "objectiveId": "az-104.test2.custom-role-scope",
+          "type": "multiple_choice",
+          "difficulty": 2,
+          "prompt": "A custom role should be assignable only within resource group rg-app in subscription 11111111-1111-1111-1111-111111111111. Which AssignableScopes entry identifies that group?",
+          "choices": [
+            "/subscriptions/11111111-1111-1111-1111-111111111111/resourceGroups/rg-other",
+            "/subscriptions/22222222-2222-2222-2222-222222222222/resourceGroups/rg-app",
+            "/subscriptions/11111111-1111-1111-1111-111111111111/providers/Microsoft.Compute",
+            "/subscriptions/11111111-1111-1111-1111-111111111111/resourceGroups/rg-app"
+          ],
+          "correctIndex": 3,
+          "explanation": "A resource-group scope includes the subscription ID and resource-group name. A path ending at resourceGroups does not identify a concrete group.",
+          "hints": [
+            "Look for the complete hierarchy ending in the named resource group."
+          ],
+          "domainId": "az104-identity-governance",
+          "subdomain": "custom-role-scope",
+          "tags": [
+            "azure",
+            "az-104",
+            "practice-test-2",
+            "identity-governance"
+          ],
+          "isGoldenEligible": false,
+          "data": {
+            "examCode": "AZ-104",
+            "sourceTest": "AZ-104 Practice Test 2",
+            "sourceQuestionNumbers": [
+              11
+            ],
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/azure/role-based-access-control/custom-roles"
+            ],
+            "bossEligible": false
+          }
+        },
+        {
+          "objectiveId": "az-104.test2.notactions-not-deny",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "A custom role excludes an operation through NotActions. A user also holds another role that permits that operation at the same effective scope. What does the exclusion establish?",
+          "choices": [
+            "It automatically deletes the other assignment",
+            "It blocks the operation from every role the user holds",
+            "It disables the resource provider",
+            "It subtracts the operation from the custom role; it is not an explicit deny against another role’s grant"
+          ],
+          "correctIndex": 3,
+          "explanation": "NotActions subtracts permissions from the role definition’s Actions. Other applicable role assignments can still grant the operation unless a separate deny mechanism applies.",
+          "hints": [
+            "Distinguish subtraction from one grant from an explicit deny."
+          ],
+          "domainId": "az104-identity-governance",
+          "subdomain": "notactions-not-deny",
+          "tags": [
+            "azure",
+            "az-104",
+            "practice-test-2",
+            "identity-governance"
+          ],
+          "isGoldenEligible": false,
+          "data": {
+            "examCode": "AZ-104",
+            "sourceTest": "AZ-104 Practice Test 2",
+            "sourceQuestionNumbers": [
+              12
+            ],
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/azure/role-based-access-control/role-definitions"
+            ],
+            "bossEligible": false
+          }
+        },
+        {
+          "objectiveId": "az-104.test2.standard-load-balancer",
+          "type": "multiple_choice",
+          "difficulty": 2,
+          "prompt": "A legacy design specifies a Basic Azure Load Balancer. The replacement must use a supported SKU with production features and explicit security rules. Which SKU is the appropriate general replacement?",
+          "choices": [
+            "An availability set without a load balancer",
+            "Standard Load Balancer",
+            "A new Basic Load Balancer",
+            "A private DNS zone instead of load distribution"
+          ],
+          "correctIndex": 1,
+          "explanation": "Basic Load Balancer has retired. Standard is the supported migration destination; public IP compatibility, security rules and outbound design must also be reviewed.",
+          "hints": [
+            "Select the supported successor and plan its associated networking requirements."
+          ],
+          "domainId": "az104-networking",
+          "subdomain": "standard-load-balancer",
+          "tags": [
+            "azure",
+            "az-104",
+            "practice-test-2",
+            "networking"
+          ],
+          "isGoldenEligible": false,
+          "data": {
+            "examCode": "AZ-104",
+            "sourceTest": "AZ-104 Practice Test 2",
+            "sourceQuestionNumbers": [
+              13,
+              14
+            ],
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/azure/load-balancer/load-balancer-basic-upgrade-guidance"
+            ],
+            "bossEligible": false
+          }
+        },
+        {
+          "objectiveId": "az-104.test2.multi-availability-set-backends",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "VMs in two availability sets share the same supported virtual network configuration. They need one load balancer backend pool. Which Azure Load Balancer SKU supports this design?",
+          "choices": [
+            "Azure Application Security Group",
+            "Standard Load Balancer",
+            "Azure DNS Private Resolver",
+            "Basic Load Balancer (retired)"
+          ],
+          "correctIndex": 1,
+          "explanation": "Standard Load Balancer supports backends across multiple availability sets. This question states its own supported network context rather than assuming the missing source VM table.",
+          "hints": [
+            "Consider the supported backend placement capabilities of the SKU."
+          ],
+          "domainId": "az104-networking",
+          "subdomain": "multi-availability-set-backends",
+          "tags": [
+            "azure",
+            "az-104",
+            "practice-test-2",
+            "networking"
+          ],
+          "isGoldenEligible": false,
+          "data": {
+            "examCode": "AZ-104",
+            "sourceTest": "AZ-104 Practice Test 2",
+            "sourceQuestionNumbers": [
+              15,
+              16
+            ],
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/azure/load-balancer/tutorial-load-balancer-multiple-availability-sets-portal"
+            ],
+            "bossEligible": false
+          }
+        },
+        {
+          "objectiveId": "az-104.test2.nat-subnet-association",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "Private VMs in subnet app need outbound internet connectivity without individual VM public IP addresses. A NAT gateway already has a public IP. Which association enables its use by those VMs?",
+          "choices": [
+            "Attach its public IP as every VM’s private IP",
+            "Create an inbound NSG rule and omit the subnet association",
+            "Associate it only with an unrelated subnet called public",
+            "Associate the NAT gateway with subnet app"
+          ],
+          "correctIndex": 3,
+          "explanation": "NAT Gateway provides outbound connectivity for resources in its associated subnet. The subnet containing the workloads must use the gateway; naming another subnet public does not create a route through it.",
+          "hints": [
+            "Locate the subnet containing the workloads that need outbound connectivity."
+          ],
+          "domainId": "az104-networking",
+          "subdomain": "nat-subnet-association",
+          "tags": [
+            "azure",
+            "az-104",
+            "practice-test-2",
+            "networking"
+          ],
+          "isGoldenEligible": false,
+          "data": {
+            "examCode": "AZ-104",
+            "sourceTest": "AZ-104 Practice Test 2",
+            "sourceQuestionNumbers": [
+              17
+            ],
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/azure/nat-gateway/nat-gateway-design"
+            ],
+            "bossEligible": false
+          }
+        },
+        {
+          "objectiveId": "az-104.test2.shared-app-plan",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "Several compatible web apps run in the same region and operating-system family. Load tests show enough capacity in one App Service plan. Which design can share paid compute resources?",
+          "choices": [
+            "Move the plan’s region on each incoming request",
+            "Mix incompatible operating-system plans into one app",
+            "Require one dedicated plan per app in every case",
+            "Host those compatible apps in the same appropriately sized plan"
+          ],
+          "correctIndex": 3,
+          "explanation": "Apps in an App Service plan share its compute resources. Capacity, OS, region, isolation and feature needs still matter; one plan is not universally the cheapest or safest design.",
+          "hints": [
+            "Separate resource sharing from an unconditional cost guarantee."
+          ],
+          "domainId": "az104-compute",
+          "subdomain": "shared-app-plan",
+          "tags": [
+            "azure",
+            "az-104",
+            "practice-test-2",
+            "compute"
+          ],
+          "isGoldenEligible": false,
+          "data": {
+            "examCode": "AZ-104",
+            "sourceTest": "AZ-104 Practice Test 2",
+            "sourceQuestionNumbers": [
+              18
+            ],
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/azure/app-service/overview-hosting-plans"
+            ],
+            "bossEligible": false
+          }
+        },
+        {
+          "objectiveId": "az-104.test2.virtual-wan-hubs",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "A network design uses Azure Virtual WAN and requires a regional virtual hub in each of three selected Azure regions. How should the hubs be organized?",
+          "choices": [
+            "Replace the Virtual WAN with three storage queues",
+            "Create three regional virtual hubs within the Virtual WAN",
+            "Create an Azure availability set for each VPN site instead",
+            "Create one hub per physical datacenter regardless of design"
+          ],
+          "correctIndex": 1,
+          "explanation": "A Virtual WAN can contain multiple regional virtual hubs. Hub placement follows the regional network design; it is not inherently one hub per on-premises datacenter.",
+          "hints": [
+            "Count required Azure hub regions rather than assuming a hub per branch."
+          ],
+          "domainId": "az104-networking",
+          "subdomain": "virtual-wan-hubs",
+          "tags": [
+            "azure",
+            "az-104",
+            "practice-test-2",
+            "networking",
+            "related-azure-topic"
+          ],
+          "isGoldenEligible": false,
+          "data": {
+            "examCode": "AZ-104",
+            "sourceTest": "AZ-104 Practice Test 2",
+            "sourceQuestionNumbers": [
+              19
+            ],
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/azure/virtual-wan/virtual-wan-about"
+            ],
+            "bossEligible": false,
+            "examScope": "related-topic-not-explicitly-listed"
+          }
+        },
+        {
+          "objectiveId": "az-104.test2.aks-public-service",
+          "type": "multiple_choice",
+          "difficulty": 2,
+          "prompt": "An AKS application must expose a supported public layer-4 endpoint for external clients. Which Kubernetes Service type requests an Azure load balancer frontend for that exposure?",
+          "choices": [
+            "Headless Service",
+            "LoadBalancer Service",
+            "ClusterIP Service",
+            "ExternalName Service"
+          ],
+          "correctIndex": 1,
+          "explanation": "A LoadBalancer Service can request an externally accessible frontend unless configured as internal. ClusterIP serves cluster-internal access; endpoint exposure still needs security controls.",
+          "hints": [
+            "Distinguish cluster-internal addressing from externally exposed service frontends."
+          ],
+          "domainId": "az104-compute",
+          "subdomain": "aks-public-service",
+          "tags": [
+            "azure",
+            "az-104",
+            "practice-test-2",
+            "compute",
+            "related-azure-topic"
+          ],
+          "isGoldenEligible": false,
+          "data": {
+            "examCode": "AZ-104",
+            "sourceTest": "AZ-104 Practice Test 2",
+            "sourceQuestionNumbers": [
+              20
+            ],
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/azure/aks/concepts-network-services"
+            ],
+            "bossEligible": false,
+            "examScope": "related-topic-not-explicitly-listed"
+          }
+        },
+        {
+          "objectiveId": "az-104.test2.app-plan-compatibility",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "A deployment explicitly requires a Linux App Service plan in West Europe. Which existing plan is compatible with those stated plan requirements?",
+          "choices": [
+            "A Windows plan in West Europe",
+            "A Windows plan in East US",
+            "A Linux plan in West Europe with sufficient capacity",
+            "A Linux plan in East US"
+          ],
+          "correctIndex": 2,
+          "explanation": "An App Service plan defines OS and region for its compute. Runtime support and capacity must be verified separately. The absent source plan table is not reconstructed.",
+          "hints": [
+            "Check both the stated OS and the stated region."
+          ],
+          "domainId": "az104-compute",
+          "subdomain": "app-plan-compatibility",
+          "tags": [
+            "azure",
+            "az-104",
+            "practice-test-2",
+            "compute"
+          ],
+          "isGoldenEligible": false,
+          "data": {
+            "examCode": "AZ-104",
+            "sourceTest": "AZ-104 Practice Test 2",
+            "sourceQuestionNumbers": [
+              21,
+              22,
+              23
+            ],
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/azure/app-service/overview-hosting-plans"
+            ],
+            "bossEligible": false
+          }
+        },
+        {
+          "objectiveId": "az-104.test2.role-assignment-permission",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "An administrator must manage Azure resource role assignments in one resource group without general permission to modify its workloads. Which listed built-in role is intended for access administration?",
+          "choices": [
+            "User Access Administrator at the resource-group scope",
+            "Global Reader in Microsoft Entra ID",
+            "Reader at subscription scope",
+            "Contributor at subscription scope"
+          ],
+          "correctIndex": 0,
+          "explanation": "User Access Administrator manages Azure resource access. Contributor cannot create Azure RBAC role assignments; Entra directory roles are a different authorization system. Other access-management roles exist, so this asks among the listed roles.",
+          "hints": [
+            "Separate access administration from general resource management."
+          ],
+          "domainId": "az104-identity-governance",
+          "subdomain": "role-assignment-permission",
+          "tags": [
+            "azure",
+            "az-104",
+            "practice-test-2",
+            "identity-governance"
+          ],
+          "isGoldenEligible": false,
+          "data": {
+            "examCode": "AZ-104",
+            "sourceTest": "AZ-104 Practice Test 2",
+            "sourceQuestionNumbers": [
+              24,
+              26
+            ],
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles/privileged"
+            ],
+            "bossEligible": false
+          }
+        },
+        {
+          "objectiveId": "az-104.test2.network-resource-role",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "A user must create and manage subnets in an existing virtual network but does not need to assign roles. Which listed role should be scoped to that virtual network?",
+          "choices": [
+            "User Administrator in the tenant",
+            "Network Contributor at the VNet",
+            "Reader at the VNet",
+            "Storage Blob Data Reader at the account"
+          ],
+          "correctIndex": 1,
+          "explanation": "Network Contributor manages network resources at its effective scope. Reader cannot modify resources; directory and blob-data roles do not grant subnet management.",
+          "hints": [
+            "Match the resource provider and required operation."
+          ],
+          "domainId": "az104-identity-governance",
+          "subdomain": "network-resource-role",
+          "tags": [
+            "azure",
+            "az-104",
+            "practice-test-2",
+            "identity-governance"
+          ],
+          "isGoldenEligible": false,
+          "data": {
+            "examCode": "AZ-104",
+            "sourceTest": "AZ-104 Practice Test 2",
+            "sourceQuestionNumbers": [
+              25
+            ],
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles/networking"
+            ],
+            "bossEligible": false
+          }
+        },
+        {
+          "objectiveId": "az-104.test2.custom-subdomain-dns",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "An App Service custom subdomain already has the required ownership verification record. You now need DNS to map www.example.com to appname.azurewebsites.net using an alias. Which record should be added?",
+          "choices": [
+            "A TXT record as the only traffic-routing record",
+            "An NSG rule instead of a DNS record",
+            "A CNAME record for www pointing to appname.azurewebsites.net",
+            "An MX record for the web app"
+          ],
+          "correctIndex": 2,
+          "explanation": "A CNAME aliases the subdomain to the App Service hostname. Ownership verification is a separate step; an A record is another mapping method rather than an additional mandatory record here.",
+          "hints": [
+            "Distinguish domain verification from alias-based name resolution."
+          ],
+          "domainId": "az104-compute",
+          "subdomain": "custom-subdomain-dns",
+          "tags": [
+            "azure",
+            "az-104",
+            "practice-test-2",
+            "compute"
+          ],
+          "isGoldenEligible": false,
+          "data": {
+            "examCode": "AZ-104",
+            "sourceTest": "AZ-104 Practice Test 2",
+            "sourceQuestionNumbers": [
+              27
+            ],
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/azure/app-service/app-service-web-tutorial-custom-domain"
+            ],
+            "bossEligible": false
+          }
+        },
+        {
+          "objectiveId": "az-104.test2.file-share-zrs",
+          "type": "multiple_choice",
+          "difficulty": 2,
+          "prompt": "A supported Azure Files deployment must replicate synchronously across availability zones in one region. Which redundancy option directly meets that requirement?",
+          "choices": [
+            "A VM snapshot as the storage-account redundancy setting",
+            "An unreplicated local disk",
+            "Zone-redundant storage (ZRS)",
+            "Locally redundant storage (LRS) alone"
+          ],
+          "correctIndex": 2,
+          "explanation": "ZRS synchronously replicates across availability zones in the primary region. Supported account types, regions and service options must be checked rather than assuming all premium shares support every redundancy choice.",
+          "hints": [
+            "Match a zone-level resilience requirement to the redundancy option."
+          ],
+          "domainId": "az104-storage",
+          "subdomain": "file-share-zrs",
+          "tags": [
+            "azure",
+            "az-104",
+            "practice-test-2",
+            "storage"
+          ],
+          "isGoldenEligible": false,
+          "data": {
+            "examCode": "AZ-104",
+            "sourceTest": "AZ-104 Practice Test 2",
+            "sourceQuestionNumbers": [
+              28
+            ],
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/azure/storage/files/files-redundancy"
+            ],
+            "bossEligible": false
+          }
+        },
+        {
+          "objectiveId": "az-104.test2.file-share-acl",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "Identity-based SMB authentication and share-level access are already configured for Azure Files. Finance users need read access to one directory and write access to another. Which additional mechanism provides directory-level granularity?",
+          "choices": [
+            "A VM availability set",
+            "Storage-account Reader alone",
+            "The storage account’s display name",
+            "Windows directory and file ACLs"
+          ],
+          "correctIndex": 3,
+          "explanation": "Share-level permissions and directory/file ACLs serve different levels of access control. Windows ACLs provide the requested granular directory permissions.",
+          "hints": [
+            "Identify the authorization layer below the share."
+          ],
+          "domainId": "az104-storage",
+          "subdomain": "file-share-acl",
+          "tags": [
+            "azure",
+            "az-104",
+            "practice-test-2",
+            "storage"
+          ],
+          "isGoldenEligible": false,
+          "data": {
+            "examCode": "AZ-104",
+            "sourceTest": "AZ-104 Practice Test 2",
+            "sourceQuestionNumbers": [
+              29
+            ],
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/azure/storage/files/storage-files-identity-assign-share-level-permissions"
+            ],
+            "bossEligible": false
+          }
+        },
+        {
+          "objectiveId": "az-104.test2.load-balancer-rbac-scope",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "An engineer must manage exactly two load balancers and has no need to manage any other resources in their resource group. Which scope choice best limits a suitable network-management role?",
+          "choices": [
+            "Use a directory User Administrator role",
+            "Assign Owner to the entire subscription",
+            "Assign Contributor to every management group",
+            "Assign the role separately at each required load-balancer resource scope"
+          ],
+          "correctIndex": 3,
+          "explanation": "Resource-scoped assignments restrict the role to the selected load balancers and their child resources. Broader group or subscription scopes would grant unnecessary authority.",
+          "hints": [
+            "Choose the narrowest scope matching the two named resources."
+          ],
+          "domainId": "az104-identity-governance",
+          "subdomain": "load-balancer-rbac-scope",
+          "tags": [
+            "azure",
+            "az-104",
+            "practice-test-2",
+            "identity-governance"
+          ],
+          "isGoldenEligible": false,
+          "data": {
+            "examCode": "AZ-104",
+            "sourceTest": "AZ-104 Practice Test 2",
+            "sourceQuestionNumbers": [
+              30,
+              31
+            ],
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/azure/role-based-access-control/scope-overview"
+            ],
+            "bossEligible": false
+          }
+        },
+        {
+          "objectiveId": "az-104.test2.site-to-site-vpn",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "An Azure VNet needs a site-to-site IPsec connection to an on-premises VPN appliance. Which Azure resource represents the on-premises gateway address and network prefixes?",
+          "choices": [
+            "Public DNS zone",
+            "Azure Files share",
+            "Application security group",
+            "Local network gateway"
+          ],
+          "correctIndex": 3,
+          "explanation": "A local network gateway represents the on-premises VPN endpoint and address prefixes. A compatible virtual network gateway and connection resource are also required.",
+          "hints": [
+            "Distinguish the representation of the remote site from the Azure-side VPN gateway."
+          ],
+          "domainId": "az104-networking",
+          "subdomain": "site-to-site-vpn",
+          "tags": [
+            "azure",
+            "az-104",
+            "practice-test-2",
+            "networking"
+          ],
+          "isGoldenEligible": false,
+          "data": {
+            "examCode": "AZ-104",
+            "sourceTest": "AZ-104 Practice Test 2",
+            "sourceQuestionNumbers": [
+              32
+            ],
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/azure/vpn-gateway/vpn-gateway-about-vpn-gateway-settings"
+            ],
+            "bossEligible": false
+          }
+        },
+        {
+          "objectiveId": "az-104.test2.management-event-alert",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "Operations needs an email when a VM management operation appears in the Azure Activity Log. Which combination evaluates the event and sends the notification?",
+          "choices": [
+            "A storage lifecycle rule and a VM snapshot",
+            "An activity-log alert rule with an email action group",
+            "An NSG rule and an App Service plan",
+            "A metric chart with no alert rule or receiver"
+          ],
+          "correctIndex": 1,
+          "explanation": "The alert rule evaluates the management event; the action group supplies the notification receiver. A chart alone does not send a notification.",
+          "hints": [
+            "Identify both the signal evaluator and notification receiver."
+          ],
+          "domainId": "az104-monitoring-recovery",
+          "subdomain": "management-event-alert",
+          "tags": [
+            "azure",
+            "az-104",
+            "practice-test-2",
+            "monitoring-recovery"
+          ],
+          "isGoldenEligible": false,
+          "data": {
+            "examCode": "AZ-104",
+            "sourceTest": "AZ-104 Practice Test 2",
+            "sourceQuestionNumbers": [
+              33
+            ],
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/azure/azure-monitor/alerts/alerts-types"
+            ],
+            "bossEligible": false
+          }
+        },
+        {
+          "objectiveId": "az-104.test2.guest-invitation-policy",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "A tenant’s external collaboration policy explicitly prevents a particular user role from inviting guests. A user in that role cannot invite a guest. Which configuration should the administrator review?",
+          "choices": [
+            "The VNet subnet address range",
+            "The VM disk caching mode",
+            "Microsoft Entra external collaboration guest invitation settings",
+            "A blob lifecycle deletion policy"
+          ],
+          "correctIndex": 2,
+          "explanation": "External collaboration settings govern who can invite guests and permitted collaboration restrictions. A generic sign-in failure alone would not establish this specific policy cause.",
+          "hints": [
+            "Use the stated policy evidence rather than diagnosing an unspecified error."
+          ],
+          "domainId": "az104-identity-governance",
+          "subdomain": "guest-invitation-policy",
+          "tags": [
+            "azure",
+            "az-104",
+            "practice-test-2",
+            "identity-governance"
+          ],
+          "isGoldenEligible": false,
+          "data": {
+            "examCode": "AZ-104",
+            "sourceTest": "AZ-104 Practice Test 2",
+            "sourceQuestionNumbers": [
+              36
+            ],
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/entra/external-id/external-collaboration-settings-configure"
+            ],
+            "bossEligible": false
+          }
+        },
+        {
+          "objectiveId": "az-104.test2.pass-through-authentication",
+          "type": "multiple_choice",
+          "difficulty": 2,
+          "prompt": "An organization wants supported hybrid sign-in to validate passwords against on-premises Active Directory without synchronizing password hashes to Microsoft Entra ID. Which listed method matches that requirement?",
+          "choices": [
+            "Password hash synchronization",
+            "A public storage account key",
+            "Pass-through authentication",
+            "Anonymous access"
+          ],
+          "correctIndex": 2,
+          "explanation": "Pass-through authentication validates credentials through on-premises agents. Availability and fallback design still matter; federation is another possible design, so it is not offered as an exclusive alternative.",
+          "hints": [
+            "Locate where password validation happens in the requested design."
+          ],
+          "domainId": "az104-identity-governance",
+          "subdomain": "pass-through-authentication",
+          "tags": [
+            "azure",
+            "az-104",
+            "practice-test-2",
+            "identity-governance",
+            "related-azure-topic"
+          ],
+          "isGoldenEligible": false,
+          "data": {
+            "examCode": "AZ-104",
+            "sourceTest": "AZ-104 Practice Test 2",
+            "sourceQuestionNumbers": [
+              38
+            ],
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/entra/identity/hybrid/connect/how-to-connect-pta"
+            ],
+            "bossEligible": false,
+            "examScope": "related-topic-not-explicitly-listed"
+          }
+        },
+        {
+          "objectiveId": "az-104.test2.rdp-rule-order",
+          "type": "multiple_choice",
+          "difficulty": 4,
+          "prompt": "A VM must allow RDP only from a specified on-premises prefix and continue serving HTTPS from the internet. The effective NSG currently allows both ports from anywhere. Which rule plan meets the requirement?",
+          "choices": [
+            "Add an outbound RDP deny rule and keep inbound RDP open",
+            "Change the VNet address range without changing RDP rules",
+            "Deny all inbound internet traffic including HTTPS",
+            "Allow TCP 3389 from the approved prefix, deny other inbound TCP 3389 at a lower precedence, and preserve the HTTPS allow rule"
+          ],
+          "correctIndex": 3,
+          "explanation": "The permitted RDP source needs a higher-precedence allow, followed by a broader RDP deny. HTTPS remains independently allowed. Azure NSG rules evaluate lower priority numbers first.",
+          "hints": [
+            "Trace inbound direction, destination port and rule precedence."
+          ],
+          "domainId": "az104-networking",
+          "subdomain": "rdp-rule-order",
+          "tags": [
+            "azure",
+            "az-104",
+            "practice-test-2",
+            "networking"
+          ],
+          "isGoldenEligible": false,
+          "data": {
+            "examCode": "AZ-104",
+            "sourceTest": "AZ-104 Practice Test 2",
+            "sourceQuestionNumbers": [
+              40
+            ],
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/azure/virtual-network/network-security-groups-overview"
+            ],
+            "bossEligible": false
+          },
+          "evidence": "Effective rules allow inbound TCP 3389 and 443 from any source.",
+          "constraints": [
+            "Preserve HTTPS access",
+            "Keep approved on-premises RDP access",
+            "Block other RDP sources"
+          ]
+        },
+        {
+          "objectiveId": "az-104.test2.nic-network-placement",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "A VM will be created in West Europe using an existing VNet in West Europe. What placement must its network interface use?",
+          "choices": [
+            "Any subnet in any region because names match",
+            "A subnet in that VNet, with the NIC in the VM’s region",
+            "An East US NIC connected directly to the West Europe VNet",
+            "A storage container instead of a subnet"
+          ],
+          "correctIndex": 1,
+          "explanation": "A NIC connects to a subnet in a VNet and is subject to regional placement requirements. The question states its own regions rather than recovering the missing source table.",
+          "hints": [
+            "Check the NIC’s region and subnet relationship."
+          ],
+          "domainId": "az104-networking",
+          "subdomain": "nic-network-placement",
+          "tags": [
+            "azure",
+            "az-104",
+            "practice-test-2",
+            "networking"
+          ],
+          "isGoldenEligible": false,
+          "data": {
+            "examCode": "AZ-104",
+            "sourceTest": "AZ-104 Practice Test 2",
+            "sourceQuestionNumbers": [
+              41
+            ],
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/azure/virtual-network/virtual-network-network-interface"
+            ],
+            "bossEligible": false
+          }
+        },
+        {
+          "objectiveId": "az-104.test2.internal-layer4-balancing",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "A private application needs an internal frontend to distribute arbitrary TCP traffic to VMs. It does not need HTTP routing. Which service fits this layer-4 requirement?",
+          "choices": [
+            "An internal Standard Load Balancer",
+            "A public DNS TXT record",
+            "A private storage queue",
+            "An application gateway solely because every protocol is HTTP"
+          ],
+          "correctIndex": 0,
+          "explanation": "Azure Load Balancer distributes supported layer-4 traffic. Application Gateway is designed for HTTP/HTTPS application delivery and should not be treated as a substitute for arbitrary TCP requirements.",
+          "hints": [
+            "Match the required traffic layer and private exposure."
+          ],
+          "domainId": "az104-networking",
+          "subdomain": "internal-layer4-balancing",
+          "tags": [
+            "azure",
+            "az-104",
+            "practice-test-2",
+            "networking"
+          ],
+          "isGoldenEligible": false,
+          "data": {
+            "examCode": "AZ-104",
+            "sourceTest": "AZ-104 Practice Test 2",
+            "sourceQuestionNumbers": [
+              42
+            ],
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/azure/load-balancer/load-balancer-overview"
+            ],
+            "bossEligible": false
+          }
+        },
+        {
+          "objectiveId": "az-104.test2.file-sync-server-endpoint",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "Azure File Sync’s storage sync service and cloud endpoint already exist. The agent is installed on a supported Windows Server, but that server has not been registered. What should happen before creating its server endpoint?",
+          "choices": [
+            "Register the server with the storage sync service",
+            "Create the endpoint while assuming an unregistered server is selectable",
+            "Convert the Azure file share into a blob container",
+            "Delete the cloud endpoint"
+          ],
+          "correctIndex": 0,
+          "explanation": "The server must be registered with the storage sync service before a server endpoint can bind its local path into the sync group. Agent installation alone is not registration.",
+          "hints": [
+            "Identify the prerequisite between installing the agent and adding a server endpoint."
+          ],
+          "domainId": "az104-storage",
+          "subdomain": "file-sync-server-endpoint",
+          "tags": [
+            "azure",
+            "az-104",
+            "practice-test-2",
+            "storage"
+          ],
+          "isGoldenEligible": false,
+          "data": {
+            "examCode": "AZ-104",
+            "sourceTest": "AZ-104 Practice Test 2",
+            "sourceQuestionNumbers": [
+              43
+            ],
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/azure/storage/file-sync/file-sync-deployment-guide"
+            ],
+            "bossEligible": false
+          }
+        },
+        {
+          "objectiveId": "az-104.test2.key-vault-template-secret",
+          "type": "multiple_choice",
+          "difficulty": 5,
+          "prompt": "A resource-group deployment needs a password stored in Key Vault. Review finds that the template author proposes checking a plaintext password into source control. Which replacement design best preserves the secret boundary?",
+          "choices": [
+            "Rename the plaintext variable to secret without changing its contents",
+            "Commit the password and remove it after deployment",
+            "Use a secure template parameter with a Key Vault reference and configure the required deployment permissions",
+            "Grant every user vault administration to simplify deployment"
+          ],
+          "correctIndex": 2,
+          "explanation": "A Key Vault parameter reference keeps the secret value out of the checked-in parameter file. The vault and deployment principal must have the documented template-deployment permissions; secure parameter types avoid inappropriate exposure.",
+          "hints": [
+            "Separate referencing a secret from copying its value into source control."
+          ],
+          "domainId": "az104-identity-governance",
+          "subdomain": "key-vault-template-secret",
+          "tags": [
+            "azure",
+            "az-104",
+            "practice-test-2",
+            "identity-governance"
+          ],
+          "isGoldenEligible": false,
+          "data": {
+            "examCode": "AZ-104",
+            "sourceTest": "AZ-104 Practice Test 2",
+            "sourceQuestionNumbers": [
+              45
+            ],
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/azure/azure-resource-manager/templates/key-vault-parameter"
+            ],
+            "bossEligible": false
+          },
+          "evidence": "The password is already held in Key Vault; the repository is broadly readable.",
+          "constraints": [
+            "Do not store the plaintext secret in the repository",
+            "Preserve least privilege",
+            "Allow authorized automated deployments"
+          ]
+        },
+        {
+          "objectiveId": "az-104.test2.unused-disk-review",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "A cost report identifies managed disks that appear unattached. What should an administrator do before deleting them?",
+          "choices": [
+            "Assume unattached means no business value",
+            "Delete every disk whose name contains old",
+            "Verify disk state, ownership, retention needs and recovery dependencies, then obtain the appropriate disposal authorization",
+            "Delete the entire resource group without inspecting dependencies"
+          ],
+          "correctIndex": 2,
+          "explanation": "Unattached disks can contain needed data or retained recovery copies. Cost cleanup should verify state and business requirements before an authorized deletion.",
+          "hints": [
+            "Separate a cleanup candidate from permission to destroy its contents."
+          ],
+          "domainId": "az104-compute",
+          "subdomain": "unused-disk-review",
+          "tags": [
+            "azure",
+            "az-104",
+            "practice-test-2",
+            "compute"
+          ],
+          "isGoldenEligible": false,
+          "data": {
+            "examCode": "AZ-104",
+            "sourceTest": "AZ-104 Practice Test 2",
+            "sourceQuestionNumbers": [
+              47
+            ],
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/azure/virtual-machines/windows/find-unattached-disks"
+            ],
+            "bossEligible": false
+          }
+        },
+        {
+          "objectiveId": "az-104.test2.location-based-mfa",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "A policy must require MFA for sign-ins from outside specified trusted named locations. Which Conditional Access condition directly represents that location requirement?",
+          "choices": [
+            "A storage replication setting",
+            "A VM update domain",
+            "A sign-in-risk condition as an exact substitute for location",
+            "Network/location conditions using the configured named locations"
+          ],
+          "correctIndex": 3,
+          "explanation": "Named locations support location-based Conditional Access. Sign-in risk measures detected risk and is a different signal; geographic location is not itself a risk score.",
+          "hints": [
+            "Choose the condition that directly represents the stated signal."
+          ],
+          "domainId": "az104-identity-governance",
+          "subdomain": "location-based-mfa",
+          "tags": [
+            "azure",
+            "az-104",
+            "practice-test-2",
+            "identity-governance",
+            "related-azure-topic"
+          ],
+          "isGoldenEligible": false,
+          "data": {
+            "examCode": "AZ-104",
+            "sourceTest": "AZ-104 Practice Test 2",
+            "sourceQuestionNumbers": [
+              48
+            ],
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/entra/identity/conditional-access/location-condition"
+            ],
+            "bossEligible": false,
+            "examScope": "related-topic-not-explicitly-listed"
+          }
+        },
+        {
+          "objectiveId": "az-104.test2.policy-deny",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "A correctly scoped Azure Policy assignment denies creation of Microsoft.Compute/virtualMachines. An authorized Contributor’s new VM deployment fails with a policy violation. Which explanation is most appropriate?",
+          "choices": [
+            "Role permissions do not bypass the effective deny policy",
+            "The VM name must match the user’s display name",
+            "Contributor always overrides policy denies",
+            "A Reader role would bypass the same deny"
+          ],
+          "correctIndex": 0,
+          "explanation": "RBAC permissions authorize actions but do not override an applicable policy deny. Any needed exception must follow the organization’s policy and exemption process.",
+          "hints": [
+            "Separate action authorization from policy compliance."
+          ],
+          "domainId": "az104-identity-governance",
+          "subdomain": "policy-deny",
+          "tags": [
+            "azure",
+            "az-104",
+            "practice-test-2",
+            "identity-governance"
+          ],
+          "isGoldenEligible": false,
+          "data": {
+            "examCode": "AZ-104",
+            "sourceTest": "AZ-104 Practice Test 2",
+            "sourceQuestionNumbers": [
+              49
+            ],
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/azure/governance/policy/concepts/effect-deny"
+            ],
+            "bossEligible": false
+          }
+        },
+        {
+          "objectiveId": "az-104.test2.topic-subscriptions",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "An event must be made available independently to billing and shipping consumers. Each consumer needs its own copy of matching messages. Which Service Bus entity design supports this?",
+          "choices": [
+            "An NSG with two inbound rules",
+            "One storage table with no message subscriptions",
+            "One queue where the consumers compete for the same messages",
+            "A topic with separate subscriptions for billing and shipping"
+          ],
+          "correctIndex": 3,
+          "explanation": "Service Bus topics support publish-subscribe through subscriptions. Each subscription receives matching messages and has independent consumption.",
+          "hints": [
+            "Distinguish independent subscriptions from competing queue consumers."
+          ],
+          "domainId": "az104-compute",
+          "subdomain": "topic-subscriptions",
+          "tags": [
+            "azure",
+            "az-104",
+            "practice-test-2",
+            "compute",
+            "related-azure-topic"
+          ],
+          "isGoldenEligible": false,
+          "data": {
+            "examCode": "AZ-104",
+            "sourceTest": "AZ-104 Practice Test 2",
+            "sourceQuestionNumbers": [
+              50
+            ],
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/azure/service-bus-messaging/service-bus-queues-topics-subscriptions"
+            ],
+            "bossEligible": false,
+            "examScope": "related-topic-not-explicitly-listed"
+          }
+        },
+        {
+          "objectiveId": "az-104.test2.queue-competing-consumers",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "Several workers should share work from one Service Bus queue. After a worker completes a message successfully, it should not also be processed as independent work by every worker. Which model fits?",
+          "choices": [
+            "A separate topic subscription for every worker when all copies must be processed",
+            "Competing consumers with correct settlement and duplicate-safe processing",
+            "Sending the same message independently to every worker",
+            "A guarantee that failures can never redeliver a queue message"
+          ],
+          "correctIndex": 1,
+          "explanation": "Queue workers compete for messages. Locks, failures and retries can cause redelivery, so handlers still need appropriate settlement and idempotency.",
+          "hints": [
+            "Distinguish work sharing from broadcast and from an exactly-once guarantee."
+          ],
+          "domainId": "az104-compute",
+          "subdomain": "queue-competing-consumers",
+          "tags": [
+            "azure",
+            "az-104",
+            "practice-test-2",
+            "compute",
+            "related-azure-topic"
+          ],
+          "isGoldenEligible": false,
+          "data": {
+            "examCode": "AZ-104",
+            "sourceTest": "AZ-104 Practice Test 2",
+            "sourceQuestionNumbers": [
+              51
+            ],
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/azure/service-bus-messaging/service-bus-queues-topics-subscriptions"
+            ],
+            "bossEligible": false,
+            "examScope": "related-topic-not-explicitly-listed"
+          }
+        },
+        {
+          "objectiveId": "az-104.test2.group-deployment-command",
+          "type": "multiple_choice",
+          "difficulty": 2,
+          "prompt": "You have an ARM template intended for resource-group scope and an existing group rg-app. Which Azure CLI command family targets that group’s deployment?",
+          "choices": [
+            "az deployment group create --resource-group rg-app",
+            "az account clear",
+            "az deployment tenant create --resource-group rg-app",
+            "az group delete --name rg-app"
+          ],
+          "correctIndex": 0,
+          "explanation": "az deployment group create performs resource-group-scoped deployments. Subscription, management-group and tenant scopes use different commands and templates.",
+          "hints": [
+            "Match the template’s declared scope to the deployment command."
+          ],
+          "domainId": "az104-identity-governance",
+          "subdomain": "group-deployment-command",
+          "tags": [
+            "azure",
+            "az-104",
+            "practice-test-2",
+            "identity-governance"
+          ],
+          "isGoldenEligible": false,
+          "data": {
+            "examCode": "AZ-104",
+            "sourceTest": "AZ-104 Practice Test 2",
+            "sourceQuestionNumbers": [
+              52
+            ],
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/azure/azure-resource-manager/templates/deploy-cli"
+            ],
+            "bossEligible": false
+          }
+        },
+        {
+          "objectiveId": "az-104.test2.protected-backup-cleanup",
+          "type": "multiple_choice",
+          "difficulty": 5,
+          "prompt": "A team wants to delete a resource group containing a Recovery Services vault. Review discovers protected backup items and retained soft-deleted recovery data. What is the safest next step?",
+          "choices": [
+            "Disable all recovery safeguards solely to make deletion convenient",
+            "Force-delete the vault without reviewing recovery data",
+            "Inventory vault dependencies and retention protections, preserve required recovery data, and follow the documented authorized cleanup sequence",
+            "Assume stopping one backup schedule removes all vault dependencies"
+          ],
+          "correctIndex": 2,
+          "explanation": "Vault removal requires resolving its actual dependencies and recovery protections. Stopping future backups alone does not remove retained items; cleanup must respect authorization and retention requirements.",
+          "hints": [
+            "Separate stopping future protection from disposing of existing recovery data."
+          ],
+          "domainId": "az104-monitoring-recovery",
+          "subdomain": "protected-backup-cleanup",
+          "tags": [
+            "azure",
+            "az-104",
+            "practice-test-2",
+            "monitoring-recovery"
+          ],
+          "isGoldenEligible": false,
+          "data": {
+            "examCode": "AZ-104",
+            "sourceTest": "AZ-104 Practice Test 2",
+            "sourceQuestionNumbers": [
+              55
+            ],
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/azure/backup/backup-azure-delete-vault"
+            ],
+            "bossEligible": false
+          },
+          "evidence": "The vault still contains protected items and soft-deleted recovery data.",
+          "constraints": [
+            "Preserve required recovery data",
+            "Respect retention policy",
+            "Avoid unauthorized destructive cleanup"
+          ]
+        },
+        {
+          "objectiveId": "az-104.test2.azcopy-container-endpoint",
+          "type": "multiple_choice",
+          "difficulty": 2,
+          "prompt": "An authenticated administrator with sufficient blob permissions needs to create a container named vmimages in storage account exampleaccount using AzCopy. Which command uses the correct public Azure Blob endpoint?",
+          "choices": [
+            "azcopy make \"https://exampleaccount.blob.core.windows.net/vmimages\"",
+            "azcopy make \"https://vmimages.file.core.windows.net/exampleaccount\"",
+            "azcopy remove \"https://exampleaccount.blob.core.windows.net/vmimages\"",
+            "azcopy make \"https://exampleaccount.images.core.windows.net/vmimages\""
+          ],
+          "correctIndex": 0,
+          "explanation": "AzCopy make can create a blob container at the account’s blob endpoint. The images.core.windows.net host is not the standard Azure Blob service endpoint; remove performs a different operation.",
+          "hints": [
+            "Check both the operation and the service endpoint."
+          ],
+          "domainId": "az104-storage",
+          "subdomain": "azcopy-container-endpoint",
+          "tags": [
+            "azure",
+            "az-104",
+            "practice-test-2",
+            "storage"
+          ],
+          "isGoldenEligible": false,
+          "data": {
+            "examCode": "AZ-104",
+            "sourceTest": "AZ-104 Practice Test 2",
+            "sourceQuestionNumbers": [
+              56
+            ],
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/azure/storage/common/storage-use-azcopy-blobs-upload"
+            ],
+            "bossEligible": false
+          }
+        },
+        {
+          "objectiveId": "az-104.test2.file-sync-cloud-share",
+          "type": "multiple_choice",
+          "difficulty": 1,
+          "prompt": "A Windows Server directory needs to synchronize through Azure File Sync. Which cloud storage resource is the sync group’s cloud endpoint based on?",
+          "choices": [
+            "An Azure file share",
+            "A blob container",
+            "An Azure managed disk",
+            "A Service Bus queue"
+          ],
+          "correctIndex": 0,
+          "explanation": "Azure File Sync synchronizes server endpoints with an Azure Files cloud endpoint. Other storage services are not interchangeable cloud endpoints for this feature.",
+          "hints": [
+            "Choose the cloud storage service used by Azure File Sync."
+          ],
+          "domainId": "az104-storage",
+          "subdomain": "file-sync-cloud-share",
+          "tags": [
+            "azure",
+            "az-104",
+            "practice-test-2",
+            "storage"
+          ],
+          "isGoldenEligible": false,
+          "data": {
+            "examCode": "AZ-104",
+            "sourceTest": "AZ-104 Practice Test 2",
+            "sourceQuestionNumbers": [
+              57
+            ],
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/azure/storage/file-sync/file-sync-introduction"
+            ],
+            "bossEligible": false
+          }
+        },
+        {
+          "objectiveId": "az-104.test2.blob-data-permission",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "An application identity needs to read, write and delete blob data in one container. General management-plane Contributor is insufficient for its Microsoft Entra-authorized data requests. Which listed role supplies the requested data access?",
+          "choices": [
+            "Microsoft Entra User Administrator",
+            "Reader at subscription scope",
+            "Network Contributor",
+            "Storage Blob Data Contributor at the container scope"
+          ],
+          "correctIndex": 3,
+          "explanation": "Storage Blob Data Contributor grants blob data operations at the effective scope. General management-plane roles do not automatically grant this identity-based blob data access.",
+          "hints": [
+            "Distinguish storage management permissions from blob data permissions."
+          ],
+          "domainId": "az104-storage",
+          "subdomain": "blob-data-permission",
+          "tags": [
+            "azure",
+            "az-104",
+            "practice-test-2",
+            "storage"
+          ],
+          "isGoldenEligible": false,
+          "data": {
+            "examCode": "AZ-104",
+            "sourceTest": "AZ-104 Practice Test 2",
+            "sourceQuestionNumbers": [
+              58
+            ],
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/azure/storage/blobs/assign-azure-role-data-access"
+            ],
+            "bossEligible": false
+          }
+        },
+        {
+          "objectiveId": "az-104.test2.ha-ports",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "A supported internal Standard Load Balancer design must distribute TCP and UDP flows across all ports to a network appliance backend. Which rule feature is designed for this requirement?",
+          "choices": [
+            "A single HTTPS-only rule",
+            "An App Service deployment slot",
+            "A CNAME record",
+            "High availability ports"
+          ],
+          "correctIndex": 3,
+          "explanation": "An HA ports rule on an internal Standard Load Balancer supports all-port TCP/UDP flow balancing. Frontend, backend, health and appliance forwarding configuration still need to be correct.",
+          "hints": [
+            "Match an all-port layer-4 requirement to the specialized rule feature."
+          ],
+          "domainId": "az104-networking",
+          "subdomain": "ha-ports",
+          "tags": [
+            "azure",
+            "az-104",
+            "practice-test-2",
+            "networking"
+          ],
+          "isGoldenEligible": false,
+          "data": {
+            "examCode": "AZ-104",
+            "sourceTest": "AZ-104 Practice Test 2",
+            "sourceQuestionNumbers": [
+              59
+            ],
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/azure/load-balancer/load-balancer-ha-ports-overview"
+            ],
+            "bossEligible": false
+          }
+        },
+        {
+          "objectiveId": "az-104.test2.arm-location-parameter",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "An ARM template defines a location parameter but hardcodes each resource’s location. A deployment overrides the parameter and the resources remain in the hardcoded region. What corrects the mismatch?",
+          "choices": [
+            "Set each intended resource’s location property to the location parameter expression",
+            "Use an unused tag named location",
+            "Rename the resource without changing its location expression",
+            "Delete all parameters and rely on the resource name"
+          ],
+          "correctIndex": 0,
+          "explanation": "A parameter only affects properties that reference it. A resource location expression such as [parameters('location')] must use a valid Azure location identifier and a supported service region.",
+          "hints": [
+            "Trace whether the resource property actually references the overridden parameter."
+          ],
+          "domainId": "az104-identity-governance",
+          "subdomain": "arm-location-parameter",
+          "tags": [
+            "azure",
+            "az-104",
+            "practice-test-2",
+            "identity-governance"
+          ],
+          "isGoldenEligible": false,
+          "data": {
+            "examCode": "AZ-104",
+            "sourceTest": "AZ-104 Practice Test 2",
+            "sourceQuestionNumbers": [
+              63
+            ],
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/azure/azure-resource-manager/templates/parameters"
+            ],
+            "bossEligible": false
+          }
+        },
+        {
+          "objectiveId": "az-104.test2.load-balancer-hash",
+          "type": "multiple_choice",
+          "difficulty": 2,
+          "prompt": "An Azure Load Balancer design explicitly requires a three-tuple session hash using source IP, destination IP and protocol. Which session persistence option matches those fields?",
+          "choices": [
+            "Round robin by user display name",
+            "Client IP and protocol",
+            "None: five-tuple distribution",
+            "Client IP: two-tuple distribution"
+          ],
+          "correctIndex": 1,
+          "explanation": "Client IP and protocol uses the three-tuple distribution mode. Client IP uses two tuples; the default includes source and destination ports in a five-tuple hash.",
+          "hints": [
+            "Count the fields in the required session key."
+          ],
+          "domainId": "az104-networking",
+          "subdomain": "load-balancer-hash",
+          "tags": [
+            "azure",
+            "az-104",
+            "practice-test-2",
+            "networking"
+          ],
+          "isGoldenEligible": false,
+          "data": {
+            "examCode": "AZ-104",
+            "sourceTest": "AZ-104 Practice Test 2",
+            "sourceQuestionNumbers": [
+              64
+            ],
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/azure/load-balancer/distribution-mode-concepts"
+            ],
+            "bossEligible": false
+          }
+        },
+        {
+          "objectiveId": "az-104.test2.directory-user-admin",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "A staff member must create and manage users in a specific Microsoft Entra tenant, without general subscription resource administration. Which listed directory role fits?",
+          "choices": [
+            "Contributor on an Azure VM",
+            "User Administrator in that tenant",
+            "Network Contributor on a VNet",
+            "Storage Blob Data Contributor on a container"
+          ],
+          "correctIndex": 1,
+          "explanation": "User Administrator is a Microsoft Entra directory role. Azure resource roles grant permissions over resources, not general directory user administration, and roles in another tenant do not transfer automatically.",
+          "hints": [
+            "Distinguish directory administration from Azure resource administration."
+          ],
+          "domainId": "az104-identity-governance",
+          "subdomain": "directory-user-admin",
+          "tags": [
+            "azure",
+            "az-104",
+            "practice-test-2",
+            "identity-governance"
+          ],
+          "isGoldenEligible": false,
+          "data": {
+            "examCode": "AZ-104",
+            "sourceTest": "AZ-104 Practice Test 2",
+            "sourceQuestionNumbers": [
+              65,
+              66
+            ],
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/entra/identity/role-based-access-control/permissions-reference"
+            ],
+            "bossEligible": false
+          }
+        },
+        {
+          "objectiveId": "az-104.test2.modern-guest-monitoring",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "A Linux VM needs supported Azure Monitor collection of guest syslog and performance counters. Which agent-based design should replace a retired diagnostics-extension approach?",
+          "choices": [
+            "Azure Monitor Agent with an appropriate data collection rule",
+            "A VM size change without data collection",
+            "An activity-log alert as the only collector of guest syslog",
+            "A new deployment of the retired Linux Diagnostics extension as the default"
+          ],
+          "correctIndex": 0,
+          "explanation": "Azure Monitor Agent and data collection rules configure supported guest telemetry collection and destinations. The retired diagnostics extension is not the default for a new deployment.",
+          "hints": [
+            "Separate guest data collection from Azure management-plane events."
+          ],
+          "domainId": "az104-monitoring-recovery",
+          "subdomain": "modern-guest-monitoring",
+          "tags": [
+            "azure",
+            "az-104",
+            "practice-test-2",
+            "monitoring-recovery"
+          ],
+          "isGoldenEligible": false,
+          "data": {
+            "examCode": "AZ-104",
+            "sourceTest": "AZ-104 Practice Test 2",
+            "sourceQuestionNumbers": [
+              67
+            ],
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/azure/azure-monitor/agents/azure-monitor-agent-migration-wad-lad"
+            ],
+            "bossEligible": false
+          }
+        },
+        {
+          "objectiveId": "az-104.test2.connection-monitor",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "A network team needs ongoing reachability and latency checks from selected VM sources to specified destination endpoints. Which Network Watcher feature fits these active tests?",
+          "choices": [
+            "A storage lifecycle policy",
+            "An inventory of every packet from every connection",
+            "Connection Monitor",
+            "A role assignment export"
+          ],
+          "correctIndex": 2,
+          "explanation": "Connection Monitor tests configured endpoints and reports connectivity and performance. It is not a capture of every packet or a complete inventory of all ambient traffic.",
+          "hints": [
+            "Choose active tests between selected endpoints rather than blanket traffic capture."
+          ],
+          "domainId": "az104-monitoring-recovery",
+          "subdomain": "connection-monitor",
+          "tags": [
+            "azure",
+            "az-104",
+            "practice-test-2",
+            "monitoring-recovery"
+          ],
+          "isGoldenEligible": false,
+          "data": {
+            "examCode": "AZ-104",
+            "sourceTest": "AZ-104 Practice Test 2",
+            "sourceQuestionNumbers": [
+              68,
+              69,
+              70
+            ],
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/azure/network-watcher/connection-monitor-overview"
+            ],
+            "bossEligible": false
+          }
+        },
+        {
+          "objectiveId": "az-104.test2.guest-log-alert-chain",
+          "type": "multiple_choice",
+          "difficulty": 4,
+          "prompt": "A VM must send selected guest events to Log Analytics and notify operators when a query detects an error pattern. Which complete chain addresses collection, evaluation and notification?",
+          "choices": [
+            "Azure Monitor Agent plus an associated data collection rule, the workspace, a log alert rule and an action group",
+            "A workspace without any ingestion source",
+            "An NSG rule and a public IP address",
+            "An agent installation alone with no collection rule or alert"
+          ],
+          "correctIndex": 0,
+          "explanation": "AMA and an associated DCR collect selected data to the destination. A log alert evaluates a query and an action group delivers notifications. Each stage must be configured and verified.",
+          "hints": [
+            "Trace the signal from collection through evaluation to notification."
+          ],
+          "domainId": "az104-monitoring-recovery",
+          "subdomain": "guest-log-alert-chain",
+          "tags": [
+            "azure",
+            "az-104",
+            "practice-test-2",
+            "monitoring-recovery"
+          ],
+          "isGoldenEligible": false,
+          "data": {
+            "examCode": "AZ-104",
+            "sourceTest": "AZ-104 Practice Test 2",
+            "sourceQuestionNumbers": [
+              71,
+              72,
+              73
+            ],
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/azure/azure-monitor/agents/data-collection-rule-azure-monitor-agent"
+            ],
+            "bossEligible": false
+          },
+          "evidence": "The VM has no configured guest-log collection and the operators require query-based detection.",
+          "constraints": [
+            "Collect only the required guest events",
+            "Use Log Analytics for the query",
+            "Deliver operator notifications"
+          ]
+        },
+        {
+          "objectiveId": "az-104.test2.vm-contributor-boundary",
+          "type": "multiple_choice",
+          "difficulty": 2,
+          "prompt": "An operator has Virtual Machine Contributor and can manage a VM. They also need to grant someone else an Azure RBAC role. Does their existing VM role alone authorize that grant?",
+          "choices": [
+            "Yes; guest administrator access automatically grants directory administration",
+            "No; it does not grant Azure RBAC role-assignment administration",
+            "Yes; every VM management role can assign all roles",
+            "Yes; VM power control implies subscription ownership"
+          ],
+          "correctIndex": 1,
+          "explanation": "Virtual Machine Contributor manages VM operations but does not permit Azure RBAC role assignments. Guest OS access, resource management and directory roles are different boundaries.",
+          "hints": [
+            "Separate managing the VM from managing Azure access to it."
+          ],
+          "domainId": "az104-identity-governance",
+          "subdomain": "vm-contributor-boundary",
+          "tags": [
+            "azure",
+            "az-104",
+            "practice-test-2",
+            "identity-governance"
+          ],
+          "isGoldenEligible": false,
+          "data": {
+            "examCode": "AZ-104",
+            "sourceTest": "AZ-104 Practice Test 2",
+            "sourceQuestionNumbers": [
+              74
+            ],
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles/compute"
+            ],
+            "bossEligible": false
+          }
+        },
+        {
+          "objectiveId": "az-104.test2.smb-port",
+          "type": "multiple_choice",
+          "difficulty": 1,
+          "prompt": "A supported client mounts an Azure Files SMB share through its normal SMB endpoint. Which outbound TCP port must the network allow for that SMB traffic?",
+          "choices": [
+            "53",
+            "445",
+            "3389",
+            "25"
+          ],
+          "correctIndex": 1,
+          "explanation": "SMB uses TCP 445 for this access path. Authentication, DNS and storage network restrictions still need to be configured separately.",
+          "hints": [
+            "Identify the protocol used by the file share."
+          ],
+          "domainId": "az104-storage",
+          "subdomain": "smb-port",
+          "tags": [
+            "azure",
+            "az-104",
+            "practice-test-2",
+            "storage"
+          ],
+          "isGoldenEligible": false,
+          "data": {
+            "examCode": "AZ-104",
+            "sourceTest": "AZ-104 Practice Test 2",
+            "sourceQuestionNumbers": [
+              75
+            ],
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/azure/storage/files/storage-troubleshoot-windows-file-connection-problems"
+            ],
+            "bossEligible": false
+          }
+        },
+        {
+          "objectiveId": "az-104.test2.rolling-batch-limit",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "A supported VM scale set rolling-upgrade policy limits each batch to 20% of a 20-instance set. Ignoring rounding because the result is an integer, how many instances can be in one upgrade batch?",
+          "choices": [
+            "16",
+            "5",
+            "4",
+            "20"
+          ],
+          "correctIndex": 2,
+          "explanation": "20% of 20 is 4. This policy calculation does not promise that the other 16 instances are all healthy; health checks and unhealthy-instance limits must be configured independently.",
+          "hints": [
+            "Apply the stated batch percentage; avoid inferring a health guarantee."
+          ],
+          "domainId": "az104-compute",
+          "subdomain": "rolling-batch-limit",
+          "tags": [
+            "azure",
+            "az-104",
+            "practice-test-2",
+            "compute"
+          ],
+          "isGoldenEligible": false,
+          "data": {
+            "examCode": "AZ-104",
+            "sourceTest": "AZ-104 Practice Test 2",
+            "sourceQuestionNumbers": [
+              76
+            ],
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/azure/virtual-machine-scale-sets/virtual-machine-scale-sets-rolling-upgrades"
+            ],
+            "bossEligible": false
+          }
+        },
+        {
+          "objectiveId": "az-104.test2.asg-membership",
+          "type": "multiple_choice",
+          "difficulty": 2,
+          "prompt": "An NSG rule references an application security group, and a VM’s traffic should be represented by that group. What resource configuration supplies the VM’s membership?",
+          "choices": [
+            "Assign a Microsoft Entra user to the VM’s guest OS",
+            "Add the VM’s display name to a DNS TXT record",
+            "Associate the relevant NIC IP configuration with the application security group",
+            "Add a storage tag with the group’s name"
+          ],
+          "correctIndex": 2,
+          "explanation": "Application security group membership is configured on relevant network interface IP configurations, subject to supported VNet constraints. It is not directory group membership.",
+          "hints": [
+            "Locate the network configuration that participates in the NSG match."
+          ],
+          "domainId": "az104-networking",
+          "subdomain": "asg-membership",
+          "tags": [
+            "azure",
+            "az-104",
+            "practice-test-2",
+            "networking"
+          ],
+          "isGoldenEligible": false,
+          "data": {
+            "examCode": "AZ-104",
+            "sourceTest": "AZ-104 Practice Test 2",
+            "sourceQuestionNumbers": [
+              77
+            ],
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/azure/virtual-network/application-security-groups"
+            ],
+            "bossEligible": false
+          }
+        },
+        {
+          "objectiveId": "az-104.test2.nva-next-hop",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "A workload subnet must send traffic for a specified remote prefix through a network virtual appliance at a known private IP. Which user-defined route next-hop type represents that appliance?",
+          "choices": [
+            "Internet",
+            "Virtual appliance",
+            "None",
+            "Virtual network"
+          ],
+          "correctIndex": 1,
+          "explanation": "Virtual appliance forwards matching traffic to the configured NVA private IP. The route must be applied at the appropriate source subnet, and appliance forwarding must be enabled.",
+          "hints": [
+            "Match an explicit intermediary IP address to the next-hop type."
+          ],
+          "domainId": "az104-networking",
+          "subdomain": "nva-next-hop",
+          "tags": [
+            "azure",
+            "az-104",
+            "practice-test-2",
+            "networking"
+          ],
+          "isGoldenEligible": false,
+          "data": {
+            "examCode": "AZ-104",
+            "sourceTest": "AZ-104 Practice Test 2",
+            "sourceQuestionNumbers": [
+              78,
+              79
+            ],
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/azure/virtual-network/virtual-networks-udr-overview"
+            ],
+            "bossEligible": false
+          }
+        },
+        {
+          "objectiveId": "az-104.test2.nva-forwarding-diagnosis",
+          "type": "multiple_choice",
+          "difficulty": 4,
+          "prompt": "A route table on the source subnet sends a remote prefix to an NVA’s private IP. The NIC does not permit IP forwarding and the appliance OS is not configured to forward. What should be corrected before treating the route as functional?",
+          "choices": [
+            "Delete the source subnet’s route-table association",
+            "Grant the application a directory user role",
+            "Enable the required NIC IP forwarding and configure forwarding in the appliance OS",
+            "Change the route’s next hop to None"
+          ],
+          "correctIndex": 2,
+          "explanation": "Azure NIC IP forwarding and the appliance’s own forwarding behavior must both permit transit traffic. A route pointing to an NVA does not by itself turn the VM into a router.",
+          "hints": [
+            "Check both Azure’s interface setting and the appliance’s own forwarding path."
+          ],
+          "domainId": "az104-networking",
+          "subdomain": "nva-forwarding-diagnosis",
+          "tags": [
+            "azure",
+            "az-104",
+            "practice-test-2",
+            "networking"
+          ],
+          "isGoldenEligible": false,
+          "data": {
+            "examCode": "AZ-104",
+            "sourceTest": "AZ-104 Practice Test 2",
+            "sourceQuestionNumbers": [
+              80
+            ],
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/azure/virtual-network/virtual-networks-udr-overview"
+            ],
+            "bossEligible": false
+          },
+          "evidence": "The route points to the appliance but both forwarding layers are disabled.",
+          "constraints": [
+            "Keep the intended appliance path",
+            "Do not bypass network inspection"
+          ]
+        }
+      ],
+      "referenceMaterial": {
+        "conversionAudit": {
+          "examCode": "AZ-104",
+          "sourceFile": "Pasted text (2).txt",
+          "sourceQuestionCount": 80,
+          "sourcePreserved": true,
+          "reviewStatus": "PENDING",
+          "routing": {
+            "lane": "CERTIFICATIONS",
+            "certExam": "AZURE",
+            "bankName": "AZ-104 Practice Test 2",
+            "note": "The current app has a generic AZURE category, not an AZ_104 enum. Use a dedicated AZ-104 pool; do not publish into AZ-900."
+          },
+          "conversionPolicy": "Questions are standalone authored replacements covering source topics, not claimed reconstructions of absent tables/diagrams. Unsupported multi-select is converted to focused single-answer MCQ. Retired or ambiguous material is replaced, consolidated or withheld explicitly.",
+          "sourceMapping": [
+            {
+              "sourceQuestionNumber": 1,
+              "sourceDomain": "Manage Azure identities and governance",
+              "status": "replacement",
+              "targetObjectiveId": "az-104.test2.department-membership",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 2,
+              "sourceDomain": "Manage Azure identities and governance",
+              "status": "replacement",
+              "targetObjectiveId": "az-104.test2.export-role-definition",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 3,
+              "sourceDomain": "Monitor and maintain Azure resource",
+              "status": "replacement",
+              "targetObjectiveId": "az-104.test2.ip-flow-diagnosis",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 4,
+              "sourceDomain": "Implement and manage virtual networking",
+              "status": "replacement",
+              "targetObjectiveId": "az-104.test2.outbound-nsg-rule",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 5,
+              "sourceDomain": "Deploy and manage Azure compute resources",
+              "status": "replacement",
+              "targetObjectiveId": "az-104.test2.zone-resilience",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 6,
+              "sourceDomain": "Deploy and manage Azure compute resources",
+              "status": "replacement",
+              "targetObjectiveId": "az-104.test2.backup-os-support",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 7,
+              "sourceDomain": "Monitor and maintain Azure resource",
+              "status": "replacement",
+              "targetObjectiveId": "az-104.test2.alert-user-response",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 8,
+              "sourceDomain": "Monitor and maintain Azure resource",
+              "status": "consolidated-replacement",
+              "targetObjectiveId": "az-104.test2.alert-user-response",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 9,
+              "sourceDomain": "Monitor and maintain Azure resource",
+              "status": "replacement",
+              "targetObjectiveId": "az-104.test2.alert-signal-types",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 10,
+              "sourceDomain": "Monitor and maintain Azure resource",
+              "status": "replacement",
+              "targetObjectiveId": "az-104.test2.action-groups",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 11,
+              "sourceDomain": "Manage Azure identities and governance",
+              "status": "replacement",
+              "targetObjectiveId": "az-104.test2.custom-role-scope",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 12,
+              "sourceDomain": null,
+              "status": "replacement",
+              "targetObjectiveId": "az-104.test2.notactions-not-deny",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 13,
+              "sourceDomain": "Implement and manage virtual networking",
+              "status": "replacement",
+              "targetObjectiveId": "az-104.test2.standard-load-balancer",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 14,
+              "sourceDomain": "Implement and manage virtual networking",
+              "status": "consolidated-replacement",
+              "targetObjectiveId": "az-104.test2.standard-load-balancer",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 15,
+              "sourceDomain": "Implement and manage virtual networking",
+              "status": "replacement",
+              "targetObjectiveId": "az-104.test2.multi-availability-set-backends",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 16,
+              "sourceDomain": "Implement and manage virtual networking",
+              "status": "consolidated-replacement",
+              "targetObjectiveId": "az-104.test2.multi-availability-set-backends",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 17,
+              "sourceDomain": "Implement and manage virtual networking",
+              "status": "replacement",
+              "targetObjectiveId": "az-104.test2.nat-subnet-association",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 18,
+              "sourceDomain": "Deploy and manage Azure compute resources",
+              "status": "replacement",
+              "targetObjectiveId": "az-104.test2.shared-app-plan",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 19,
+              "sourceDomain": "Implement and manage virtual networking",
+              "status": "replacement",
+              "targetObjectiveId": "az-104.test2.virtual-wan-hubs",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 20,
+              "sourceDomain": "Implement and manage virtual networking",
+              "status": "replacement",
+              "targetObjectiveId": "az-104.test2.aks-public-service",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 21,
+              "sourceDomain": "Deploy and manage Azure compute resources",
+              "status": "replacement",
+              "targetObjectiveId": "az-104.test2.app-plan-compatibility",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 22,
+              "sourceDomain": "Deploy and manage Azure compute resources",
+              "status": "consolidated-replacement",
+              "targetObjectiveId": "az-104.test2.app-plan-compatibility",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 23,
+              "sourceDomain": "Deploy and manage Azure compute resources",
+              "status": "consolidated-replacement",
+              "targetObjectiveId": "az-104.test2.app-plan-compatibility",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 24,
+              "sourceDomain": "Manage Azure identities and governance",
+              "status": "replacement",
+              "targetObjectiveId": "az-104.test2.role-assignment-permission",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 25,
+              "sourceDomain": "Manage Azure identities and governance",
+              "status": "replacement",
+              "targetObjectiveId": "az-104.test2.network-resource-role",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 26,
+              "sourceDomain": "Manage Azure identities and governance",
+              "status": "consolidated-replacement",
+              "targetObjectiveId": "az-104.test2.role-assignment-permission",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 27,
+              "sourceDomain": "Implement and manage virtual networking",
+              "status": "replacement",
+              "targetObjectiveId": "az-104.test2.custom-subdomain-dns",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 28,
+              "sourceDomain": "Implement and manage storage",
+              "status": "replacement",
+              "targetObjectiveId": "az-104.test2.file-share-zrs",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 29,
+              "sourceDomain": "Implement and manage storage",
+              "status": "replacement",
+              "targetObjectiveId": "az-104.test2.file-share-acl",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 30,
+              "sourceDomain": "Implement and manage virtual networking",
+              "status": "replacement",
+              "targetObjectiveId": "az-104.test2.load-balancer-rbac-scope",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 31,
+              "sourceDomain": "Implement and manage virtual networking",
+              "status": "consolidated-replacement",
+              "targetObjectiveId": "az-104.test2.load-balancer-rbac-scope",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 32,
+              "sourceDomain": "Implement and manage virtual networking",
+              "status": "replacement",
+              "targetObjectiveId": "az-104.test2.site-to-site-vpn",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 33,
+              "sourceDomain": "Monitor and maintain Azure resource",
+              "status": "replacement",
+              "targetObjectiveId": "az-104.test2.management-event-alert",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 34,
+              "sourceDomain": "Deploy and manage Azure compute resources",
+              "status": "withheld-review",
+              "reviewNote": "Exact VM restore-option answer depends on the missing configuration and current support matrix."
+            },
+            {
+              "sourceQuestionNumber": 35,
+              "sourceDomain": "Deploy and manage Azure compute resources",
+              "status": "withheld-review",
+              "reviewNote": "Missing recovery-host table; source’s OS-version restriction needs a fresh support-matrix review."
+            },
+            {
+              "sourceQuestionNumber": 36,
+              "sourceDomain": "Manage Azure identities and governance",
+              "status": "replacement",
+              "targetObjectiveId": "az-104.test2.guest-invitation-policy",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 37,
+              "sourceDomain": "Deploy and manage Azure compute resources",
+              "status": "withheld-review",
+              "reviewNote": "Source makes an unconditional resize-state claim; exact size, allocation and supported resize behavior are absent."
+            },
+            {
+              "sourceQuestionNumber": 38,
+              "sourceDomain": "Manage Azure identities and governance",
+              "status": "replacement",
+              "targetObjectiveId": "az-104.test2.pass-through-authentication",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 39,
+              "sourceDomain": "Implement and manage storage",
+              "status": "withheld-review",
+              "reviewNote": "The source-only Support-request approach to ZRS conversion is outdated; migration eligibility needs a current configuration."
+            },
+            {
+              "sourceQuestionNumber": 40,
+              "sourceDomain": "Implement and manage virtual networking",
+              "status": "replacement",
+              "targetObjectiveId": "az-104.test2.rdp-rule-order",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 41,
+              "sourceDomain": "Implement and manage virtual networking",
+              "status": "replacement",
+              "targetObjectiveId": "az-104.test2.nic-network-placement",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 42,
+              "sourceDomain": "Implement and manage virtual networking",
+              "status": "replacement",
+              "targetObjectiveId": "az-104.test2.internal-layer4-balancing",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 43,
+              "sourceDomain": "Implement and manage storage",
+              "status": "replacement",
+              "targetObjectiveId": "az-104.test2.file-sync-server-endpoint",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 44,
+              "sourceDomain": "Monitor and maintain Azure resource",
+              "status": "withheld-review",
+              "reviewNote": "The management-event integration scenario is ambiguous; do not infer the missing Event Grid/Logic Apps design."
+            },
+            {
+              "sourceQuestionNumber": 45,
+              "sourceDomain": "Deploy and manage Azure compute resources",
+              "status": "replacement",
+              "targetObjectiveId": "az-104.test2.key-vault-template-secret",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 46,
+              "sourceDomain": "Deploy and manage Azure compute resources",
+              "status": "withheld-review",
+              "reviewNote": "Legacy cross-cloud migration workflow should not be imported as current AZ-104 coverage without a fresh scope and tooling review."
+            },
+            {
+              "sourceQuestionNumber": 47,
+              "sourceDomain": "Monitor and maintain Azure resource",
+              "status": "replacement",
+              "targetObjectiveId": "az-104.test2.unused-disk-review",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 48,
+              "sourceDomain": "Manage Azure identities and governance",
+              "status": "replacement",
+              "targetObjectiveId": "az-104.test2.location-based-mfa",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 49,
+              "sourceDomain": "Deploy and manage Azure compute resources",
+              "status": "replacement",
+              "targetObjectiveId": "az-104.test2.policy-deny",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 50,
+              "sourceDomain": "Monitor and maintain Azure resource",
+              "status": "replacement",
+              "targetObjectiveId": "az-104.test2.topic-subscriptions",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 51,
+              "sourceDomain": "Deploy and manage Azure compute resources",
+              "status": "replacement",
+              "targetObjectiveId": "az-104.test2.queue-competing-consumers",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 52,
+              "sourceDomain": "Deploy and manage Azure compute resources",
+              "status": "replacement",
+              "targetObjectiveId": "az-104.test2.group-deployment-command",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 53,
+              "sourceDomain": "Deploy and manage Azure compute resources",
+              "status": "withheld-review",
+              "reviewNote": "Cannot determine named VM/disk migration eligibility from the missing source table."
+            },
+            {
+              "sourceQuestionNumber": 54,
+              "sourceDomain": "Implement and manage storage",
+              "status": "withheld-review",
+              "reviewNote": "The specific Data Box transfer and destination choices need current service and order details."
+            },
+            {
+              "sourceQuestionNumber": 55,
+              "sourceDomain": "Deploy and manage Azure compute resources",
+              "status": "replacement",
+              "targetObjectiveId": "az-104.test2.protected-backup-cleanup",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 56,
+              "sourceDomain": "Deploy and manage Azure compute resources",
+              "status": "replacement",
+              "targetObjectiveId": "az-104.test2.azcopy-container-endpoint",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 57,
+              "sourceDomain": "Implement and manage storage",
+              "status": "replacement",
+              "targetObjectiveId": "az-104.test2.file-sync-cloud-share",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 58,
+              "sourceDomain": "Implement and manage storage",
+              "status": "replacement",
+              "targetObjectiveId": "az-104.test2.blob-data-permission",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 59,
+              "sourceDomain": "Implement and manage virtual networking",
+              "status": "replacement",
+              "targetObjectiveId": "az-104.test2.ha-ports",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 60,
+              "sourceDomain": "Deploy and manage Azure compute resources",
+              "status": "withheld-review",
+              "reviewNote": "Legacy DSC/Automation provisioning answer needs redesign against supported configuration-management tools."
+            },
+            {
+              "sourceQuestionNumber": 61,
+              "sourceDomain": "Implement and manage virtual networking",
+              "status": "withheld-review",
+              "reviewNote": "Policy/static gateway description and absent peering routes do not establish a unique supported P2S remedy."
+            },
+            {
+              "sourceQuestionNumber": 62,
+              "sourceDomain": "Implement and manage virtual networking",
+              "status": "withheld-review",
+              "reviewNote": "Source incorrectly treats every VPN connection as requiring client administrator rights; client/install context is absent."
+            },
+            {
+              "sourceQuestionNumber": 63,
+              "sourceDomain": "Deploy and manage Azure compute resources",
+              "status": "replacement",
+              "targetObjectiveId": "az-104.test2.arm-location-parameter",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 64,
+              "sourceDomain": "Implement and manage virtual networking",
+              "status": "replacement",
+              "targetObjectiveId": "az-104.test2.load-balancer-hash",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 65,
+              "sourceDomain": "Manage Azure identities and governance",
+              "status": "replacement",
+              "targetObjectiveId": "az-104.test2.directory-user-admin",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 66,
+              "sourceDomain": "Manage Azure identities and governance",
+              "status": "consolidated-replacement",
+              "targetObjectiveId": "az-104.test2.directory-user-admin",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 67,
+              "sourceDomain": "Monitor and maintain Azure resource",
+              "status": "replacement",
+              "targetObjectiveId": "az-104.test2.modern-guest-monitoring",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 68,
+              "sourceDomain": "Monitor and maintain Azure resource",
+              "status": "replacement",
+              "targetObjectiveId": "az-104.test2.connection-monitor",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 69,
+              "sourceDomain": "Monitor and maintain Azure resource",
+              "status": "consolidated-replacement",
+              "targetObjectiveId": "az-104.test2.connection-monitor",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 70,
+              "sourceDomain": "Monitor and maintain Azure resource",
+              "status": "consolidated-replacement",
+              "targetObjectiveId": "az-104.test2.connection-monitor",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 71,
+              "sourceDomain": "Monitor and maintain Azure resource",
+              "status": "replacement",
+              "targetObjectiveId": "az-104.test2.guest-log-alert-chain",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 72,
+              "sourceDomain": "Monitor and maintain Azure resource",
+              "status": "consolidated-replacement",
+              "targetObjectiveId": "az-104.test2.guest-log-alert-chain",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 73,
+              "sourceDomain": "Monitor and maintain Azure resource",
+              "status": "consolidated-replacement",
+              "targetObjectiveId": "az-104.test2.guest-log-alert-chain",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 74,
+              "sourceDomain": "Manage Azure identities and governance",
+              "status": "replacement",
+              "targetObjectiveId": "az-104.test2.vm-contributor-boundary",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 75,
+              "sourceDomain": "Implement and manage storage",
+              "status": "replacement",
+              "targetObjectiveId": "az-104.test2.smb-port",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 76,
+              "sourceDomain": "Deploy and manage Azure compute resources",
+              "status": "replacement",
+              "targetObjectiveId": "az-104.test2.rolling-batch-limit",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 77,
+              "sourceDomain": "Deploy and manage Azure compute resources",
+              "status": "replacement",
+              "targetObjectiveId": "az-104.test2.asg-membership",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 78,
+              "sourceDomain": "Implement and manage virtual networking",
+              "status": "replacement",
+              "targetObjectiveId": "az-104.test2.nva-next-hop",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 79,
+              "sourceDomain": "Implement and manage virtual networking",
+              "status": "consolidated-replacement",
+              "targetObjectiveId": "az-104.test2.nva-next-hop",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            },
+            {
+              "sourceQuestionNumber": 80,
+              "sourceDomain": "Implement and manage virtual networking",
+              "status": "replacement",
+              "targetObjectiveId": "az-104.test2.nva-forwarding-diagnosis",
+              "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+            }
+          ],
+          "reviewReferences": [
+            "https://learn.microsoft.com/en-us/azure/aks/concepts-network-services",
+            "https://learn.microsoft.com/en-us/azure/app-service/app-service-web-tutorial-custom-domain",
+            "https://learn.microsoft.com/en-us/azure/app-service/overview-hosting-plans",
+            "https://learn.microsoft.com/en-us/azure/azure-monitor/agents/azure-monitor-agent-migration-wad-lad",
+            "https://learn.microsoft.com/en-us/azure/azure-monitor/agents/data-collection-rule-azure-monitor-agent",
+            "https://learn.microsoft.com/en-us/azure/azure-monitor/alerts/action-groups",
+            "https://learn.microsoft.com/en-us/azure/azure-monitor/alerts/alerts-manage-alert-instances",
+            "https://learn.microsoft.com/en-us/azure/azure-monitor/alerts/alerts-types",
+            "https://learn.microsoft.com/en-us/azure/azure-resource-manager/templates/deploy-cli",
+            "https://learn.microsoft.com/en-us/azure/azure-resource-manager/templates/key-vault-parameter",
+            "https://learn.microsoft.com/en-us/azure/azure-resource-manager/templates/parameters",
+            "https://learn.microsoft.com/en-us/azure/backup/backup-azure-delete-vault",
+            "https://learn.microsoft.com/en-us/azure/backup/backup-support-matrix-iaas",
+            "https://learn.microsoft.com/en-us/azure/governance/policy/concepts/effect-deny",
+            "https://learn.microsoft.com/en-us/azure/load-balancer/distribution-mode-concepts",
+            "https://learn.microsoft.com/en-us/azure/load-balancer/load-balancer-basic-upgrade-guidance",
+            "https://learn.microsoft.com/en-us/azure/load-balancer/load-balancer-ha-ports-overview",
+            "https://learn.microsoft.com/en-us/azure/load-balancer/load-balancer-overview",
+            "https://learn.microsoft.com/en-us/azure/load-balancer/tutorial-load-balancer-multiple-availability-sets-portal",
+            "https://learn.microsoft.com/en-us/azure/nat-gateway/nat-gateway-design",
+            "https://learn.microsoft.com/en-us/azure/network-watcher/connection-monitor-overview",
+            "https://learn.microsoft.com/en-us/azure/network-watcher/ip-flow-verify-overview",
+            "https://learn.microsoft.com/en-us/azure/reliability/availability-zones-overview",
+            "https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles/compute",
+            "https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles/networking",
+            "https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles/privileged",
+            "https://learn.microsoft.com/en-us/azure/role-based-access-control/custom-roles",
+            "https://learn.microsoft.com/en-us/azure/role-based-access-control/custom-roles-powershell",
+            "https://learn.microsoft.com/en-us/azure/role-based-access-control/role-definitions",
+            "https://learn.microsoft.com/en-us/azure/role-based-access-control/scope-overview",
+            "https://learn.microsoft.com/en-us/azure/service-bus-messaging/service-bus-queues-topics-subscriptions",
+            "https://learn.microsoft.com/en-us/azure/storage/blobs/assign-azure-role-data-access",
+            "https://learn.microsoft.com/en-us/azure/storage/common/storage-use-azcopy-blobs-upload",
+            "https://learn.microsoft.com/en-us/azure/storage/file-sync/file-sync-deployment-guide",
+            "https://learn.microsoft.com/en-us/azure/storage/file-sync/file-sync-introduction",
+            "https://learn.microsoft.com/en-us/azure/storage/files/files-redundancy",
+            "https://learn.microsoft.com/en-us/azure/storage/files/storage-files-identity-assign-share-level-permissions",
+            "https://learn.microsoft.com/en-us/azure/storage/files/storage-troubleshoot-windows-file-connection-problems",
+            "https://learn.microsoft.com/en-us/azure/virtual-machine-scale-sets/virtual-machine-scale-sets-rolling-upgrades",
+            "https://learn.microsoft.com/en-us/azure/virtual-machines/windows/find-unattached-disks",
+            "https://learn.microsoft.com/en-us/azure/virtual-network/application-security-groups",
+            "https://learn.microsoft.com/en-us/azure/virtual-network/network-security-groups-overview",
+            "https://learn.microsoft.com/en-us/azure/virtual-network/virtual-network-network-interface",
+            "https://learn.microsoft.com/en-us/azure/virtual-network/virtual-networks-udr-overview",
+            "https://learn.microsoft.com/en-us/azure/virtual-wan/virtual-wan-about",
+            "https://learn.microsoft.com/en-us/azure/vpn-gateway/vpn-gateway-about-vpn-gateway-settings",
+            "https://learn.microsoft.com/en-us/entra/external-id/external-collaboration-settings-configure",
+            "https://learn.microsoft.com/en-us/entra/identity/conditional-access/location-condition",
+            "https://learn.microsoft.com/en-us/entra/identity/hybrid/connect/how-to-connect-pta",
+            "https://learn.microsoft.com/en-us/entra/identity/role-based-access-control/permissions-reference",
+            "https://learn.microsoft.com/en-us/entra/identity/users/groups-dynamic-membership"
+          ],
+          "examReference": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/az-104",
+          "coverageWarning": "A supplementary practice bank, not a complete official AZ-104 exam blueprint or a reproduction of all original exam questions.",
+          "importQuestionCount": 56,
+          "sourceSha256": "ddd21d6f8625ccd52cccfc600915ca88d92d488296a5df9641c50188f7f00b35",
+          "summary": {
+            "replacement": 56,
+            "consolidated-replacement": 13,
+            "withheld-review": 11
+          },
+          "difficultyCounts": {
+            "2": 14,
+            "3": 35,
+            "4": 3,
+            "5": 2,
+            "1": 2
+          },
+          "independentFactCheck": "Targeted corrections checked against primary documentation. Standalone replacements require final editorial review, and referenced documentation should be checked when publishing.",
+          "examScopeReview": {
+            "blueprintEffectiveDate": "2026-04-17",
+            "relatedTopicsNotExplicitlyListed": [
+              "virtual-wan-hubs",
+              "aks-public-service",
+              "pass-through-authentication",
+              "location-based-mfa",
+              "topic-subscriptions",
+              "queue-competing-consumers"
+            ],
+            "note": "These source-derived related Azure topics remain reviewable supplemental material; reviewers should exclude them from an exam-weighted core pool unless deliberately including related topics."
+          }
+        }
+      }
+    }
+  ]
+}

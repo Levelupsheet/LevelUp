@@ -1,0 +1,647 @@
+{
+  "examCode": "AZ-104",
+  "sourceFile": "Pasted text (2).txt",
+  "sourceQuestionCount": 80,
+  "sourcePreserved": true,
+  "reviewStatus": "PENDING",
+  "routing": {
+    "lane": "CERTIFICATIONS",
+    "certExam": "AZURE",
+    "bankName": "AZ-104 Practice Test 2",
+    "note": "The current app has a generic AZURE category, not an AZ_104 enum. Use a dedicated AZ-104 pool; do not publish into AZ-900."
+  },
+  "conversionPolicy": "Questions are standalone authored replacements covering source topics, not claimed reconstructions of absent tables/diagrams. Unsupported multi-select is converted to focused single-answer MCQ. Retired or ambiguous material is replaced, consolidated or withheld explicitly.",
+  "sourceMapping": [
+    {
+      "sourceQuestionNumber": 1,
+      "sourceDomain": "Manage Azure identities and governance",
+      "status": "replacement",
+      "targetObjectiveId": "az-104.test2.department-membership",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 2,
+      "sourceDomain": "Manage Azure identities and governance",
+      "status": "replacement",
+      "targetObjectiveId": "az-104.test2.export-role-definition",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 3,
+      "sourceDomain": "Monitor and maintain Azure resource",
+      "status": "replacement",
+      "targetObjectiveId": "az-104.test2.ip-flow-diagnosis",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 4,
+      "sourceDomain": "Implement and manage virtual networking",
+      "status": "replacement",
+      "targetObjectiveId": "az-104.test2.outbound-nsg-rule",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 5,
+      "sourceDomain": "Deploy and manage Azure compute resources",
+      "status": "replacement",
+      "targetObjectiveId": "az-104.test2.zone-resilience",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 6,
+      "sourceDomain": "Deploy and manage Azure compute resources",
+      "status": "replacement",
+      "targetObjectiveId": "az-104.test2.backup-os-support",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 7,
+      "sourceDomain": "Monitor and maintain Azure resource",
+      "status": "replacement",
+      "targetObjectiveId": "az-104.test2.alert-user-response",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 8,
+      "sourceDomain": "Monitor and maintain Azure resource",
+      "status": "consolidated-replacement",
+      "targetObjectiveId": "az-104.test2.alert-user-response",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 9,
+      "sourceDomain": "Monitor and maintain Azure resource",
+      "status": "replacement",
+      "targetObjectiveId": "az-104.test2.alert-signal-types",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 10,
+      "sourceDomain": "Monitor and maintain Azure resource",
+      "status": "replacement",
+      "targetObjectiveId": "az-104.test2.action-groups",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 11,
+      "sourceDomain": "Manage Azure identities and governance",
+      "status": "replacement",
+      "targetObjectiveId": "az-104.test2.custom-role-scope",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 12,
+      "sourceDomain": null,
+      "status": "replacement",
+      "targetObjectiveId": "az-104.test2.notactions-not-deny",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 13,
+      "sourceDomain": "Implement and manage virtual networking",
+      "status": "replacement",
+      "targetObjectiveId": "az-104.test2.standard-load-balancer",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 14,
+      "sourceDomain": "Implement and manage virtual networking",
+      "status": "consolidated-replacement",
+      "targetObjectiveId": "az-104.test2.standard-load-balancer",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 15,
+      "sourceDomain": "Implement and manage virtual networking",
+      "status": "replacement",
+      "targetObjectiveId": "az-104.test2.multi-availability-set-backends",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 16,
+      "sourceDomain": "Implement and manage virtual networking",
+      "status": "consolidated-replacement",
+      "targetObjectiveId": "az-104.test2.multi-availability-set-backends",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 17,
+      "sourceDomain": "Implement and manage virtual networking",
+      "status": "replacement",
+      "targetObjectiveId": "az-104.test2.nat-subnet-association",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 18,
+      "sourceDomain": "Deploy and manage Azure compute resources",
+      "status": "replacement",
+      "targetObjectiveId": "az-104.test2.shared-app-plan",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 19,
+      "sourceDomain": "Implement and manage virtual networking",
+      "status": "replacement",
+      "targetObjectiveId": "az-104.test2.virtual-wan-hubs",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 20,
+      "sourceDomain": "Implement and manage virtual networking",
+      "status": "replacement",
+      "targetObjectiveId": "az-104.test2.aks-public-service",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 21,
+      "sourceDomain": "Deploy and manage Azure compute resources",
+      "status": "replacement",
+      "targetObjectiveId": "az-104.test2.app-plan-compatibility",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 22,
+      "sourceDomain": "Deploy and manage Azure compute resources",
+      "status": "consolidated-replacement",
+      "targetObjectiveId": "az-104.test2.app-plan-compatibility",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 23,
+      "sourceDomain": "Deploy and manage Azure compute resources",
+      "status": "consolidated-replacement",
+      "targetObjectiveId": "az-104.test2.app-plan-compatibility",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 24,
+      "sourceDomain": "Manage Azure identities and governance",
+      "status": "replacement",
+      "targetObjectiveId": "az-104.test2.role-assignment-permission",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 25,
+      "sourceDomain": "Manage Azure identities and governance",
+      "status": "replacement",
+      "targetObjectiveId": "az-104.test2.network-resource-role",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 26,
+      "sourceDomain": "Manage Azure identities and governance",
+      "status": "consolidated-replacement",
+      "targetObjectiveId": "az-104.test2.role-assignment-permission",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 27,
+      "sourceDomain": "Implement and manage virtual networking",
+      "status": "replacement",
+      "targetObjectiveId": "az-104.test2.custom-subdomain-dns",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 28,
+      "sourceDomain": "Implement and manage storage",
+      "status": "replacement",
+      "targetObjectiveId": "az-104.test2.file-share-zrs",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 29,
+      "sourceDomain": "Implement and manage storage",
+      "status": "replacement",
+      "targetObjectiveId": "az-104.test2.file-share-acl",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 30,
+      "sourceDomain": "Implement and manage virtual networking",
+      "status": "replacement",
+      "targetObjectiveId": "az-104.test2.load-balancer-rbac-scope",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 31,
+      "sourceDomain": "Implement and manage virtual networking",
+      "status": "consolidated-replacement",
+      "targetObjectiveId": "az-104.test2.load-balancer-rbac-scope",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 32,
+      "sourceDomain": "Implement and manage virtual networking",
+      "status": "replacement",
+      "targetObjectiveId": "az-104.test2.site-to-site-vpn",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 33,
+      "sourceDomain": "Monitor and maintain Azure resource",
+      "status": "replacement",
+      "targetObjectiveId": "az-104.test2.management-event-alert",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 34,
+      "sourceDomain": "Deploy and manage Azure compute resources",
+      "status": "withheld-review",
+      "reviewNote": "Exact VM restore-option answer depends on the missing configuration and current support matrix."
+    },
+    {
+      "sourceQuestionNumber": 35,
+      "sourceDomain": "Deploy and manage Azure compute resources",
+      "status": "withheld-review",
+      "reviewNote": "Missing recovery-host table; source’s OS-version restriction needs a fresh support-matrix review."
+    },
+    {
+      "sourceQuestionNumber": 36,
+      "sourceDomain": "Manage Azure identities and governance",
+      "status": "replacement",
+      "targetObjectiveId": "az-104.test2.guest-invitation-policy",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 37,
+      "sourceDomain": "Deploy and manage Azure compute resources",
+      "status": "withheld-review",
+      "reviewNote": "Source makes an unconditional resize-state claim; exact size, allocation and supported resize behavior are absent."
+    },
+    {
+      "sourceQuestionNumber": 38,
+      "sourceDomain": "Manage Azure identities and governance",
+      "status": "replacement",
+      "targetObjectiveId": "az-104.test2.pass-through-authentication",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 39,
+      "sourceDomain": "Implement and manage storage",
+      "status": "withheld-review",
+      "reviewNote": "The source-only Support-request approach to ZRS conversion is outdated; migration eligibility needs a current configuration."
+    },
+    {
+      "sourceQuestionNumber": 40,
+      "sourceDomain": "Implement and manage virtual networking",
+      "status": "replacement",
+      "targetObjectiveId": "az-104.test2.rdp-rule-order",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 41,
+      "sourceDomain": "Implement and manage virtual networking",
+      "status": "replacement",
+      "targetObjectiveId": "az-104.test2.nic-network-placement",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 42,
+      "sourceDomain": "Implement and manage virtual networking",
+      "status": "replacement",
+      "targetObjectiveId": "az-104.test2.internal-layer4-balancing",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 43,
+      "sourceDomain": "Implement and manage storage",
+      "status": "replacement",
+      "targetObjectiveId": "az-104.test2.file-sync-server-endpoint",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 44,
+      "sourceDomain": "Monitor and maintain Azure resource",
+      "status": "withheld-review",
+      "reviewNote": "The management-event integration scenario is ambiguous; do not infer the missing Event Grid/Logic Apps design."
+    },
+    {
+      "sourceQuestionNumber": 45,
+      "sourceDomain": "Deploy and manage Azure compute resources",
+      "status": "replacement",
+      "targetObjectiveId": "az-104.test2.key-vault-template-secret",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 46,
+      "sourceDomain": "Deploy and manage Azure compute resources",
+      "status": "withheld-review",
+      "reviewNote": "Legacy cross-cloud migration workflow should not be imported as current AZ-104 coverage without a fresh scope and tooling review."
+    },
+    {
+      "sourceQuestionNumber": 47,
+      "sourceDomain": "Monitor and maintain Azure resource",
+      "status": "replacement",
+      "targetObjectiveId": "az-104.test2.unused-disk-review",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 48,
+      "sourceDomain": "Manage Azure identities and governance",
+      "status": "replacement",
+      "targetObjectiveId": "az-104.test2.location-based-mfa",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 49,
+      "sourceDomain": "Deploy and manage Azure compute resources",
+      "status": "replacement",
+      "targetObjectiveId": "az-104.test2.policy-deny",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 50,
+      "sourceDomain": "Monitor and maintain Azure resource",
+      "status": "replacement",
+      "targetObjectiveId": "az-104.test2.topic-subscriptions",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 51,
+      "sourceDomain": "Deploy and manage Azure compute resources",
+      "status": "replacement",
+      "targetObjectiveId": "az-104.test2.queue-competing-consumers",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 52,
+      "sourceDomain": "Deploy and manage Azure compute resources",
+      "status": "replacement",
+      "targetObjectiveId": "az-104.test2.group-deployment-command",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 53,
+      "sourceDomain": "Deploy and manage Azure compute resources",
+      "status": "withheld-review",
+      "reviewNote": "Cannot determine named VM/disk migration eligibility from the missing source table."
+    },
+    {
+      "sourceQuestionNumber": 54,
+      "sourceDomain": "Implement and manage storage",
+      "status": "withheld-review",
+      "reviewNote": "The specific Data Box transfer and destination choices need current service and order details."
+    },
+    {
+      "sourceQuestionNumber": 55,
+      "sourceDomain": "Deploy and manage Azure compute resources",
+      "status": "replacement",
+      "targetObjectiveId": "az-104.test2.protected-backup-cleanup",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 56,
+      "sourceDomain": "Deploy and manage Azure compute resources",
+      "status": "replacement",
+      "targetObjectiveId": "az-104.test2.azcopy-container-endpoint",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 57,
+      "sourceDomain": "Implement and manage storage",
+      "status": "replacement",
+      "targetObjectiveId": "az-104.test2.file-sync-cloud-share",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 58,
+      "sourceDomain": "Implement and manage storage",
+      "status": "replacement",
+      "targetObjectiveId": "az-104.test2.blob-data-permission",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 59,
+      "sourceDomain": "Implement and manage virtual networking",
+      "status": "replacement",
+      "targetObjectiveId": "az-104.test2.ha-ports",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 60,
+      "sourceDomain": "Deploy and manage Azure compute resources",
+      "status": "withheld-review",
+      "reviewNote": "Legacy DSC/Automation provisioning answer needs redesign against supported configuration-management tools."
+    },
+    {
+      "sourceQuestionNumber": 61,
+      "sourceDomain": "Implement and manage virtual networking",
+      "status": "withheld-review",
+      "reviewNote": "Policy/static gateway description and absent peering routes do not establish a unique supported P2S remedy."
+    },
+    {
+      "sourceQuestionNumber": 62,
+      "sourceDomain": "Implement and manage virtual networking",
+      "status": "withheld-review",
+      "reviewNote": "Source incorrectly treats every VPN connection as requiring client administrator rights; client/install context is absent."
+    },
+    {
+      "sourceQuestionNumber": 63,
+      "sourceDomain": "Deploy and manage Azure compute resources",
+      "status": "replacement",
+      "targetObjectiveId": "az-104.test2.arm-location-parameter",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 64,
+      "sourceDomain": "Implement and manage virtual networking",
+      "status": "replacement",
+      "targetObjectiveId": "az-104.test2.load-balancer-hash",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 65,
+      "sourceDomain": "Manage Azure identities and governance",
+      "status": "replacement",
+      "targetObjectiveId": "az-104.test2.directory-user-admin",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 66,
+      "sourceDomain": "Manage Azure identities and governance",
+      "status": "consolidated-replacement",
+      "targetObjectiveId": "az-104.test2.directory-user-admin",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 67,
+      "sourceDomain": "Monitor and maintain Azure resource",
+      "status": "replacement",
+      "targetObjectiveId": "az-104.test2.modern-guest-monitoring",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 68,
+      "sourceDomain": "Monitor and maintain Azure resource",
+      "status": "replacement",
+      "targetObjectiveId": "az-104.test2.connection-monitor",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 69,
+      "sourceDomain": "Monitor and maintain Azure resource",
+      "status": "consolidated-replacement",
+      "targetObjectiveId": "az-104.test2.connection-monitor",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 70,
+      "sourceDomain": "Monitor and maintain Azure resource",
+      "status": "consolidated-replacement",
+      "targetObjectiveId": "az-104.test2.connection-monitor",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 71,
+      "sourceDomain": "Monitor and maintain Azure resource",
+      "status": "replacement",
+      "targetObjectiveId": "az-104.test2.guest-log-alert-chain",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 72,
+      "sourceDomain": "Monitor and maintain Azure resource",
+      "status": "consolidated-replacement",
+      "targetObjectiveId": "az-104.test2.guest-log-alert-chain",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 73,
+      "sourceDomain": "Monitor and maintain Azure resource",
+      "status": "consolidated-replacement",
+      "targetObjectiveId": "az-104.test2.guest-log-alert-chain",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 74,
+      "sourceDomain": "Manage Azure identities and governance",
+      "status": "replacement",
+      "targetObjectiveId": "az-104.test2.vm-contributor-boundary",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 75,
+      "sourceDomain": "Implement and manage storage",
+      "status": "replacement",
+      "targetObjectiveId": "az-104.test2.smb-port",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 76,
+      "sourceDomain": "Deploy and manage Azure compute resources",
+      "status": "replacement",
+      "targetObjectiveId": "az-104.test2.rolling-batch-limit",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 77,
+      "sourceDomain": "Deploy and manage Azure compute resources",
+      "status": "replacement",
+      "targetObjectiveId": "az-104.test2.asg-membership",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 78,
+      "sourceDomain": "Implement and manage virtual networking",
+      "status": "replacement",
+      "targetObjectiveId": "az-104.test2.nva-next-hop",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 79,
+      "sourceDomain": "Implement and manage virtual networking",
+      "status": "consolidated-replacement",
+      "targetObjectiveId": "az-104.test2.nva-next-hop",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    },
+    {
+      "sourceQuestionNumber": 80,
+      "sourceDomain": "Implement and manage virtual networking",
+      "status": "replacement",
+      "targetObjectiveId": "az-104.test2.nva-forwarding-diagnosis",
+      "reviewNote": "New standalone scenario assesses the source topic; this is not a reconstruction or claimed answer to missing source tables."
+    }
+  ],
+  "reviewReferences": [
+    "https://learn.microsoft.com/en-us/azure/aks/concepts-network-services",
+    "https://learn.microsoft.com/en-us/azure/app-service/app-service-web-tutorial-custom-domain",
+    "https://learn.microsoft.com/en-us/azure/app-service/overview-hosting-plans",
+    "https://learn.microsoft.com/en-us/azure/azure-monitor/agents/azure-monitor-agent-migration-wad-lad",
+    "https://learn.microsoft.com/en-us/azure/azure-monitor/agents/data-collection-rule-azure-monitor-agent",
+    "https://learn.microsoft.com/en-us/azure/azure-monitor/alerts/action-groups",
+    "https://learn.microsoft.com/en-us/azure/azure-monitor/alerts/alerts-manage-alert-instances",
+    "https://learn.microsoft.com/en-us/azure/azure-monitor/alerts/alerts-types",
+    "https://learn.microsoft.com/en-us/azure/azure-resource-manager/templates/deploy-cli",
+    "https://learn.microsoft.com/en-us/azure/azure-resource-manager/templates/key-vault-parameter",
+    "https://learn.microsoft.com/en-us/azure/azure-resource-manager/templates/parameters",
+    "https://learn.microsoft.com/en-us/azure/backup/backup-azure-delete-vault",
+    "https://learn.microsoft.com/en-us/azure/backup/backup-support-matrix-iaas",
+    "https://learn.microsoft.com/en-us/azure/governance/policy/concepts/effect-deny",
+    "https://learn.microsoft.com/en-us/azure/load-balancer/distribution-mode-concepts",
+    "https://learn.microsoft.com/en-us/azure/load-balancer/load-balancer-basic-upgrade-guidance",
+    "https://learn.microsoft.com/en-us/azure/load-balancer/load-balancer-ha-ports-overview",
+    "https://learn.microsoft.com/en-us/azure/load-balancer/load-balancer-overview",
+    "https://learn.microsoft.com/en-us/azure/load-balancer/tutorial-load-balancer-multiple-availability-sets-portal",
+    "https://learn.microsoft.com/en-us/azure/nat-gateway/nat-gateway-design",
+    "https://learn.microsoft.com/en-us/azure/network-watcher/connection-monitor-overview",
+    "https://learn.microsoft.com/en-us/azure/network-watcher/ip-flow-verify-overview",
+    "https://learn.microsoft.com/en-us/azure/reliability/availability-zones-overview",
+    "https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles/compute",
+    "https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles/networking",
+    "https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles/privileged",
+    "https://learn.microsoft.com/en-us/azure/role-based-access-control/custom-roles",
+    "https://learn.microsoft.com/en-us/azure/role-based-access-control/custom-roles-powershell",
+    "https://learn.microsoft.com/en-us/azure/role-based-access-control/role-definitions",
+    "https://learn.microsoft.com/en-us/azure/role-based-access-control/scope-overview",
+    "https://learn.microsoft.com/en-us/azure/service-bus-messaging/service-bus-queues-topics-subscriptions",
+    "https://learn.microsoft.com/en-us/azure/storage/blobs/assign-azure-role-data-access",
+    "https://learn.microsoft.com/en-us/azure/storage/common/storage-use-azcopy-blobs-upload",
+    "https://learn.microsoft.com/en-us/azure/storage/file-sync/file-sync-deployment-guide",
+    "https://learn.microsoft.com/en-us/azure/storage/file-sync/file-sync-introduction",
+    "https://learn.microsoft.com/en-us/azure/storage/files/files-redundancy",
+    "https://learn.microsoft.com/en-us/azure/storage/files/storage-files-identity-assign-share-level-permissions",
+    "https://learn.microsoft.com/en-us/azure/storage/files/storage-troubleshoot-windows-file-connection-problems",
+    "https://learn.microsoft.com/en-us/azure/virtual-machine-scale-sets/virtual-machine-scale-sets-rolling-upgrades",
+    "https://learn.microsoft.com/en-us/azure/virtual-machines/windows/find-unattached-disks",
+    "https://learn.microsoft.com/en-us/azure/virtual-network/application-security-groups",
+    "https://learn.microsoft.com/en-us/azure/virtual-network/network-security-groups-overview",
+    "https://learn.microsoft.com/en-us/azure/virtual-network/virtual-network-network-interface",
+    "https://learn.microsoft.com/en-us/azure/virtual-network/virtual-networks-udr-overview",
+    "https://learn.microsoft.com/en-us/azure/virtual-wan/virtual-wan-about",
+    "https://learn.microsoft.com/en-us/azure/vpn-gateway/vpn-gateway-about-vpn-gateway-settings",
+    "https://learn.microsoft.com/en-us/entra/external-id/external-collaboration-settings-configure",
+    "https://learn.microsoft.com/en-us/entra/identity/conditional-access/location-condition",
+    "https://learn.microsoft.com/en-us/entra/identity/hybrid/connect/how-to-connect-pta",
+    "https://learn.microsoft.com/en-us/entra/identity/role-based-access-control/permissions-reference",
+    "https://learn.microsoft.com/en-us/entra/identity/users/groups-dynamic-membership"
+  ],
+  "examReference": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/az-104",
+  "coverageWarning": "A supplementary practice bank, not a complete official AZ-104 exam blueprint or a reproduction of all original exam questions.",
+  "importQuestionCount": 56,
+  "sourceSha256": "ddd21d6f8625ccd52cccfc600915ca88d92d488296a5df9641c50188f7f00b35",
+  "summary": {
+    "replacement": 56,
+    "consolidated-replacement": 13,
+    "withheld-review": 11
+  },
+  "difficultyCounts": {
+    "2": 14,
+    "3": 35,
+    "4": 3,
+    "5": 2,
+    "1": 2
+  },
+  "independentFactCheck": "Targeted corrections checked against primary documentation. Standalone replacements require final editorial review, and referenced documentation should be checked when publishing.",
+  "examScopeReview": {
+    "blueprintEffectiveDate": "2026-04-17",
+    "relatedTopicsNotExplicitlyListed": [
+      "virtual-wan-hubs",
+      "aks-public-service",
+      "pass-through-authentication",
+      "location-based-mfa",
+      "topic-subscriptions",
+      "queue-competing-consumers"
+    ],
+    "note": "These source-derived related Azure topics remain reviewable supplemental material; reviewers should exclude them from an exam-weighted core pool unless deliberately including related topics."
+  }
+}

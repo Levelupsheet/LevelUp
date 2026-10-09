@@ -1,0 +1,838 @@
+{
+  "examCode": "SY0-701",
+  "sourceFile": "Pasted text(1).txt",
+  "sourceQuestionCount": 90,
+  "sourcePreserved": true,
+  "reviewStatus": "PENDING",
+  "independentFactCheck": "Targeted corrections verified; not a claim of independent verification of every retained source statement.",
+  "duplicateComparison": "Compared concepts with the earlier 115-question bank; consolidated entries reference that bank. Import preview remains required against the live pool.",
+  "sourceMapping": [
+    {
+      "sourceQuestionNumber": 1,
+      "sourceQuestionId": "64c1938ddd32557d54e4c0e6",
+      "sourceObjective": "4.2",
+      "status": "consolidated-existing",
+      "targetBank": "security-plus-sy0-701-v2.json",
+      "targetObjectiveId": "sy0-701.4.2.media-sanitization",
+      "reviewNote": "Existing bank already assesses this concept; no wording-only duplicate emitted."
+    },
+    {
+      "sourceQuestionNumber": 2,
+      "sourceQuestionId": "64bc22aca1b9d558709b3f6d",
+      "sourceObjective": "2.3",
+      "status": "corrected",
+      "targetObjectiveId": "sy0-701.test2.2.3.q02",
+      "mappedObjective": "2.3",
+      "reviewNote": "Self-contained single-answer replacement; original wording/key corrected."
+    },
+    {
+      "sourceQuestionNumber": 3,
+      "sourceQuestionId": "64c12584d3b7c5521ae6f5c3",
+      "sourceObjective": "4.5",
+      "status": "adapted",
+      "targetObjectiveId": "sy0-701.test2.4.5.q03",
+      "mappedObjective": "4.5",
+      "reviewNote": "Provided prompt and answer retained with import normalization; editorial review still required."
+    },
+    {
+      "sourceQuestionNumber": 4,
+      "sourceQuestionId": "64c00395f467f5bbfbbf11c7",
+      "sourceObjective": "4.4",
+      "status": "adapted",
+      "targetObjectiveId": "sy0-701.test2.4.4.q04",
+      "mappedObjective": "4.4",
+      "reviewNote": "Provided prompt and answer retained with import normalization; editorial review still required."
+    },
+    {
+      "sourceQuestionNumber": 5,
+      "sourceQuestionId": "64c19cf4f13766bcfbac4f63",
+      "sourceObjective": "3.4",
+      "status": "adapted",
+      "targetObjectiveId": "sy0-701.test2.3.4.q05",
+      "mappedObjective": "3.4",
+      "reviewNote": "Provided prompt and answer retained with import normalization; editorial review still required."
+    },
+    {
+      "sourceQuestionNumber": 6,
+      "sourceQuestionId": "64c1a41ef35deb7523e71f56",
+      "sourceObjective": "4.7",
+      "status": "consolidated-existing",
+      "targetBank": "security-plus-sy0-701-v2.json",
+      "targetObjectiveId": "sy0-701.4.7.continuous-integration",
+      "reviewNote": "Existing bank already assesses this concept; no wording-only duplicate emitted."
+    },
+    {
+      "sourceQuestionNumber": 7,
+      "sourceQuestionId": "64b88c9688b3fb59a48a1039",
+      "sourceObjective": "2.1",
+      "status": "adapted",
+      "targetObjectiveId": "sy0-701.test2.2.1.q07",
+      "mappedObjective": "2.1",
+      "reviewNote": "Provided prompt and answer retained with import normalization; editorial review still required."
+    },
+    {
+      "sourceQuestionNumber": 8,
+      "sourceQuestionId": "64ba1a31b711a9b6c71715d2",
+      "sourceObjective": "2.2",
+      "status": "corrected",
+      "targetObjectiveId": "sy0-701.test2.2.2.q08",
+      "mappedObjective": "2.2",
+      "reviewNote": "Self-contained single-answer replacement; original wording/key corrected."
+    },
+    {
+      "sourceQuestionNumber": 9,
+      "sourceQuestionId": "64bb437248f9d4fbc1cdd412",
+      "sourceObjective": "5.3",
+      "status": "consolidated-existing",
+      "targetBank": "security-plus-sy0-701-v2.json",
+      "targetObjectiveId": "sy0-701.5.3.vendor-audit-evidence",
+      "reviewNote": "Existing bank already assesses this concept; no wording-only duplicate emitted."
+    },
+    {
+      "sourceQuestionNumber": 10,
+      "sourceQuestionId": "64c1a7233c0620e9baa77d41",
+      "sourceObjective": "3.4",
+      "status": "adapted",
+      "targetObjectiveId": "sy0-701.test2.3.4.q10",
+      "mappedObjective": "3.4",
+      "reviewNote": "Provided prompt and answer retained with import normalization; editorial review still required."
+    },
+    {
+      "sourceQuestionNumber": 11,
+      "sourceQuestionId": "654448f50c5ecc119a27011e",
+      "sourceObjective": "4.6",
+      "status": "adapted",
+      "targetObjectiveId": "sy0-701.test2.4.6.q11",
+      "mappedObjective": "4.6",
+      "reviewNote": "Provided prompt and answer retained with import normalization; editorial review still required."
+    },
+    {
+      "sourceQuestionNumber": 12,
+      "sourceQuestionId": "65257f22f1de9bff7fa68806",
+      "sourceObjective": "1.4",
+      "status": "corrected",
+      "targetObjectiveId": "sy0-701.test2.1.4.q12",
+      "mappedObjective": "1.4",
+      "reviewNote": "Self-contained single-answer replacement; original wording/key corrected."
+    },
+    {
+      "sourceQuestionNumber": 13,
+      "sourceQuestionId": "64c16da16ab51895b912b830",
+      "sourceObjective": "3.2",
+      "status": "corrected",
+      "targetObjectiveId": "sy0-701.test2.3.2.q13",
+      "mappedObjective": "3.2",
+      "reviewNote": "Self-contained single-answer replacement; original wording/key corrected."
+    },
+    {
+      "sourceQuestionNumber": 14,
+      "sourceQuestionId": "64c1ab973c0620e9baa77d64",
+      "sourceObjective": "5.5",
+      "status": "adapted",
+      "targetObjectiveId": "sy0-701.test2.5.5.q14",
+      "mappedObjective": "5.5",
+      "reviewNote": "Provided prompt and answer retained with import normalization; editorial review still required."
+    },
+    {
+      "sourceQuestionNumber": 15,
+      "sourceQuestionId": "64c196c9ecb41e3664cf3e58",
+      "sourceObjective": "3.3",
+      "status": "adapted",
+      "targetObjectiveId": "sy0-701.test2.3.3.q15",
+      "mappedObjective": "3.3",
+      "reviewNote": "Provided prompt and answer retained with import normalization; editorial review still required."
+    },
+    {
+      "sourceQuestionNumber": 16,
+      "sourceQuestionId": "64bcce73f1dea48c270e0947",
+      "sourceObjective": "2.4",
+      "status": "adapted",
+      "targetObjectiveId": "sy0-701.test2.2.4.q16",
+      "mappedObjective": "2.4",
+      "reviewNote": "Provided prompt and answer retained with import normalization; editorial review still required."
+    },
+    {
+      "sourceQuestionNumber": 17,
+      "sourceQuestionId": "65262aa26f507d8e8ff08998",
+      "sourceObjective": "4.1",
+      "status": "corrected",
+      "targetObjectiveId": "sy0-701.test2.4.1.q17",
+      "mappedObjective": "4.1",
+      "reviewNote": "Self-contained single-answer replacement; original wording/key corrected."
+    },
+    {
+      "sourceQuestionNumber": 18,
+      "sourceQuestionId": "672240d0059e10a8d42841f5",
+      "sourceObjective": "5.2",
+      "status": "adapted",
+      "targetObjectiveId": "sy0-701.test2.5.2.q18",
+      "mappedObjective": "5.2",
+      "reviewNote": "Provided prompt and answer retained with import normalization; editorial review still required."
+    },
+    {
+      "sourceQuestionNumber": 19,
+      "sourceQuestionId": "654325b46809155389722589",
+      "sourceObjective": "4.5",
+      "status": "adapted",
+      "targetObjectiveId": "sy0-701.test2.4.5.q19",
+      "mappedObjective": "4.5",
+      "reviewNote": "Provided prompt and answer retained with import normalization; editorial review still required."
+    },
+    {
+      "sourceQuestionNumber": 20,
+      "sourceQuestionId": "651ee362dcae756d17d5574d",
+      "sourceObjective": "4.2",
+      "status": "adapted",
+      "targetObjectiveId": "sy0-701.test2.4.2.q20",
+      "mappedObjective": "4.2",
+      "reviewNote": "Provided prompt and answer retained with import normalization; editorial review still required."
+    },
+    {
+      "sourceQuestionNumber": 21,
+      "sourceQuestionId": "64c1a87d3c0620e9baa77d4b",
+      "sourceObjective": "5.5",
+      "status": "adapted",
+      "targetObjectiveId": "sy0-701.test2.5.5.q21",
+      "mappedObjective": "5.5",
+      "reviewNote": "Provided prompt and answer retained with import normalization; editorial review still required."
+    },
+    {
+      "sourceQuestionNumber": 22,
+      "sourceQuestionId": "64bcd4d64f97be0dbe753493",
+      "sourceObjective": "2.4",
+      "status": "adapted",
+      "targetObjectiveId": "sy0-701.test2.2.4.q22",
+      "mappedObjective": "2.4",
+      "reviewNote": "Provided prompt and answer retained with import normalization; editorial review still required."
+    },
+    {
+      "sourceQuestionNumber": 23,
+      "sourceQuestionId": "654561b37dcb30bec4e75c3f",
+      "sourceObjective": "5.1",
+      "status": "corrected",
+      "targetObjectiveId": "sy0-701.test2.5.1.q23",
+      "mappedObjective": "5.1",
+      "reviewNote": "Self-contained single-answer replacement; original wording/key corrected."
+    },
+    {
+      "sourceQuestionNumber": 24,
+      "sourceQuestionId": "64c162d48d1f702de4fdf19e",
+      "sourceObjective": "4.8",
+      "status": "adapted",
+      "targetObjectiveId": "sy0-701.test2.4.8.q24",
+      "mappedObjective": "4.8",
+      "reviewNote": "Provided prompt and answer retained with import normalization; editorial review still required."
+    },
+    {
+      "sourceQuestionNumber": 25,
+      "sourceQuestionId": "65497e37f0813714ed1d059f",
+      "sourceObjective": "5.3",
+      "status": "adapted",
+      "targetObjectiveId": "sy0-701.test2.5.3.q25",
+      "mappedObjective": "5.3",
+      "reviewNote": "Provided prompt and answer retained with import normalization; editorial review still required."
+    },
+    {
+      "sourceQuestionNumber": 26,
+      "sourceQuestionId": "64c3d5eececafa5b2df5d307",
+      "sourceObjective": "1.4",
+      "status": "corrected",
+      "targetObjectiveId": "sy0-701.test2.1.4.q26",
+      "mappedObjective": "1.4",
+      "reviewNote": "Self-contained single-answer replacement; original wording/key corrected."
+    },
+    {
+      "sourceQuestionNumber": 27,
+      "sourceQuestionId": "64b9f1c3974c18fd63dd24b1",
+      "sourceObjective": "5.2",
+      "status": "adapted",
+      "targetObjectiveId": "sy0-701.test2.5.2.q27",
+      "mappedObjective": "5.2",
+      "reviewNote": "Provided prompt and answer retained with import normalization; editorial review still required."
+    },
+    {
+      "sourceQuestionNumber": 28,
+      "sourceQuestionId": "64bfffaf22b117b12e6981b5",
+      "sourceObjective": "4.4",
+      "status": "adapted",
+      "targetObjectiveId": "sy0-701.test2.4.4.q28",
+      "mappedObjective": "4.4",
+      "reviewNote": "Provided prompt and answer retained with import normalization; editorial review still required."
+    },
+    {
+      "sourceQuestionNumber": 29,
+      "sourceQuestionId": "64c1abf93c0620e9baa77d69",
+      "sourceObjective": "5.5",
+      "status": "corrected",
+      "targetObjectiveId": "sy0-701.test2.5.5.q29",
+      "mappedObjective": "5.5",
+      "reviewNote": "Self-contained single-answer replacement; original wording/key corrected."
+    },
+    {
+      "sourceQuestionNumber": 30,
+      "sourceQuestionId": "64c1a95cf35deb7523e71f74",
+      "sourceObjective": "4.9",
+      "status": "corrected",
+      "targetObjectiveId": "sy0-701.test2.4.9.q30",
+      "mappedObjective": "4.9",
+      "reviewNote": "Self-contained single-answer replacement; original wording/key corrected."
+    },
+    {
+      "sourceQuestionNumber": 31,
+      "sourceQuestionId": "6525b7e83856455739a1582e",
+      "sourceObjective": "2.2",
+      "status": "corrected",
+      "targetObjectiveId": "sy0-701.test2.2.2.q31",
+      "mappedObjective": "2.2",
+      "reviewNote": "Self-contained single-answer replacement; original wording/key corrected."
+    },
+    {
+      "sourceQuestionNumber": 32,
+      "sourceQuestionId": "64c050ab622fbc04cdbf2532",
+      "sourceObjective": "3.1",
+      "status": "adapted",
+      "targetObjectiveId": "sy0-701.test2.3.1.q32",
+      "mappedObjective": "3.1",
+      "reviewNote": "Provided prompt and answer retained with import normalization; editorial review still required."
+    },
+    {
+      "sourceQuestionNumber": 33,
+      "sourceQuestionId": "64c19a0c1e0c5b8b7971dad8",
+      "sourceObjective": "4.3",
+      "status": "corrected",
+      "targetObjectiveId": "sy0-701.test2.4.3.q33",
+      "mappedObjective": "4.3",
+      "reviewNote": "Self-contained single-answer replacement; original wording/key corrected."
+    },
+    {
+      "sourceQuestionNumber": 34,
+      "sourceQuestionId": "64b9f337974c18fd63dd24b6",
+      "sourceObjective": "5.2",
+      "status": "adapted",
+      "targetObjectiveId": "sy0-701.test2.5.2.q34",
+      "mappedObjective": "5.2",
+      "reviewNote": "Provided prompt and answer retained with import normalization; editorial review still required."
+    },
+    {
+      "sourceQuestionNumber": 35,
+      "sourceQuestionId": "64be9b294a0dd75c4bddfc38",
+      "sourceObjective": "4.2",
+      "status": "corrected",
+      "targetObjectiveId": "sy0-701.test2.4.2.q35",
+      "mappedObjective": "4.2",
+      "reviewNote": "Self-contained single-answer replacement; original wording/key corrected."
+    },
+    {
+      "sourceQuestionNumber": 36,
+      "sourceQuestionId": "652f33f17d7a95707741eab2",
+      "sourceObjective": "4.1",
+      "status": "corrected",
+      "targetObjectiveId": "sy0-701.test2.4.1.q36",
+      "mappedObjective": "4.1",
+      "reviewNote": "Self-contained single-answer replacement; original wording/key corrected."
+    },
+    {
+      "sourceQuestionNumber": 37,
+      "sourceQuestionId": "652b3568818ffad49a170582",
+      "sourceObjective": "2.5",
+      "status": "corrected",
+      "targetObjectiveId": "sy0-701.test2.2.5.q37",
+      "mappedObjective": "2.5",
+      "reviewNote": "Self-contained single-answer replacement; original wording/key corrected."
+    },
+    {
+      "sourceQuestionNumber": 38,
+      "sourceQuestionId": "64c03b8a3a8522a3b5997a5a",
+      "sourceObjective": "1.2",
+      "status": "consolidated-existing",
+      "targetBank": "security-plus-sy0-701-v2.json",
+      "targetObjectiveId": "sy0-701.4.1.conditional-authentication",
+      "reviewNote": "Existing bank already assesses this concept; no wording-only duplicate emitted."
+    },
+    {
+      "sourceQuestionNumber": 39,
+      "sourceQuestionId": "64bc218faba7f3fba667ceef",
+      "sourceObjective": "2.3",
+      "status": "corrected",
+      "targetObjectiveId": "sy0-701.test2.2.3.q39",
+      "mappedObjective": "2.3",
+      "reviewNote": "Self-contained single-answer replacement; original wording/key corrected."
+    },
+    {
+      "sourceQuestionNumber": 40,
+      "sourceQuestionId": "672247623be32ad83a19dc8a",
+      "sourceObjective": "5.2",
+      "status": "withheld-review",
+      "reviewNote": "Neutral risk appetite is a vague label here; no measurable decision criterion establishes a unique answer."
+    },
+    {
+      "sourceQuestionNumber": 41,
+      "sourceQuestionId": "64c1972fdd32557d54e4c0f5",
+      "sourceObjective": "3.3",
+      "status": "adapted",
+      "targetObjectiveId": "sy0-701.test2.3.3.q41",
+      "mappedObjective": "3.3",
+      "reviewNote": "Provided prompt and answer retained with import normalization; editorial review still required."
+    },
+    {
+      "sourceQuestionNumber": 42,
+      "sourceQuestionId": "64b889c675f3764616371b59",
+      "sourceObjective": "4.1",
+      "status": "adapted",
+      "targetObjectiveId": "sy0-701.test2.4.1.q42",
+      "mappedObjective": "4.1",
+      "reviewNote": "Provided prompt and answer retained with import normalization; editorial review still required."
+    },
+    {
+      "sourceQuestionNumber": 43,
+      "sourceQuestionId": "65171dfb50fd765762f8e252",
+      "sourceObjective": "3.1",
+      "status": "corrected",
+      "targetObjectiveId": "sy0-701.test2.3.1.q43",
+      "mappedObjective": "3.1",
+      "reviewNote": "Self-contained single-answer replacement; original wording/key corrected."
+    },
+    {
+      "sourceQuestionNumber": 44,
+      "sourceQuestionId": "64c019867466b36c144bf8fb",
+      "sourceObjective": "4.7",
+      "status": "adapted",
+      "targetObjectiveId": "sy0-701.test2.4.7.q44",
+      "mappedObjective": "4.7",
+      "reviewNote": "Provided prompt and answer retained with import normalization; editorial review still required."
+    },
+    {
+      "sourceQuestionNumber": 45,
+      "sourceQuestionId": "652c848c3b1d2556f6cb6b7a",
+      "sourceObjective": "3.2",
+      "status": "corrected",
+      "targetObjectiveId": "sy0-701.test2.3.2.q45",
+      "mappedObjective": "3.2",
+      "reviewNote": "Self-contained single-answer replacement; original wording/key corrected."
+    },
+    {
+      "sourceQuestionNumber": 46,
+      "sourceQuestionId": "65281e61304674464742f9e3",
+      "sourceObjective": "2.4",
+      "status": "corrected",
+      "targetObjectiveId": "sy0-701.test2.2.4.q46",
+      "mappedObjective": "2.4",
+      "reviewNote": "Self-contained single-answer replacement; original wording/key corrected."
+    },
+    {
+      "sourceQuestionNumber": 47,
+      "sourceQuestionId": "67223a264ba26b3d1637fc1a",
+      "sourceObjective": "5.1",
+      "status": "consolidated-existing",
+      "targetBank": "security-plus-sy0-701-v2.json",
+      "targetObjectiveId": "sy0-701.3.1.recoverability",
+      "reviewNote": "Existing bank already assesses this concept; no wording-only duplicate emitted."
+    },
+    {
+      "sourceQuestionNumber": 48,
+      "sourceQuestionId": "65245928ae19f8bdaee92dc6",
+      "sourceObjective": "1.2",
+      "status": "adapted",
+      "targetObjectiveId": "sy0-701.test2.1.2.q48",
+      "mappedObjective": "1.2",
+      "reviewNote": "Provided prompt and answer retained with import normalization; editorial review still required."
+    },
+    {
+      "sourceQuestionNumber": 49,
+      "sourceQuestionId": "65432c686491794aff7fb0c9",
+      "sourceObjective": "3.2",
+      "status": "consolidated-existing",
+      "targetBank": "security-plus-sy0-701-v2.json",
+      "targetObjectiveId": "sy0-701.3.2.ngfw",
+      "reviewNote": "Existing bank already assesses this concept; no wording-only duplicate emitted."
+    },
+    {
+      "sourceQuestionNumber": 50,
+      "sourceQuestionId": "6529e47678c8fd0f1b752da8",
+      "sourceObjective": "2.4",
+      "status": "corrected",
+      "targetObjectiveId": "sy0-701.test2.2.4.q50",
+      "mappedObjective": "2.4",
+      "reviewNote": "Authored evidence-based replacement assesses diagnosis or dependency/permission tradeoffs; no recall-only hard-tier label."
+    },
+    {
+      "sourceQuestionNumber": 51,
+      "sourceQuestionId": "652c438f6000c2244d013a0d",
+      "sourceObjective": "3.1",
+      "status": "corrected",
+      "targetObjectiveId": "sy0-701.test2.3.1.q51",
+      "mappedObjective": "3.1",
+      "reviewNote": "Self-contained single-answer replacement; original wording/key corrected."
+    },
+    {
+      "sourceQuestionNumber": 52,
+      "sourceQuestionId": "64c157fb528e3065c137971d",
+      "sourceObjective": "4.6",
+      "status": "corrected",
+      "targetObjectiveId": "sy0-701.test2.4.6.q52",
+      "mappedObjective": "4.6",
+      "reviewNote": "Self-contained single-answer replacement; original wording/key corrected."
+    },
+    {
+      "sourceQuestionNumber": 53,
+      "sourceQuestionId": "65445b6fc47e0cf3c470dd71",
+      "sourceObjective": "4.6",
+      "status": "adapted",
+      "targetObjectiveId": "sy0-701.test2.4.6.q53",
+      "mappedObjective": "4.6",
+      "reviewNote": "Provided prompt and answer retained with import normalization; editorial review still required."
+    },
+    {
+      "sourceQuestionNumber": 54,
+      "sourceQuestionId": "64c04411e69668a02c0dfe0b",
+      "sourceObjective": "1.2",
+      "status": "corrected",
+      "targetObjectiveId": "sy0-701.test2.1.2.q54",
+      "mappedObjective": "1.2",
+      "reviewNote": "Self-contained single-answer replacement; original wording/key corrected."
+    },
+    {
+      "sourceQuestionNumber": 55,
+      "sourceQuestionId": "6543e8b0896f42788ac46b08",
+      "sourceObjective": "4.8",
+      "status": "corrected",
+      "targetObjectiveId": "sy0-701.test2.4.8.q55",
+      "mappedObjective": "4.8",
+      "reviewNote": "Self-contained single-answer replacement; original wording/key corrected."
+    },
+    {
+      "sourceQuestionNumber": 56,
+      "sourceQuestionId": "652c75a274644bf66062a2f2",
+      "sourceObjective": "3.2",
+      "status": "corrected",
+      "targetObjectiveId": "sy0-701.test2.3.2.q56",
+      "mappedObjective": "3.2",
+      "reviewNote": "Self-contained single-answer replacement; original wording/key corrected."
+    },
+    {
+      "sourceQuestionNumber": 57,
+      "sourceQuestionId": "65262caf6f507d8e8ff089a2",
+      "sourceObjective": "2.2",
+      "status": "corrected",
+      "targetObjectiveId": "sy0-701.test2.2.2.q57",
+      "mappedObjective": "2.2",
+      "reviewNote": "Self-contained single-answer replacement; original wording/key corrected."
+    },
+    {
+      "sourceQuestionNumber": 58,
+      "sourceQuestionId": "6541d97e902ccdf6404e822d",
+      "sourceObjective": "4.3",
+      "status": "corrected",
+      "targetObjectiveId": "sy0-701.test2.4.3.q58",
+      "mappedObjective": "4.3",
+      "reviewNote": "Authored evidence-based replacement assesses diagnosis or dependency/permission tradeoffs; no recall-only hard-tier label."
+    },
+    {
+      "sourceQuestionNumber": 59,
+      "sourceQuestionId": "6549cd4f4e3ef4759e7c0ddd",
+      "sourceObjective": "5.6",
+      "status": "corrected",
+      "targetObjectiveId": "sy0-701.test2.5.6.q59",
+      "mappedObjective": "5.6",
+      "reviewNote": "Self-contained single-answer replacement; original wording/key corrected."
+    },
+    {
+      "sourceQuestionNumber": 60,
+      "sourceQuestionId": "6525a52eb511ef5634172a7b",
+      "sourceObjective": "2.1",
+      "status": "adapted",
+      "targetObjectiveId": "sy0-701.test2.2.1.q60",
+      "mappedObjective": "2.1",
+      "reviewNote": "Provided prompt and answer retained with import normalization; editorial review still required."
+    },
+    {
+      "sourceQuestionNumber": 61,
+      "sourceQuestionId": "64b9f508974c18fd63dd24bb",
+      "sourceObjective": "5.2",
+      "status": "adapted",
+      "targetObjectiveId": "sy0-701.test2.5.2.q61",
+      "mappedObjective": "5.2",
+      "reviewNote": "Provided prompt and answer retained with import normalization; editorial review still required."
+    },
+    {
+      "sourceQuestionNumber": 62,
+      "sourceQuestionId": "65445e70fbad95d7ea4e4c49",
+      "sourceObjective": "4.6",
+      "status": "adapted",
+      "targetObjectiveId": "sy0-701.test2.4.6.q62",
+      "mappedObjective": "4.6",
+      "reviewNote": "Provided prompt and answer retained with import normalization; editorial review still required."
+    },
+    {
+      "sourceQuestionNumber": 63,
+      "sourceQuestionId": "64c04870aa720bef4eafef15",
+      "sourceObjective": "3.1",
+      "status": "adapted",
+      "targetObjectiveId": "sy0-701.test2.3.1.q63",
+      "mappedObjective": "3.1",
+      "reviewNote": "Provided prompt and answer retained with import normalization; editorial review still required."
+    },
+    {
+      "sourceQuestionNumber": 64,
+      "sourceQuestionId": "65244cca4c4116404f67d29d",
+      "sourceObjective": "1.4",
+      "status": "consolidated-existing",
+      "targetBank": "security-plus-sy0-701-v2.json",
+      "targetObjectiveId": "sy0-701.1.4.blockchain",
+      "reviewNote": "Existing bank already assesses this concept; no wording-only duplicate emitted."
+    },
+    {
+      "sourceQuestionNumber": 65,
+      "sourceQuestionId": "65487b93acaa0dbbe5e8022e",
+      "sourceObjective": "5.2",
+      "status": "corrected",
+      "targetObjectiveId": "sy0-701.test2.5.2.q65",
+      "mappedObjective": "5.2",
+      "reviewNote": "Self-contained single-answer replacement; original wording/key corrected."
+    },
+    {
+      "sourceQuestionNumber": 66,
+      "sourceQuestionId": "64bd92ebe95286472e079184",
+      "sourceObjective": "4.2",
+      "status": "corrected",
+      "targetObjectiveId": "sy0-701.test2.4.2.q66",
+      "mappedObjective": "4.2",
+      "reviewNote": "Self-contained single-answer replacement; original wording/key corrected."
+    },
+    {
+      "sourceQuestionNumber": 67,
+      "sourceQuestionId": "654879a9acaa0dbbe5e80224",
+      "sourceObjective": "5.2",
+      "status": "adapted",
+      "targetObjectiveId": "sy0-701.test2.5.2.q67",
+      "mappedObjective": "5.2",
+      "reviewNote": "Provided prompt and answer retained with import normalization; editorial review still required."
+    },
+    {
+      "sourceQuestionNumber": 68,
+      "sourceQuestionId": "652ee4f0a5199fdd13f637ec",
+      "sourceObjective": "3.4",
+      "status": "corrected",
+      "targetObjectiveId": "sy0-701.test2.3.4.q68",
+      "mappedObjective": "3.4",
+      "reviewNote": "Authored evidence-based replacement assesses diagnosis or dependency/permission tradeoffs; no recall-only hard-tier label."
+    },
+    {
+      "sourceQuestionNumber": 69,
+      "sourceQuestionId": "6524e5389e22f124a23e7938",
+      "sourceObjective": "1.4",
+      "status": "corrected",
+      "targetObjectiveId": "sy0-701.test2.1.4.q69",
+      "mappedObjective": "1.4",
+      "reviewNote": "Self-contained single-answer replacement; original wording/key corrected."
+    },
+    {
+      "sourceQuestionNumber": 70,
+      "sourceQuestionId": "6542fac17a7f9376f6eca40c",
+      "sourceObjective": "4.4",
+      "status": "corrected",
+      "targetObjectiveId": "sy0-701.test2.4.4.q70",
+      "mappedObjective": "4.4",
+      "reviewNote": "Self-contained single-answer replacement; original wording/key corrected."
+    },
+    {
+      "sourceQuestionNumber": 71,
+      "sourceQuestionId": "64bcc9e5d05f45402ccc6a2b",
+      "sourceObjective": "2.4",
+      "status": "corrected",
+      "targetObjectiveId": "sy0-701.test2.2.4.q71",
+      "mappedObjective": "2.4",
+      "reviewNote": "Self-contained single-answer replacement; original wording/key corrected."
+    },
+    {
+      "sourceQuestionNumber": 72,
+      "sourceQuestionId": "64c15363528e3065c1379718",
+      "sourceObjective": "1.3",
+      "status": "adapted",
+      "targetObjectiveId": "sy0-701.test2.1.3.q72",
+      "mappedObjective": "1.3",
+      "reviewNote": "Provided prompt and answer retained with import normalization; editorial review still required."
+    },
+    {
+      "sourceQuestionNumber": 73,
+      "sourceQuestionId": "65263a9e8dac4f87323045ef",
+      "sourceObjective": "2.2",
+      "status": "adapted",
+      "targetObjectiveId": "sy0-701.test2.3.4.q73",
+      "mappedObjective": "3.4",
+      "reviewNote": "Provided prompt and answer retained with import normalization; editorial review still required."
+    },
+    {
+      "sourceQuestionNumber": 74,
+      "sourceQuestionId": "64c1a8fcf35deb7523e71f6f",
+      "sourceObjective": "4.9",
+      "status": "corrected",
+      "targetObjectiveId": "sy0-701.test2.4.9.q74",
+      "mappedObjective": "4.9",
+      "reviewNote": "Self-contained single-answer replacement; original wording/key corrected."
+    },
+    {
+      "sourceQuestionNumber": 75,
+      "sourceQuestionId": "6720ff1fe8b5ca200ac63846",
+      "sourceObjective": "1.2",
+      "status": "adapted",
+      "targetObjectiveId": "sy0-701.test2.1.2.q75",
+      "mappedObjective": "1.2",
+      "reviewNote": "Provided prompt and answer retained with import normalization; editorial review still required."
+    },
+    {
+      "sourceQuestionNumber": 76,
+      "sourceQuestionId": "64bf76e15ff7b41f675e4230",
+      "sourceObjective": "3.1",
+      "status": "adapted",
+      "targetObjectiveId": "sy0-701.test2.3.1.q76",
+      "mappedObjective": "3.1",
+      "reviewNote": "Provided prompt and answer retained with import normalization; editorial review still required."
+    },
+    {
+      "sourceQuestionNumber": 77,
+      "sourceQuestionId": "652623b17d94fbceb5d12419",
+      "sourceObjective": "2.2",
+      "status": "adapted",
+      "targetObjectiveId": "sy0-701.test2.2.2.q77",
+      "mappedObjective": "2.2",
+      "reviewNote": "Provided prompt and answer retained with import normalization; editorial review still required."
+    },
+    {
+      "sourceQuestionNumber": 78,
+      "sourceQuestionId": "65296a066fb1e3052b309211",
+      "sourceObjective": "2.4",
+      "status": "corrected",
+      "targetObjectiveId": "sy0-701.test2.2.4.q78",
+      "mappedObjective": "2.4",
+      "reviewNote": "Self-contained single-answer replacement; original wording/key corrected."
+    },
+    {
+      "sourceQuestionNumber": 79,
+      "sourceQuestionId": "64bd55d28ecaa950633d569c",
+      "sourceObjective": "1.1",
+      "status": "adapted",
+      "targetObjectiveId": "sy0-701.test2.1.1.q79",
+      "mappedObjective": "1.1",
+      "reviewNote": "Provided prompt and answer retained with import normalization; editorial review still required."
+    },
+    {
+      "sourceQuestionNumber": 80,
+      "sourceQuestionId": "64b86349030c7ba35a5609e7",
+      "sourceObjective": "2.1",
+      "status": "adapted",
+      "targetObjectiveId": "sy0-701.test2.2.1.q80",
+      "mappedObjective": "2.1",
+      "reviewNote": "Provided prompt and answer retained with import normalization; editorial review still required."
+    },
+    {
+      "sourceQuestionNumber": 81,
+      "sourceQuestionId": "64c189817afca4c13451de4d",
+      "sourceObjective": "3.3",
+      "status": "corrected",
+      "targetObjectiveId": "sy0-701.test2.3.3.q81",
+      "mappedObjective": "3.3",
+      "reviewNote": "Authored evidence-based replacement assesses diagnosis or dependency/permission tradeoffs; no recall-only hard-tier label."
+    },
+    {
+      "sourceQuestionNumber": 82,
+      "sourceQuestionId": "64bef17bcdab7c65df69bb3b",
+      "sourceObjective": "2.5",
+      "status": "consolidated-existing",
+      "targetBank": "security-plus-sy0-701-v2.json",
+      "targetObjectiveId": "sy0-701.4.6.least-privilege",
+      "reviewNote": "Existing bank already assesses this concept; no wording-only duplicate emitted."
+    },
+    {
+      "sourceQuestionNumber": 83,
+      "sourceQuestionId": "64b9f3c43f4084e37d4f8fea",
+      "sourceObjective": "5.2",
+      "status": "consolidated-existing",
+      "targetBank": "security-plus-sy0-701-v2.json",
+      "targetObjectiveId": "sy0-701.5.2.rto",
+      "reviewNote": "Existing bank already assesses this concept; no wording-only duplicate emitted."
+    },
+    {
+      "sourceQuestionNumber": 84,
+      "sourceQuestionId": "64b9f70d974c18fd63dd24c5",
+      "sourceObjective": "5.2",
+      "status": "adapted",
+      "targetObjectiveId": "sy0-701.test2.5.2.q84",
+      "mappedObjective": "5.2",
+      "reviewNote": "Provided prompt and answer retained with import normalization; editorial review still required."
+    },
+    {
+      "sourceQuestionNumber": 85,
+      "sourceQuestionId": "652c310e895352c4197a4f42",
+      "sourceObjective": "3.1",
+      "status": "adapted",
+      "targetObjectiveId": "sy0-701.test2.3.1.q85",
+      "mappedObjective": "3.1",
+      "reviewNote": "Provided prompt and answer retained with import normalization; editorial review still required."
+    },
+    {
+      "sourceQuestionNumber": 86,
+      "sourceQuestionId": "64bfd70627afd558bd9151f5",
+      "sourceObjective": "4.3",
+      "status": "adapted",
+      "targetObjectiveId": "sy0-701.test2.4.3.q86",
+      "mappedObjective": "4.3",
+      "reviewNote": "Provided prompt and answer retained with import normalization; editorial review still required."
+    },
+    {
+      "sourceQuestionNumber": 87,
+      "sourceQuestionId": "65296ae86fb1e3052b309216",
+      "sourceObjective": "2.4",
+      "status": "corrected",
+      "targetObjectiveId": "sy0-701.test2.2.4.q87",
+      "mappedObjective": "2.4",
+      "reviewNote": "Self-contained single-answer replacement; original wording/key corrected."
+    },
+    {
+      "sourceQuestionNumber": 88,
+      "sourceQuestionId": "6543eb4ca69e5671c3827c55",
+      "sourceObjective": "4.8",
+      "status": "adapted",
+      "targetObjectiveId": "sy0-701.test2.4.8.q88",
+      "mappedObjective": "4.8",
+      "reviewNote": "Provided prompt and answer retained with import normalization; editorial review still required."
+    },
+    {
+      "sourceQuestionNumber": 89,
+      "sourceQuestionId": "654983c35429895e833da5de",
+      "sourceObjective": "5.4",
+      "status": "consolidated-existing",
+      "targetBank": "security-plus-sy0-701-v2.json",
+      "targetObjectiveId": "sy0-701.5.3.vendor-audit-evidence",
+      "reviewNote": "Existing bank already assesses this concept; no wording-only duplicate emitted."
+    },
+    {
+      "sourceQuestionNumber": 90,
+      "sourceQuestionId": "652c463484c5639ae7b63f1b",
+      "sourceObjective": "3.1",
+      "status": "corrected",
+      "targetObjectiveId": "sy0-701.test2.3.1.q90",
+      "mappedObjective": "3.1",
+      "reviewNote": "Self-contained single-answer replacement; original wording/key corrected."
+    }
+  ],
+  "reviewReferences": [
+    "https://csrc.nist.gov/pubs/sp/800/88/r2/final",
+    "https://www.edpb.europa.eu/sme/be-compliant/process-personal-data-lawfully_en"
+  ],
+  "importQuestionCount": 79,
+  "sourceSha256": "306e440780e3a09fa48281528217702be53395e9725dc58da2c7f289dbbeee98",
+  "summary": {
+    "consolidated-existing": 10,
+    "corrected": 38,
+    "adapted": 41,
+    "withheld-review": 1
+  },
+  "difficultyCounts": {
+    "2": 40,
+    "3": 24,
+    "1": 11,
+    "4": 2,
+    "5": 2
+  }
+}
