@@ -12,6 +12,8 @@ import { normalizeQuestionType } from "@/lib/questionTypes";
 export type GameLane = "TRAINING" | "CERTIFICATIONS" | "TEST_NOW";
 
 type Props = {
+  completeAllQuestions?: boolean;
+  feedbackSheet?: boolean;
   lane: GameLane;
   title: string;
   subtitle?: string;
@@ -241,5 +243,5 @@ export default function GameEngine(props: Props) {
 
   if (!questions.length) return <div className="page"><div className="container" style={{ maxWidth: 1120 }}><div className="card" style={{ padding: 18 }}><div style={{ fontWeight: 800, fontSize: 18 }}>No questions available</div><div className="muted" style={{ marginTop: 8 }}>{loadError || "Assign an active question set in Admin."}</div><div style={{ marginTop: 14 }}><Link className="btn" href="/admin">Open Admin</Link></div></div></div></div>;
 
-  return <DiabloQuizRunner title={title} subtitle={setLabel} enemyName={initialState?.boss?.visual?.bossName || enemyName} playerDisplayName={careerPlayerName} questions={questions} timed={timed} metaLeft={metaLeft || `Adaptive lane: ${lane.replaceAll("_", " ")}`} metaRight={metaRight || `${questions.length} questions loaded`} exitHref={exitHref} exitLabel={exitLabel} onExit={onExit} onComplete={handleComplete} onStateChange={saveSessionProgress} onAdvanceQuestion={handleAdvanceQuestion} initialState={initialState} learningMastery={learningMastery} rules={initialState?.boss?.rules || rulesOverride} encounterType={encounterType} media={{ ...playerMedia, enemyIdleSrc: "/video/enemy-idle.mp4", enemyHitSrc: "/video/enemy-damage.mp4", width: 1600, height: 900 }} />;
+  return <DiabloQuizRunner completeAllQuestions={props.completeAllQuestions} feedbackSheet={props.feedbackSheet} title={title} subtitle={setLabel} enemyName={initialState?.boss?.visual?.bossName || enemyName} playerDisplayName={careerPlayerName} questions={questions} timed={timed} metaLeft={metaLeft || `Adaptive lane: ${lane.replaceAll("_", " ")}`} metaRight={metaRight || `${questions.length} questions loaded`} exitHref={exitHref} exitLabel={exitLabel} onExit={onExit} onComplete={handleComplete} onStateChange={saveSessionProgress} onAdvanceQuestion={handleAdvanceQuestion} initialState={initialState} learningMastery={learningMastery} rules={initialState?.boss?.rules || rulesOverride} encounterType={encounterType} media={{ ...playerMedia, enemyIdleSrc: "/video/enemy-idle.mp4", enemyHitSrc: "/video/enemy-damage.mp4", width: 1600, height: 900 }} />;
 }

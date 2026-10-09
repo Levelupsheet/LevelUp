@@ -1,0 +1,22 @@
+const {test}=require('node:test');const assert=require('node:assert/strict');const fs=require('node:fs');const path=require('node:path');const Module=require('node:module');const ts=require('typescript');const React=require('react');const{create,act}=require('react-test-renderer');
+const resolve=Module._resolveFilename;Module._resolveFilename=function(request,parent,...args){if(request.startsWith('@/'))request=path.join(__dirname,'../src',request.slice(2));return resolve.call(this,request,parent,...args);};
+for(const ext of ['.ts','.tsx'])require.extensions[ext]=(m,f)=>m._compile(ts.transpileModule(fs.readFileSync(f,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022,jsx:ts.JsxEmit.ReactJSX,esModuleInterop:true}}).outputText,f);require.extensions['.css']=()=>{};
+const mock=(file,exports)=>{const filename=path.join(__dirname,'../src',file);require.cache[filename]={id:filename,filename,loaded:true,exports};};
+const bank={key:'CERTIFICATIONS:SECURITY_PLUS',lane:'CERTIFICATIONS',label:'Security+',certExam:'SECURITY_PLUS',questionCount:100,setIds:['pool']};let runner;
+mock('lib/useContentPools.ts',{useContentPools:()=>({pools:[bank],loading:false,error:null})});
+mock('components/PracticeDialog.tsx',{__esModule:true,default:props=>React.createElement('section',{'aria-label':props.title},props.children)});
+mock('components/DiabloQuizRunner.tsx',{__esModule:true,default:props=>{runner=props;return React.createElement('p',{},'Running');}});
+mock('components/GameEngine.tsx',{__esModule:true,default:props=>{runner=props;return React.createElement('p',{},'Saved run');}});
+const Launcher=require('../src/components/PracticeLauncher.tsx').default;
+const flattened=n=>n.children.map(c=>typeof c==='string'?c:flattened(c)).join('');
+const click=async(renderer,text)=>{const button=renderer.root.findAllByType('button').find(b=>flattened(b).includes(text));assert.ok(button,text);await act(async()=>button.props.onClick());};
+async function setup(signed=false){const storage=new Map(),calls=[];global.localStorage={getItem:k=>storage.get(k)||null,setItem:(k,v)=>storage.set(k,v)};global.window={location:{search:'',assign:()=>{}},history:{replaceState:()=>{}}};global.fetch=async(url,options)=>{const body=options?.body?JSON.parse(options.body):null;calls.push({url,body});return{ok:true,json:async()=>url==='/api/auth/me'?{user:signed?{id:'account'}:null}:url.startsWith('/api/practice/access')?{unlocked:false,amountCents:299,checkoutEnabled:true}:{questions:[{id:'q',type:'multiple_choice',prompt:'Question',choices:['A','B'],correctIndex:0,domainId:'security',level:2}],requestedCount:5}};};let renderer;await act(async()=>{renderer=create(React.createElement(Launcher));});return{renderer,calls,storage};}
+test('guests start directly, get feedback and history, then practice missed questions without account rewards',async()=>{
+ const f=await setup();await click(f.renderer,'Start →');await click(f.renderer,'Quick Quiz');assert.equal(runner.guestPractice,true);assert.equal(runner.feedbackSheet,true);assert.ok(f.calls.some(c=>c.url==='/api/practice/session'));assert.equal(f.calls.some(c=>c.url==='/api/game/session'),false);
+ await act(async()=>runner.onAnswerReviewed({id:'q',domainId:'security'},false));await act(async()=>runner.onComplete({outcome:'defeat',correctCount:0,totalQuestions:1,xpEarned:0,masteryByDomain:{security:0}}));
+ assert.ok([...f.storage.values()].some(v=>JSON.parse(v).missed.includes('q')));await click(f.renderer,'Practice missed questions');assert.equal(f.calls.at(-1).body.focus,'missed');assert.deepEqual(f.calls.at(-1).body.missed,['q']);await act(async()=>f.renderer.unmount());
+});
+test('full mode opens a fee dialog without allocating a full test, while signed-in free practice keeps saved sessions',async()=>{
+ let f=await setup();await click(f.renderer,'Start →');await click(f.renderer,'Full Test');assert.ok(f.renderer.root.findAllByType('button').some(b=>flattened(b).includes('Continue to PayPal')));assert.equal(f.calls.some(c=>c.url==='/api/practice/session'),false);await act(async()=>f.renderer.unmount());
+ f=await setup(true);await click(f.renderer,'Start →');await click(f.renderer,'Study Mode');assert.equal(runner.questionCount,10);assert.equal(runner.certExam,'SECURITY_PLUS');assert.equal(runner.completeAllQuestions,true);assert.equal(runner.feedbackSheet,true);await act(async()=>f.renderer.unmount());
+});

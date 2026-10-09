@@ -2,6 +2,7 @@
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import PracticeDialog from '@/components/PracticeDialog';
 import D2LifeOrb from "@/components/D2LifeOrb";
 import D2EnemyHealthBar from "@/components/D2EnemyHealthBar";
 import DomainRuneBar from "@/components/DomainRuneBar";
@@ -484,6 +485,10 @@ function renderQuestionInput(args: {
 
 export default function DiabloQuizRunner(props: {
   title: string;
+  completeAllQuestions?: boolean;
+  guestPractice?: boolean;
+  feedbackSheet?: boolean;
+  onAnswerReviewed?: (question: DiabloQuestion, correct: boolean) => void;
   subtitle?: string;
   enemyName?: string;
   playerDisplayName?: string;
@@ -507,6 +512,10 @@ export default function DiabloQuizRunner(props: {
 }) {
   const {
     title,
+    completeAllQuestions = false,
+    guestPractice = false,
+    feedbackSheet = false,
+    onAnswerReviewed,
     subtitle,
     enemyName = "Lagger",
     playerDisplayName,
@@ -529,6 +538,9 @@ export default function DiabloQuizRunner(props: {
     encounterType = "standard",
   } = props;
 
+  const [feedbackDismissed, setFeedbackDismissed] = useState(false);
+  const nextPendingRef = useRef(false);
+  const reviewedQuestionsRef = useRef(new Set<string>());
   const combatQuestions: CombatQuestion[] = useMemo(
     () =>
       [...questions].sort((a, b) => encounterType === "boss" || questions.some(q => q.sessionQuestionId) ? 0 : (Math.max(1, Math.min(5, Number(a.level || 1))) - Math.max(1, Math.min(5, Number(b.level || 1))))).map((q, i) => ({
@@ -617,9 +629,9 @@ export default function DiabloQuizRunner(props: {
       return createEnemyProfile(encounterType === "boss" ? (enemyName || config.name) : config.name, tier,
         encounterType === "boss" ? (rules?.enemyMaxHP ?? rules?.startHP ?? 100) : config.hp);
     },
-    getPlayerDamageTaken: ({ usedShield, question: hitQuestion, tier, state: hitState }) => incomingEnemyDamage(
+    getPlayerDamageTaken: ({ usedShield, question: hitQuestion, tier, state: hitState }) => Math.min(completeAllQuestions ? Math.max(0,hitState.playerHP-1) : Infinity, incomingEnemyDamage(
       encounterType === "boss" ? (rules?.playerDamageByTier?.[tier] ?? 24) : GAME_CONFIG.playerDamageByTier[hitState.enemyTier as DifficultyTier],
-      usedShield, combatDamageScale(inferLevel(hitQuestion), hitState.enemyTier) * Number((hitQuestion.data as any)?.playerDamageMultiplier || 1) * (nextEnemyAbility(hitState.enemyInventory) === "fury" ? 1.5 : 1)),
+      usedShield, combatDamageScale(inferLevel(hitQuestion), hitState.enemyTier) * Number((hitQuestion.data as any)?.playerDamageMultiplier || 1) * (nextEnemyAbility(hitState.enemyInventory) === "fury" ? 1.5 : 1))),
     getEnemyDamageDealt: ({ correct, usedFury, question: hitQuestion, tier, state: hitState }) => correct ? outgoingEnemyDamage(
       encounterType === "boss" ? (rules?.enemyDamageByTier?.[tier] ?? 34) : Math.ceil(hitState.enemyMaxHP / 3) * combatDamageScale(inferLevel(hitQuestion), hitState.enemyTier),
       usedFury, nextEnemyAbility(hitState.enemyInventory) === "shield" || Boolean((hitQuestion.data as any)?.blockNextCorrect)) : 0,
@@ -658,7 +670,7 @@ export default function DiabloQuizRunner(props: {
       setStageAnswered(count => count + 1);
       window.setTimeout(() => setDamageFloat({}), 2200);
       window.setTimeout(() => {
-        feedbackRevealRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        if (!feedbackSheet) feedbackRevealRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
       }, 140);
 
       const nextHistory = [...stage8History, { correct: Boolean(r.correct), responseTimeMs, baseTier }].slice(-8);
@@ -826,7 +838,7 @@ const showExpandedExplanation = useMemo(() => {
   }, [question?.id, questionType]);
 
   useEffect(() => {
-    if (!question || !state.locked || state.finished) return;
+    if (guestPractice || !question || !state.locked || state.finished) return;
     let active = true;
     const answer = deriveSelectedAnswer();
     setIsExplaining(true);
@@ -850,7 +862,7 @@ const showExpandedExplanation = useMemo(() => {
     return () => {
       active = false;
     };
-  }, [question?.id, state.locked, state.finished]);
+  }, [question?.id, state.locked, state.finished, guestPractice]);
 
   useEffect(() => {
     if (!state.finished || finishedOnceRef.current) return;
@@ -889,6 +901,7 @@ const showExpandedExplanation = useMemo(() => {
   }, [playerDisplayName]);
 
   useEffect(() => {
+    if (guestPractice) return;
     const uid = resolveClientUserId();
     userIdRef.current = uid;
     if (!uid) return;
@@ -907,8 +920,14 @@ const showExpandedExplanation = useMemo(() => {
         });
       })
       .catch(() => {});
-  }, [title]);
+  }, [title, guestPractice]);
 
+  useEffect(() => { setFeedbackDismissed(false); }, [question?.id]);
+  useEffect(() => {
+    if (!state.locked || !question?.id || reviewedQuestionsRef.current.has(question.id)) return;
+    reviewedQuestionsRef.current.add(question.id);
+    onAnswerReviewed?.(question as any, Boolean(state.lastWasCorrect));
+  }, [state.locked, question?.id, state.lastWasCorrect, onAnswerReviewed]);
   const domainLabel = labelForDomain(currentDomainId);
   const finished = Boolean(forceFinish) || (state.finished && !finishFeedbackPending);
   const displayedXp = Math.max(0, state.xpEarned - hintXpSpent);
@@ -1003,7 +1022,9 @@ const showExpandedExplanation = useMemo(() => {
   }, [state.locked, (question as any)?.sessionQuestionId]);
 
   async function handleNext() {
-    if (itemPendingRef.current.size) return;
+    if (itemPendingRef.current.size || nextPendingRef.current) return;
+    nextPendingRef.current = true;
+    try {
     const currentQuestion = question as any;
     let awarded = false;
     if (state.locked && currentQuestion?.sessionQuestionId && onAdvanceQuestion) {
@@ -1059,6 +1080,7 @@ const showExpandedExplanation = useMemo(() => {
       setGoldenEntryFlash("✅ Golden sweepstakes entry added!");
       window.setTimeout(() => setGoldenEntryFlash(null), 4000);
     }
+    } finally { nextPendingRef.current = false; }
   }
 
   const isEnemyHitVideo = hitPulse === "enemy" && Boolean(media?.enemyHitSrc);
@@ -1221,6 +1243,7 @@ const showExpandedExplanation = useMemo(() => {
     function onKeyDown(e: KeyboardEvent) {
       if (itemPendingRef.current.size) return;
       if (e.key !== "Enter" || e.defaultPrevented) return;
+      if (feedbackSheet && state.locked && !feedbackDismissed) return;
       const target = e.target as HTMLElement | null;
       const tag = (target?.tagName || "").toLowerCase();
       if (tag === "textarea") return;
@@ -1235,7 +1258,7 @@ const showExpandedExplanation = useMemo(() => {
     }
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [state.locked, fillValue, cliValue, logValue, matchingSelections, multiSelected, sequenceItems, state.selected, usesManualSubmit, question]);
+  }, [state.locked, fillValue, cliValue, logValue, matchingSelections, multiSelected, sequenceItems, state.selected, usesManualSubmit, question, feedbackSheet, feedbackDismissed]);
 
   function canSubmitCurrentQuestion() {
     if (!question || state.locked) return false;
@@ -1269,6 +1292,7 @@ const showExpandedExplanation = useMemo(() => {
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
+      if (feedbackSheet && state.locked && !feedbackDismissed) return;
       if (event.key !== "Enter") return;
       if (event.shiftKey || event.ctrlKey || event.altKey || event.metaKey) return;
       const target = event.target as HTMLElement | null;
@@ -1282,6 +1306,8 @@ const showExpandedExplanation = useMemo(() => {
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [
+    feedbackSheet,
+    feedbackDismissed,
     question?.id,
     state.locked,
     state.selected,
@@ -1299,6 +1325,16 @@ const showExpandedExplanation = useMemo(() => {
       className="modalShell d2QuizShell"
       style={{ position: "relative", width: "min(98vw, 1600px)", maxWidth: media?.width || 1600, height: "calc(100dvh - 12px)", maxHeight: "calc(100dvh - 12px)", minHeight: 0, margin: "0 auto", display: "flex", flexDirection: "column", overflow: "hidden" }}
     >
+      {feedbackSheet && state.locked && question && !feedbackDismissed && <PracticeDialog
+        title={state.lastWasCorrect ? 'Correct!' : state.timeLeft <= 0 && timed ? "Time’s up" : 'Review the answer'}
+        tone={state.lastWasCorrect ? 'correct' : 'incorrect'} onClose={() => setFeedbackDismissed(true)}>
+        <p>{state.lastWasCorrect ? 'Well done. Here is why it works.' : 'Use this explanation to prepare for the next question.'}</p>
+        <div className="practiceFeedbackAnswer"><b>Correct answer</b><p>{question.type === 'cli_command' ? safeArray<string>((question.data as any)?.expectedCommands).join(' or ') : question.choices?.[Number(question.correctIndex ?? 0)] || String((question.data as any)?.correctAnswer ?? 'See explanation below.')}</p></div>
+        <p>{explanationText}</p>
+        {adaptiveCoachText && <p>{adaptiveCoachText}</p>}
+        {hintMessage && <p role="status">{hintMessage}</p>}
+        <button type="button" className="d2Btn practiceContinue" onClick={() => void handleNext()}>Continue →</button>
+      </PracticeDialog>}
       <div className="modalHead">
         <div>
           <div className="modalTitle d2Roman">{title}</div>
@@ -1477,7 +1513,7 @@ const showExpandedExplanation = useMemo(() => {
                         </button>
                       </>
                     ) : (
-                      <button className={(question as any)?.isGolden ? "gold grimdarkPrimaryAction" : "d2Btn grimdarkPrimaryAction"} onClick={() => handleNext()}>NEXT</button>
+                      <button className={(question as any)?.isGolden ? "gold grimdarkPrimaryAction" : "d2Btn grimdarkPrimaryAction"} onClick={() => handleNext()}>CONTINUE</button>
                     )}
                   </div>
 
@@ -1686,7 +1722,7 @@ const showExpandedExplanation = useMemo(() => {
                         </button>
                       </>
                     ) : (
-                      <button className={(question as any)?.isGolden ? "gold" : "d2Btn"} onClick={() => handleNext()}>NEXT</button>
+                      <button className={(question as any)?.isGolden ? "gold" : "d2Btn"} onClick={() => handleNext()}>CONTINUE</button>
                     )}
                   </div>
                   {state.locked && (

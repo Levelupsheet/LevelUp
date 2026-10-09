@@ -104,7 +104,7 @@ function trackEnterApp(source: string) {
 
 function goEnterApp(source: string) {
   trackEnterApp(source);
-  window.location.href = "/dashboard";
+  window.location.href = "/learn";
 }
 
 function scrollToId(id: string) {

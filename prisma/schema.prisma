@@ -667,3 +667,21 @@ model RewardClaim {
 
   @@index([userId, createdAt])
 }
+
+// One-time bank unlock. Guest ownership is a hash of an HTTP-only browser token.
+model PracticePurchase {
+  id          String   @id @default(cuid())
+  bankKey     String
+  ownerHash   String
+  userId      String?
+  amountCents Int
+  currency    String   @default("USD")
+  orderId     String?  @unique
+  captureId   String?  @unique
+  status      String   @default("CREATED")
+  createdAt   DateTime @default(now())
+  paidAt      DateTime?
+
+  @@index([ownerHash, bankKey, status])
+  @@index([userId, bankKey, status])
+}
