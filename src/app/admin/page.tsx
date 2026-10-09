@@ -1531,7 +1531,7 @@ export default function AdminPage(){
             <div className="card" style={{ position:"absolute", right:0, top:"calc(100% + 8px)", zIndex:50, minWidth:210, padding:8, display:"grid", gap:6 }}>
               <button onClick={() => setTab("sweepstakes")}>Sweepstakes Admin</button>
               <button onClick={() => setTab("local")}>Local Prototype</button>
-              <button onClick={() => (window.location.href="/admin/content")}>Content Studio</button>
+              <button onClick={() => (window.location.href="/admin/content")}>Import JSON / Content Studio</button>
             </div>
           </details>
           <button className="danger" onClick={() => { window.location.href = "/dashboard"; }}>Back</button>
