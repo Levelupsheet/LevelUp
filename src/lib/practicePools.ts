@@ -2,7 +2,7 @@
 
 export type PracticeLane = "POSITION" | "CERT" | "TEST_NOW";
 export type PositionPath = "HELPDESK_SUPPORT" | "DESKTOP_TECHNICIAN" | "CLOUD_ENGINEER";
-export type CertTrack = "A_PLUS" | "SECURITY_PLUS" | "AZ_900" | "AWS" | "AZURE";
+export type CertTrack = "A_PLUS" | "SECURITY_PLUS" | "AZ_900" | "AWS" | "AZURE" | "MD_102";
 
 export type PracticeQuestion = {
   id: string;
@@ -298,7 +298,7 @@ export function getPool(poolKey: string): PracticeQuestion[] {
   }
   if (lane === "CERT") {
     const c = track as CertTrack;
-    if (c === "A_PLUS" || c === "SECURITY_PLUS" || c === "AZ_900" || c === "AWS" || c === "AZURE") {
+    if (c === "A_PLUS" || c === "SECURITY_PLUS" || c === "AZ_900" || c === "AWS" || c === "AZURE" || c === "MD_102") {
       return getCertPool(c);
     }
     return [];

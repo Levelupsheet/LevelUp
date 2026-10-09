@@ -11,7 +11,7 @@ import { getActiveUser } from "@/lib/userStore";
 
 type Kind = "position" | "cert" | "test";
 type PositionPath = "HELPDESK_SUPPORT" | "DESKTOP_TECHNICIAN" | "CLOUD_ENGINEER";
-type CertTrack = "A_PLUS" | "SECURITY_PLUS" | "AZ_900" | "AWS" | "AZURE";
+type CertTrack = "A_PLUS" | "SECURITY_PLUS" | "AZ_900" | "AWS" | "AZURE" | "MD_102";
 
 export default function PracticeMiniGameModal(props: {
   open: boolean;

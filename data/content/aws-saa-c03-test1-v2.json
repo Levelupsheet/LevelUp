@@ -1,0 +1,2659 @@
+{
+  "schemaVersion": 2,
+  "blocks": [
+    {
+      "id": "aws-saa-c03-test1-v2",
+      "title": "AWS SAA-C03 — Practice Test 1",
+      "setName": "AWS SAA-C03 Practice Test 1",
+      "lane": "CERTIFICATIONS",
+      "certExam": "AWS",
+      "industry": "Information Technology",
+      "careerPath": "Cloud Engineer",
+      "domain": "AWS",
+      "domainId": "aws-saa-c03",
+      "difficulty": 1,
+      "questions": [
+        {
+          "objectiveId": "saa-c03.test1.ordered-queue-throughput",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "An SQS workload requires ordered processing within each customer’s message group. What queue and capacity plan should an architect evaluate?",
+          "choices": [
+            "Use FIFO and assume one message group scales without a serialization limit",
+            "Choose queue settings solely from an old universal 300-request limit",
+            "Use FIFO with appropriate message groups, batching and the applicable regional throughput settings",
+            "Use Standard and assume strict ordering is guaranteed"
+          ],
+          "correctIndex": 2,
+          "explanation": "FIFO ordering is scoped to message groups. Capacity depends on batching, group distribution, throughput mode, quotas and consumer performance; the old arithmetic alone does not establish current throughput.",
+          "hints": [
+            "Separate ordering scope from capacity and quota planning."
+          ],
+          "domainId": "saa-c03-resilience",
+          "subdomain": "ordered-queue-throughput",
+          "isGoldenEligible": false,
+          "tags": [
+            "saa-c03",
+            "practice-test-1",
+            "resilience"
+          ],
+          "data": {
+            "examCode": "SAA-C03",
+            "sourceQuestionNumbers": [
+              2
+            ],
+            "sourceTest": "SAA-C03 Practice Test 1",
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": [
+              "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/quotas-messages.html"
+            ]
+          }
+        },
+        {
+          "objectiveId": "saa-c03.test1.root-account-security",
+          "type": "multiple_choice",
+          "difficulty": 1,
+          "prompt": "An IT consultant is helping the owner of a medium-sized business set up an AWS account. What are the security recommendations he must follow while creating the AWS account root user?\nChoose the single option containing the complete correct combination.",
+          "choices": [
+            "Enable Multi Factor Authentication (MFA) for the AWS account root user account; Create a strong password for the AWS account root user",
+            "Send an email to the business owner with details of the login username and password for the AWS root user. This will help the business owner to troubleshoot any login issues in future; Encrypt the access keys and save them on Amazon S3",
+            "Send an email to the business owner with details of the login username and password for the AWS root user. This will help the business owner to troubleshoot any login issues in future; Create AWS account root user access keys and share those keys only with the business owner",
+            "Send an email to the business owner with details of the login username and password for the AWS root user. This will help the business owner to troubleshoot any login issues in future; Enable Multi Factor Authentication (MFA) for the AWS account root user account"
+          ],
+          "correctIndex": 0,
+          "explanation": "Here are some of the best practices while creating an AWS account root user:\n\n1) Use a strong password to help protect account-level access to the AWS Management Console. 2) Never share your AWS account root user password or access keys with anyone. 3) If you do have an access key for your AWS account root user, delete it. If you must keep it, rotate (change) the access key regularly. You should not encrypt the access keys and save them on Amazon S3. 4) If you don't already have an access key for your AWS account root user, don't create one unless you absolutely need to. 5) Enable AWS multi-factor authentication (MFA) on your AWS account root user account.\n\nAWS Root Account Security Best Practices:  via -",
+          "hints": [
+            "Compare each proposed design with every stated requirement."
+          ],
+          "domainId": "saa-c03-security",
+          "subdomain": "root-account-security",
+          "isGoldenEligible": false,
+          "tags": [
+            "saa-c03",
+            "practice-test-1",
+            "security"
+          ],
+          "data": {
+            "examCode": "SAA-C03",
+            "sourceQuestionNumbers": [
+              3
+            ],
+            "sourceTest": "SAA-C03 Practice Test 1",
+            "contentOrigin": "adapted-user-practice",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": []
+          }
+        },
+        {
+          "objectiveId": "saa-c03.test1.api-protocols",
+          "type": "multiple_choice",
+          "difficulty": 2,
+          "prompt": "The product team at a startup has figured out a market need to support both stateful and stateless client-server communications via the application programming interface (APIs) developed using its platform. You have been hired by the startup as a solutions architect to build a solution to fulfill this market need using Amazon API Gateway.\n\nWhich of the following would you identify as correct?",
+          "choices": [
+            "Amazon API Gateway creates RESTful APIs that enable stateless client-server communication and Amazon API Gateway also creates WebSocket APIs that adhere to the WebSocket protocol, which enables stateful, full-duplex communication between client and server",
+            "Amazon API Gateway creates RESTful APIs that enable stateless client-server communication and Amazon API Gateway also creates WebSocket APIs that adhere to the WebSocket protocol, which enables stateless, full-duplex communication between client and server",
+            "Amazon API Gateway creates RESTful APIs that enable stateful client-server communication and Amazon API Gateway also creates WebSocket APIs that adhere to the WebSocket protocol, which enables stateful, full-duplex communication between client and server",
+            "Amazon API Gateway creates RESTful APIs that enable stateful client-server communication and Amazon API Gateway also creates WebSocket APIs that adhere to the WebSocket protocol, which enables stateless, full-duplex communication between client and server"
+          ],
+          "correctIndex": 0,
+          "explanation": "Amazon API Gateway is a fully managed service that makes it easy for developers to create, publish, maintain, monitor, and secure APIs at any scale. APIs act as the front door for applications to access data, business logic, or functionality from your backend services. Using API Gateway, you can create RESTful APIs and WebSocket APIs that enable real-time two-way communication applications.\n\nHow Amazon API Gateway Works:  via -\n\nAmazon API Gateway creates RESTful APIs that:",
+          "hints": [
+            "Compare each proposed design with every stated requirement."
+          ],
+          "domainId": "saa-c03-performance",
+          "subdomain": "api-protocols",
+          "isGoldenEligible": false,
+          "tags": [
+            "saa-c03",
+            "practice-test-1",
+            "performance"
+          ],
+          "data": {
+            "examCode": "SAA-C03",
+            "sourceQuestionNumbers": [
+              4
+            ],
+            "sourceTest": "SAA-C03 Practice Test 1",
+            "contentOrigin": "adapted-user-practice",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": []
+          }
+        },
+        {
+          "objectiveId": "saa-c03.test1.permissions-boundary",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "An IT company wants to review its security best-practices after an incident was reported where a new developer on the team was assigned full access to Amazon DynamoDB. The developer accidentally deleted a couple of tables from the production environment while building out a new feature.\n\nWhich is the MOST effective way to address this issue so that such incidents do not recur?",
+          "choices": [
+            "The CTO should review the permissions for each new developer's IAM user so that such incidents don't recur",
+            "Only root user should have full database access in the organization",
+            "Use permissions boundary to control the maximum permissions employees can grant to the IAM principals",
+            "Remove full database access for all IAM users in the organization"
+          ],
+          "correctIndex": 2,
+          "explanation": "A permissions boundary can be used to control the maximum permissions employees can grant to the IAM principals (that is, users and roles) that they create and manage. As the IAM administrator, you can define one or more permissions boundaries using managed policies and allow your employee to create a principal with this boundary. The employee can then attach a permissions policy to this principal. However, the effective permissions of the principal are the intersection of the permissions boundary and permissions policy. As a result, the new principal cannot exceed the boundary that you defined. Therefore, using the permissions boundary offers the right solution for this use-case.",
+          "hints": [
+            "Compare each proposed design with every stated requirement."
+          ],
+          "domainId": "saa-c03-security",
+          "subdomain": "permissions-boundary",
+          "isGoldenEligible": false,
+          "tags": [
+            "saa-c03",
+            "practice-test-1",
+            "security"
+          ],
+          "data": {
+            "examCode": "SAA-C03",
+            "sourceQuestionNumbers": [
+              5
+            ],
+            "sourceTest": "SAA-C03 Practice Test 1",
+            "contentOrigin": "adapted-user-practice",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": []
+          }
+        },
+        {
+          "objectiveId": "saa-c03.test1.q06",
+          "type": "multiple_choice",
+          "difficulty": 2,
+          "prompt": "For a conventional Amazon RDS Multi-AZ DB instance deployment with a standby, how does its purpose differ from a supported read replica?",
+          "choices": [
+            "Both configurations guarantee zero data loss across every Region",
+            "The synchronously replicated standby supports availability; an asynchronously replicated read replica supports eligible read workloads",
+            "A read replica automatically replaces all backup and failover requirements",
+            "The standby is the general read-scaling endpoint while every read replica is synchronous"
+          ],
+          "correctIndex": 1,
+          "explanation": "A conventional Multi-AZ DB instance standby supports failover rather than ordinary read traffic. Read replicas use asynchronous replication for supported read use cases; Multi-AZ DB clusters have different reader capabilities and must not be conflated with this instance deployment.",
+          "hints": [
+            "Distinguish the explicitly stated standby deployment from a Multi-AZ DB cluster."
+          ],
+          "domainId": "saa-c03-resilience",
+          "subdomain": "q06",
+          "isGoldenEligible": false,
+          "tags": [
+            "saa-c03",
+            "practice-test-1",
+            "resilience"
+          ],
+          "data": {
+            "examCode": "SAA-C03",
+            "sourceQuestionNumbers": [
+              6
+            ],
+            "sourceTest": "SAA-C03 Practice Test 1",
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": [
+              "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.MultiAZSingleStandby.html",
+              "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_ReadRepl.html"
+            ]
+          }
+        },
+        {
+          "objectiveId": "saa-c03.test1.provisioned-volume-billing",
+          "type": "multiple_choice",
+          "difficulty": 2,
+          "prompt": "An EBS volume is provisioned at 100 GiB but holds a 1 GiB file. Which fact must be included when estimating its storage cost?",
+          "choices": [
+            "A universal price ranking valid in every Region forever",
+            "The number of letters in the volume name",
+            "Only the file size because unused volume capacity is always free",
+            "The EBS volume’s provisioned capacity, not only the file’s size"
+          ],
+          "correctIndex": 3,
+          "explanation": "EBS volume charges depend on provisioned capacity and volume characteristics. Compare current regional prices and workload usage rather than assuming a timeless S3/EFS/EBS price ordering.",
+          "hints": [
+            "Distinguish provisioned block capacity from stored object bytes."
+          ],
+          "domainId": "saa-c03-cost",
+          "subdomain": "provisioned-volume-billing",
+          "isGoldenEligible": false,
+          "tags": [
+            "saa-c03",
+            "practice-test-1",
+            "cost"
+          ],
+          "data": {
+            "examCode": "SAA-C03",
+            "sourceQuestionNumbers": [
+              7
+            ],
+            "sourceTest": "SAA-C03 Practice Test 1",
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": [
+              "https://docs.aws.amazon.com/ebs/latest/userguide/ebs-volume-types.html"
+            ]
+          }
+        },
+        {
+          "objectiveId": "saa-c03.test1.efs-network-and-iam",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "A company has moved its business critical data to Amazon Elastic File System (Amazon EFS) which will be accessed by multiple Amazon EC2 instances.\n\nAs an AWS Certified Solutions Architect - Associate, which of the following would you recommend to exercise access control such that only the permitted Amazon EC2 instances can read from the Amazon EFS file system?\nChoose the single option containing the complete correct combination.",
+          "choices": [
+            "Set up the IAM policy root credentials to control and configure the clients accessing the Amazon EFS file system; Use Amazon GuardDuty to curb unwanted access to Amazon EFS file system",
+            "Set up the IAM policy root credentials to control and configure the clients accessing the Amazon EFS file system; Use an IAM policy to control access for clients who can mount your file system with the required permissions",
+            "Set up the IAM policy root credentials to control and configure the clients accessing the Amazon EFS file system; Use VPC security groups to control the network traffic to and from your file system",
+            "Use VPC security groups to control the network traffic to and from your file system; Use an IAM policy to control access for clients who can mount your file system with the required permissions"
+          ],
+          "correctIndex": 3,
+          "explanation": "You control which Amazon EC2 instances can access your Amazon EFS file system by using VPC security group rules and AWS Identity and Access Management (IAM) policies. Use VPC security groups to control the network traffic to and from your file system. Attach an IAM policy to your file system to control which clients can mount your file system and with what permissions, and you may use Amazon EFS Access Points to manage application access. Control access to files and directories with POSIX-compliant user and group-level permissions.\n\nFiles and directories in an Amazon EFS file system support standard Unix-style read, write, and execute permissions based on the user ID and group IDs. When an NFS client mounts an Amazon EFS file system without using an access point, the user ID and group ID provided by the client is trusted. You can also use Amazon EFS access points to override user ID and group IDs used by the NFS client. When users attempt to access files and directories, Amazon EFS checks their user IDs and group IDs to verify that each user has permission to access the objects.",
+          "hints": [
+            "Compare each proposed design with every stated requirement."
+          ],
+          "domainId": "saa-c03-security",
+          "subdomain": "efs-network-and-iam",
+          "isGoldenEligible": false,
+          "tags": [
+            "saa-c03",
+            "practice-test-1",
+            "security"
+          ],
+          "data": {
+            "examCode": "SAA-C03",
+            "sourceQuestionNumbers": [
+              8
+            ],
+            "sourceTest": "SAA-C03 Practice Test 1",
+            "contentOrigin": "adapted-user-practice",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": []
+          }
+        },
+        {
+          "objectiveId": "saa-c03.test1.object-lock-versions",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "A company uses Amazon S3 buckets for storing sensitive customer data. The company has defined different retention periods for different objects present in the Amazon S3 buckets, based on the compliance requirements. But, the retention rules do not seem to work as expected.\n\nWhich of the following options represent a valid configuration for setting up retention periods for objects in Amazon S3 buckets?\nChoose the single option containing the complete correct combination.",
+          "choices": [
+            "When you apply a retention period to an object version explicitly, you specify a Retain Until Date for the object version; You cannot place a retention period on an object version through a bucket default setting",
+            "When you apply a retention period to an object version explicitly, you specify a Retain Until Date for the object version; Different versions of a single object can have different retention modes and periods",
+            "When you apply a retention period to an object version explicitly, you specify a Retain Until Date for the object version; When you use bucket default settings, you specify a Retain Until Date for the object version",
+            "When you apply a retention period to an object version explicitly, you specify a Retain Until Date for the object version; The bucket default settings will override any explicit retention mode or period you request on an object version"
+          ],
+          "correctIndex": 1,
+          "explanation": "You can place a retention period on an object version either explicitly or through a bucket default setting. When you apply a retention period to an object version explicitly, you specify a Retain Until Date for the object version. Amazon S3 stores the Retain Until Date setting in the object version's metadata and protects the object version until the retention period expires.\n\nLike all other Object Lock settings, retention periods apply to individual object versions. Different versions of a single object can have different retention modes and periods.\n\nFor example, suppose that you have an object that is 15 days into a 30-day retention period, and you PUT an object into Amazon S3 with the same name and a 60-day retention period. In this case, your PUT succeeds, and Amazon S3 creates a new version of the object with a 60-day retention period. The older version maintains its original retention period and becomes deletable in 15 days.",
+          "hints": [
+            "Compare each proposed design with every stated requirement."
+          ],
+          "domainId": "saa-c03-security",
+          "subdomain": "object-lock-versions",
+          "isGoldenEligible": false,
+          "tags": [
+            "saa-c03",
+            "practice-test-1",
+            "security"
+          ],
+          "data": {
+            "examCode": "SAA-C03",
+            "sourceQuestionNumbers": [
+              9
+            ],
+            "sourceTest": "SAA-C03 Practice Test 1",
+            "contentOrigin": "adapted-user-practice",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": []
+          }
+        },
+        {
+          "objectiveId": "saa-c03.test1.s3-transfer-performance",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "A news network uses Amazon Simple Storage Service (Amazon S3) to aggregate the raw video footage from its reporting teams across the US. The news network has recently expanded into new geographies in Europe and Asia. The technical teams at the overseas branch offices have reported huge delays in uploading large video files to the destination Amazon S3 bucket.\n\nWhich of the following are the MOST cost-effective options to improve the file upload speed into Amazon S3\nChoose the single option containing the complete correct combination.",
+          "choices": [
+            "Create multiple AWS Site-to-Site VPN connections between the AWS Cloud and branch offices in Europe and Asia. Use these VPN connections for faster file uploads into Amazon S3; Create multiple AWS Direct Connect connections between the AWS Cloud and branch offices in Europe and Asia. Use the direct connect connections for faster file uploads into Amazon S3",
+            "Create multiple AWS Site-to-Site VPN connections between the AWS Cloud and branch offices in Europe and Asia. Use these VPN connections for faster file uploads into Amazon S3; Use AWS Global Accelerator for faster file uploads into the destination Amazon S3 bucket",
+            "Create multiple AWS Site-to-Site VPN connections between the AWS Cloud and branch offices in Europe and Asia. Use these VPN connections for faster file uploads into Amazon S3; Use multipart uploads for faster file uploads into the destination Amazon S3 bucket",
+            "Use multipart uploads for faster file uploads into the destination Amazon S3 bucket; Use Amazon S3 Transfer Acceleration (Amazon S3TA) to enable faster file uploads into the destination S3 bucket"
+          ],
+          "correctIndex": 3,
+          "explanation": "Amazon S3 Transfer Acceleration enables fast, easy, and secure transfers of files over long distances between your client and an S3 bucket. Amazon S3TA takes advantage of Amazon CloudFront’s globally distributed edge locations. As the data arrives at an edge location, data is routed to Amazon S3 over an optimized network path.\n\nMultipart upload allows you to upload a single object as a set of parts. Each part is a contiguous portion of the object's data. You can upload these object parts independently and in any order. If transmission of any part fails, you can retransmit that part without affecting other parts. After all parts of your object are uploaded, Amazon S3 assembles these parts and creates the object. In general, when your object size reaches 100 MB, you should consider using multipart uploads instead of uploading the object in a single operation. Multipart upload provides improved throughput, therefore it facilitates faster file uploads.",
+          "hints": [
+            "Compare each proposed design with every stated requirement."
+          ],
+          "domainId": "saa-c03-performance",
+          "subdomain": "s3-transfer-performance",
+          "isGoldenEligible": false,
+          "tags": [
+            "saa-c03",
+            "practice-test-1",
+            "performance"
+          ],
+          "data": {
+            "examCode": "SAA-C03",
+            "sourceQuestionNumbers": [
+              10
+            ],
+            "sourceTest": "SAA-C03 Practice Test 1",
+            "contentOrigin": "adapted-user-practice",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": []
+          }
+        },
+        {
+          "objectiveId": "saa-c03.test1.serverless-ingestion",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "A leading carmaker would like to build a new car-as-a-sensor service by leveraging fully serverless components that are provisioned and managed automatically by AWS. The development team at the carmaker does not want an option that requires the capacity to be manually provisioned, as it does not want to respond manually to changing volumes of sensor data.\n\nGiven these constraints, which of the following solutions is the BEST fit to develop this car-as-a-sensor service?",
+          "choices": [
+            "Ingest the sensor data in an Amazon Simple Queue Service (Amazon SQS) standard queue, which is polled by an application running on an Amazon EC2 instance and the data is written into an auto-scaled Amazon DynamoDB table for downstream processing",
+            "Ingest the sensor data in Amazon Kinesis Data Firehose, which directly writes the data into an auto-scaled Amazon DynamoDB table for downstream processing",
+            "Ingest the sensor data in Amazon Kinesis Data Streams, which is polled by an application running on an Amazon EC2 instance and the data is written into an auto-scaled Amazon DynamoDB table for downstream processing",
+            "Ingest the sensor data in an Amazon Simple Queue Service (Amazon SQS) standard queue, which is polled by an AWS Lambda function in batches and the data is written into an auto-scaled Amazon DynamoDB table for downstream processing"
+          ],
+          "correctIndex": 3,
+          "explanation": "AWS Lambda lets you run code without provisioning or managing servers. You pay only for the compute time you consume. Amazon Simple Queue Service (SQS) is a fully managed message queuing service that enables you to decouple and scale microservices, distributed systems, and serverless applications. SQS offers two types of message queues. Standard queues offer maximum throughput, best-effort ordering, and at-least-once delivery. SQS FIFO queues are designed to guarantee that messages are processed exactly once, in the exact order that they are sent.\n\nAWS manages all ongoing operations and underlying infrastructure needed to provide a highly available and scalable message queuing service. With SQS, there is no upfront cost, no need to acquire, install, and configure messaging software, and no time-consuming build-out and maintenance of supporting infrastructure. SQS queues are dynamically created and scale automatically so you can build and grow applications quickly and efficiently.\n\nAs there is no need to manually provision the capacity, so this is the correct option.",
+          "hints": [
+            "Compare each proposed design with every stated requirement."
+          ],
+          "domainId": "saa-c03-resilience",
+          "subdomain": "serverless-ingestion",
+          "isGoldenEligible": false,
+          "tags": [
+            "saa-c03",
+            "practice-test-1",
+            "resilience"
+          ],
+          "data": {
+            "examCode": "SAA-C03",
+            "sourceQuestionNumbers": [
+              11
+            ],
+            "sourceTest": "SAA-C03 Practice Test 1",
+            "contentOrigin": "adapted-user-practice",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": []
+          }
+        },
+        {
+          "objectiveId": "saa-c03.test1.scheduled-scaling",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "The payroll department at a company initiates several computationally intensive workloads on Amazon EC2 instances at a designated hour on the last day of every month. The payroll department has noticed a trend of severe performance lag during this hour. The engineering team has figured out a solution by using Auto Scaling Group for these Amazon EC2 instances and making sure that 10 Amazon EC2 instances are available during this peak usage hour. For normal operations only 2 Amazon EC2 instances are enough to cater to the workload.\n\nAs a solutions architect, which of the following steps would you recommend to implement the solution?",
+          "choices": [
+            "Configure your Auto Scaling group by creating a scheduled action that kicks-off at the designated hour on the last day of the month. Set the desired capacity of instances to 10. This causes the scale-out to happen before peak traffic kicks in at the designated hour",
+            "Configure your Auto Scaling group by creating a scheduled action that kicks-off at the designated hour on the last day of the month. Set the min count as well as the max count of instances to 10. This causes the scale-out to happen before peak traffic kicks in at the designated hour",
+            "Configure your Auto Scaling group by creating a simple tracking policy and setting the instance count to 10 at the designated hour. This causes the scale-out to happen before peak traffic kicks in at the designated hour",
+            "Configure your Auto Scaling group by creating a target tracking policy and setting the instance count to 10 at the designated hour. This causes the scale-out to happen before peak traffic kicks in at the designated hour"
+          ],
+          "correctIndex": 0,
+          "explanation": "Scheduled scaling allows you to set your own scaling schedule. For example, let's say that every week the traffic to your web application starts to increase on Wednesday, remains high on Thursday, and starts to decrease on Friday. You can plan your scaling actions based on the predictable traffic patterns of your web application. Scaling actions are performed automatically as a function of time and date.\n\nA scheduled action sets the minimum, maximum, and desired sizes to what is specified by the scheduled action at the time specified by the scheduled action. For the given use case, the correct solution is to set the desired capacity to 10. When we want to specify a range of instances, then we must use min and max values.",
+          "hints": [
+            "Compare each proposed design with every stated requirement."
+          ],
+          "domainId": "saa-c03-resilience",
+          "subdomain": "scheduled-scaling",
+          "isGoldenEligible": false,
+          "tags": [
+            "saa-c03",
+            "practice-test-1",
+            "resilience"
+          ],
+          "data": {
+            "examCode": "SAA-C03",
+            "sourceQuestionNumbers": [
+              12
+            ],
+            "sourceTest": "SAA-C03 Practice Test 1",
+            "contentOrigin": "adapted-user-practice",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": []
+          }
+        },
+        {
+          "objectiveId": "saa-c03.test1.global-accelerator-udp",
+          "type": "multiple_choice",
+          "difficulty": 2,
+          "prompt": "A gaming company is looking at improving the availability and performance of its global flagship application which utilizes User Datagram Protocol and needs to support fast regional failover in case an AWS Region goes down. The company wants to continue using its own custom Domain Name System (DNS) service.\n\nWhich of the following AWS services represents the best solution for this use-case?",
+          "choices": [
+            "AWS Global Accelerator",
+            "Amazon Route 53",
+            "Amazon CloudFront",
+            "AWS Elastic Load Balancing (ELB)"
+          ],
+          "correctIndex": 0,
+          "explanation": "AWS Global Accelerator utilizes the Amazon global network, allowing you to improve the performance of your applications by lowering first-byte latency (the round trip time for a packet to go from a client to your endpoint and back again) and jitter (the variation of latency), and increasing throughput (the amount of time it takes to transfer data) as compared to the public internet.\n\nAWS Global Accelerator improves performance for a wide range of applications over TCP or UDP by proxying packets at the edge to applications running in one or more AWS Regions. Global Accelerator is a good fit for non-HTTP use cases, such as gaming (UDP), IoT (MQTT), or Voice over IP, as well as for HTTP use cases that specifically require static IP addresses or deterministic, fast regional failover.",
+          "hints": [
+            "Compare each proposed design with every stated requirement."
+          ],
+          "domainId": "saa-c03-performance",
+          "subdomain": "global-accelerator-udp",
+          "isGoldenEligible": false,
+          "tags": [
+            "saa-c03",
+            "practice-test-1",
+            "performance"
+          ],
+          "data": {
+            "examCode": "SAA-C03",
+            "sourceQuestionNumbers": [
+              13
+            ],
+            "sourceTest": "SAA-C03 Practice Test 1",
+            "contentOrigin": "adapted-user-practice",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": []
+          }
+        },
+        {
+          "objectiveId": "saa-c03.test1.multi-az-web-availability",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "An e-commerce company is looking for a solution with high availability, as it plans to migrate its flagship application to a fleet of Amazon Elastic Compute Cloud (Amazon EC2) instances. The solution should allow for content-based routing as part of the architecture.\n\nAs a Solutions Architect, which of the following will you suggest for the company?",
+          "choices": [
+            "Use an Auto Scaling group for distributing traffic to the Amazon EC2 instances spread across different Availability Zones (AZs). Configure a Public IP address to mask any failure of an instance",
+            "Use a Network Load Balancer for distributing traffic to the Amazon EC2 instances spread across different Availability Zones (AZs). Configure a Private IP address to mask any failure of an instance",
+            "Use an Application Load Balancer for distributing traffic to the Amazon EC2 instances spread across different Availability Zones (AZs). Configure Auto Scaling group to mask any failure of an instance",
+            "Use an Auto Scaling group for distributing traffic to the Amazon EC2 instances spread across different Availability Zones (AZs). Configure an elastic IP address (EIP) to mask any failure of an instance"
+          ],
+          "correctIndex": 2,
+          "explanation": "The Application Load Balancer (ALB) is best suited for load balancing HTTP and HTTPS traffic and provides advanced request routing targeted at the delivery of modern application architectures, including microservices and containers. Operating at the individual request level (Layer 7), the Application Load Balancer routes traffic to targets within Amazon Virtual Private Cloud (Amazon VPC) based on the content of the request.\n\nThis is the correct option since the question has a specific requirement for content-based routing which can be configured via the Application Load Balancer. Different Availability Zones (AZs) provide high availability to the overall architecture and Auto Scaling group will help mask any instance failures.\n\nMore info on Application Load Balancer:  via -",
+          "hints": [
+            "Compare each proposed design with every stated requirement."
+          ],
+          "domainId": "saa-c03-resilience",
+          "subdomain": "multi-az-web-availability",
+          "isGoldenEligible": false,
+          "tags": [
+            "saa-c03",
+            "practice-test-1",
+            "resilience"
+          ],
+          "data": {
+            "examCode": "SAA-C03",
+            "sourceQuestionNumbers": [
+              14
+            ],
+            "sourceTest": "SAA-C03 Practice Test 1",
+            "contentOrigin": "adapted-user-practice",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": []
+          }
+        },
+        {
+          "objectiveId": "saa-c03.test1.cloudfront-custom-origin",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "A retail company's dynamic website is hosted using on-premises servers in its data center in the United States. The company is launching its website in Asia, and it wants to optimize the website loading times for new users in Asia. The website's backend must remain in the United States. The website is being launched in a few days, and an immediate solution is needed.\n\nWhat would you recommend?",
+          "choices": [
+            "Use Amazon CloudFront with a custom origin pointing to the on-premises servers",
+            "Migrate the website to Amazon S3. Use S3 cross-region replication (S3 CRR) between AWS Regions in the US and Asia",
+            "Use Amazon CloudFront with a custom origin pointing to the DNS record of the website on Amazon Route 53",
+            "Leverage a Amazon Route 53 geo-proximity routing policy pointing to on-premises servers"
+          ],
+          "correctIndex": 0,
+          "explanation": "Amazon CloudFront is a web service that gives businesses and web application developers an easy and cost-effective way to distribute content with low latency and high data transfer speeds. Amazon CloudFront uses standard cache control headers you set on your files to identify static and dynamic content. You can use different origins for different types of content on a single site – e.g. Amazon S3 for static objects, Amazon EC2 for dynamic content, and custom origins for third-party content.\n\nAn origin server stores the original, definitive version of your objects. If you're serving content over HTTP, your origin server is either an Amazon S3 bucket or an HTTP server, such as a web server. Your HTTP server can run on an Amazon Elastic Compute Cloud (Amazon EC2) instance or on a server that you manage; these servers are also known as custom origins.\n\nAmazon CloudFront employs a global network of edge locations and regional edge caches that cache copies of your content close to your viewers. Amazon CloudFront ensures that end-user requests are served by the closest edge location. As a result, viewer requests travel a short distance, improving performance for your viewers. Therefore for the given use case, the users in Asia will enjoy a low latency experience while using the website even though the on-premises servers continue to be in the US.",
+          "hints": [
+            "Compare each proposed design with every stated requirement."
+          ],
+          "domainId": "saa-c03-performance",
+          "subdomain": "cloudfront-custom-origin",
+          "isGoldenEligible": false,
+          "tags": [
+            "saa-c03",
+            "practice-test-1",
+            "performance"
+          ],
+          "data": {
+            "examCode": "SAA-C03",
+            "sourceQuestionNumbers": [
+              15
+            ],
+            "sourceTest": "SAA-C03 Practice Test 1",
+            "contentOrigin": "adapted-user-practice",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": []
+          }
+        },
+        {
+          "objectiveId": "saa-c03.test1.resolver-outbound",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "A healthcare company is developing a secure internal web portal hosted on AWS. The application must communicate with legacy systems that reside in the company's on-premises data centers. These data centers are connected to AWS via a site-to-site VPN. The company uses Amazon Route 53 as its DNS solution and requires the application to resolve private DNS records for the on-premises services from within its Amazon VPC.\n\nWhat is the MOST secure and appropriate way to meet these DNS resolution requirements?",
+          "choices": [
+            "Configure a Route 53 Resolver inbound endpoint and create a DNS forwarding rule. Enable recursive DNS resolution in the VPC to access on-premises services",
+            "Create a hybrid connectivity gateway and attach the on-premises DNS servers to Route 53 as authoritative zones for internal domains",
+            "Create a Route 53 Resolver outbound endpoint. Define a forwarding rule that routes DNS queries for on-premises domains to the on-premises DNS server. Associate the rule with the VPC",
+            "Create a Route 53 private hosted zone for the on-premises domain. Associate the hosted zone with the VPC to allow the application to resolve DNS names of the on-premises services"
+          ],
+          "correctIndex": 2,
+          "explanation": "This solution allows DNS queries from AWS-based workloads (inside the VPC) to resolve private on-premises domain names using a Route 53 Resolver outbound endpoint. The outbound endpoint forwards DNS queries from the VPC to the on-premises DNS server across the site-to-site VPN. The forwarding rules determine which domain names are sent to the on-premises DNS server. Associating the rule with the correct VPC ensures that the application can securely resolve on-premises DNS records. This method follows AWS best practices for hybrid DNS resolution.",
+          "hints": [
+            "Compare each proposed design with every stated requirement."
+          ],
+          "domainId": "saa-c03-performance",
+          "subdomain": "resolver-outbound",
+          "isGoldenEligible": false,
+          "tags": [
+            "saa-c03",
+            "practice-test-1",
+            "performance"
+          ],
+          "data": {
+            "examCode": "SAA-C03",
+            "sourceQuestionNumbers": [
+              16
+            ],
+            "sourceTest": "SAA-C03 Practice Test 1",
+            "contentOrigin": "adapted-user-practice",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": []
+          }
+        },
+        {
+          "objectiveId": "saa-c03.test1.recoverable-instance-store",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "A research group runs its flagship application on a fleet of Amazon EC2 instances for a specialized task that must deliver high random I/O performance. Each instance in the fleet would have access to a dataset that is replicated across the instances by the application itself. Because of the resilient application architecture, the specialized task would continue to be processed even if any instance goes down, as the underlying application would ensure the replacement instance has access to the required dataset.\n\nWhich of the following options is the MOST cost-optimal and resource-efficient solution to build this fleet of Amazon EC2 instances?",
+          "choices": [
+            "Use Amazon EC2 instances with Amazon EFS mount points",
+            "Use Amazon EC2 instances with access to Amazon S3 based storage",
+            "Use Amazon Elastic Block Store (Amazon EBS) based EC2 instances",
+            "Use Instance Store based Amazon EC2 instances"
+          ],
+          "correctIndex": 3,
+          "explanation": "An instance store provides temporary block-level storage for your instance. This storage is located on disks that are physically attached to the host instance. Instance store is ideal for the temporary storage of information that changes frequently such as buffers, caches, scratch data, and other temporary content, or for data that is replicated across a fleet of instances, such as a load-balanced pool of web servers. Instance store volumes are included as part of the instance's usage cost.\n\nAs Instance Store based volumes provide high random I/O performance at low cost (as the storage is part of the instance's usage cost) and the resilient architecture can adjust for the loss of any instance, therefore you should use Instance Store based Amazon EC2 instances for this use-case.\n\nAmazon EC2 Instance Store Overview:  via -",
+          "hints": [
+            "Compare each proposed design with every stated requirement."
+          ],
+          "domainId": "saa-c03-performance",
+          "subdomain": "recoverable-instance-store",
+          "isGoldenEligible": false,
+          "tags": [
+            "saa-c03",
+            "practice-test-1",
+            "performance"
+          ],
+          "data": {
+            "examCode": "SAA-C03",
+            "sourceQuestionNumbers": [
+              17
+            ],
+            "sourceTest": "SAA-C03 Practice Test 1",
+            "contentOrigin": "adapted-user-practice",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": []
+          }
+        },
+        {
+          "objectiveId": "saa-c03.test1.s3-prefix-throughput",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "A file-hosting service uses Amazon Simple Storage Service (Amazon S3) under the hood to power its storage offerings. Currently all the customer files are uploaded directly under a single Amazon S3 bucket. The engineering team has started seeing scalability issues where customer file uploads have started failing during the peak access hours with more than 5000 requests per second.\n\nWhich of the following is the MOST resource efficient and cost-optimal way of addressing this issue?",
+          "choices": [
+            "Change the application architecture to create customer-specific custom prefixes within the single Amazon S3 bucket and then upload the daily files into those prefixed locations",
+            "Change the application architecture to create a new Amazon S3 bucket for each day's data and then upload the daily files directly under that day's bucket",
+            "Change the application architecture to create a new Amazon S3 bucket for each customer and then upload each customer's files directly under the respective buckets",
+            "Change the application architecture to use Amazon Elastic File System (Amazon EFS) instead of Amazon S3 for storing the customers' uploaded files"
+          ],
+          "correctIndex": 0,
+          "explanation": "Amazon Simple Storage Service (Amazon S3) is an object storage service that offers industry-leading scalability, data availability, security, and performance. Your applications can easily achieve thousands of transactions per second in request performance when uploading and retrieving storage from Amazon S3. Amazon S3 automatically scales to high request rates. For example, your application can achieve at least 3,500 PUT/COPY/POST/DELETE or 5,500 GET/HEAD requests per second per prefix in a bucket.\n\nThere are no limits to the number of prefixes in a bucket. You can increase your read or write performance by parallelizing reads. For example, if you create 10 prefixes in an Amazon S3 bucket to parallelize reads, you could scale your read performance to 55,000 read requests per second. Please see this example for more clarity on prefixes: if you have a file f1 stored in an S3 object path like so s3://your_bucket_name/folder1/sub_folder_1/f1, then /folder1/sub_folder_1/ becomes the prefix for file f1.\n\nSome data lake applications on Amazon S3 scan millions or billions of objects for queries that run over petabytes of data. These data lake applications achieve single-instance transfer rates that maximize the network interface used for their Amazon EC2 instance, which can be up to 100 Gb/s on a single instance. These applications then aggregate throughput across multiple instances to get multiple terabits per second. Therefore creating customer-specific custom prefixes within the single bucket and then uploading the daily files into those prefixed locations is the BEST solution for the given constraints.",
+          "hints": [
+            "Compare each proposed design with every stated requirement."
+          ],
+          "domainId": "saa-c03-performance",
+          "subdomain": "s3-prefix-throughput",
+          "isGoldenEligible": false,
+          "tags": [
+            "saa-c03",
+            "practice-test-1",
+            "performance"
+          ],
+          "data": {
+            "examCode": "SAA-C03",
+            "sourceQuestionNumbers": [
+              18
+            ],
+            "sourceTest": "SAA-C03 Practice Test 1",
+            "contentOrigin": "adapted-user-practice",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": []
+          }
+        },
+        {
+          "objectiveId": "saa-c03.test1.hdd-volume-boot-limits",
+          "type": "multiple_choice",
+          "difficulty": 2,
+          "prompt": "A software engineering intern at an e-commerce company is documenting the process flow to provision Amazon EC2 instances via the Amazon EC2 API. These instances are to be used for an internal application that processes Human Resources payroll data. He wants to highlight those volume types that cannot be used as a boot volume.\n\nCan you help the intern by identifying those storage volume types that CANNOT be used as boot volumes while creating the instances?\nChoose the single option containing the complete correct combination.",
+          "choices": [
+            "Instance Store; General Purpose Solid State Drive (gp2)",
+            "Throughput Optimized Hard disk drive (st1); Cold Hard disk drive (sc1)",
+            "Instance Store; Cold Hard disk drive (sc1)",
+            "Instance Store; Throughput Optimized Hard disk drive (st1)"
+          ],
+          "correctIndex": 1,
+          "explanation": "The Amazon EBS volume types fall into two categories:\n\nSolid state drive (SSD) backed volumes optimized for transactional workloads involving frequent read/write operations with small I/O size, where the dominant performance attribute is IOPS.\n\nHard disk drive (HDD) backed volumes optimized for large streaming workloads where throughput (measured in MiB/s) is a better performance measure than IOPS.",
+          "hints": [
+            "Compare each proposed design with every stated requirement."
+          ],
+          "domainId": "saa-c03-performance",
+          "subdomain": "hdd-volume-boot-limits",
+          "isGoldenEligible": false,
+          "tags": [
+            "saa-c03",
+            "practice-test-1",
+            "performance"
+          ],
+          "data": {
+            "examCode": "SAA-C03",
+            "sourceQuestionNumbers": [
+              19
+            ],
+            "sourceTest": "SAA-C03 Practice Test 1",
+            "contentOrigin": "adapted-user-practice",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": []
+          }
+        },
+        {
+          "objectiveId": "saa-c03.test1.fsx-lustre-workload",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "An Electronic Design Automation (EDA) application produces massive volumes of data that can be divided into two categories. The 'hot data' needs to be both processed and stored quickly in a parallel and distributed fashion. The 'cold data' needs to be kept for reference with quick access for reads and updates at a low cost.\n\nWhich of the following AWS services is BEST suited to accelerate the aforementioned chip design process?",
+          "choices": [
+            "Amazon FSx for Lustre",
+            "Amazon FSx for Windows File Server",
+            "Amazon EMR cluster storage",
+            "AWS Glue catalog metadata"
+          ],
+          "correctIndex": 0,
+          "explanation": "Amazon FSx for Lustre makes it easy and cost-effective to launch and run the world’s most popular high-performance file system. It is used for workloads such as machine learning, high-performance computing (HPC), video processing, and financial modeling. The open-source Lustre file system is designed for applications that require fast storage – where you want your storage to keep up with your compute. FSx for Lustre integrates with Amazon S3, making it easy to process data sets with the Lustre file system. When linked to an S3 bucket, an FSx for Lustre file system transparently presents S3 objects as files and allows you to write changed data back to S3.\n\nFSx for Lustre provides the ability to both process the 'hot data' in a parallel and distributed fashion as well as easily store the 'cold data' on Amazon S3. Therefore this option is the BEST fit for the given problem statement.",
+          "hints": [
+            "Compare each proposed design with every stated requirement."
+          ],
+          "domainId": "saa-c03-performance",
+          "subdomain": "fsx-lustre-workload",
+          "isGoldenEligible": false,
+          "tags": [
+            "saa-c03",
+            "practice-test-1",
+            "performance"
+          ],
+          "data": {
+            "examCode": "SAA-C03",
+            "sourceQuestionNumbers": [
+              21
+            ],
+            "sourceTest": "SAA-C03 Practice Test 1",
+            "contentOrigin": "adapted-user-practice",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": []
+          }
+        },
+        {
+          "objectiveId": "saa-c03.test1.outposts-control-plane",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "An approved on-premises Kubernetes design requires both its Kubernetes control plane and worker nodes to run on an Outposts rack. Which EKS deployment option should be evaluated?",
+          "choices": [
+            "An EKS regional control plane while claiming it is physically on premises",
+            "An Amazon EKS local cluster on AWS Outposts",
+            "A CloudFront distribution as a Kubernetes control plane",
+            "Fargate in an AWS Region while claiming all compute remains on premises"
+          ],
+          "correctIndex": 1,
+          "explanation": "EKS local clusters place the control plane and nodes on Outposts. Service connectivity, telemetry, residency boundaries and supported configurations still need review; this does not promise that every AWS service or all metadata stays on premises.",
+          "hints": [
+            "Locate both the control plane and the worker compute."
+          ],
+          "domainId": "saa-c03-performance",
+          "subdomain": "outposts-control-plane",
+          "isGoldenEligible": false,
+          "tags": [
+            "saa-c03",
+            "practice-test-1",
+            "performance"
+          ],
+          "data": {
+            "examCode": "SAA-C03",
+            "sourceQuestionNumbers": [
+              22
+            ],
+            "sourceTest": "SAA-C03 Practice Test 1",
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": [
+              "https://docs.aws.amazon.com/eks/latest/userguide/eks-outposts-local-cluster-overview.html"
+            ]
+          }
+        },
+        {
+          "objectiveId": "saa-c03.test1.alb-path-routing",
+          "type": "multiple_choice",
+          "difficulty": 2,
+          "prompt": "The development team at an e-commerce startup has set up multiple microservices running on Amazon EC2 instances under an Application Load Balancer. The team wants to route traffic to multiple back-end services based on the URL path of the HTTP header. So it wants requests for https://www.example.com/orders to go to a specific microservice and requests for https://www.example.com/products to go to another microservice.\n\nWhich of the following features of Application Load Balancers can be used for this use-case?",
+          "choices": [
+            "Path-based Routing",
+            "Query string parameter-based routing",
+            "Host-based Routing",
+            "HTTP header-based routing"
+          ],
+          "correctIndex": 0,
+          "explanation": "Elastic Load Balancing automatically distributes incoming application traffic across multiple targets, such as Amazon EC2 instances, containers, IP addresses, and AWS Lambda functions.\n\nIf your application is composed of several individual services, an Application Load Balancer can route a request to a service based on the content of the request. Here are the different types -\n\nYou can route a client request based on the Host field of the HTTP header allowing you to route to multiple domains from the same load balancer.",
+          "hints": [
+            "Compare each proposed design with every stated requirement."
+          ],
+          "domainId": "saa-c03-performance",
+          "subdomain": "alb-path-routing",
+          "isGoldenEligible": false,
+          "tags": [
+            "saa-c03",
+            "practice-test-1",
+            "performance"
+          ],
+          "data": {
+            "examCode": "SAA-C03",
+            "sourceQuestionNumbers": [
+              23
+            ],
+            "sourceTest": "SAA-C03 Practice Test 1",
+            "contentOrigin": "adapted-user-practice",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": []
+          }
+        },
+        {
+          "objectiveId": "saa-c03.test1.cross-region-ami",
+          "type": "multiple_choice",
+          "difficulty": 2,
+          "prompt": "The solo founder at a tech startup has just created a brand new AWS account. The founder has provisioned an Amazon EC2 instance 1A which is running in AWS Region A. Later, he takes a snapshot of the instance 1A and then creates a new Amazon Machine Image (AMI) in Region A from this snapshot. This AMI is then copied into another Region B. The founder provisions an instance 1B in Region B using this new AMI in Region B.\n\nAt this point in time, what entities exist in Region B?",
+          "choices": [
+            "1 Amazon EC2 instance and 2 AMIs exist in Region B",
+            "1 Amazon EC2 instance and 1 snapshot exist in Region B",
+            "1 Amazon EC2 instance and 1 AMI exist in Region B",
+            "1 Amazon EC2 instance, 1 AMI and 1 snapshot exist in Region B"
+          ],
+          "correctIndex": 3,
+          "explanation": "An Amazon Machine Image (AMI) provides the information required to launch an instance. You must specify an AMI when you launch an instance. When the new AMI is copied from Region A into Region B, it automatically creates a snapshot in Region B because AMIs are based on the underlying snapshots. Further, an instance is created from this AMI in Region B. Hence, we have 1 Amazon EC2 instance, 1 AMI and 1 snapshot in Region B.\n\nAmazon Machine Image (AMI) Overview:  via -",
+          "hints": [
+            "Compare each proposed design with every stated requirement."
+          ],
+          "domainId": "saa-c03-resilience",
+          "subdomain": "cross-region-ami",
+          "isGoldenEligible": false,
+          "tags": [
+            "saa-c03",
+            "practice-test-1",
+            "resilience"
+          ],
+          "data": {
+            "examCode": "SAA-C03",
+            "sourceQuestionNumbers": [
+              24
+            ],
+            "sourceTest": "SAA-C03 Practice Test 1",
+            "contentOrigin": "adapted-user-practice",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": []
+          }
+        },
+        {
+          "objectiveId": "saa-c03.test1.cluster-placement",
+          "type": "multiple_choice",
+          "difficulty": 2,
+          "prompt": "An ivy-league university is assisting NASA to find potential landing sites for exploration vehicles of unmanned missions to our neighboring planets. The university uses High Performance Computing (HPC) driven application architecture to identify these landing sites.\n\nWhich of the following Amazon EC2 instance topologies should this application be deployed on?",
+          "choices": [
+            "The Amazon EC2 instances should be deployed in a spread placement group so that there are no correlated failures",
+            "The Amazon EC2 instances should be deployed in a partition placement group so that distributed workloads can be handled effectively",
+            "The Amazon EC2 instances should be deployed in a cluster placement group so that the underlying workload can benefit from low network latency and high network throughput",
+            "The Amazon EC2 instances should be deployed in an Auto Scaling group so that application meets high availability requirements"
+          ],
+          "correctIndex": 2,
+          "explanation": "The key thing to understand in this question is that HPC workloads need to achieve low-latency network performance necessary for tightly-coupled node-to-node communication that is typical of HPC applications. Cluster placement groups pack instances close together inside an Availability Zone. These are recommended for applications that benefit from low network latency, high network throughput, or both. Therefore this option is the correct answer.",
+          "hints": [
+            "Compare each proposed design with every stated requirement."
+          ],
+          "domainId": "saa-c03-performance",
+          "subdomain": "cluster-placement",
+          "isGoldenEligible": false,
+          "tags": [
+            "saa-c03",
+            "practice-test-1",
+            "performance"
+          ],
+          "data": {
+            "examCode": "SAA-C03",
+            "sourceQuestionNumbers": [
+              25
+            ],
+            "sourceTest": "SAA-C03 Practice Test 1",
+            "contentOrigin": "adapted-user-practice",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": []
+          }
+        },
+        {
+          "objectiveId": "saa-c03.test1.asg-maintenance-standby",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "The DevOps team at an e-commerce company wants to perform some maintenance work on a specific Amazon EC2 instance that is part of an Auto Scaling group using a step scaling policy. The team is facing a maintenance challenge - every time the team deploys a maintenance patch, the instance health check status shows as out of service for a few minutes. This causes the Auto Scaling group to provision another replacement instance immediately.\n\nAs a solutions architect, which are the MOST time/resource efficient steps that you would recommend so that the maintenance work can be completed at the earliest?\nChoose the single option containing the complete correct combination.",
+          "choices": [
+            "Suspend the ReplaceUnhealthy process type for the Auto Scaling group and apply the maintenance patch to the instance. Once the instance is ready, you can manually set the instance's health status back to healthy and activate the ReplaceUnhealthy process type again; Put the instance into the Standby state and then update the instance by applying the maintenance patch. Once the instance is ready, you can exit the Standby state and then return the instance to service",
+            "Take a snapshot of the instance, create a new Amazon Machine Image (AMI) and then launch a new instance using this AMI. Apply the maintenance patch to this new instance and then add it back to the Auto Scaling Group by using the manual scaling policy. Terminate the earlier instance that had the maintenance issue; Put the instance into the Standby state and then update the instance by applying the maintenance patch. Once the instance is ready, you can exit the Standby state and then return the instance to service",
+            "Take a snapshot of the instance, create a new Amazon Machine Image (AMI) and then launch a new instance using this AMI. Apply the maintenance patch to this new instance and then add it back to the Auto Scaling Group by using the manual scaling policy. Terminate the earlier instance that had the maintenance issue; Suspend the ScheduledActions process type for the Auto Scaling group and apply the maintenance patch to the instance. Once the instance is ready, you can you can manually set the instance's health status back to healthy and activate the ScheduledActions process type again",
+            "Take a snapshot of the instance, create a new Amazon Machine Image (AMI) and then launch a new instance using this AMI. Apply the maintenance patch to this new instance and then add it back to the Auto Scaling Group by using the manual scaling policy. Terminate the earlier instance that had the maintenance issue; Suspend the ReplaceUnhealthy process type for the Auto Scaling group and apply the maintenance patch to the instance. Once the instance is ready, you can manually set the instance's health status back to healthy and activate the ReplaceUnhealthy process type again"
+          ],
+          "correctIndex": 0,
+          "explanation": "Put the instance into the Standby state and then update the instance by applying the maintenance patch. Once the instance is ready, you can exit the Standby state and then return the instance to service - You can put an instance that is in the InService state into the Standby state, update some software or troubleshoot the instance, and then return the instance to service. Instances that are on standby are still part of the Auto Scaling group, but they do not actively handle application traffic.\n\nSuspend the ReplaceUnhealthy process type for the Auto Scaling group and apply the maintenance patch to the instance. Once the instance is ready, you can manually set the instance's health status back to healthy and activate the ReplaceUnhealthy process type again - The ReplaceUnhealthy process terminates instances that are marked as unhealthy and then creates new instances to replace them. Amazon EC2 Auto Scaling stops replacing instances that are marked as unhealthy. Instances that fail EC2 or Elastic Load Balancing health checks are still marked as unhealthy. As soon as you resume the ReplaceUnhealthly process, Amazon EC2 Auto Scaling replaces instances that were marked unhealthy while this process was suspended.",
+          "hints": [
+            "Compare each proposed design with every stated requirement."
+          ],
+          "domainId": "saa-c03-resilience",
+          "subdomain": "asg-maintenance-standby",
+          "isGoldenEligible": false,
+          "tags": [
+            "saa-c03",
+            "practice-test-1",
+            "resilience"
+          ],
+          "data": {
+            "examCode": "SAA-C03",
+            "sourceQuestionNumbers": [
+              26
+            ],
+            "sourceTest": "SAA-C03 Practice Test 1",
+            "contentOrigin": "adapted-user-practice",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": []
+          }
+        },
+        {
+          "objectiveId": "saa-c03.test1.encrypted-direct-connect",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "The engineering team at an e-commerce company wants to establish a dedicated, encrypted, low latency, and high throughput connection between its data center and AWS Cloud. The engineering team has set aside sufficient time to account for the operational overhead of establishing this connection.\n\nAs a solutions architect, which of the following solutions would you recommend to the company?",
+          "choices": [
+            "Use AWS Direct Connect plus virtual private network (VPN) to establish a connection between the data center and AWS Cloud",
+            "Use AWS Transit Gateway to establish a connection between the data center and AWS Cloud",
+            "Use AWS Direct Connect to establish a connection between the data center and AWS Cloud",
+            "Use AWS site-to-site VPN to establish a connection between the data center and AWS Cloud"
+          ],
+          "correctIndex": 0,
+          "explanation": "AWS Direct Connect is a cloud service solution that makes it easy to establish a dedicated network connection from your premises to AWS. AWS Direct Connect lets you establish a dedicated network connection between your network and one of the AWS Direct Connect locations.\n\nWith AWS Direct Connect plus VPN, you can combine one or more AWS Direct Connect dedicated network connections with the Amazon VPC VPN. This combination provides an IPsec-encrypted private connection that also reduces network costs, increases bandwidth throughput, and provides a more consistent network experience than internet-based VPN connections.\n\nThis solution combines the AWS managed benefits of the VPN solution with low latency, increased bandwidth, more consistent benefits of the AWS Direct Connect solution, and an end-to-end, secure IPsec connection. Therefore, AWS Direct Connect plus VPN is the correct solution for this use-case.",
+          "hints": [
+            "Compare each proposed design with every stated requirement."
+          ],
+          "domainId": "saa-c03-resilience",
+          "subdomain": "encrypted-direct-connect",
+          "isGoldenEligible": false,
+          "tags": [
+            "saa-c03",
+            "practice-test-1",
+            "resilience"
+          ],
+          "data": {
+            "examCode": "SAA-C03",
+            "sourceQuestionNumbers": [
+              28
+            ],
+            "sourceTest": "SAA-C03 Practice Test 1",
+            "contentOrigin": "adapted-user-practice",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": []
+          }
+        },
+        {
+          "objectiveId": "saa-c03.test1.s3-file-gateway",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "A video analytics company runs data-intensive batch processing workloads that generate large log files and metadata daily. These files are currently stored in an on-premises NFS-based storage system located in the company's primary data center. However, the storage system is becoming increasingly difficult to scale and is unable to meet the company's growing storage demands. The IT team wants to migrate to a cloud-based storage solution that minimizes costs, retains NFS compatibility, and supports automated tiering of rarely accessed data to lower-cost storage. The team prefers to continue using existing NFS-based tools and protocols for compatibility with their current application stack.\n\nWhich solution will meet these requirements MOST cost-effectively?",
+          "choices": [
+            "Deploy an AWS Storage Gateway Volume Gateway in cached mode. Attach it as a block device to an on-premises file server and mount NFS on top. Store snapshots in Amazon S3 Glacier Deep Archive, and use AWS Backup to manage recovery operations and tiering",
+            "Use Amazon FSx for Windows File Server to replace the NFS workload. Enable data deduplication and automatic backups. Use Amazon S3 Glacier to move snapshots to a cost-efficient storage tier. Reconfigure the analytics application to access files using SMB protocol",
+            "Deploy an AWS Storage Gateway File Gateway on premises. Configure it to present an NFS-compatible file share to the workloads. Store the uploaded files in Amazon S3, and use S3 Lifecycle policies to automatically transition infrequently accessed objects to lower-cost storage classes",
+            "Provision an Amazon Elastic File System (Amazon EFS) file system with the One Zone–IA storage class. Use AWS DataSync to migrate the NFS data to EFS. Configure the application to mount the file system over NFS and activate lifecycle management to tier infrequently accessed files"
+          ],
+          "correctIndex": 2,
+          "explanation": "This is the most cost-effective and operationally seamless solution. File Gateway presents an NFS-compatible interface to on-premises applications, allowing the existing workloads to write to it as they would to a traditional NFS server. Behind the scenes, the data is stored in Amazon S3, allowing the company to leverage S3's virtually unlimited scalability. With S3 Lifecycle policies, files can be automatically transitioned to low-cost storage classes like S3 Standard-IA or Glacier, further optimizing costs over time. This approach requires minimal changes to applications and eliminates the scalability bottleneck.",
+          "hints": [
+            "Compare each proposed design with every stated requirement."
+          ],
+          "domainId": "saa-c03-performance",
+          "subdomain": "s3-file-gateway",
+          "isGoldenEligible": false,
+          "tags": [
+            "saa-c03",
+            "practice-test-1",
+            "performance"
+          ],
+          "data": {
+            "examCode": "SAA-C03",
+            "sourceQuestionNumbers": [
+              29
+            ],
+            "sourceTest": "SAA-C03 Practice Test 1",
+            "contentOrigin": "adapted-user-practice",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": []
+          }
+        },
+        {
+          "objectiveId": "saa-c03.test1.ranked-leaderboard",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "A live leaderboard needs efficient updates and retrieval by score using a native sorted-set data structure in a supported in-memory service. Which choice best fits?",
+          "choices": [
+            "Amazon S3 as an in-memory sorted-set engine",
+            "DynamoDB with DAX as a native Redis sorted-set implementation",
+            "Amazon RDS for Oracle as a Redis protocol server",
+            "Amazon ElastiCache with a supported Redis OSS or Valkey engine"
+          ],
+          "correctIndex": 3,
+          "explanation": "Redis-compatible sorted sets suit score-ranked leaderboards. DAX caches supported DynamoDB requests; it is not a general-purpose Redis sorted-set engine. Availability and persistence requirements must be configured separately.",
+          "hints": [
+            "Identify the data structure and protocol the workload requires."
+          ],
+          "domainId": "saa-c03-performance",
+          "subdomain": "ranked-leaderboard",
+          "isGoldenEligible": false,
+          "tags": [
+            "saa-c03",
+            "practice-test-1",
+            "performance"
+          ],
+          "data": {
+            "examCode": "SAA-C03",
+            "sourceQuestionNumbers": [
+              30
+            ],
+            "sourceTest": "SAA-C03 Practice Test 1",
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": [
+              "https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/WhatIs.html"
+            ]
+          }
+        },
+        {
+          "objectiveId": "saa-c03.test1.interruptible-spot-workflow",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "A company runs a data processing workflow that takes about 60 minutes to complete. The workflow can withstand disruptions and it can be started and stopped multiple times.\n\nWhich is the most cost-effective solution to build a solution for the workflow?",
+          "choices": [
+            "Use Amazon EC2 reserved instances to run the workflow processes",
+            "Use Amazon EC2 on-demand instances to run the workflow processes",
+            "Use AWS Lambda function to run the workflow processes",
+            "Use Amazon EC2 spot instances to run the workflow processes"
+          ],
+          "correctIndex": 3,
+          "explanation": "Amazon EC2 Spot instances allow you to request spare Amazon EC2 computing capacity for up to 90% off the On-Demand price.\n\nApplications that have flexible start and end times Applications that are feasible only at very low compute prices Users with urgent computing needs for large amounts of additional capacity\n\nFor the given use case, spot instances offer the most cost-effective solution as the workflow can withstand disruptions and can be started and stopped multiple times.",
+          "hints": [
+            "Compare each proposed design with every stated requirement."
+          ],
+          "domainId": "saa-c03-cost",
+          "subdomain": "interruptible-spot-workflow",
+          "isGoldenEligible": false,
+          "tags": [
+            "saa-c03",
+            "practice-test-1",
+            "cost"
+          ],
+          "data": {
+            "examCode": "SAA-C03",
+            "sourceQuestionNumbers": [
+              31
+            ],
+            "sourceTest": "SAA-C03 Practice Test 1",
+            "contentOrigin": "adapted-user-practice",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": []
+          }
+        },
+        {
+          "objectiveId": "saa-c03.test1.kms-key-audit",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "A US-based healthcare startup is building an interactive diagnostic tool for COVID-19 related assessments. The users would be required to capture their personal health records via this tool. As this is sensitive health information, the backup of the user data must be kept encrypted in Amazon Simple Storage Service (Amazon S3). The startup does not want to provide its own encryption keys but still wants to maintain an audit trail of when an encryption key was used and by whom.\n\nWhich of the following is the BEST solution for this use-case?",
+          "choices": [
+            "Use server-side encryption with Amazon S3 managed keys (SSE-S3) to encrypt the user data on Amazon S3",
+            "Use client-side encryption with client provided keys and then upload the encrypted user data to Amazon S3",
+            "Use server-side encryption with customer-provided keys (SSE-C) to encrypt the user data on Amazon S3",
+            "Use server-side encryption with AWS Key Management Service keys (SSE-KMS) to encrypt the user data on Amazon S3"
+          ],
+          "correctIndex": 3,
+          "explanation": "AWS Key Management Service (AWS KMS) is a service that combines secure, highly available hardware and software to provide a key management system scaled for the cloud. When you use server-side encryption with AWS KMS (SSE-KMS), you can specify a customer-managed CMK that you have already created. SSE-KMS provides you with an audit trail that shows when your CMK was used and by whom. Therefore SSE-KMS is the correct solution for this use-case.\n\nServer Side Encryption in S3:  via -",
+          "hints": [
+            "Compare each proposed design with every stated requirement."
+          ],
+          "domainId": "saa-c03-security",
+          "subdomain": "kms-key-audit",
+          "isGoldenEligible": false,
+          "tags": [
+            "saa-c03",
+            "practice-test-1",
+            "security"
+          ],
+          "data": {
+            "examCode": "SAA-C03",
+            "sourceQuestionNumbers": [
+              32
+            ],
+            "sourceTest": "SAA-C03 Practice Test 1",
+            "contentOrigin": "adapted-user-practice",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": []
+          }
+        },
+        {
+          "objectiveId": "saa-c03.test1.container-billing",
+          "type": "multiple_choice",
+          "difficulty": 2,
+          "prompt": "A leading social media analytics company is contemplating moving its dockerized application stack into AWS Cloud. The company is not sure about the pricing for using Amazon Elastic Container Service (Amazon ECS) with the EC2 launch type compared to the Amazon Elastic Container Service (Amazon ECS) with the Fargate launch type.\n\nWhich of the following is correct regarding the pricing for these two services?",
+          "choices": [
+            "Amazon ECS with EC2 launch type is charged based on EC2 instances and EBS volumes used. Amazon ECS with Fargate launch type is charged based on vCPU and memory resources that the containerized application requests",
+            "Both Amazon ECS with EC2 launch type and Amazon ECS with Fargate launch type are charged based on vCPU and memory resources that the containerized application requests",
+            "Both Amazon ECS with EC2 launch type and Amazon ECS with Fargate launch type are just charged based on Elastic Container Service used per hour",
+            "Both Amazon ECS with EC2 launch type and Amazon ECS with Fargate launch type are charged based on Amazon EC2 instances and Amazon EBS Elastic Volumes used"
+          ],
+          "correctIndex": 0,
+          "explanation": "Amazon Elastic Container Service (Amazon ECS) is a fully managed container orchestration service. ECS allows you to easily run, scale, and secure Docker container applications on AWS.\n\nWith the Fargate launch type, you pay for the amount of vCPU and memory resources that your containerized application requests. vCPU and memory resources are calculated from the time your container images are pulled until the Amazon ECS Task terminates, rounded up to the nearest second. With the EC2 launch type, there is no additional charge for the EC2 launch type. You pay for AWS resources (e.g. EC2 instances or EBS volumes) you create to store and run your application.",
+          "hints": [
+            "Compare each proposed design with every stated requirement."
+          ],
+          "domainId": "saa-c03-cost",
+          "subdomain": "container-billing",
+          "isGoldenEligible": false,
+          "tags": [
+            "saa-c03",
+            "practice-test-1",
+            "cost"
+          ],
+          "data": {
+            "examCode": "SAA-C03",
+            "sourceQuestionNumbers": [
+              33
+            ],
+            "sourceTest": "SAA-C03 Practice Test 1",
+            "contentOrigin": "adapted-user-practice",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": []
+          }
+        },
+        {
+          "objectiveId": "saa-c03.test1.stream-score-pipeline",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "A gaming company is developing a mobile game that streams score updates to a backend processor and then publishes results on a leaderboard. The company has hired you as an AWS Certified Solutions Architect Associate to design a solution that can handle major traffic spikes, process the mobile game updates in the order of receipt, and store the processed updates in a highly available database. The company wants to minimize the management overhead required to maintain the solution.\n\nWhich of the following will you recommend to meet these requirements?",
+          "choices": [
+            "Push score updates to Amazon Kinesis Data Streams which uses an AWS Lambda function to process these updates and then store these processed updates in Amazon DynamoDB",
+            "Push score updates to Amazon Kinesis Data Streams which uses a fleet of Amazon EC2 instances (with Auto Scaling) to process the updates in Amazon Kinesis Data Streams and then store these processed updates in Amazon DynamoDB",
+            "Push score updates to an Amazon Simple Queue Service (Amazon SQS) queue which uses a fleet of Amazon EC2 instances (with Auto Scaling) to process these updates in the Amazon SQS queue and then store these processed updates in an Amazon RDS MySQL database",
+            "Push score updates to an Amazon Simple Notification Service (Amazon SNS) topic, subscribe an AWS Lambda function to this Amazon SNS topic to process the updates and then store these processed updates in a SQL database running on Amazon EC2 instance"
+          ],
+          "correctIndex": 0,
+          "explanation": "To help ingest real-time data or streaming data at large scales, you can use Amazon Kinesis Data Streams (KDS). KDS can continuously capture gigabytes of data per second from hundreds of thousands of sources. The data collected is available in milliseconds, enabling real-time analytics. KDS provides ordering of records, as well as the ability to read and/or replay records in the same order to multiple Amazon Kinesis Applications.\n\nAWS Lambda integrates natively with Kinesis Data Streams. The polling, checkpointing, and error handling complexities are abstracted when you use this native integration. The processed data can then be configured to be saved in Amazon DynamoDB.",
+          "hints": [
+            "Compare each proposed design with every stated requirement."
+          ],
+          "domainId": "saa-c03-performance",
+          "subdomain": "stream-score-pipeline",
+          "isGoldenEligible": false,
+          "tags": [
+            "saa-c03",
+            "practice-test-1",
+            "performance"
+          ],
+          "data": {
+            "examCode": "SAA-C03",
+            "sourceQuestionNumbers": [
+              34
+            ],
+            "sourceTest": "SAA-C03 Practice Test 1",
+            "contentOrigin": "adapted-user-practice",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": []
+          }
+        },
+        {
+          "objectiveId": "saa-c03.test1.long-running-compute",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "A digital wallet company plans to launch a new cloud-based service for processing user cash transfers and peer-to-peer payments. The application will receive transaction requests from mobile clients via a secure endpoint. Each transaction request must go through a lightweight validation step before being forwarded for backend processing, which includes fraud detection, ledger updates, and notifications. The backend workload is compute- and memory-intensive, requires scaling based on volume, and must run for a longer duration than typical short-lived tasks. The engineering team prefers a fully managed solution that minimizes infrastructure maintenance, including provisioning and patching of virtual machines or containers.\n\nWhich solution will meet these requirements with the LEAST operational overhead?",
+          "choices": [
+            "Create an Amazon API Gateway endpoint to receive transaction requests from mobile devices. Use AWS Lambda to validate the transactions. For backend processing, deploy the application on Amazon EKS Anywhere, running on on-premises servers in the company’s data center. Use a custom provisioning script to scale Kubernetes worker nodes based on transaction volume",
+            "Expose an Amazon API Gateway REST API endpoint to receive transaction requests from mobile clients. Integrate the API with AWS Lambda to perform basic validation. For backend processing, deploy the long-running application to Amazon ECS using the Fargate launch type, allowing ECS to manage compute and memory provisioning automatically, with no server management required",
+            "Configure Amazon SQS to receive encrypted payment notifications from mobile devices. Use Amazon EventBridge rules to extract the payload and perform validation. Route the messages to a backend system hosted on Amazon Lightsail instances with dynamic scaling policies based on memory thresholds and instance health checks",
+            "Build a REST API using Amazon API Gateway. Integrate it with an AWS Step Functions state machine for validation. Launch the backend application using Amazon EKS with self-managed nodes, and use Kubernetes Jobs to handle transaction processing workflows. Manually scale the cluster based on demand"
+          ],
+          "correctIndex": 1,
+          "explanation": "This architecture uses Amazon API Gateway to securely expose a RESTful endpoint, which integrates seamlessly with AWS Lambda for the lightweight validation logic. Once validated, the data is passed to Amazon ECS running on Fargate, a serverless container orchestration service that automatically provisions compute and memory resources based on task definitions. ECS with Fargate eliminates the need for cluster management, OS patching, or infrastructure provisioning. This makes the solution fully managed, highly scalable, and the most operationally efficient for long-running backend tasks.\n\nWhat is serverless development?  via -",
+          "hints": [
+            "Compare each proposed design with every stated requirement."
+          ],
+          "domainId": "saa-c03-resilience",
+          "subdomain": "long-running-compute",
+          "isGoldenEligible": false,
+          "tags": [
+            "saa-c03",
+            "practice-test-1",
+            "resilience"
+          ],
+          "data": {
+            "examCode": "SAA-C03",
+            "sourceQuestionNumbers": [
+              35
+            ],
+            "sourceTest": "SAA-C03 Practice Test 1",
+            "contentOrigin": "adapted-user-practice",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": []
+          }
+        },
+        {
+          "objectiveId": "saa-c03.test1.target-tracking",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "The engineering team at a data analytics company has observed that its flagship application functions at its peak performance when the underlying Amazon Elastic Compute Cloud (Amazon EC2) instances have a CPU utilization of about 50%. The application is built on a fleet of Amazon EC2 instances managed under an Auto Scaling group. The workflow requests are handled by an internal Application Load Balancer that routes the requests to the instances.\n\nAs a solutions architect, what would you recommend so that the application runs near its peak performance state?",
+          "choices": [
+            "Configure the Auto Scaling group to use simple scaling policy and set the CPU utilization as the target metric with a target value of 50%",
+            "Configure the Auto Scaling group to use target tracking policy and set the CPU utilization as the target metric with a target value of 50%",
+            "Configure the Auto Scaling group to use a Amazon Cloudwatch alarm triggered on a CPU utilization threshold of 50%",
+            "Configure the Auto Scaling group to use step scaling policy and set the CPU utilization as the target metric with a target value of 50%"
+          ],
+          "correctIndex": 1,
+          "explanation": "An Auto Scaling group contains a collection of Amazon EC2 instances that are treated as a logical grouping for the purposes of automatic scaling and management. An Auto Scaling group also enables you to use Amazon EC2 Auto Scaling features such as health check replacements and scaling policies.\n\nWith target tracking scaling policies, you select a scaling metric and set a target value. Amazon EC2 Auto Scaling creates and manages the CloudWatch alarms that trigger the scaling policy and calculates the scaling adjustment based on the metric and the target value. The scaling policy adds or removes capacity as required to keep the metric at, or close to, the specified target value.\n\nFor example, you can use target tracking scaling to:",
+          "hints": [
+            "Compare each proposed design with every stated requirement."
+          ],
+          "domainId": "saa-c03-performance",
+          "subdomain": "target-tracking",
+          "isGoldenEligible": false,
+          "tags": [
+            "saa-c03",
+            "practice-test-1",
+            "performance"
+          ],
+          "data": {
+            "examCode": "SAA-C03",
+            "sourceQuestionNumbers": [
+              36
+            ],
+            "sourceTest": "SAA-C03 Practice Test 1",
+            "contentOrigin": "adapted-user-practice",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": []
+          }
+        },
+        {
+          "objectiveId": "saa-c03.test1.aurora-global-data",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "The flagship application for a gaming company connects to an Amazon Aurora database and the entire technology stack is currently deployed in the United States. Now, the company has plans to expand to Europe and Asia for its operations. It needs the games table to be accessible globally but needs the users and games_played tables to be regional only.\n\nHow would you implement this with minimal application refactoring?",
+          "choices": [
+            "Use an Amazon Aurora Global Database for the games table and use Amazon Aurora for the users and games_played tables",
+            "Use a Amazon DynamoDB global table for the games table and use Amazon Aurora for the users and games_played tables",
+            "Use a Amazon DynamoDB global table for the games table and use Amazon DynamoDB tables for the users and games_played tables",
+            "Use an Amazon Aurora Global Database for the games table and use Amazon DynamoDB tables for the users and games_played tables"
+          ],
+          "correctIndex": 0,
+          "explanation": "Amazon Aurora is a MySQL and PostgreSQL-compatible relational database built for the cloud, that combines the performance and availability of traditional enterprise databases with the simplicity and cost-effectiveness of open source databases. Amazon Aurora features a distributed, fault-tolerant, self-healing storage system that auto-scales up to 128TB per database instance. Aurora is not an in-memory database.\n\nAmazon Aurora Global Database is designed for globally distributed applications, allowing a single Amazon Aurora database to span multiple AWS regions. It replicates your data with no impact on database performance, enables fast local reads with low latency in each region, and provides disaster recovery from region-wide outages. Amazon Aurora Global Database is the correct choice for the given use-case.\n\nFor the given use-case, we, therefore, need to have two Aurora clusters, one for the global table (games table) and the other one for the local tables (users and games_played tables).",
+          "hints": [
+            "Compare each proposed design with every stated requirement."
+          ],
+          "domainId": "saa-c03-resilience",
+          "subdomain": "aurora-global-data",
+          "isGoldenEligible": false,
+          "tags": [
+            "saa-c03",
+            "practice-test-1",
+            "resilience"
+          ],
+          "data": {
+            "examCode": "SAA-C03",
+            "sourceQuestionNumbers": [
+              37
+            ],
+            "sourceTest": "SAA-C03 Practice Test 1",
+            "contentOrigin": "adapted-user-practice",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": []
+          }
+        },
+        {
+          "objectiveId": "saa-c03.test1.stream-processing-modern-service",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "A truck-telemetry workload needs managed stateful stream processing with event-time windows and checkpoints. Which supported AWS service is designed for Apache Flink applications?",
+          "choices": [
+            "Amazon Managed Service for Apache Flink",
+            "A Route 53 private DNS zone",
+            "An S3 lifecycle transition rule",
+            "Retired Kinesis Data Analytics for SQL applications as a new default"
+          ],
+          "correctIndex": 0,
+          "explanation": "Managed Service for Apache Flink supports stateful stream processing. API ingestion, durable streams, result storage and query endpoints are separate architecture components; an API paired with an obsolete SQL offering does not define the complete pipeline.",
+          "hints": [
+            "Look for the managed processing engine rather than only the ingestion endpoint."
+          ],
+          "domainId": "saa-c03-performance",
+          "subdomain": "stream-processing-modern-service",
+          "isGoldenEligible": false,
+          "tags": [
+            "saa-c03",
+            "practice-test-1",
+            "performance"
+          ],
+          "data": {
+            "examCode": "SAA-C03",
+            "sourceQuestionNumbers": [
+              38
+            ],
+            "sourceTest": "SAA-C03 Practice Test 1",
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": [
+              "https://docs.aws.amazon.com/managed-flink/latest/java/what-is.html",
+              "https://docs.aws.amazon.com/kinesisanalytics/latest/dev/discontinuation.html"
+            ]
+          }
+        },
+        {
+          "objectiveId": "saa-c03.test1.s3-delete-protection",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "A healthcare startup needs to enforce compliance and regulatory guidelines for objects stored in Amazon S3. One of the key requirements is to provide adequate protection against accidental deletion of objects.\n\nAs a solutions architect, what are your recommendations to address these guidelines?  ?\nChoose the single option containing the complete correct combination.",
+          "choices": [
+            "Enable multi-factor authentication (MFA) delete on the Amazon S3 bucket; Establish a process to get managerial approval for deleting Amazon S3 objects",
+            "Enable multi-factor authentication (MFA) delete on the Amazon S3 bucket; Change the configuration on Amazon S3 console so that the user needs to provide additional confirmation while deleting any Amazon S3 object",
+            "Enable multi-factor authentication (MFA) delete on the Amazon S3 bucket; Create an event trigger on deleting any Amazon S3 object. The event invokes an Amazon Simple Notification Service (Amazon SNS) notification via email to the IT manager",
+            "Enable multi-factor authentication (MFA) delete on the Amazon S3 bucket; Enable versioning on the Amazon S3 bucket"
+          ],
+          "correctIndex": 3,
+          "explanation": "Versioning is a means of keeping multiple variants of an object in the same bucket. You can use versioning to preserve, retrieve, and restore every version of every object stored in your Amazon S3 bucket. Versioning-enabled buckets enable you to recover objects from accidental deletion or overwrite.\n\nIf you overwrite an object, it results in a new object version in the bucket. You can always restore the previous version. If you delete an object, instead of removing it permanently, Amazon S3 inserts a delete marker, which becomes the current object version. You can always restore the previous version. Hence, this is the correct option.\n\nTo provide additional protection, multi-factor authentication (MFA) delete can be enabled. MFA delete requires secondary authentication to take place before objects can be permanently deleted from an Amazon S3 bucket. Hence, this is the correct option.",
+          "hints": [
+            "Compare each proposed design with every stated requirement."
+          ],
+          "domainId": "saa-c03-security",
+          "subdomain": "s3-delete-protection",
+          "isGoldenEligible": false,
+          "tags": [
+            "saa-c03",
+            "practice-test-1",
+            "security"
+          ],
+          "data": {
+            "examCode": "SAA-C03",
+            "sourceQuestionNumbers": [
+              39
+            ],
+            "sourceTest": "SAA-C03 Practice Test 1",
+            "contentOrigin": "adapted-user-practice",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": []
+          }
+        },
+        {
+          "objectiveId": "saa-c03.test1.viewer-country-access",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "A CloudFront distribution must deny viewer requests from disallowed countries using its supported country-level access feature. Which choice enforces that distribution-level restriction rather than only choosing a DNS response?",
+          "choices": [
+            "Route 53 failover routing as a country-denial mechanism",
+            "Route 53 weighted routing as a viewer authorization check",
+            "Route 53 geolocation routing as a complete substitute for access control",
+            "CloudFront geographic restrictions"
+          ],
+          "correctIndex": 3,
+          "explanation": "CloudFront geographic restrictions deny requests according to the configured country list. DNS routing alone is not viewer access authorization. IP geolocation has limitations, and origin access should prevent bypass of the distribution.",
+          "hints": [
+            "Distinguish refusing a viewer request from selecting a DNS response."
+          ],
+          "domainId": "saa-c03-security",
+          "subdomain": "viewer-country-access",
+          "isGoldenEligible": false,
+          "tags": [
+            "saa-c03",
+            "practice-test-1",
+            "security"
+          ],
+          "data": {
+            "examCode": "SAA-C03",
+            "sourceQuestionNumbers": [
+              40
+            ],
+            "sourceTest": "SAA-C03 Practice Test 1",
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": [
+              "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/georestrictions.html"
+            ]
+          }
+        },
+        {
+          "objectiveId": "saa-c03.test1.serverless-data-warehouse",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "A retail analytics company operates a large-scale data lake on Amazon S3, where they store daily logs of customer transactions, product views, and inventory updates. Each morning, they need to transform and load the data into a data warehouse to support fast analytical queries. The company also wants to enable data analysts to build and train machine learning (ML) models using familiar SQL syntax without writing custom Python code. The architecture must support massively parallel processing (MPP) for fast data aggregation and scoring, and must use serverless AWS services wherever possible to reduce infrastructure management and operational overhead.\n\nWhich solution best meets these requirements?",
+          "choices": [
+            "Provision and run a daily Amazon EMR cluster with Apache Spark to process and transform the S3 data. Load the results into Amazon Redshift (provisioned). Enable ML model development by integrating Redshift with Amazon SageMaker notebooks for advanced modeling tasks",
+            "Use an AWS Glue job to transform and load data into Amazon RDS for PostgreSQL. Allow analysts to run machine learning models using Amazon Aurora ML integrated with PostgreSQL, leveraging Amazon SageMaker endpoints behind the scenes",
+            "Run a daily AWS Glue job to process and transform the raw files in S3 and register the outputs as Amazon Athena tables in AWS Glue Data Catalog. Allow analysts to build ML models using Amazon Athena ML, with SQL-based predictions on top of S3 data without moving it to a warehouse",
+            "Use a daily AWS Glue job to transform and clean the data stored in Amazon S3. Load the transformed dataset into Amazon Redshift Serverless, which offers MPP capabilities in a serverless model. Enable analysts to use Amazon Redshift ML to build and train ML models"
+          ],
+          "correctIndex": 3,
+          "explanation": "This solution is fully serverless and optimized for high-performance analytics and ML. AWS Glue provides serverless ETL, and Amazon Redshift Serverless offers a MPP data warehouse that scales compute independently. Amazon Redshift ML lets analysts create, train, and deploy ML models using SQL by integrating with Amazon SageMaker under the hood — abstracting away the complexity of building models. This architecture meets all core requirements: serverless, SQL-based ML, and scalable MPP analytics.",
+          "hints": [
+            "Compare each proposed design with every stated requirement."
+          ],
+          "domainId": "saa-c03-performance",
+          "subdomain": "serverless-data-warehouse",
+          "isGoldenEligible": false,
+          "tags": [
+            "saa-c03",
+            "practice-test-1",
+            "performance"
+          ],
+          "data": {
+            "examCode": "SAA-C03",
+            "sourceQuestionNumbers": [
+              41
+            ],
+            "sourceTest": "SAA-C03 Practice Test 1",
+            "contentOrigin": "adapted-user-practice",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": []
+          }
+        },
+        {
+          "objectiveId": "saa-c03.test1.cost-anomaly-detection",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "A software company operates a customer analytics platform on a fleet of Amazon EC2 instances. During a quarterly cloud cost review, the finance team discovers an unexpected increase in AWS charges that had gone unnoticed for several days. The company wants to continuously identify abnormal spending patterns and automatically notify designated stakeholders when AWS detects unexpected cost increases.\n\nWhich solution will meet these requirements?",
+          "choices": [
+            "Use AWS Pricing Calculator to model the expected cost of the existing EC2 workload and periodically compare the estimate with actual AWS charges",
+            "Create an AWS Cost Anomaly Detection monitor and configure an alert subscription to notify designated stakeholders when the monitor detects anomalous spending",
+            "Enable Amazon CloudWatch billing metrics, create alarms for predetermined estimated charge thresholds, and configure Amazon SNS notifications for the finance team",
+            "Create a zero spend budget from an AWS Budgets template and configure the budget to notify stakeholders when spending exceeds the configured threshold"
+          ],
+          "correctIndex": 1,
+          "explanation": "AWS Cost Anomaly Detection is specifically designed to identify unusual AWS spending patterns. The service uses machine learning models to evaluate historical spending behavior and identify anomalous costs while accounting for factors such as normal growth and recurring spending patterns. This capability directly addresses the requirement to detect spending that deviates unexpectedly from normal usage.\n\nA cost monitor defines the AWS spending that Cost Anomaly Detection evaluates. The company can create an alert subscription for the monitor and specify the stakeholders who should receive notifications. AWS supports email notifications for daily or weekly summaries and Amazon SNS for individual alerts, allowing responsible teams to learn about significant anomalies soon after AWS identifies them.\n\nUnlike a fixed budget or billing alarm, Cost Anomaly Detection does not require the company to predict the exact monetary value at which unusual spending will occur. AWS determines whether spending behavior is anomalous based on learned cost patterns, and the company can configure notification thresholds based on the financial impact or percentage impact of an anomaly. Therefore, Cost Anomaly Detection provides the most appropriate combination of continuous anomaly identification and stakeholder notification.",
+          "hints": [
+            "Compare each proposed design with every stated requirement."
+          ],
+          "domainId": "saa-c03-cost",
+          "subdomain": "cost-anomaly-detection",
+          "isGoldenEligible": false,
+          "tags": [
+            "saa-c03",
+            "practice-test-1",
+            "cost"
+          ],
+          "data": {
+            "examCode": "SAA-C03",
+            "sourceQuestionNumbers": [
+              42
+            ],
+            "sourceTest": "SAA-C03 Practice Test 1",
+            "contentOrigin": "adapted-user-practice",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": []
+          }
+        },
+        {
+          "objectiveId": "saa-c03.test1.object-permission-resource",
+          "type": "multiple_choice",
+          "difficulty": 4,
+          "prompt": "An IAM policy allows s3:ListBucket and s3:DeleteObject only on arn:aws:s3:::example-bucket. Listing works but object deletion is denied. Which least-privilege addition addresses the object-resource mismatch?",
+          "choices": [
+            "Allow only s3:ListBucket on the same bucket ARN again",
+            "Allow s3:* on every bucket in the account",
+            "Allow s3:DeleteObject on arn:aws:s3:::example-bucket/*",
+            "Use the malformed policy version 2021-10-17 to override the denial"
+          ],
+          "correctIndex": 2,
+          "explanation": "DeleteObject requires an object resource ARN. ListBucket uses the bucket ARN. The policy version should be 2012-10-17, and other applicable denies or retention protections can still block deletion.",
+          "hints": [
+            "Compare bucket-level and object-level resource identifiers."
+          ],
+          "domainId": "saa-c03-security",
+          "subdomain": "object-permission-resource",
+          "isGoldenEligible": false,
+          "tags": [
+            "saa-c03",
+            "practice-test-1",
+            "security"
+          ],
+          "data": {
+            "examCode": "SAA-C03",
+            "sourceQuestionNumbers": [
+              43
+            ],
+            "sourceTest": "SAA-C03 Practice Test 1",
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": [
+              "https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-with-s3-policy-actions.html"
+            ]
+          },
+          "evidence": "The existing statements name only the bucket ARN.",
+          "constraints": [
+            "Do not grant unrelated S3 actions",
+            "Limit access to the required bucket’s objects"
+          ]
+        },
+        {
+          "objectiveId": "saa-c03.test1.cache-access-patterns",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "A retail company has developed a REST API which is deployed in an Auto Scaling group behind an Application Load Balancer. The REST API stores the user data in Amazon DynamoDB and any static content, such as images, are served via Amazon Simple Storage Service (Amazon S3). On analyzing the usage trends, it is found that 90% of the read requests are for commonly accessed data across all users.\n\nAs a Solutions Architect, which of the following would you suggest as the MOST efficient solution to improve the application performance?",
+          "choices": [
+            "Enable ElastiCache Redis for DynamoDB and Amazon CloudFront for Amazon S3",
+            "Enable Amazon DynamoDB Accelerator (DAX) for Amazon DynamoDB and ElastiCache Memcached for Amazon S3",
+            "Enable Amazon DynamoDB Accelerator (DAX) for Amazon DynamoDB and Amazon CloudFront for Amazon S3",
+            "Enable ElastiCache Redis for DynamoDB and ElastiCache Memcached for Amazon S3"
+          ],
+          "correctIndex": 2,
+          "explanation": "Amazon DynamoDB Accelerator (DAX) is a fully managed, highly available, in-memory cache for Amazon DynamoDB that delivers up to a 10 times performance improvement—from milliseconds to microseconds—even at millions of requests per second.\n\nAmazon DynamoDB Accelerator (DAX) is tightly integrated with Amazon DynamoDB—you simply provision a DAX cluster, use the DAX client SDK to point your existing Amazon DynamoDB API calls at the DAX cluster, and let DAX handle the rest. Because DAX is API-compatible with Amazon DynamoDB, you don't have to make any functional application code changes. DAX is used to natively cache Amazon DynamoDB reads.\n\nAmazon CloudFront is a content delivery network (CDN) service that delivers static and dynamic web content, video streams, and APIs around the world, securely and at scale. By design, delivering data out of Amazon CloudFront can be more cost-effective than delivering it from S3 directly to your users.",
+          "hints": [
+            "Compare each proposed design with every stated requirement."
+          ],
+          "domainId": "saa-c03-performance",
+          "subdomain": "cache-access-patterns",
+          "isGoldenEligible": false,
+          "tags": [
+            "saa-c03",
+            "practice-test-1",
+            "performance"
+          ],
+          "data": {
+            "examCode": "SAA-C03",
+            "sourceQuestionNumbers": [
+              44
+            ],
+            "sourceTest": "SAA-C03 Practice Test 1",
+            "contentOrigin": "adapted-user-practice",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": []
+          }
+        },
+        {
+          "objectiveId": "saa-c03.test1.privileged-account-auditing",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "A new DevOps engineer has joined a large financial services company recently. As part of his onboarding, the IT department is conducting a review of the checklist for tasks related to AWS Identity and Access Management (AWS IAM).\n\nAs an AWS Certified Solutions Architect – Associate, which best practices would you recommend ?\nChoose the single option containing the complete correct combination.",
+          "choices": [
+            "Grant maximum privileges to avoid assigning privileges again; Create a minimum number of accounts and share these account credentials among employees",
+            "Grant maximum privileges to avoid assigning privileges again; Enable AWS Multi-Factor Authentication (AWS MFA) for privileged users",
+            "Grant maximum privileges to avoid assigning privileges again; Use user credentials to provide access specific permissions for Amazon EC2 instances",
+            "Enable AWS Multi-Factor Authentication (AWS MFA) for privileged users; Configure AWS CloudTrail to log all AWS Identity and Access Management (AWS IAM) actions"
+          ],
+          "correctIndex": 3,
+          "explanation": "As per the AWS best practices, it is better to enable Multi Factor Authentication (MFA) for privileged users via an MFA-enabled mobile device or hardware MFA token.\n\nAWS recommends to turn on AWS CloudTrail to log all IAM actions for monitoring and audit purposes.",
+          "hints": [
+            "Compare each proposed design with every stated requirement."
+          ],
+          "domainId": "saa-c03-security",
+          "subdomain": "privileged-account-auditing",
+          "isGoldenEligible": false,
+          "tags": [
+            "saa-c03",
+            "practice-test-1",
+            "security"
+          ],
+          "data": {
+            "examCode": "SAA-C03",
+            "sourceQuestionNumbers": [
+              46
+            ],
+            "sourceTest": "SAA-C03 Practice Test 1",
+            "contentOrigin": "adapted-user-practice",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": []
+          }
+        },
+        {
+          "objectiveId": "saa-c03.test1.threat-versus-vulnerability-detection",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "A security team needs threat detection for suspicious S3 access activity and vulnerability findings for eligible EC2 workloads. Which service pairing matches these distinct tasks?",
+          "choices": [
+            "GuardDuty with appropriate S3 protection, and Amazon Inspector for supported workload vulnerability scanning",
+            "A backup retention policy as the only threat and vulnerability detector",
+            "CloudFront for both IAM activity detection and host package scanning",
+            "Amazon Inspector for S3 access threat detection, and Route 53 for software vulnerabilities"
+          ],
+          "correctIndex": 0,
+          "explanation": "GuardDuty analyzes supported signals for threat detection; Inspector scans supported workloads for vulnerabilities. Enable the required coverage and review findings. These services do not guarantee detection of every malicious action.",
+          "hints": [
+            "Separate suspicious activity detection from software vulnerability assessment."
+          ],
+          "domainId": "saa-c03-security",
+          "subdomain": "threat-versus-vulnerability-detection",
+          "isGoldenEligible": false,
+          "tags": [
+            "saa-c03",
+            "practice-test-1",
+            "security"
+          ],
+          "data": {
+            "examCode": "SAA-C03",
+            "sourceQuestionNumbers": [
+              47
+            ],
+            "sourceTest": "SAA-C03 Practice Test 1",
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": [
+              "https://docs.aws.amazon.com/guardduty/latest/ug/s3-protection.html"
+            ]
+          }
+        },
+        {
+          "objectiveId": "saa-c03.test1.windows-file-service",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "A large financial institution operates an on-premises data center with hundreds of petabytes of data managed on Microsoft’s Distributed File System (DFS). The CTO wants the organization to transition into a hybrid cloud environment and run data-intensive analytics workloads that support DFS.\n\nWhich of the following AWS services can facilitate the migration of these workloads?",
+          "choices": [
+            "Microsoft SQL Server on AWS",
+            "AWS Directory Service for Microsoft Active Directory (AWS Managed Microsoft AD)",
+            "Amazon FSx for Lustre",
+            "Amazon FSx for Windows File Server"
+          ],
+          "correctIndex": 3,
+          "explanation": "Amazon FSx for Windows File Server provides fully managed, highly reliable file storage that is accessible over the industry-standard Service Message Block (SMB) protocol. It is built on Windows Server, delivering a wide range of administrative features such as user quotas, end-user file restore, and Microsoft Active Directory (AD) integration. Amazon FSx supports the use of Microsoft’s Distributed File System (DFS) to organize shares into a single folder structure up to hundreds of PB in size. So this option is correct.\n\nHow Amazon FSx for Windows File Server Works:  via -",
+          "hints": [
+            "Compare each proposed design with every stated requirement."
+          ],
+          "domainId": "saa-c03-performance",
+          "subdomain": "windows-file-service",
+          "isGoldenEligible": false,
+          "tags": [
+            "saa-c03",
+            "practice-test-1",
+            "performance"
+          ],
+          "data": {
+            "examCode": "SAA-C03",
+            "sourceQuestionNumbers": [
+              48
+            ],
+            "sourceTest": "SAA-C03 Practice Test 1",
+            "contentOrigin": "adapted-user-practice",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": []
+          }
+        },
+        {
+          "objectiveId": "saa-c03.test1.visual-data-preparation",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "A healthcare analytics company centralizes clinical and operational datasets in an Amazon S3–based data lake. Incoming data is ingested in Apache Parquet format from multiple hospitals and wearable health devices. To ensure quality and standardization, the company applies several transformation steps: anomaly filtering, datetime normalization, and aggregation by patient cohort. The company needs a solution to support a code-free interface that enables data engineers and business analysts to collaborate on data preparation workflows. The company also requires data lineage tracking, data profiling capabilities, and an easy way to share transformation logic across teams without writing or managing code.\n\nWhich AWS solution best meets these requirements?",
+          "choices": [
+            "Use Amazon AppFlow to move and transform Parquet files in S3. Configure AppFlow transformations and mappings within the visual interface. Share flows with collaborators through AWS IAM policies and scheduled executions",
+            "Create Amazon Athena SQL queries to perform transformation steps directly on S3. Store queries in AWS Glue Data Catalog and share saved queries with other users through Amazon Athena's query editor",
+            "Use AWS Glue DataBrew to visually build transformation workflows on top of the raw Parquet files in S3. Use DataBrew recipes to track, audit, and share the transformation steps with others. Enable data profiling to inspect column statistics, null values, and data types across datasets",
+            "Use AWS Glue Studio’s visual canvas to design data transformation workflows on top of the Parquet files in Amazon S3. Configure Glue Studio jobs to run these transformations without writing code. Share the job definitions with team members for reuse. Use the visual job editor to track transformation progress and inspect profiling statistics for each dataset column"
+          ],
+          "correctIndex": 2,
+          "explanation": "AWS Glue DataBrew is a fully managed, serverless data preparation tool that enables users to visually clean, transform, and normalize raw datasets—all without writing any code. It is specifically designed for data analysts, business users, and data engineers who need to prepare data for analytics or machine learning workflows using an intuitive point-and-click interface.\n\nIn the scenario, the company ingests Apache Parquet files into Amazon S3 and needs to apply multiple transformation steps such as anomaly filtering, standardizing date formats, and computing aggregates. With DataBrew, users can perform these tasks through a drag-and-drop UI and configure complex workflows using reusable “recipes”—collections of ordered transformation steps that can be saved, versioned, and shared with others in the organization.\n\nFurthermore, DataBrew provides built-in data profiling capabilities. It automatically generates column-level statistics such as distributions, cardinality, null value counts, standard deviations, and outlier detection. This visibility enables better data quality assessment before the data is used for reporting or machine learning.",
+          "hints": [
+            "Compare each proposed design with every stated requirement."
+          ],
+          "domainId": "saa-c03-performance",
+          "subdomain": "visual-data-preparation",
+          "isGoldenEligible": false,
+          "tags": [
+            "saa-c03",
+            "practice-test-1",
+            "performance"
+          ],
+          "data": {
+            "examCode": "SAA-C03",
+            "sourceQuestionNumbers": [
+              49
+            ],
+            "sourceTest": "SAA-C03 Practice Test 1",
+            "contentOrigin": "adapted-user-practice",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": []
+          }
+        },
+        {
+          "objectiveId": "saa-c03.test1.eks-identity-boundary",
+          "type": "multiple_choice",
+          "difficulty": 4,
+          "prompt": "Two EKS services need different AWS permissions. Investigation finds that every pod uses the same broad AWS identity. The cluster has an approved IRSA configuration. Which change enforces the required service boundary?",
+          "choices": [
+            "Use separate Kubernetes service accounts and scoped IAM roles, with correct IRSA trust conditions",
+            "Give every pod the node role’s broad permissions",
+            "Store one administrator access key in a shared container image",
+            "Keep one shared role and differentiate only pod display names"
+          ],
+          "correctIndex": 0,
+          "explanation": "IRSA can map service accounts to IAM roles with constrained trust. Separate roles and policies enforce different AWS permissions; Kubernetes names alone do not enforce AWS access boundaries.",
+          "hints": [
+            "Trace the identity presented by each service to AWS."
+          ],
+          "domainId": "saa-c03-security",
+          "subdomain": "eks-identity-boundary",
+          "isGoldenEligible": false,
+          "tags": [
+            "saa-c03",
+            "practice-test-1",
+            "security"
+          ],
+          "data": {
+            "examCode": "SAA-C03",
+            "sourceQuestionNumbers": [
+              50
+            ],
+            "sourceTest": "SAA-C03 Practice Test 1",
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": [
+              "https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html"
+            ]
+          },
+          "evidence": "Both services currently resolve to one broad AWS role.",
+          "constraints": [
+            "The UI needs only its DynamoDB operations",
+            "The data service needs only its approved S3 operations",
+            "Do not distribute long-lived administrator keys"
+          ]
+        },
+        {
+          "objectiveId": "saa-c03.test1.accelerated-multipart-transfer",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "A data analytics company measures what the consumers watch and what advertising they’re exposed to. This real-time data is ingested into its on-premises data center and subsequently, the daily data feed is compressed into a single file and uploaded on Amazon S3 for backup. The typical compressed file size is around 2 gigabytes.\n\nWhich of the following is the fastest way to upload the daily compressed file into Amazon S3?",
+          "choices": [
+            "Upload the compressed file in a single operation",
+            "FTP the compressed file into an Amazon EC2 instance that runs in the same region as the Amazon S3 bucket. Then transfer the file from the Amazon EC2 instance into the Amazon S3 bucket",
+            "Upload the compressed file using multipart upload with Amazon S3 Transfer Acceleration (Amazon S3TA)",
+            "Upload the compressed file using multipart upload"
+          ],
+          "correctIndex": 2,
+          "explanation": "Amazon S3 Transfer Acceleration (Amazon S3TA) enables fast, easy, and secure transfers of files over long distances between your client and an S3 bucket. Transfer Acceleration takes advantage of Amazon CloudFront’s globally distributed edge locations. As the data arrives at an edge location, data is routed to Amazon S3 over an optimized network path.\n\nMultipart upload allows you to upload a single object as a set of parts. Each part is a contiguous portion of the object's data. You can upload these object parts independently and in any order. If transmission of any part fails, you can retransmit that part without affecting other parts. After all parts of your object are uploaded, Amazon S3 assembles these parts and creates the object. If you're uploading large objects over a stable high-bandwidth network, use multipart uploading to maximize the use of your available bandwidth by uploading object parts in parallel for multi-threaded performance. If you're uploading over a spotty network, use multipart uploading to increase resiliency to network errors by avoiding upload restarts.",
+          "hints": [
+            "Compare each proposed design with every stated requirement."
+          ],
+          "domainId": "saa-c03-performance",
+          "subdomain": "accelerated-multipart-transfer",
+          "isGoldenEligible": false,
+          "tags": [
+            "saa-c03",
+            "practice-test-1",
+            "performance"
+          ],
+          "data": {
+            "examCode": "SAA-C03",
+            "sourceQuestionNumbers": [
+              51
+            ],
+            "sourceTest": "SAA-C03 Practice Test 1",
+            "contentOrigin": "adapted-user-practice",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": []
+          }
+        },
+        {
+          "objectiveId": "saa-c03.test1.waf-country-control",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "A media company runs a photo-sharing web application that is accessed across three different countries. The application is deployed on several Amazon Elastic Compute Cloud (Amazon EC2) instances running behind an Application Load Balancer. With new government regulations, the company has been asked to block access from two countries and allow access only from the home country of the company.\n\nWhich configuration should be used to meet this changed requirement?",
+          "choices": [
+            "Configure the security group for the Amazon EC2 instances",
+            "Configure AWS Web Application Firewall (AWS WAF) on the Application Load Balancer in a Amazon Virtual Private Cloud (Amazon VPC)",
+            "Use Geo Restriction feature of Amazon CloudFront in a Amazon Virtual Private Cloud (Amazon VPC)",
+            "Configure the security group on the Application Load Balancer"
+          ],
+          "correctIndex": 1,
+          "explanation": "AWS Web Application Firewall (AWS WAF) is a web application firewall service that lets you monitor web requests and protect your web applications from malicious requests. Use AWS WAF to block or allow requests based on conditions that you specify, such as the IP addresses. You can also use AWS WAF preconfigured protections to block common attacks like SQL injection or cross-site scripting.\n\nYou can use AWS WAF with your Application Load Balancer to allow or block requests based on the rules in a web access control list (web ACL). Geographic (Geo) Match Conditions in AWS WAF allows you to use AWS WAF to restrict application access based on the geographic location of your viewers. With geo match conditions you can choose the countries from which AWS WAF should allow access.\n\nGeo match conditions are important for many customers. For example, legal and licensing requirements restrict some customers from delivering their applications outside certain countries. These customers can configure a whitelist that allows only viewers in those countries. Other customers need to prevent the downloading of their encrypted software by users in certain countries. These customers can configure a blacklist so that end-users from those countries are blocked from downloading their software.",
+          "hints": [
+            "Compare each proposed design with every stated requirement."
+          ],
+          "domainId": "saa-c03-security",
+          "subdomain": "waf-country-control",
+          "isGoldenEligible": false,
+          "tags": [
+            "saa-c03",
+            "practice-test-1",
+            "security"
+          ],
+          "data": {
+            "examCode": "SAA-C03",
+            "sourceQuestionNumbers": [
+              52
+            ],
+            "sourceTest": "SAA-C03 Practice Test 1",
+            "contentOrigin": "adapted-user-practice",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": []
+          }
+        },
+        {
+          "objectiveId": "saa-c03.test1.custom-entity-extraction",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "Product-description text uploaded to S3 needs domain-specific entity extraction. An approved labeled training dataset is available, and the team wants a managed custom entity recognition model. Which service is designed for that NLP task?",
+          "choices": [
+            "Amazon Comprehend custom entity recognition",
+            "Amazon Transcribe as a required text-to-audio-to-text workaround",
+            "Amazon Lookout for Vision as a general text entity parser",
+            "A Route 53 routing policy as a language model"
+          ],
+          "correctIndex": 0,
+          "explanation": "Comprehend custom entity recognition uses a trained custom model for domain-specific entities. Training data, model evaluation and inference mode must be configured; S3 event processing and DynamoDB storage are separate pipeline components.",
+          "hints": [
+            "Match the required text-processing capability and the available training data."
+          ],
+          "domainId": "saa-c03-performance",
+          "subdomain": "custom-entity-extraction",
+          "isGoldenEligible": false,
+          "tags": [
+            "saa-c03",
+            "practice-test-1",
+            "performance"
+          ],
+          "data": {
+            "examCode": "SAA-C03",
+            "sourceQuestionNumbers": [
+              53
+            ],
+            "sourceTest": "SAA-C03 Practice Test 1",
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": [
+              "https://docs.aws.amazon.com/comprehend/latest/dg/custom-entity-recognition.html"
+            ]
+          }
+        },
+        {
+          "objectiveId": "saa-c03.test1.short-lived-query-results",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "A leading video streaming service delivers billions of hours of content from Amazon Simple Storage Service (Amazon S3) to customers around the world. Amazon S3 also serves as the data lake for its big data analytics solution. The data lake has a staging zone where intermediary query results are kept only for 24 hours. These results are also heavily referenced by other parts of the analytics pipeline.\n\nWhich of the following is the MOST cost-effective strategy for storing this intermediary query data?",
+          "choices": [
+            "Store the intermediary query results in Amazon S3 Standard storage class",
+            "Store the intermediary query results in Amazon S3 One Zone-Infrequent Access storage class",
+            "Store the intermediary query results in Amazon S3 Glacier Instant Retrieval storage class",
+            "Store the intermediary query results in Amazon S3 Standard-Infrequent Access storage class"
+          ],
+          "correctIndex": 0,
+          "explanation": "Amazon S3 Standard offers high durability, availability, and performance object storage for frequently accessed data. Because it delivers low latency and high throughput, S3 Standard is appropriate for a wide variety of use cases, including cloud applications, dynamic websites, content distribution, mobile and gaming applications, and big data analytics. As there is no minimum storage duration charge and no retrieval fee (remember that intermediary query results are heavily referenced by other parts of the analytics pipeline), this is the MOST cost-effective storage class amongst the given options.",
+          "hints": [
+            "Compare each proposed design with every stated requirement."
+          ],
+          "domainId": "saa-c03-cost",
+          "subdomain": "short-lived-query-results",
+          "isGoldenEligible": false,
+          "tags": [
+            "saa-c03",
+            "practice-test-1",
+            "cost"
+          ],
+          "data": {
+            "examCode": "SAA-C03",
+            "sourceQuestionNumbers": [
+              54
+            ],
+            "sourceTest": "SAA-C03 Practice Test 1",
+            "contentOrigin": "adapted-user-practice",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": []
+          }
+        },
+        {
+          "objectiveId": "saa-c03.test1.q55",
+          "type": "multiple_choice",
+          "difficulty": 2,
+          "prompt": "An administrator uploads an object to a normal Amazon S3 endpoint. When estimating cost, which statement correctly separates data transfer into S3 from other charges?",
+          "choices": [
+            "An upload automatically eliminates future storage charges",
+            "Data transfer into S3 is generally free, but requests, storage and optional acceleration can still incur charges",
+            "Every operation associated with an upload is always free",
+            "S3 object names determine a universal transfer price"
+          ],
+          "correctIndex": 1,
+          "explanation": "Normal inbound data transfer and request/storage costs are different billing dimensions. Check current pricing and the actual transfer path; Transfer Acceleration or other services may add charges.",
+          "hints": [
+            "Separate inbound transfer from storage, requests and optional services."
+          ],
+          "domainId": "saa-c03-cost",
+          "subdomain": "q55",
+          "isGoldenEligible": false,
+          "tags": [
+            "saa-c03",
+            "practice-test-1",
+            "cost"
+          ],
+          "data": {
+            "examCode": "SAA-C03",
+            "sourceQuestionNumbers": [
+              55
+            ],
+            "sourceTest": "SAA-C03 Practice Test 1",
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": []
+          }
+        },
+        {
+          "objectiveId": "saa-c03.test1.cross-account-role-assumption",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "An organization wants to delegate access to a set of users from the development environment so that they can access some resources in the production environment which is managed under another AWS account.\n\nAs a solutions architect, which of the following steps would you recommend?",
+          "choices": [
+            "Create a new IAM role with the required permissions to access the resources in the production environment. The users can then assume this IAM role while accessing the resources from the production environment",
+            "It is not possible to access cross-account resources",
+            "Both IAM roles and IAM users can be used interchangeably for cross-account access",
+            "Create new IAM user credentials for the production environment and share these credentials with the set of users from the development environment"
+          ],
+          "correctIndex": 0,
+          "explanation": "IAM roles allow you to delegate access to users or services that normally don't have access to your organization's AWS resources. IAM users or AWS services can assume a role to obtain temporary security credentials that can be used to make AWS API calls. Consequently, you don't have to share long-term credentials for access to a resource. Using IAM roles, it is possible to access cross-account resources.",
+          "hints": [
+            "Compare each proposed design with every stated requirement."
+          ],
+          "domainId": "saa-c03-security",
+          "subdomain": "cross-account-role-assumption",
+          "isGoldenEligible": false,
+          "tags": [
+            "saa-c03",
+            "practice-test-1",
+            "security"
+          ],
+          "data": {
+            "examCode": "SAA-C03",
+            "sourceQuestionNumbers": [
+              56
+            ],
+            "sourceTest": "SAA-C03 Practice Test 1",
+            "contentOrigin": "adapted-user-practice",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": []
+          }
+        },
+        {
+          "objectiveId": "saa-c03.test1.sql-server-migration-compatibility",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "A retail company runs a customer management system backed by a Microsoft SQL Server database. The system is tightly integrated with applications that rely on T-SQL queries. The company wants to modernize its infrastructure by migrating to Amazon Aurora PostgreSQL, but it needs to avoid major modifications to the existing application logic.\n\nWhich combination of actions should the company take to achieve this goal with minimal application refactoring?\nChoose the single option containing the complete correct combination.",
+          "choices": [
+            "Deploy Babelfish for Aurora PostgreSQL to enable support for T-SQL commands; Use AWS Schema Conversion Tool (AWS SCT) along with AWS Database Migration Service (AWS DMS) to migrate the schema and data",
+            "Deploy Babelfish for Aurora PostgreSQL to enable support for T-SQL commands; Use Amazon Aurora Global Database to replicate data across regions for compatibility",
+            "Deploy Babelfish for Aurora PostgreSQL to enable support for T-SQL commands; Use AWS Glue to convert T-SQL queries to PostgreSQL-compatible SQL during the migration",
+            "Deploy Babelfish for Aurora PostgreSQL to enable support for T-SQL commands; Configure Amazon Aurora PostgreSQL with a custom endpoint that emulates Microsoft SQL Server behavior"
+          ],
+          "correctIndex": 0,
+          "explanation": "Babelfish allows Aurora PostgreSQL to understand T-SQL (Microsoft SQL Server's query language) and SQL Server wire protocol, enabling applications to communicate with Aurora using SQL Server-style queries with minimal code changes. This is ideal for minimizing application code refactoring.\n\nThe AWS Schema Conversion Tool (SCT) helps convert the SQL Server schema to PostgreSQL-compatible syntax, and AWS Database Migration Service (DMS) can move the actual data with minimal downtime. These tools are designed for database migration and are essential for schema and data transfer.",
+          "hints": [
+            "Compare each proposed design with every stated requirement."
+          ],
+          "domainId": "saa-c03-resilience",
+          "subdomain": "sql-server-migration-compatibility",
+          "isGoldenEligible": false,
+          "tags": [
+            "saa-c03",
+            "practice-test-1",
+            "resilience"
+          ],
+          "data": {
+            "examCode": "SAA-C03",
+            "sourceQuestionNumbers": [
+              57
+            ],
+            "sourceTest": "SAA-C03 Practice Test 1",
+            "contentOrigin": "adapted-user-practice",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": []
+          }
+        },
+        {
+          "objectiveId": "saa-c03.test1.lambda-throttle-diagnosis",
+          "type": "multiple_choice",
+          "difficulty": 4,
+          "prompt": "An SNS-triggered Lambda workload loses timely delivery during a burst. Monitoring confirms Lambda throttles at its configured concurrency limit, while invocation duration is longer than normal. Which response best addresses the demonstrated bottleneck?",
+          "choices": [
+            "Review concurrency settings and quotas, processing duration, retries and failure handling before applying a justified capacity change",
+            "Provision physical servers to scale the SNS service",
+            "Assume the request rate alone proves the regional concurrency quota was exceeded",
+            "Disable retries and discard every delayed notification"
+          ],
+          "correctIndex": 0,
+          "explanation": "Concurrency depends on invocation rate and duration, and configured reserved limits may be the bottleneck. Observed throttle metrics justify investigating limits and execution behavior; SNS/Lambda failure handling must preserve messages during bursts.",
+          "hints": [
+            "Use the measured throttle cause, not only a requests-per-second number."
+          ],
+          "domainId": "saa-c03-resilience",
+          "subdomain": "lambda-throttle-diagnosis",
+          "isGoldenEligible": false,
+          "tags": [
+            "saa-c03",
+            "practice-test-1",
+            "resilience"
+          ],
+          "data": {
+            "examCode": "SAA-C03",
+            "sourceQuestionNumbers": [
+              58
+            ],
+            "sourceTest": "SAA-C03 Practice Test 1",
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": [
+              "https://docs.aws.amazon.com/lambda/latest/dg/lambda-concurrency.html"
+            ]
+          },
+          "evidence": "Lambda throttle metrics rise at the configured limit; processing duration has increased.",
+          "constraints": [
+            "Avoid silently dropping notifications",
+            "Confirm the applicable concurrency limit"
+          ]
+        },
+        {
+          "objectiveId": "saa-c03.test1.api-error-monitoring",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "While consolidating logs for the weekly reporting, a development team at an e-commerce company noticed that an unusually large number of illegal AWS application programming interface (API) queries were made sometime during the week. Due to the off-season, there was no visible impact on the systems. However, this event led the management team to seek an automated solution that can trigger near-real-time warnings in case such an event recurs.\n\nWhich of the following represents the best solution for the given scenario?",
+          "choices": [
+            "AWS Trusted Advisor publishes metrics about check results to Amazon CloudWatch. Create an alarm to track status changes for checks in the Service Limits category for the APIs. The alarm will then notify when the service quota is reached or exceeded",
+            "Create an Amazon CloudWatch metric filter that processes AWS CloudTrail logs having API call details and looks at any errors by factoring in all the error codes that need to be tracked. Create an alarm based on this metric's rate to send an Amazon SNS notification to the required team",
+            "Run Amazon Athena SQL queries against AWS CloudTrail log files stored in Amazon S3 buckets. Use Amazon QuickSight to generate reports for managerial dashboards",
+            "Configure AWS CloudTrail to stream event data to Amazon Kinesis. Use Amazon Kinesis stream-level metrics in the Amazon CloudWatch to trigger an AWS Lambda function that will trigger an error workflow"
+          ],
+          "correctIndex": 1,
+          "explanation": "AWS CloudTrail log data can be ingested into Amazon CloudWatch to monitor and identify your AWS account activity against security threats, and create a governance framework for security best practices. You can analyze log trail event data in CloudWatch using features such as Logs Insight, Contributor Insights, Metric filters, and CloudWatch Alarms.\n\nAWS CloudTrail integrates with the Amazon CloudWatch service to publish the API calls being made to resources or services in the AWS account. The published event has invaluable information that can be used for compliance, auditing, and governance of your AWS accounts. Below we introduce several features available in CloudWatch to monitor API activity, analyze the logs at scale, and take action when malicious activity is discovered, without provisioning your infrastructure.\n\nFor the AWS Cloudtrail logs available in Amazon CloudWatch Logs, you can begin searching and filtering the log data by creating one or more metric filters. Use these metric filters to turn log data into numerical CloudWatch metrics that you can graph or set a CloudWatch Alarm on.",
+          "hints": [
+            "Compare each proposed design with every stated requirement."
+          ],
+          "domainId": "saa-c03-resilience",
+          "subdomain": "api-error-monitoring",
+          "isGoldenEligible": false,
+          "tags": [
+            "saa-c03",
+            "practice-test-1",
+            "resilience"
+          ],
+          "data": {
+            "examCode": "SAA-C03",
+            "sourceQuestionNumbers": [
+              59
+            ],
+            "sourceTest": "SAA-C03 Practice Test 1",
+            "contentOrigin": "adapted-user-practice",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": []
+          }
+        },
+        {
+          "objectiveId": "saa-c03.test1.efs-inter-region-network",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "The sourcing team at the US headquarters of a global e-commerce company is preparing a spreadsheet of the new product catalog. The spreadsheet is saved on an Amazon Elastic File System (Amazon EFS) created in us-east-1 region. The sourcing team counterparts from other AWS regions such as Asia Pacific and Europe also want to collaborate on this spreadsheet.\n\nAs a solutions architect, what is your recommendation to enable this collaboration with the LEAST amount of operational overhead?",
+          "choices": [
+            "The spreadsheet will have to be copied in Amazon S3 which can then be accessed from any AWS region",
+            "The spreadsheet on the Amazon Elastic File System (Amazon EFS) can be accessed in other AWS regions by using an inter-region VPC peering connection",
+            "The spreadsheet will have to be copied into Amazon EFS file systems of other AWS regions as Amazon EFS is a regional service and it does not allow access from other AWS regions",
+            "The spreadsheet data will have to be moved into an Amazon RDS for MySQL database which can then be accessed from any AWS region"
+          ],
+          "correctIndex": 1,
+          "explanation": "Amazon Elastic File System (Amazon EFS) provides a simple, scalable, fully managed elastic NFS file system for use with AWS Cloud services and on-premises resources.\n\nAmazon EFS is a regional service storing data within and across multiple Availability Zones (AZs) for high availability and durability. Amazon EC2 instances can access your file system across AZs, regions, and VPCs, while on-premises servers can access using AWS Direct Connect or AWS VPN.\n\nYou can connect to Amazon EFS file systems from EC2 instances in other AWS regions using an inter-region VPC peering connection, and from on-premises servers using an AWS VPN connection. So this is the correct option.",
+          "hints": [
+            "Compare each proposed design with every stated requirement."
+          ],
+          "domainId": "saa-c03-performance",
+          "subdomain": "efs-inter-region-network",
+          "isGoldenEligible": false,
+          "tags": [
+            "saa-c03",
+            "practice-test-1",
+            "performance"
+          ],
+          "data": {
+            "examCode": "SAA-C03",
+            "sourceQuestionNumbers": [
+              60
+            ],
+            "sourceTest": "SAA-C03 Practice Test 1",
+            "contentOrigin": "adapted-user-practice",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": []
+          }
+        },
+        {
+          "objectiveId": "saa-c03.test1.durable-transaction-burst",
+          "type": "multiple_choice",
+          "difficulty": 5,
+          "prompt": "A purchase service times out during bursts. Database telemetry shows excessive connection churn, and requests may be retried after an acknowledgement is lost. Which design best improves burst handling without creating duplicate completed purchases?",
+          "choices": [
+            "Treat a cache entry as the only durable purchase record",
+            "Send writes to read replicas and rely on geographical proximity",
+            "Buffer accepted work durably, scale workers, pool database connections and enforce a stable idempotency key in the transaction path",
+            "Retry every timed-out purchase with a new identifier and assume duplicates cannot occur"
+          ],
+          "correctIndex": 2,
+          "explanation": "A durable queue can absorb bursts and RDS Proxy can reduce connection churn. Retries and redelivery still require an idempotent transaction path; buffering does not by itself promise exactly-once business effects.",
+          "hints": [
+            "Address durable acceptance, connection pressure and repeated execution separately."
+          ],
+          "domainId": "saa-c03-resilience",
+          "subdomain": "durable-transaction-burst",
+          "isGoldenEligible": false,
+          "tags": [
+            "saa-c03",
+            "practice-test-1",
+            "resilience"
+          ],
+          "data": {
+            "examCode": "SAA-C03",
+            "sourceQuestionNumbers": [
+              62
+            ],
+            "sourceTest": "SAA-C03 Practice Test 1",
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": [
+              "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/standard-queues.html",
+              "https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/rds-proxy.html"
+            ]
+          },
+          "evidence": "A lost acknowledgement may trigger a retry of an already committed purchase; connection churn is measured.",
+          "constraints": [
+            "Keep a durable record of accepted work",
+            "Preserve transaction integrity",
+            "Prevent duplicate completed purchases"
+          ]
+        },
+        {
+          "objectiveId": "saa-c03.test1.q63",
+          "type": "multiple_choice",
+          "difficulty": 4,
+          "prompt": "An Auto Scaling group has an explicitly configured instance maintenance policy requiring replacement capacity to be launched before an unhealthy instance is terminated. What should the architect verify during replacement?",
+          "choices": [
+            "Terminate all healthy instances before starting replacement capacity",
+            "Assume every Auto Scaling group always uses the same replacement order without a policy",
+            "New capacity passes the relevant health checks before removal, with sufficient capacity headroom and policy compliance",
+            "Disable health checks so replacement finishes without proving readiness"
+          ],
+          "correctIndex": 2,
+          "explanation": "Replacement behavior depends on configured maintenance policy and constraints. Health readiness and capacity headroom matter; the source’s unconditional replacement-order statement is not a universal guarantee.",
+          "hints": [
+            "Use the stated policy and health evidence rather than memorizing one replacement order."
+          ],
+          "domainId": "saa-c03-resilience",
+          "subdomain": "q63",
+          "isGoldenEligible": false,
+          "tags": [
+            "saa-c03",
+            "practice-test-1",
+            "resilience"
+          ],
+          "data": {
+            "examCode": "SAA-C03",
+            "sourceQuestionNumbers": [
+              63
+            ],
+            "sourceTest": "SAA-C03 Practice Test 1",
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": [
+              "https://docs.aws.amazon.com/autoscaling/ec2/userguide/instance-maintenance-policy-overview-and-considerations.html"
+            ]
+          },
+          "evidence": "The group’s configured policy requires launch before termination; available headroom is limited.",
+          "constraints": [
+            "Maintain the required healthy capacity",
+            "Use the actual configured policy"
+          ]
+        },
+        {
+          "objectiveId": "saa-c03.test1.s3-lifecycle-direction",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "The IT department at a consulting firm is conducting a training workshop for new developers. As part of an evaluation exercise on Amazon S3, the new developers were asked to identify the invalid storage class lifecycle transitions for objects stored on Amazon S3.\n\nCan you spot the INVALID lifecycle transitions from the options below?\nChoose the single option containing the complete correct combination.",
+          "choices": [
+            "Amazon S3 Standard-IA => Amazon S3 One Zone-IA; Amazon S3 One Zone-IA => Amazon S3 Standard-IA",
+            "Amazon S3 Standard-IA => Amazon S3 One Zone-IA; Amazon S3 Intelligent-Tiering => Amazon S3 Standard",
+            "Amazon S3 One Zone-IA => Amazon S3 Standard-IA; Amazon S3 Intelligent-Tiering => Amazon S3 Standard",
+            "Amazon S3 Standard-IA => Amazon S3 One Zone-IA; Amazon S3 Standard-IA => Amazon S3 Intelligent-Tiering"
+          ],
+          "correctIndex": 2,
+          "explanation": "As the question wants to know about the INVALID lifecycle transitions, the following options are the correct answers -\n\nFollowing are the unsupported life cycle transitions for S3 storage classes - Any storage class to the Amazon S3 Standard storage class. Any storage class to the Reduced Redundancy storage class. The Amazon S3 Intelligent-Tiering storage class to the Amazon S3 Standard-IA storage class. The Amazon S3 One Zone-IA storage class to the Amazon S3 Standard-IA or Amazon S3 Intelligent-Tiering storage classes.",
+          "hints": [
+            "Compare each proposed design with every stated requirement."
+          ],
+          "domainId": "saa-c03-performance",
+          "subdomain": "s3-lifecycle-direction",
+          "isGoldenEligible": false,
+          "tags": [
+            "saa-c03",
+            "practice-test-1",
+            "performance"
+          ],
+          "data": {
+            "examCode": "SAA-C03",
+            "sourceQuestionNumbers": [
+              64
+            ],
+            "sourceTest": "SAA-C03 Practice Test 1",
+            "contentOrigin": "adapted-user-practice",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": []
+          }
+        },
+        {
+          "objectiveId": "saa-c03.test1.fifo-processing-boundary",
+          "type": "multiple_choice",
+          "difficulty": 5,
+          "prompt": "A permit-processing service requires ordered work per applicant and must tolerate message redelivery without creating duplicate permits. Which design meets both requirements?",
+          "choices": [
+            "Use FIFO message groups per applicant and an idempotent consumer with durable processing records",
+            "Delete messages before recording the permit result",
+            "Assume FIFO alone makes every downstream database effect exactly once",
+            "Use one Standard queue and assume strict per-applicant ordering"
+          ],
+          "correctIndex": 0,
+          "explanation": "FIFO preserves ordering within a message group and supports deduplication features. Consumer failures can still require retries, so application-side durable idempotency is necessary for duplicate-safe business effects.",
+          "hints": [
+            "Separate queue ordering from the transaction’s duplicate handling."
+          ],
+          "domainId": "saa-c03-resilience",
+          "subdomain": "fifo-processing-boundary",
+          "isGoldenEligible": false,
+          "tags": [
+            "saa-c03",
+            "practice-test-1",
+            "resilience"
+          ],
+          "data": {
+            "examCode": "SAA-C03",
+            "sourceQuestionNumbers": [
+              65
+            ],
+            "sourceTest": "SAA-C03 Practice Test 1",
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": [
+              "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/FIFO-queues-understanding-logic.html"
+            ]
+          },
+          "evidence": "Consumers can crash after creating a permit but before completing message processing.",
+          "constraints": [
+            "Keep work ordered per applicant",
+            "Do not create duplicate permits",
+            "Recover safely after worker failure"
+          ]
+        }
+      ],
+      "referenceMaterial": {
+        "conversionAudit": {
+          "examCode": "SAA-C03",
+          "sourceQuestionCount": 65,
+          "sourceFile": "Pasted text(2).txt",
+          "sourceSha256": "076b591787af80e59968652a0582aab76fdf753eaa72e3eebc7896a84df2594b",
+          "sourcePreserved": true,
+          "importQuestionCount": 60,
+          "reviewStatus": "PENDING",
+          "sourceMapping": [
+            {
+              "sourceQuestionNumber": 1,
+              "status": "withheld-review",
+              "reviewNote": "Native Lambda mounting of cross-account EFS requires explicit current service/API support validation; generic EFS cross-account NFS documentation alone is insufficient."
+            },
+            {
+              "sourceQuestionNumber": 2,
+              "status": "corrected-replacement",
+              "reviewNote": "Authored a focused current scenario; changed or removed unsupported source assumptions.",
+              "targetObjectiveId": "saa-c03.test1.ordered-queue-throughput"
+            },
+            {
+              "sourceQuestionNumber": 3,
+              "status": "combined-single-answer",
+              "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+              "targetObjectiveId": "saa-c03.test1.root-account-security"
+            },
+            {
+              "sourceQuestionNumber": 4,
+              "status": "adapted",
+              "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+              "targetObjectiveId": "saa-c03.test1.api-protocols"
+            },
+            {
+              "sourceQuestionNumber": 5,
+              "status": "adapted",
+              "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+              "targetObjectiveId": "saa-c03.test1.permissions-boundary"
+            },
+            {
+              "sourceQuestionNumber": 6,
+              "status": "corrected-replacement",
+              "reviewNote": "Removed unconditional source claims; authored a scoped question with explicit conditions.",
+              "targetObjectiveId": "saa-c03.test1.q06"
+            },
+            {
+              "sourceQuestionNumber": 7,
+              "status": "corrected-replacement",
+              "reviewNote": "Authored a focused current scenario; changed or removed unsupported source assumptions.",
+              "targetObjectiveId": "saa-c03.test1.provisioned-volume-billing"
+            },
+            {
+              "sourceQuestionNumber": 8,
+              "status": "combined-single-answer",
+              "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+              "targetObjectiveId": "saa-c03.test1.efs-network-and-iam"
+            },
+            {
+              "sourceQuestionNumber": 9,
+              "status": "combined-single-answer",
+              "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+              "targetObjectiveId": "saa-c03.test1.object-lock-versions"
+            },
+            {
+              "sourceQuestionNumber": 10,
+              "status": "combined-single-answer",
+              "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+              "targetObjectiveId": "saa-c03.test1.s3-transfer-performance"
+            },
+            {
+              "sourceQuestionNumber": 11,
+              "status": "adapted",
+              "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+              "targetObjectiveId": "saa-c03.test1.serverless-ingestion"
+            },
+            {
+              "sourceQuestionNumber": 12,
+              "status": "adapted",
+              "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+              "targetObjectiveId": "saa-c03.test1.scheduled-scaling"
+            },
+            {
+              "sourceQuestionNumber": 13,
+              "status": "adapted",
+              "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+              "targetObjectiveId": "saa-c03.test1.global-accelerator-udp"
+            },
+            {
+              "sourceQuestionNumber": 14,
+              "status": "adapted",
+              "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+              "targetObjectiveId": "saa-c03.test1.multi-az-web-availability"
+            },
+            {
+              "sourceQuestionNumber": 15,
+              "status": "adapted",
+              "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+              "targetObjectiveId": "saa-c03.test1.cloudfront-custom-origin"
+            },
+            {
+              "sourceQuestionNumber": 16,
+              "status": "adapted",
+              "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+              "targetObjectiveId": "saa-c03.test1.resolver-outbound"
+            },
+            {
+              "sourceQuestionNumber": 17,
+              "status": "adapted",
+              "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+              "targetObjectiveId": "saa-c03.test1.recoverable-instance-store"
+            },
+            {
+              "sourceQuestionNumber": 18,
+              "status": "adapted",
+              "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+              "targetObjectiveId": "saa-c03.test1.s3-prefix-throughput"
+            },
+            {
+              "sourceQuestionNumber": 19,
+              "status": "combined-single-answer",
+              "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+              "targetObjectiveId": "saa-c03.test1.hdd-volume-boot-limits"
+            },
+            {
+              "sourceQuestionNumber": 20,
+              "status": "withheld-review",
+              "reviewNote": "RDS behind a PrivateLink NLB needs a supported endpoint registration and failover design; the supplied answer omits this operational requirement."
+            },
+            {
+              "sourceQuestionNumber": 21,
+              "status": "adapted",
+              "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+              "targetObjectiveId": "saa-c03.test1.fsx-lustre-workload"
+            },
+            {
+              "sourceQuestionNumber": 22,
+              "status": "corrected-replacement",
+              "reviewNote": "Authored a focused current scenario; changed or removed unsupported source assumptions.",
+              "targetObjectiveId": "saa-c03.test1.outposts-control-plane"
+            },
+            {
+              "sourceQuestionNumber": 23,
+              "status": "adapted",
+              "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+              "targetObjectiveId": "saa-c03.test1.alb-path-routing"
+            },
+            {
+              "sourceQuestionNumber": 24,
+              "status": "adapted",
+              "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+              "targetObjectiveId": "saa-c03.test1.cross-region-ami"
+            },
+            {
+              "sourceQuestionNumber": 25,
+              "status": "adapted",
+              "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+              "targetObjectiveId": "saa-c03.test1.cluster-placement"
+            },
+            {
+              "sourceQuestionNumber": 26,
+              "status": "combined-single-answer",
+              "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+              "targetObjectiveId": "saa-c03.test1.asg-maintenance-standby"
+            },
+            {
+              "sourceQuestionNumber": 27,
+              "status": "withheld-review",
+              "reviewNote": "A blanket most-cost-effective storage-class choice cannot be proven without retention, retrieval volume and pricing assumptions."
+            },
+            {
+              "sourceQuestionNumber": 28,
+              "status": "adapted",
+              "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+              "targetObjectiveId": "saa-c03.test1.encrypted-direct-connect"
+            },
+            {
+              "sourceQuestionNumber": 29,
+              "status": "adapted",
+              "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+              "targetObjectiveId": "saa-c03.test1.s3-file-gateway"
+            },
+            {
+              "sourceQuestionNumber": 30,
+              "status": "corrected-replacement",
+              "reviewNote": "Authored a focused current scenario; changed or removed unsupported source assumptions.",
+              "targetObjectiveId": "saa-c03.test1.ranked-leaderboard"
+            },
+            {
+              "sourceQuestionNumber": 31,
+              "status": "adapted",
+              "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+              "targetObjectiveId": "saa-c03.test1.interruptible-spot-workflow"
+            },
+            {
+              "sourceQuestionNumber": 32,
+              "status": "adapted",
+              "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+              "targetObjectiveId": "saa-c03.test1.kms-key-audit"
+            },
+            {
+              "sourceQuestionNumber": 33,
+              "status": "adapted",
+              "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+              "targetObjectiveId": "saa-c03.test1.container-billing"
+            },
+            {
+              "sourceQuestionNumber": 34,
+              "status": "adapted",
+              "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+              "targetObjectiveId": "saa-c03.test1.stream-score-pipeline"
+            },
+            {
+              "sourceQuestionNumber": 35,
+              "status": "adapted",
+              "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+              "targetObjectiveId": "saa-c03.test1.long-running-compute"
+            },
+            {
+              "sourceQuestionNumber": 36,
+              "status": "adapted",
+              "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+              "targetObjectiveId": "saa-c03.test1.target-tracking"
+            },
+            {
+              "sourceQuestionNumber": 37,
+              "status": "adapted",
+              "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+              "targetObjectiveId": "saa-c03.test1.aurora-global-data"
+            },
+            {
+              "sourceQuestionNumber": 38,
+              "status": "corrected-replacement",
+              "reviewNote": "Authored a focused current scenario; changed or removed unsupported source assumptions.",
+              "targetObjectiveId": "saa-c03.test1.stream-processing-modern-service"
+            },
+            {
+              "sourceQuestionNumber": 39,
+              "status": "combined-single-answer",
+              "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+              "targetObjectiveId": "saa-c03.test1.s3-delete-protection"
+            },
+            {
+              "sourceQuestionNumber": 40,
+              "status": "corrected-replacement",
+              "reviewNote": "Removed a misleading source premise and authored an explicit service capability assessment.",
+              "targetObjectiveId": "saa-c03.test1.viewer-country-access"
+            },
+            {
+              "sourceQuestionNumber": 41,
+              "status": "adapted",
+              "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+              "targetObjectiveId": "saa-c03.test1.serverless-data-warehouse"
+            },
+            {
+              "sourceQuestionNumber": 42,
+              "status": "adapted",
+              "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+              "targetObjectiveId": "saa-c03.test1.cost-anomaly-detection"
+            },
+            {
+              "sourceQuestionNumber": 43,
+              "status": "corrected-replacement",
+              "reviewNote": "Authored a focused current scenario; changed or removed unsupported source assumptions.",
+              "targetObjectiveId": "saa-c03.test1.object-permission-resource"
+            },
+            {
+              "sourceQuestionNumber": 44,
+              "status": "adapted",
+              "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+              "targetObjectiveId": "saa-c03.test1.cache-access-patterns"
+            },
+            {
+              "sourceQuestionNumber": 45,
+              "status": "withheld-review",
+              "reviewNote": "RDS Custom for Oracle has an announced end-of-support date; the new architecture needs explicit eligibility and lifecycle review."
+            },
+            {
+              "sourceQuestionNumber": 46,
+              "status": "combined-single-answer",
+              "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+              "targetObjectiveId": "saa-c03.test1.privileged-account-auditing"
+            },
+            {
+              "sourceQuestionNumber": 47,
+              "status": "corrected-replacement",
+              "reviewNote": "Removed a misleading source premise and authored an explicit service capability assessment.",
+              "targetObjectiveId": "saa-c03.test1.threat-versus-vulnerability-detection"
+            },
+            {
+              "sourceQuestionNumber": 48,
+              "status": "adapted",
+              "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+              "targetObjectiveId": "saa-c03.test1.windows-file-service"
+            },
+            {
+              "sourceQuestionNumber": 49,
+              "status": "adapted",
+              "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+              "targetObjectiveId": "saa-c03.test1.visual-data-preparation"
+            },
+            {
+              "sourceQuestionNumber": 50,
+              "status": "corrected-replacement",
+              "reviewNote": "Authored a focused current scenario; changed or removed unsupported source assumptions.",
+              "targetObjectiveId": "saa-c03.test1.eks-identity-boundary"
+            },
+            {
+              "sourceQuestionNumber": 51,
+              "status": "adapted",
+              "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+              "targetObjectiveId": "saa-c03.test1.accelerated-multipart-transfer"
+            },
+            {
+              "sourceQuestionNumber": 52,
+              "status": "adapted",
+              "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+              "targetObjectiveId": "saa-c03.test1.waf-country-control"
+            },
+            {
+              "sourceQuestionNumber": 53,
+              "status": "corrected-replacement",
+              "reviewNote": "Removed a misleading source premise and authored an explicit service capability assessment.",
+              "targetObjectiveId": "saa-c03.test1.custom-entity-extraction"
+            },
+            {
+              "sourceQuestionNumber": 54,
+              "status": "adapted",
+              "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+              "targetObjectiveId": "saa-c03.test1.short-lived-query-results"
+            },
+            {
+              "sourceQuestionNumber": 55,
+              "status": "corrected-replacement",
+              "reviewNote": "Removed unconditional source claims; authored a scoped question with explicit conditions.",
+              "targetObjectiveId": "saa-c03.test1.q55"
+            },
+            {
+              "sourceQuestionNumber": 56,
+              "status": "adapted",
+              "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+              "targetObjectiveId": "saa-c03.test1.cross-account-role-assumption"
+            },
+            {
+              "sourceQuestionNumber": 57,
+              "status": "combined-single-answer",
+              "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+              "targetObjectiveId": "saa-c03.test1.sql-server-migration-compatibility"
+            },
+            {
+              "sourceQuestionNumber": 58,
+              "status": "corrected-replacement",
+              "reviewNote": "Authored a focused current scenario; changed or removed unsupported source assumptions.",
+              "targetObjectiveId": "saa-c03.test1.lambda-throttle-diagnosis"
+            },
+            {
+              "sourceQuestionNumber": 59,
+              "status": "adapted",
+              "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+              "targetObjectiveId": "saa-c03.test1.api-error-monitoring"
+            },
+            {
+              "sourceQuestionNumber": 60,
+              "status": "adapted",
+              "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+              "targetObjectiveId": "saa-c03.test1.efs-inter-region-network"
+            },
+            {
+              "sourceQuestionNumber": 61,
+              "status": "withheld-review",
+              "reviewNote": "AD Connector/Identity Center integration requires supported identity-source and topology details that the source does not fully establish."
+            },
+            {
+              "sourceQuestionNumber": 62,
+              "status": "corrected-replacement",
+              "reviewNote": "Authored a focused current scenario; changed or removed unsupported source assumptions.",
+              "targetObjectiveId": "saa-c03.test1.durable-transaction-burst"
+            },
+            {
+              "sourceQuestionNumber": 63,
+              "status": "corrected-replacement",
+              "reviewNote": "Removed unconditional source claims; authored a scoped question with explicit conditions.",
+              "targetObjectiveId": "saa-c03.test1.q63"
+            },
+            {
+              "sourceQuestionNumber": 64,
+              "status": "combined-single-answer",
+              "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+              "targetObjectiveId": "saa-c03.test1.s3-lifecycle-direction"
+            },
+            {
+              "sourceQuestionNumber": 65,
+              "status": "corrected-replacement",
+              "reviewNote": "Authored a focused current scenario; changed or removed unsupported source assumptions.",
+              "targetObjectiveId": "saa-c03.test1.fifo-processing-boundary"
+            }
+          ],
+          "summary": {
+            "withheld-review": 5,
+            "corrected-replacement": 16,
+            "combined-single-answer": 10,
+            "adapted": 34
+          },
+          "independentFactCheck": "Targeted current corrections checked against primary documentation; retained source content requires editorial review. Automated validation is not independent factual certification.",
+          "coverageWarning": "Supplementary SAA-C03 practice; no complete blueprint coverage or weighting claim.",
+          "examReference": "https://docs.aws.amazon.com/aws-certification/latest/solutions-architect-associate-03.html",
+          "difficultyCounts": {
+            "3": 43,
+            "1": 1,
+            "2": 10,
+            "4": 4,
+            "5": 2
+          }
+        }
+      }
+    }
+  ]
+}

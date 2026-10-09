@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useContentPools } from "@/lib/useContentPools";
 import GameEngine from "@/components/GameEngine";
 
-type Exam = "A_PLUS" | "SECURITY_PLUS" | "AZ_900" | "AWS" | "AZURE";
+type Exam = "A_PLUS" | "SECURITY_PLUS" | "AZ_900" | "AWS" | "AZURE" | "MD_102";
 
 export default function CertMCQPage() {
   const router = useRouter();
@@ -29,7 +29,7 @@ export default function CertMCQPage() {
   }, [router]);
 
   const selectedExam = exams.find(p => p.certExam === exam) || exams[0];
-  const examLabel = useMemo(() => selectedExam?.label || (exam === "A_PLUS" ? "A+" : exam === "SECURITY_PLUS" ? "Security+" : exam === "AZ_900" ? "AZ-900" : exam === "AZURE" ? "Azure" : "AWS"), [exam, selectedExam?.label]);
+  const examLabel = useMemo(() => selectedExam?.label || (exam === "A_PLUS" ? "A+" : exam === "SECURITY_PLUS" ? "Security+" : exam === "AZ_900" ? "AZ-900" : exam === "AZURE" ? "Azure" : exam === "MD_102" ? "MD-102" : "AWS"), [exam, selectedExam?.label]);
 
   return (
     <div className="page">

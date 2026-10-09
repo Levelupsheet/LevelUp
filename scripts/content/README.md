@@ -105,3 +105,12 @@ Validation commands:
 node scripts/content/validateQuestions.mjs data/content/security-plus-sy0-701-test2-v2.json
 node scripts/content/validateQuestions.mjs data/content/azure-az104-test2-v2.json
 ```
+
+## AWS SAA-C03 and MD-102 Practice Test 1
+
+- `data/content/aws-saa-c03-test1-v2.json`: 60 single-answer MCQs under `CERTIFICATIONS` / `AWS`, with `examCode: SAA-C03`. Five source items are withheld for review; the conversion report accounts for all 65 entries. Multi-answer source items become one supported combination-choice MCQ. Source corrections address throughput assumptions, storage billing, EKS/Outposts terminology, stream-processing services, S3 permission scope, Lambda throttle diagnosis and duplicate-safe transaction handling.
+- `data/content/microsoft-md102-test1-v2.json`: 32 single-answer MCQs under the new `CERTIFICATIONS` / `MD_102` destination. All 45 source entries are accounted for: 32 authored replacements, seven consolidated variants and six retired MDT entries withheld. Corrections include Delivery Optimization, Chrome bookmarks, subscription activation, scope tags versus targeting, ESP diagnostics, Win32 packaging and dependencies. Current standalone scenarios replace old OS/product assumptions instead of recommending unsupported new deployments.
+
+**Deploy before importing MD-102:** run the repository's deployment flow including `prisma migrate deploy`, `prisma generate` and `next build`. Migration `20261009020000_add_md102_certification` only adds an enum value; it does not create, publish, clear or move pools. The Admin destination list uses the database client enum and the learner catalog still shows only active published placements. Create/select a dedicated MD-102 pool and choose Microsoft MD-102 when publishing. Do not route it to AZURE or AZ_900.
+
+Both banks include hints, explanations, per-question objectives/subdomains, five authored tiers and source provenance. Their matching conversion reports are embedded and are not import files. Golden/Boss flags remain off; editorial review is still required. Automated format, accounting and duplicate checks are not a full independent fact-check. Existing questions and uploaded source files remain intact.

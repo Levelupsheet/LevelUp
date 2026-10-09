@@ -30,3 +30,12 @@ test('career preference migration is additive, repeatable, and preserves existin
  for(const name of ['Information Technology','Healthcare','Sales','Software Development','Real Estate','Transportation','Industrial/Skilled Trades'])assert.ok(industries.includes(name));
  }finally{await db.close();}
 });
+
+test('MD-102 certification migration is additive and repeatable without changing existing placements',async()=>{
+ const db=new PGlite();try{
+  await db.exec(`CREATE TYPE "CertExam" AS ENUM ('A_PLUS','SECURITY_PLUS','AZ_900','AWS','AZURE'); CREATE TABLE placements (id TEXT PRIMARY KEY, exam "CertExam", active BOOLEAN); INSERT INTO placements VALUES ('existing','AZURE',TRUE);`);
+  const sql=fs.readFileSync(path.join(__dirname,'../prisma/migrations/20261009020000_add_md102_certification/migration.sql'),'utf8');await db.exec(sql);await db.exec(sql);
+  await db.exec(`INSERT INTO placements VALUES ('md','MD_102',FALSE)`);
+  assert.deepEqual((await db.query(`SELECT * FROM placements WHERE id='existing'`)).rows[0],{id:'existing',exam:'AZURE',active:true});assert.equal((await db.query(`SELECT exam FROM placements WHERE id='md'`)).rows[0].exam,'MD_102');
+ }finally{await db.close();}
+});

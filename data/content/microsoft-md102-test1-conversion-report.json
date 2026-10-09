@@ -1,0 +1,300 @@
+{
+  "examCode": "MD-102",
+  "sourceQuestionCount": 45,
+  "sourceFile": "Pasted text (2)(1).txt",
+  "sourceSha256": "b48e44efc5ad3d2ebc19cbbe098a1a546909db0b18850d86385761ee7dfaa617",
+  "sourcePreserved": true,
+  "importQuestionCount": 32,
+  "reviewStatus": "PENDING",
+  "sourceMapping": [
+    {
+      "sourceQuestionNumber": 1,
+      "status": "withheld-retired",
+      "reviewNote": "Retired Microsoft Deployment Toolkit workflow; preserve for reference but do not publish as current MD-102 preparation."
+    },
+    {
+      "sourceQuestionNumber": 2,
+      "status": "corrected-replacement",
+      "targetObjectiveId": "md-102.test1.delivery-optimization",
+      "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+    },
+    {
+      "sourceQuestionNumber": 3,
+      "status": "corrected-replacement",
+      "targetObjectiveId": "md-102.test1.macos-defender",
+      "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+    },
+    {
+      "sourceQuestionNumber": 4,
+      "status": "corrected-replacement",
+      "targetObjectiveId": "md-102.test1.hello-pin-policy",
+      "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+    },
+    {
+      "sourceQuestionNumber": 5,
+      "status": "corrected-replacement",
+      "targetObjectiveId": "md-102.test1.remoting-authorization",
+      "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+    },
+    {
+      "sourceQuestionNumber": 6,
+      "status": "corrected-replacement",
+      "targetObjectiveId": "md-102.test1.subscription-activation",
+      "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+    },
+    {
+      "sourceQuestionNumber": 7,
+      "status": "corrected-replacement",
+      "targetObjectiveId": "md-102.test1.endpoint-analytics",
+      "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+    },
+    {
+      "sourceQuestionNumber": 8,
+      "status": "corrected-replacement",
+      "targetObjectiveId": "md-102.test1.m365-app-deployment",
+      "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+    },
+    {
+      "sourceQuestionNumber": 9,
+      "status": "consolidated-replacement",
+      "targetObjectiveId": "md-102.test1.hello-pin-policy",
+      "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+    },
+    {
+      "sourceQuestionNumber": 10,
+      "status": "corrected-replacement",
+      "targetObjectiveId": "md-102.test1.chrome-bookmarks",
+      "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+    },
+    {
+      "sourceQuestionNumber": 11,
+      "status": "withheld-retired",
+      "reviewNote": "Retired Microsoft Deployment Toolkit workflow; preserve for reference but do not publish as current MD-102 preparation."
+    },
+    {
+      "sourceQuestionNumber": 12,
+      "status": "corrected-replacement",
+      "targetObjectiveId": "md-102.test1.authenticator-number-matching",
+      "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+    },
+    {
+      "sourceQuestionNumber": 13,
+      "status": "corrected-replacement",
+      "targetObjectiveId": "md-102.test1.android-corporate-profile",
+      "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+    },
+    {
+      "sourceQuestionNumber": 14,
+      "status": "corrected-replacement",
+      "targetObjectiveId": "md-102.test1.android-patch-compliance",
+      "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+    },
+    {
+      "sourceQuestionNumber": 15,
+      "status": "corrected-replacement",
+      "targetObjectiveId": "md-102.test1.defender-onboarding",
+      "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+    },
+    {
+      "sourceQuestionNumber": 16,
+      "status": "corrected-replacement",
+      "targetObjectiveId": "md-102.test1.targeting-versus-scope-tags",
+      "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+    },
+    {
+      "sourceQuestionNumber": 17,
+      "status": "corrected-replacement",
+      "targetObjectiveId": "md-102.test1.defender-connector",
+      "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+    },
+    {
+      "sourceQuestionNumber": 18,
+      "status": "corrected-replacement",
+      "targetObjectiveId": "md-102.test1.ios-lob-package",
+      "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+    },
+    {
+      "sourceQuestionNumber": 19,
+      "status": "corrected-replacement",
+      "targetObjectiveId": "md-102.test1.os-based-groups",
+      "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+    },
+    {
+      "sourceQuestionNumber": 20,
+      "status": "withheld-retired",
+      "reviewNote": "Retired Microsoft Deployment Toolkit workflow; preserve for reference but do not publish as current MD-102 preparation."
+    },
+    {
+      "sourceQuestionNumber": 21,
+      "status": "corrected-replacement",
+      "targetObjectiveId": "md-102.test1.enable-remoting-target",
+      "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+    },
+    {
+      "sourceQuestionNumber": 22,
+      "status": "corrected-replacement",
+      "targetObjectiveId": "md-102.test1.data-warehouse-report",
+      "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+    },
+    {
+      "sourceQuestionNumber": 23,
+      "status": "corrected-replacement",
+      "targetObjectiveId": "md-102.test1.esp-diagnostics",
+      "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+    },
+    {
+      "sourceQuestionNumber": 24,
+      "status": "corrected-replacement",
+      "targetObjectiveId": "md-102.test1.retire-versus-wipe",
+      "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+    },
+    {
+      "sourceQuestionNumber": 25,
+      "status": "withheld-retired",
+      "reviewNote": "Retired Microsoft Deployment Toolkit workflow; preserve for reference but do not publish as current MD-102 preparation."
+    },
+    {
+      "sourceQuestionNumber": 26,
+      "status": "consolidated-replacement",
+      "targetObjectiveId": "md-102.test1.hello-pin-policy",
+      "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+    },
+    {
+      "sourceQuestionNumber": 27,
+      "status": "corrected-replacement",
+      "targetObjectiveId": "md-102.test1.guest-log-collection",
+      "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+    },
+    {
+      "sourceQuestionNumber": 28,
+      "status": "corrected-replacement",
+      "targetObjectiveId": "md-102.test1.entra-join",
+      "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+    },
+    {
+      "sourceQuestionNumber": 29,
+      "status": "corrected-replacement",
+      "targetObjectiveId": "md-102.test1.endpoint-security-policies",
+      "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+    },
+    {
+      "sourceQuestionNumber": 30,
+      "status": "corrected-replacement",
+      "targetObjectiveId": "md-102.test1.preview-build-control",
+      "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+    },
+    {
+      "sourceQuestionNumber": 31,
+      "status": "corrected-replacement",
+      "targetObjectiveId": "md-102.test1.win32-preparation",
+      "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+    },
+    {
+      "sourceQuestionNumber": 32,
+      "status": "corrected-replacement",
+      "targetObjectiveId": "md-102.test1.provisioning-without-reimage",
+      "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+    },
+    {
+      "sourceQuestionNumber": 33,
+      "status": "corrected-replacement",
+      "targetObjectiveId": "md-102.test1.android-enrollment-restrictions",
+      "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+    },
+    {
+      "sourceQuestionNumber": 34,
+      "status": "corrected-replacement",
+      "targetObjectiveId": "md-102.test1.remote-help-prerequisites",
+      "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+    },
+    {
+      "sourceQuestionNumber": 35,
+      "status": "corrected-replacement",
+      "targetObjectiveId": "md-102.test1.analytics-baseline",
+      "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+    },
+    {
+      "sourceQuestionNumber": 36,
+      "status": "consolidated-replacement",
+      "targetObjectiveId": "md-102.test1.defender-onboarding",
+      "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+    },
+    {
+      "sourceQuestionNumber": 37,
+      "status": "withheld-retired",
+      "reviewNote": "Retired Microsoft Deployment Toolkit workflow; preserve for reference but do not publish as current MD-102 preparation."
+    },
+    {
+      "sourceQuestionNumber": 38,
+      "status": "consolidated-replacement",
+      "targetObjectiveId": "md-102.test1.endpoint-analytics",
+      "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+    },
+    {
+      "sourceQuestionNumber": 39,
+      "status": "consolidated-replacement",
+      "targetObjectiveId": "md-102.test1.esp-diagnostics",
+      "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+    },
+    {
+      "sourceQuestionNumber": 40,
+      "status": "consolidated-replacement",
+      "targetObjectiveId": "md-102.test1.macos-defender",
+      "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+    },
+    {
+      "sourceQuestionNumber": 41,
+      "status": "consolidated-replacement",
+      "targetObjectiveId": "md-102.test1.defender-connector",
+      "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+    },
+    {
+      "sourceQuestionNumber": 42,
+      "status": "corrected-replacement",
+      "targetObjectiveId": "md-102.test1.win32-dependency-diagnosis",
+      "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+    },
+    {
+      "sourceQuestionNumber": 43,
+      "status": "withheld-retired",
+      "reviewNote": "Retired Microsoft Deployment Toolkit workflow; preserve for reference but do not publish as current MD-102 preparation."
+    },
+    {
+      "sourceQuestionNumber": 44,
+      "status": "corrected-replacement",
+      "targetObjectiveId": "md-102.test1.supported-office-configuration",
+      "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+    },
+    {
+      "sourceQuestionNumber": 45,
+      "status": "corrected-replacement",
+      "targetObjectiveId": "md-102.test1.apple-push-certificate",
+      "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+    }
+  ],
+  "summary": {
+    "withheld-retired": 6,
+    "corrected-replacement": 32,
+    "consolidated-replacement": 7
+  },
+  "independentFactCheck": "Targeted source errors checked against primary documentation. Standalone replacements still require final editorial review.",
+  "conversionPolicy": "Use current standalone supported-platform scenarios; do not silently change a source key or reconstruct missing context. Consolidate repeated concepts and preserve retirement/correction reasons.",
+  "routing": {
+    "lane": "CERTIFICATIONS",
+    "certExam": "MD_102",
+    "requiresMigration": "20261009020000_add_md102_certification",
+    "note": "Deploy migration and regenerate Prisma before importing. MD-102 is not an Azure/AZ-104 pool."
+  },
+  "examReference": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/md-102",
+  "coverageWarning": "Supplementary practice, not a complete current exam blueprint.",
+  "reviewReferences": [
+    "https://learn.microsoft.com/en-us/troubleshoot/mem/configmgr/mdt/mdt-retirement"
+  ],
+  "difficultyCounts": {
+    "3": 21,
+    "4": 2,
+    "2": 6,
+    "1": 2,
+    "5": 1
+  }
+}

@@ -22,8 +22,8 @@ declare module "@prisma/client" {
   export type QuestionSetStatus = "DRAFT" | "PUBLISHED" | "ARCHIVED";
   export const ContentLane: { TEST_NOW: "TEST_NOW"; TRAINING: "TRAINING"; CERTIFICATIONS: "CERTIFICATIONS"; INTERVIEW: "INTERVIEW" };
   export type ContentLane = "TEST_NOW" | "TRAINING" | "CERTIFICATIONS" | "INTERVIEW";
-  export const CertExam: { A_PLUS: "A_PLUS"; SECURITY_PLUS: "SECURITY_PLUS"; AZ_900: "AZ_900"; AWS: "AWS"; AZURE: "AZURE" };
-  export type CertExam = "A_PLUS" | "SECURITY_PLUS" | "AZ_900" | "AWS" | "AZURE";
+  export const CertExam: { A_PLUS: "A_PLUS"; SECURITY_PLUS: "SECURITY_PLUS"; AZ_900: "AZ_900"; AWS: "AWS"; AZURE: "AZURE"; MD_102: "MD_102" };
+  export type CertExam = "A_PLUS" | "SECURITY_PLUS" | "AZ_900" | "AWS" | "AZURE" | "MD_102";
   export const StartingPosition: { HELPDESK_SUPPORT: "HELPDESK_SUPPORT"; DESKTOP_TECHNICIAN: "DESKTOP_TECHNICIAN"; CLOUD_ENGINEER: "CLOUD_ENGINEER" };
   export type StartingPosition = "HELPDESK_SUPPORT" | "DESKTOP_TECHNICIAN" | "CLOUD_ENGINEER";
   export const QuestionDomain: { IDENTITY: "IDENTITY"; NETWORKING: "NETWORKING"; SECURITY: "SECURITY"; COMPUTE: "COMPUTE"; STORAGE: "STORAGE"; AZURE: "AZURE"; AWS: "AWS"; WINDOWS: "WINDOWS"; GENERAL: "GENERAL"; };

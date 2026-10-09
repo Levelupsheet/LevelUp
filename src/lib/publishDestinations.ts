@@ -10,5 +10,5 @@ export function trainingDestinations(catalog: any[], placements: any[], sets: an
 }
 
 export function certificationLabel(code: string) {
-  return ({ A_PLUS: 'CompTIA A+', SECURITY_PLUS: 'CompTIA Security+', AZ_900: 'Microsoft AZ-900', AWS: 'AWS', AZURE: 'Azure' } as Record<string, string>)[code] || code.replaceAll('_', ' ');
+  return ({ A_PLUS: 'CompTIA A+', SECURITY_PLUS: 'CompTIA Security+', AZ_900: 'Microsoft AZ-900', AWS: 'AWS', AZURE: 'Azure', MD_102: 'Microsoft MD-102' } as Record<string, string>)[code] || code.replaceAll('_', ' ');
 }

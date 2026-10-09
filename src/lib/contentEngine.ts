@@ -63,7 +63,7 @@ export type CandidateQuestion = {
 
 const LANES = ["TEST_NOW", "TRAINING", "CERTIFICATIONS", "INTERVIEW"] as const;
 const STARTING_POSITIONS = ["HELPDESK_SUPPORT", "DESKTOP_TECHNICIAN", "CLOUD_ENGINEER"] as const;
-const CERT_EXAMS = ["A_PLUS", "SECURITY_PLUS", "AZ_900", "AWS", "AZURE"] as const;
+const CERT_EXAMS = ["A_PLUS", "SECURITY_PLUS", "AZ_900", "AWS", "AZURE", "MD_102"] as const;
 const DOMAINS = ["IDENTITY", "NETWORKING", "SECURITY", "COMPUTE", "STORAGE", "AZURE", "AWS", "WINDOWS", "GENERAL"] as const;
 const DOMAIN_ALIASES: Record<string, QuestionDomain> = {
   ACTIVE_DIRECTORY: "IDENTITY",
@@ -93,7 +93,7 @@ function inferLane(raw: any): ContentLane { const direct = normalizeToken(raw?.l
 function normalizeStartingPosition(input?: string | null): StartingPosition | null { const raw = normalizeToken(input || ""); return (STARTING_POSITIONS as readonly string[]).includes(raw) ? raw as StartingPosition : null; }
 function inferStartingPosition(raw: any, lane: ContentLane): StartingPosition | null { const direct = normalizeStartingPosition(raw?.startingPosition); if (direct) return direct; if (lane !== "TRAINING") return null; const hay = normalizeToken([raw?.id, raw?.title, raw?.setName, raw?.domain, ...(Array.isArray(raw?.tags) ? raw.tags : [])].join(" ")); if (/HELPDESK/.test(hay)) return "HELPDESK_SUPPORT"; if (/DESKTOP/.test(hay)) return "DESKTOP_TECHNICIAN"; if (/CLOUD/.test(hay)) return "CLOUD_ENGINEER"; return null; }
 function normalizeCertExam(input?: string | null): CertExam | null { const raw = normalizeToken(input || ""); if (raw === "SECURITY" || raw === "SECURITYPLUS") return "SECURITY_PLUS"; if (raw === "A" || raw === "APLUS") return "A_PLUS"; return (CERT_EXAMS as readonly string[]).includes(raw) ? raw as CertExam : null; }
-function inferCertExam(raw: any, lane: ContentLane): CertExam | null { const direct = normalizeCertExam(raw?.certExam); if (direct) return direct; if (lane !== "CERTIFICATIONS") return null; const hay = normalizeToken([raw?.id, raw?.title, raw?.setName, raw?.domain, ...(Array.isArray(raw?.tags) ? raw.tags : [])].join(" ")); if (/AZ_900/.test(hay)) return "AZ_900"; if (/SECURITY_PLUS|SECURITY\+/.test(hay)) return "SECURITY_PLUS"; if (/A_PLUS|A\+/.test(hay)) return "A_PLUS"; if (/AWS/.test(hay)) return "AWS"; if (/AZURE/.test(hay)) return "AZURE"; return null; }
+function inferCertExam(raw: any, lane: ContentLane): CertExam | null { const direct = normalizeCertExam(raw?.certExam); if (direct) return direct; if (lane !== "CERTIFICATIONS") return null; const hay = normalizeToken([raw?.id, raw?.title, raw?.setName, raw?.domain, ...(Array.isArray(raw?.tags) ? raw.tags : [])].join(" ")); if (/MD_102/.test(hay)) return "MD_102"; if (/AZ_900/.test(hay)) return "AZ_900"; if (/SECURITY_PLUS|SECURITY\+/.test(hay)) return "SECURITY_PLUS"; if (/A_PLUS|A\+/.test(hay)) return "A_PLUS"; if (/AWS/.test(hay)) return "AWS"; if (/AZURE/.test(hay)) return "AZURE"; return null; }
 export function normalizeKnowledgeBlock(input: KnowledgeBlockInput, index = 0): NormalizedKnowledgeBlock {
   const raw = input?.contentJson && typeof input.contentJson === "object" ? { ...input.contentJson, ...input } : input;
   if (raw.schemaVersion === 2 && (!raw.id || !raw.setName || !raw.lane)) throw new Error('Version 2 knowledge blocks require stable id, setName and explicit lane');

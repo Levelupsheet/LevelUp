@@ -228,7 +228,7 @@ function LocalPrototypeAdmin(){
 
   const poolMeta = useMemo(() => {
     const paths: PositionPath[] = ["HELPDESK_SUPPORT", "DESKTOP_TECHNICIAN", "CLOUD_ENGINEER"];
-    const certs: CertTrack[] = ["A_PLUS", "SECURITY_PLUS", "AZ_900", "AWS", "AZURE"];
+    const certs: CertTrack[] = ["A_PLUS", "SECURITY_PLUS", "AZ_900", "AWS", "AZURE", "MD_102"];
     const entries: { key: string; label: string }[] = [];
     for (const p of paths) entries.push({ key: getPoolKeyForPosition(p), label: `Position • ${p}` });
     for (const c of certs) entries.push({ key: getPoolKeyForCert(c), label: `Cert • ${c}` });
@@ -1043,7 +1043,7 @@ export default function AdminPage(){
   const [placements, setPlacements] = useState<any[]>([]);
   const [poolViewLane, setPoolViewLane] = useState<"TRAINING"|"CERTIFICATIONS"|"TEST_NOW"|"INTERVIEW">("TRAINING");
   const [assignStartPos, setAssignStartPos] = useState<"HELPDESK_SUPPORT" | "DESKTOP_TECHNICIAN" | "CLOUD_ENGINEER">("HELPDESK_SUPPORT");
-  const [assignCertExam, setAssignCertExam] = useState<"A_PLUS" | "SECURITY_PLUS" | "AZ_900" | "AWS" | "AZURE">("A_PLUS");
+  const [assignCertExam, setAssignCertExam] = useState<"A_PLUS" | "SECURITY_PLUS" | "AZ_900" | "AWS" | "AZURE" | "MD_102">("A_PLUS");
 
   const [selectedSet, setSelectedSet] = useState<string>("");
   const [newSetName, setNewSetName] = useState("Networking Set 1");

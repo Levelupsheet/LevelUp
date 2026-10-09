@@ -115,3 +115,25 @@ test('AZ-104 corrects known source errors without guessing missing named machine
  assert.ok(rows.every(q=>!/(following|below)\s+(table|diagram)|VM-[ABCDE]|\bAZ-900\b/i.test(q.prompt)));
  assert.equal(source.referenceMaterial.conversionAudit.sourceMapping.filter(x=>x.status==='withheld-review').length,11);
 });
+
+test('AWS and MD-102 uploads retain complete accounting, supported formats, five tiers and stable certification metadata',()=>{
+ for(const [name,exam,count,sourceCount,cert] of [['aws-saa-c03-test1','SAA-C03',60,65,'AWS'],['microsoft-md102-test1','MD-102',32,45,'MD_102']]){
+  const [b]=importEnvelope(JSON.parse(fs.readFileSync(require.resolve('../data/content/'+name+'-v2.json'),'utf8')));
+  assert.equal(b.lane,'CERTIFICATIONS');assert.equal(b.certExam,cert);
+  const audit=b.referenceMaterial.conversionAudit;assert.equal(audit.importQuestionCount,count);assert.deepEqual(audit.sourceMapping.map(r=>r.sourceQuestionNumber),Array.from({length:sourceCount},(_,i)=>i+1));
+  assert.deepEqual(audit,JSON.parse(fs.readFileSync(require.resolve('../data/content/'+name+'-conversion-report.json'),'utf8')));
+  const r=generateContentReport(normalizeKnowledgeBlock(b));assert.deepEqual(r.issues,[]);assert.equal(r.questions.length,count);assert.deepEqual([...new Set(r.questions.map(q=>q.difficulty))].sort(),[1,2,3,4,5]);
+  for(const q of r.questions){assert.equal(q.type,'multiple_choice');assert.equal(q.data.examCode,exam);assert.ok(q.data.hints.length && q.explanation && !q.goldenEligible && !q.data.bossEligible);assert.equal(duplicateContentReason(q,r.questions.filter(other=>other!==q)),'',q.prompt);}
+  const imported=contentImportReport(b);assert.deepEqual(imported.issues,[]);assert.equal(imported.questions.length,count);
+  const round=generateContentReport(normalizeKnowledgeBlock({...b,questions:r.questions}));assert.deepEqual(round.issues,[]);assert.equal(round.questions.length,count);
+  for(const row of audit.sourceMapping.filter(x=>x.targetObjectiveId))assert.ok(r.questions.some(q=>q.data.objectiveId===row.targetObjectiveId),JSON.stringify(row));
+ }
+});
+
+test('MD-102 corrects contradictory ESP answers and wrong targeting, packaging and prerequisite keys',()=>{
+ const [b]=importEnvelope(JSON.parse(fs.readFileSync(require.resolve('../data/content/microsoft-md102-test1-v2.json'),'utf8')));const r=contentImportReport(b);const answer=topic=>{const q=r.questions.find(q=>q.data.subdomain===topic);return q.choices[q.correctIndex];};
+ assert.match(answer('esp-diagnostics'),/Enrollment Status Page/);assert.match(answer('chrome-bookmarks'),/app configuration/);assert.match(answer('targeting-versus-scope-tags'),/assignment/);assert.match(answer('win32-preparation'),/Content Prep Tool/);assert.match(answer('win32-dependency-diagnosis'),/dependency/);
+ const maps=b.referenceMaterial.conversionAudit.sourceMapping;assert.equal(maps.find(x=>x.sourceQuestionNumber===23).targetObjectiveId,maps.find(x=>x.sourceQuestionNumber===39).targetObjectiveId);assert.equal(maps.filter(x=>x.status==='withheld-retired').length,6);
+ const {CertExam}=require('@prisma/client');assert.ok(Object.values(CertExam).includes('MD_102'));
+ const {certificationLabel}=require('../src/lib/publishDestinations.ts');assert.equal(certificationLabel('MD_102'),'Microsoft MD-102');
+});

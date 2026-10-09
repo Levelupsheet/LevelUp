@@ -1,0 +1,1560 @@
+{
+  "schemaVersion": 2,
+  "blocks": [
+    {
+      "id": "microsoft-md102-test1-v2",
+      "title": "Microsoft MD-102 — Endpoint Administrator Practice Test 1",
+      "setName": "MD-102 Practice Test 1",
+      "lane": "CERTIFICATIONS",
+      "certExam": "MD_102",
+      "industry": "Information Technology",
+      "careerPath": "Desktop Technician",
+      "domain": "WINDOWS",
+      "domainId": "microsoft-md102",
+      "difficulty": 1,
+      "questions": [
+        {
+          "objectiveId": "md-102.test1.delivery-optimization",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "Intune-managed supported Windows devices should download updates from Microsoft and peers on the local network, with controlled download bandwidth. Which policy family configures this behavior?",
+          "choices": [
+            "Chrome app protection settings",
+            "Delivery Optimization settings in an assigned device configuration policy",
+            "A Microsoft Entra user display-name setting",
+            "An Intune scope tag by itself"
+          ],
+          "correctIndex": 1,
+          "explanation": "Delivery Optimization settings control download modes and bandwidth. Use supported settings-catalog or template settings and test assignment; an unrelated peer-networking policy is not the Intune configuration required here.",
+          "hints": [
+            "Identify the Windows update content-distribution feature."
+          ],
+          "domainId": "md-102-device-management",
+          "subdomain": "delivery-optimization",
+          "isGoldenEligible": false,
+          "tags": [
+            "md-102",
+            "practice-test-1",
+            "device-management"
+          ],
+          "data": {
+            "examCode": "MD-102",
+            "sourceQuestionNumbers": [
+              2
+            ],
+            "sourceTest": "MD-102 Practice Test 1",
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/intune/device-configuration/templates/configure-delivery-optimization-windows"
+            ]
+          }
+        },
+        {
+          "objectiveId": "md-102.test1.macos-defender",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "A supported macOS device is enrolled in Intune but does not have Microsoft Defender for Endpoint installed. The administrator wants Defender antivirus policies to affect that endpoint. Which prerequisite must be addressed?",
+          "choices": [
+            "Deploy and correctly configure Microsoft Defender for Endpoint on the Mac",
+            "Deploy a Windows-only MSI installer to the Mac",
+            "Change the device’s display name",
+            "Assign only a scope tag and omit the security product"
+          ],
+          "correctIndex": 0,
+          "explanation": "The endpoint security product and its macOS prerequisites must exist before its policies can provide protection. Required permissions, onboarding and licensing must also be configured.",
+          "hints": [
+            "Check whether the product governed by the policy is present."
+          ],
+          "domainId": "md-102-security",
+          "subdomain": "macos-defender",
+          "isGoldenEligible": false,
+          "tags": [
+            "md-102",
+            "practice-test-1",
+            "security"
+          ],
+          "data": {
+            "examCode": "MD-102",
+            "sourceQuestionNumbers": [
+              3,
+              40
+            ],
+            "sourceTest": "MD-102 Practice Test 1",
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/defender-endpoint/mac-install-with-intune"
+            ]
+          }
+        },
+        {
+          "objectiveId": "md-102.test1.hello-pin-policy",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "Users on supported managed Windows devices must create a Windows Hello for Business PIN with at least six digits. Which configuration directly expresses that requirement?",
+          "choices": [
+            "Only enabling automatic MDM enrollment without a PIN policy",
+            "Adding a DNS TXT record containing the number six",
+            "An assigned Windows Hello for Business policy with minimum PIN length set to six",
+            "Only changing Microsoft Entra device display names"
+          ],
+          "correctIndex": 2,
+          "explanation": "Windows Hello for Business PIN settings configure PIN requirements. Enrollment enables management but does not by itself establish the required PIN length. Verify assignment and policy conflicts before enforcement.",
+          "hints": [
+            "Distinguish the management enrollment prerequisite from the PIN requirement."
+          ],
+          "domainId": "md-102-security",
+          "subdomain": "hello-pin-policy",
+          "isGoldenEligible": false,
+          "tags": [
+            "md-102",
+            "practice-test-1",
+            "security"
+          ],
+          "data": {
+            "examCode": "MD-102",
+            "sourceQuestionNumbers": [
+              4,
+              9,
+              26
+            ],
+            "sourceTest": "MD-102 Practice Test 1",
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/intune/device-enrollment/windows/windows-hello"
+            ]
+          }
+        },
+        {
+          "objectiveId": "md-102.test1.remoting-authorization",
+          "type": "multiple_choice",
+          "difficulty": 4,
+          "prompt": "An authorized support user can reach WinRM on a supported Windows device but is denied access to its PowerShell session endpoint. The task does not require an interactive Remote Desktop session. What should be reviewed?",
+          "choices": [
+            "The Intune app icon cache",
+            "Remote Desktop Users membership as proof of PowerShell endpoint access",
+            "Only the wallpaper setting",
+            "The PowerShell endpoint’s session permissions and approved remoting authorization"
+          ],
+          "correctIndex": 3,
+          "explanation": "PowerShell remoting requires endpoint authorization as well as transport access. Remote Desktop membership controls a different access path. Use least privilege or a constrained endpoint for approved support tasks.",
+          "hints": [
+            "Separate transport connectivity from authorization to the remoting endpoint."
+          ],
+          "domainId": "md-102-security",
+          "subdomain": "remoting-authorization",
+          "isGoldenEligible": false,
+          "tags": [
+            "md-102",
+            "practice-test-1",
+            "security"
+          ],
+          "data": {
+            "examCode": "MD-102",
+            "sourceQuestionNumbers": [
+              5
+            ],
+            "sourceTest": "MD-102 Practice Test 1",
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_remote_requirements"
+            ]
+          },
+          "evidence": "WinRM is reachable; the PowerShell endpoint returns an authorization denial.",
+          "constraints": [
+            "Do not grant unnecessary interactive access",
+            "Preserve least privilege"
+          ]
+        },
+        {
+          "objectiveId": "md-102.test1.subscription-activation",
+          "type": "multiple_choice",
+          "difficulty": 2,
+          "prompt": "A supported Windows 11 Pro device and its user meet the documented Enterprise subscription activation prerequisites. What does assigning the qualifying subscription provide?",
+          "choices": [
+            "An upgrade from every Home edition without prerequisites",
+            "An edition step-up from Pro to Enterprise without an OS-version upgrade by itself",
+            "An automatic Windows 10-to-Windows 11 upgrade regardless of hardware support",
+            "A replacement for the device’s required qualifying base license"
+          ],
+          "correctIndex": 1,
+          "explanation": "Subscription activation changes the licensed edition when prerequisites are met. It is distinct from upgrading the operating-system version and does not bypass eligibility requirements.",
+          "hints": [
+            "Separate edition activation from an operating-system version upgrade."
+          ],
+          "domainId": "md-102-device-management",
+          "subdomain": "subscription-activation",
+          "isGoldenEligible": false,
+          "tags": [
+            "md-102",
+            "practice-test-1",
+            "device-management"
+          ],
+          "data": {
+            "examCode": "MD-102",
+            "sourceQuestionNumbers": [
+              6
+            ],
+            "sourceTest": "MD-102 Practice Test 1",
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/windows/deployment/windows-subscription-activation"
+            ]
+          }
+        },
+        {
+          "objectiveId": "md-102.test1.endpoint-analytics",
+          "type": "multiple_choice",
+          "difficulty": 2,
+          "prompt": "An endpoint administrator needs reporting on supported Windows devices’ startup performance and restart patterns. Which Intune capability supplies this analysis?",
+          "choices": [
+            "Endpoint analytics",
+            "A DNS zone transfer",
+            "An Azure NSG flow rule",
+            "An Intune app protection PIN alone"
+          ],
+          "correctIndex": 0,
+          "explanation": "Endpoint analytics provides endpoint experience and performance insights, including startup reporting. Eligible devices must be onboarded and send the required telemetry.",
+          "hints": [
+            "Choose the endpoint experience reporting capability."
+          ],
+          "domainId": "md-102-device-management",
+          "subdomain": "endpoint-analytics",
+          "isGoldenEligible": false,
+          "tags": [
+            "md-102",
+            "practice-test-1",
+            "device-management"
+          ],
+          "data": {
+            "examCode": "MD-102",
+            "sourceQuestionNumbers": [
+              7,
+              38
+            ],
+            "sourceTest": "MD-102 Practice Test 1",
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/intune/analytics/overview"
+            ]
+          }
+        },
+        {
+          "objectiveId": "md-102.test1.m365-app-deployment",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "An organization must deploy supported Microsoft 365 Apps to enrolled Windows devices through Intune. Which resource should be created and assigned?",
+          "choices": [
+            "A device profile that only changes the wallpaper",
+            "A Microsoft 365 Apps for Windows app deployment",
+            "A scope tag without an app assignment",
+            "An Android APK deployment"
+          ],
+          "correctIndex": 1,
+          "explanation": "Intune’s Microsoft 365 Apps deployment configures and assigns the Windows app suite. A general device profile does not replace an app deployment.",
+          "hints": [
+            "Distinguish app installation from device configuration."
+          ],
+          "domainId": "md-102-app-management",
+          "subdomain": "m365-app-deployment",
+          "isGoldenEligible": false,
+          "tags": [
+            "md-102",
+            "practice-test-1",
+            "app-management"
+          ],
+          "data": {
+            "examCode": "MD-102",
+            "sourceQuestionNumbers": [
+              8
+            ],
+            "sourceTest": "MD-102 Practice Test 1",
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/intune/app-management/deployment/add-microsoft-365-apps"
+            ]
+          }
+        },
+        {
+          "objectiveId": "md-102.test1.chrome-bookmarks",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "Managed Android Enterprise devices need administrator-defined Chrome bookmarks. Which Intune policy type carries the supported Chrome configuration?",
+          "choices": [
+            "An app configuration policy for managed devices targeting Chrome",
+            "A Windows update ring",
+            "An app protection policy as a substitute for managed bookmarks",
+            "An Intune scope tag without any app settings"
+          ],
+          "correctIndex": 0,
+          "explanation": "Supported Chrome managed settings are delivered with an app configuration policy. App protection policies protect app data; they do not replace this application configuration.",
+          "hints": [
+            "Separate application settings from app-data protection."
+          ],
+          "domainId": "md-102-app-management",
+          "subdomain": "chrome-bookmarks",
+          "isGoldenEligible": false,
+          "tags": [
+            "md-102",
+            "practice-test-1",
+            "app-management"
+          ],
+          "data": {
+            "examCode": "MD-102",
+            "sourceQuestionNumbers": [
+              10
+            ],
+            "sourceTest": "MD-102 Practice Test 1",
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/intune/app-management/configuration/configure-chrome-android"
+            ]
+          }
+        },
+        {
+          "objectiveId": "md-102.test1.authenticator-number-matching",
+          "type": "multiple_choice",
+          "difficulty": 2,
+          "prompt": "A supported Microsoft Entra passwordless phone sign-in flow requires the user to approve a displayed number using the registered mobile app. Which listed method fits?",
+          "choices": [
+            "A FIDO2 security key touch as a number-matching app flow",
+            "SMS text message codes",
+            "A voice call approval",
+            "Microsoft Authenticator phone sign-in"
+          ],
+          "correctIndex": 3,
+          "explanation": "Microsoft Authenticator supports the specified phone sign-in experience. Other passwordless or MFA methods have different interactions; registration and authentication-method policy must support the selected flow.",
+          "hints": [
+            "Match the requested mobile approval interaction."
+          ],
+          "domainId": "md-102-security",
+          "subdomain": "authenticator-number-matching",
+          "isGoldenEligible": false,
+          "tags": [
+            "md-102",
+            "practice-test-1",
+            "security"
+          ],
+          "data": {
+            "examCode": "MD-102",
+            "sourceQuestionNumbers": [
+              12
+            ],
+            "sourceTest": "MD-102 Practice Test 1",
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/entra/identity/authentication/howto-authentication-passwordless-phone"
+            ]
+          }
+        },
+        {
+          "objectiveId": "md-102.test1.android-corporate-profile",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "An Android Enterprise device needs separate organization and personal app/data spaces while remaining company-owned. Which enrollment model matches that combination?",
+          "choices": [
+            "A personally owned device with no work profile",
+            "An unmanaged device using a shared account",
+            "Corporate-owned device with a work profile",
+            "A Windows Autopilot self-deploying device"
+          ],
+          "correctIndex": 2,
+          "explanation": "A corporate-owned work profile separates work and personal spaces on supported company-owned Android devices. It is distinct from fully managed and personally owned enrollment models.",
+          "hints": [
+            "Check both device ownership and the need for separate work and personal spaces."
+          ],
+          "domainId": "md-102-device-management",
+          "subdomain": "android-corporate-profile",
+          "isGoldenEligible": false,
+          "tags": [
+            "md-102",
+            "practice-test-1",
+            "device-management"
+          ],
+          "data": {
+            "examCode": "MD-102",
+            "sourceQuestionNumbers": [
+              13
+            ],
+            "sourceTest": "MD-102 Practice Test 1",
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/intune/device-enrollment/android/corporate-owned-work-profile-enroll"
+            ]
+          }
+        },
+        {
+          "objectiveId": "md-102.test1.android-patch-compliance",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "A supported Android Enterprise compliance policy must mark devices noncompliant when their reported security patch date is older than the approved threshold. Which setting directly evaluates this requirement?",
+          "choices": [
+            "Minimum security patch level",
+            "A policy that guarantees every OEM releases a patch immediately",
+            "A Chrome managed bookmark",
+            "A Windows quality-update ring"
+          ],
+          "correctIndex": 0,
+          "explanation": "A minimum security patch level evaluates the device’s reported patch date. It does not deploy patches itself or guarantee OEM/carrier availability, and it is different from requiring a new major OS version.",
+          "hints": [
+            "Distinguish checking a patch level from delivering an update."
+          ],
+          "domainId": "md-102-security",
+          "subdomain": "android-patch-compliance",
+          "isGoldenEligible": false,
+          "tags": [
+            "md-102",
+            "practice-test-1",
+            "security"
+          ],
+          "data": {
+            "examCode": "MD-102",
+            "sourceQuestionNumbers": [
+              14
+            ],
+            "sourceTest": "MD-102 Practice Test 1",
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/intune/device-security/compliance/ref-android-enterprise"
+            ]
+          }
+        },
+        {
+          "objectiveId": "md-102.test1.defender-onboarding",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "Licensed Intune-managed Windows devices must be onboarded to Microsoft Defender for Endpoint using the supported integration. Which endpoint security policy family is intended for this onboarding?",
+          "choices": [
+            "Only a Wi-Fi profile",
+            "Only a Windows wallpaper profile",
+            "An app uninstall assignment for Defender",
+            "Endpoint detection and response policy"
+          ],
+          "correctIndex": 3,
+          "explanation": "An EDR policy supports Defender for Endpoint onboarding through the configured integration. Licensing, connector setup and device eligibility are prerequisites; verify onboarding state after assignment.",
+          "hints": [
+            "Choose the policy that establishes endpoint detection and response onboarding."
+          ],
+          "domainId": "md-102-security",
+          "subdomain": "defender-onboarding",
+          "isGoldenEligible": false,
+          "tags": [
+            "md-102",
+            "practice-test-1",
+            "security"
+          ],
+          "data": {
+            "examCode": "MD-102",
+            "sourceQuestionNumbers": [
+              15,
+              36
+            ],
+            "sourceTest": "MD-102 Practice Test 1",
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/intune/device-security/endpoint-security/edr-policy"
+            ]
+          }
+        },
+        {
+          "objectiveId": "md-102.test1.targeting-versus-scope-tags",
+          "type": "multiple_choice",
+          "difficulty": 4,
+          "prompt": "A policy is assigned to a group containing Device1 and Device2. An administrator adds a scope tag and expects only Device1 to receive it. Both devices still receive it. Which change addresses the targeting requirement?",
+          "choices": [
+            "Rename the policy to Device1",
+            "Give Device1 a different wallpaper without changing targeting",
+            "Add more scope tags while retaining the same target assignment",
+            "Change group assignment or use a supported assignment filter matching Device1"
+          ],
+          "correctIndex": 3,
+          "explanation": "Scope tags constrain administrative visibility and management scope. Policy delivery uses assignments and supported filters; a scope tag is not an individual-device targeting rule.",
+          "hints": [
+            "Trace the delivery assignment separately from administrator visibility."
+          ],
+          "domainId": "md-102-device-management",
+          "subdomain": "targeting-versus-scope-tags",
+          "isGoldenEligible": false,
+          "tags": [
+            "md-102",
+            "practice-test-1",
+            "device-management"
+          ],
+          "data": {
+            "examCode": "MD-102",
+            "sourceQuestionNumbers": [
+              16
+            ],
+            "sourceTest": "MD-102 Practice Test 1",
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/intune/fundamentals/role-based-access-control/scope-tags"
+            ]
+          },
+          "evidence": "Both devices remain members of the assigned group; only a scope tag changed.",
+          "constraints": [
+            "Keep Device2 outside the intended deployment",
+            "Do not rely on a display name as a targeting rule"
+          ]
+        },
+        {
+          "objectiveId": "md-102.test1.defender-connector",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "An administrator plans to use Intune’s Microsoft Defender for Endpoint integration. Which tenant integration must be configured and verified before assigning dependent endpoint policies?",
+          "choices": [
+            "A VM availability-set name",
+            "An unrelated S3 bucket connection",
+            "A Chrome bookmark URL",
+            "The Microsoft Defender for Endpoint service connection in Intune"
+          ],
+          "correctIndex": 3,
+          "explanation": "The Defender connection links the services for supported endpoint security workflows. Portal navigation may change; verify the actual service connection rather than memorizing one historical menu location.",
+          "hints": [
+            "Identify the service-to-service integration behind the policy workflow."
+          ],
+          "domainId": "md-102-security",
+          "subdomain": "defender-connector",
+          "isGoldenEligible": false,
+          "tags": [
+            "md-102",
+            "practice-test-1",
+            "security"
+          ],
+          "data": {
+            "examCode": "MD-102",
+            "sourceQuestionNumbers": [
+              17,
+              41
+            ],
+            "sourceTest": "MD-102 Practice Test 1",
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/intune/device-security/defender/integrate"
+            ]
+          }
+        },
+        {
+          "objectiveId": "md-102.test1.ios-lob-package",
+          "type": "multiple_choice",
+          "difficulty": 1,
+          "prompt": "An administrator prepares a supported iOS/iPadOS line-of-business application package for Intune. Which file extension identifies the iOS app archive?",
+          "choices": [
+            ".msi",
+            ".apk",
+            ".ipa",
+            ".intunewin"
+          ],
+          "correctIndex": 2,
+          "explanation": "An IPA is an iOS application archive. Signing, provisioning, distribution and enrollment requirements must still be satisfied; the extension alone does not guarantee installability.",
+          "hints": [
+            "Identify the archive format for the target platform."
+          ],
+          "domainId": "md-102-app-management",
+          "subdomain": "ios-lob-package",
+          "isGoldenEligible": false,
+          "tags": [
+            "md-102",
+            "practice-test-1",
+            "app-management"
+          ],
+          "data": {
+            "examCode": "MD-102",
+            "sourceQuestionNumbers": [
+              18
+            ],
+            "sourceTest": "MD-102 Practice Test 1",
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/intune/app-management/deployment/lob-apps-ios"
+            ]
+          }
+        },
+        {
+          "objectiveId": "md-102.test1.os-based-groups",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "Intune needs different device policies for Android and iOS devices. Which group design can maintain membership from device platform attributes automatically?",
+          "choices": [
+            "Microsoft Entra dynamic device groups using supported device attributes",
+            "A single manually named user group with no membership rule",
+            "An app icon labeled Android",
+            "An Azure resource-group tag without an Intune assignment"
+          ],
+          "correctIndex": 0,
+          "explanation": "Dynamic device group rules can evaluate supported platform attributes. Policies must still be assigned to the appropriate groups and eligible enrollment types.",
+          "hints": [
+            "Look for device attributes rather than only user labels."
+          ],
+          "domainId": "md-102-device-management",
+          "subdomain": "os-based-groups",
+          "isGoldenEligible": false,
+          "tags": [
+            "md-102",
+            "practice-test-1",
+            "device-management"
+          ],
+          "data": {
+            "examCode": "MD-102",
+            "sourceQuestionNumbers": [
+              19
+            ],
+            "sourceTest": "MD-102 Practice Test 1",
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/entra/identity/users/groups-dynamic-membership"
+            ]
+          }
+        },
+        {
+          "objectiveId": "md-102.test1.enable-remoting-target",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "A support operator must run an approved PowerShell remoting command on Computer2 from Computer1. Remoting is not configured on Computer2. On which device must the target-side remoting configuration be enabled?",
+          "choices": [
+            "Computer2, with the required transport and endpoint authorization",
+            "Only an unrelated DNS server",
+            "Neither computer because a matching name automatically enables remoting",
+            "Only Computer1 while leaving Computer2 unconfigured"
+          ],
+          "correctIndex": 0,
+          "explanation": "The target must accept the supported remoting transport and authorize the operator. Enable-PSRemoting configures target-side remoting; network and security settings still require appropriate review.",
+          "hints": [
+            "Locate the device that receives the remote command."
+          ],
+          "domainId": "md-102-device-management",
+          "subdomain": "enable-remoting-target",
+          "isGoldenEligible": false,
+          "tags": [
+            "md-102",
+            "practice-test-1",
+            "device-management"
+          ],
+          "data": {
+            "examCode": "MD-102",
+            "sourceQuestionNumbers": [
+              21
+            ],
+            "sourceTest": "MD-102 Practice Test 1",
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/enable-psremoting"
+            ]
+          }
+        },
+        {
+          "objectiveId": "md-102.test1.data-warehouse-report",
+          "type": "multiple_choice",
+          "difficulty": 2,
+          "prompt": "An administrator needs to build a supported report using Intune Data Warehouse data through its documented integration. Which listed analytics tool fits?",
+          "choices": [
+            "An NSG rule editor",
+            "A VM serial console",
+            "Microsoft Paint",
+            "Microsoft Power BI"
+          ],
+          "correctIndex": 3,
+          "explanation": "Power BI can consume Intune Data Warehouse data for reports. Access, schema and refresh behavior must be configured; warehouse data should not be treated as a live per-device control plane.",
+          "hints": [
+            "Choose the reporting tool that consumes the warehouse data."
+          ],
+          "domainId": "md-102-device-management",
+          "subdomain": "data-warehouse-report",
+          "isGoldenEligible": false,
+          "tags": [
+            "md-102",
+            "practice-test-1",
+            "device-management"
+          ],
+          "data": {
+            "examCode": "MD-102",
+            "sourceQuestionNumbers": [
+              22
+            ],
+            "sourceTest": "MD-102 Practice Test 1",
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/intune/developer/reports/reports-proc-get-a-link-powerbi"
+            ]
+          }
+        },
+        {
+          "objectiveId": "md-102.test1.esp-diagnostics",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "An Autopilot enrollment fails, and users need the supported log-collection and diagnostics option during the enrollment experience. Which configuration should be reviewed?",
+          "choices": [
+            "Only a Defender antivirus exclusion",
+            "Only a Wi-Fi SSID label",
+            "The Enrollment Status Page profile’s log collection and diagnostics setting",
+            "Only the Windows Autopilot deployment profile’s device naming template"
+          ],
+          "correctIndex": 2,
+          "explanation": "The ESP profile provides the log-collection and diagnostics setting for the enrollment experience. The source variants disagree; the deployment profile’s device naming options are not the required setting.",
+          "hints": [
+            "Identify the settings for failure handling on the enrollment status page."
+          ],
+          "domainId": "md-102-device-management",
+          "subdomain": "esp-diagnostics",
+          "isGoldenEligible": false,
+          "tags": [
+            "md-102",
+            "practice-test-1",
+            "device-management"
+          ],
+          "data": {
+            "examCode": "MD-102",
+            "sourceQuestionNumbers": [
+              23,
+              39
+            ],
+            "sourceTest": "MD-102 Practice Test 1",
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/intune/device-enrollment/windows/setup-status-page"
+            ]
+          }
+        },
+        {
+          "objectiveId": "md-102.test1.retire-versus-wipe",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "An organization intends to remove supported managed corporate settings and management from a device while preserving personal data. Which Intune action should be evaluated instead of a factory-reset wipe?",
+          "choices": [
+            "Rename and assume management is removed",
+            "Retire, after reviewing the platform-specific removal behavior",
+            "Sync and assume corporate settings are deleted",
+            "Wipe and assume all personal data is always preserved"
+          ],
+          "correctIndex": 1,
+          "explanation": "Retire removes supported organizational management and settings while preserving personal content according to platform behavior. Review limitations before executing; it is different from a factory-reset wipe.",
+          "hints": [
+            "Distinguish selective management removal from resetting the device."
+          ],
+          "domainId": "md-102-device-management",
+          "subdomain": "retire-versus-wipe",
+          "isGoldenEligible": false,
+          "tags": [
+            "md-102",
+            "practice-test-1",
+            "device-management"
+          ],
+          "data": {
+            "examCode": "MD-102",
+            "sourceQuestionNumbers": [
+              24
+            ],
+            "sourceTest": "MD-102 Practice Test 1",
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/intune/device-management/actions/retire"
+            ]
+          }
+        },
+        {
+          "objectiveId": "md-102.test1.guest-log-collection",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "A supported Windows endpoint must send selected Windows event logs to Log Analytics using Azure Monitor Agent. What configuration defines the collected event channels and destination?",
+          "choices": [
+            "An associated data collection rule with the required Windows event selections and workspace destination",
+            "Only creating an empty workspace",
+            "A Windows desktop shortcut to the Azure portal",
+            "An Intune scope tag without data collection"
+          ],
+          "correctIndex": 0,
+          "explanation": "AMA collects the configured guest telemetry through data collection rules and associations. A workspace alone does not ingest every endpoint log automatically.",
+          "hints": [
+            "Trace the collection rule and its association to the endpoint."
+          ],
+          "domainId": "md-102-device-management",
+          "subdomain": "guest-log-collection",
+          "isGoldenEligible": false,
+          "tags": [
+            "md-102",
+            "practice-test-1",
+            "device-management"
+          ],
+          "data": {
+            "examCode": "MD-102",
+            "sourceQuestionNumbers": [
+              27
+            ],
+            "sourceTest": "MD-102 Practice Test 1",
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/azure/azure-monitor/agents/data-collection-rule-azure-monitor-agent"
+            ]
+          }
+        },
+        {
+          "objectiveId": "md-102.test1.entra-join",
+          "type": "multiple_choice",
+          "difficulty": 2,
+          "prompt": "A supported Windows 11 workgroup device must join the organization’s Microsoft Entra tenant through the interactive supported workflow. Which Windows area starts that process?",
+          "choices": [
+            "Disk Management → Format every volume",
+            "A file extension rename in Explorer",
+            "Task Manager → End every process",
+            "Settings → Accounts → Access work or school"
+          ],
+          "correctIndex": 3,
+          "explanation": "Access work or school provides the supported organizational connection and join workflow. Device edition, tenant permissions and organizational join restrictions must permit it.",
+          "hints": [
+            "Find the account and organization connection workflow."
+          ],
+          "domainId": "md-102-device-management",
+          "subdomain": "entra-join",
+          "isGoldenEligible": false,
+          "tags": [
+            "md-102",
+            "practice-test-1",
+            "device-management"
+          ],
+          "data": {
+            "examCode": "MD-102",
+            "sourceQuestionNumbers": [
+              28
+            ],
+            "sourceTest": "MD-102 Practice Test 1",
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/entra/identity/devices/device-join-manual"
+            ]
+          }
+        },
+        {
+          "objectiveId": "md-102.test1.endpoint-security-policies",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "An administrator needs centrally assigned Microsoft Defender Antivirus and Windows Firewall settings for eligible Intune-managed Windows endpoints. Which policy families directly address these controls?",
+          "choices": [
+            "Only a browser bookmark policy",
+            "Only a wallpaper configuration and app icon policy",
+            "Only a user display-name rule",
+            "Endpoint security Antivirus and Firewall policies"
+          ],
+          "correctIndex": 3,
+          "explanation": "Endpoint security policies provide targeted antivirus and firewall management. Configure assignments and check conflicts with other management authorities rather than assuming every device-restrictions profile configures these controls.",
+          "hints": [
+            "Match the policy family to each security component."
+          ],
+          "domainId": "md-102-security",
+          "subdomain": "endpoint-security-policies",
+          "isGoldenEligible": false,
+          "tags": [
+            "md-102",
+            "practice-test-1",
+            "security"
+          ],
+          "data": {
+            "examCode": "MD-102",
+            "sourceQuestionNumbers": [
+              29
+            ],
+            "sourceTest": "MD-102 Practice Test 1",
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/intune/device-security/endpoint-security/manage"
+            ]
+          }
+        },
+        {
+          "objectiveId": "md-102.test1.preview-build-control",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "An organization must prevent eligible managed Windows devices from enrolling in preview builds. Which supported configuration should be evaluated and assigned?",
+          "choices": [
+            "A storage redundancy setting",
+            "The applicable Windows Insider/preview-build policy settings",
+            "A Chrome bookmark configuration",
+            "Only an Intune scope tag"
+          ],
+          "correctIndex": 1,
+          "explanation": "Windows preview-build policy settings control the supported Insider behavior. Use the current supported management setting and verify its enforcement instead of assuming only a custom profile can implement the requirement.",
+          "hints": [
+            "Choose the Windows servicing control relevant to preview builds."
+          ],
+          "domainId": "md-102-device-management",
+          "subdomain": "preview-build-control",
+          "isGoldenEligible": false,
+          "tags": [
+            "md-102",
+            "practice-test-1",
+            "device-management"
+          ],
+          "data": {
+            "examCode": "MD-102",
+            "sourceQuestionNumbers": [
+              30
+            ],
+            "sourceTest": "MD-102 Practice Test 1",
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/windows/deployment/update/waas-manage-updates-wufb"
+            ]
+          }
+        },
+        {
+          "objectiveId": "md-102.test1.win32-preparation",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "A traditional Windows application has a setup executable and supporting installation files. It will be deployed as a Win32 app through Intune. What packaging step is required before uploading that Win32 app?",
+          "choices": [
+            "Rename the installer to .apk",
+            "Upload arbitrary source folders directly as the finished Win32 app",
+            "Prepare an .intunewin package using the Microsoft Win32 Content Prep Tool",
+            "Install retired MDT solely to create the Intune app"
+          ],
+          "correctIndex": 2,
+          "explanation": "The Win32 Content Prep Tool packages the installer and supporting content into .intunewin for upload. Uploading unprepared files is not the required packaging workflow.",
+          "hints": [
+            "Identify the packaging format consumed by Intune Win32 deployment."
+          ],
+          "domainId": "md-102-app-management",
+          "subdomain": "win32-preparation",
+          "isGoldenEligible": false,
+          "tags": [
+            "md-102",
+            "practice-test-1",
+            "app-management"
+          ],
+          "data": {
+            "examCode": "MD-102",
+            "sourceQuestionNumbers": [
+              31
+            ],
+            "sourceTest": "MD-102 Practice Test 1",
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/intune/app-management/deployment/prepare-win32"
+            ]
+          }
+        },
+        {
+          "objectiveId": "md-102.test1.provisioning-without-reimage",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "Supported Windows devices need an approved provisioning package to configure organization settings while retaining their existing user-installed apps. Which tool creates a Windows provisioning package?",
+          "choices": [
+            "Windows Configuration Designer",
+            "An Android package signer",
+            "A disk-format utility",
+            "A DNS record editor"
+          ],
+          "correctIndex": 0,
+          "explanation": "Windows Configuration Designer creates provisioning packages for supported Windows settings. Edition activation, join configuration and application delivery have separate prerequisites; a package does not waive licensing or compatibility requirements.",
+          "hints": [
+            "Choose configuration provisioning rather than destructive reimaging."
+          ],
+          "domainId": "md-102-device-management",
+          "subdomain": "provisioning-without-reimage",
+          "isGoldenEligible": false,
+          "tags": [
+            "md-102",
+            "practice-test-1",
+            "device-management"
+          ],
+          "data": {
+            "examCode": "MD-102",
+            "sourceQuestionNumbers": [
+              32
+            ],
+            "sourceTest": "MD-102 Practice Test 1",
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/windows/configuration/provisioning-packages/provisioning-create-package"
+            ]
+          }
+        },
+        {
+          "objectiveId": "md-102.test1.android-enrollment-restrictions",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "An Intune tenant must permit a selected supported Android Enterprise enrollment mode and block disallowed Android enrollment types. Which configuration should be reviewed?",
+          "choices": [
+            "Windows Autopilot naming configuration and enrollment profiles",
+            "Administrator visibility scope tags and role assignments",
+            "Android Enterprise enrollment configuration and enrollment restrictions",
+            "Chrome managed bookmark configuration and application assignments"
+          ],
+          "correctIndex": 2,
+          "explanation": "Enrollment restrictions govern permitted platforms and ownership/enrollment conditions where supported. Configure the appropriate Android Enterprise path and test the exact permitted mode rather than assuming an Allow setting alone blocks every other type.",
+          "hints": [
+            "Evaluate the enrollment boundary before assigning post-enrollment policies."
+          ],
+          "domainId": "md-102-device-management",
+          "subdomain": "android-enrollment-restrictions",
+          "isGoldenEligible": false,
+          "tags": [
+            "md-102",
+            "practice-test-1",
+            "device-management"
+          ],
+          "data": {
+            "examCode": "MD-102",
+            "sourceQuestionNumbers": [
+              33
+            ],
+            "sourceTest": "MD-102 Practice Test 1",
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/intune/device-enrollment/setup-enrollment-restrictions"
+            ]
+          }
+        },
+        {
+          "objectiveId": "md-102.test1.remote-help-prerequisites",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "An organization wants to use Intune Remote Help on supported Windows devices. Which prerequisite set must be verified before expecting a support session to work?",
+          "choices": [
+            "Only a scope tag with the helper’s name",
+            "An unrelated Azure Backup policy",
+            "Only a public DNS record",
+            "Required Remote Help licensing, tenant settings, app deployment and role permissions"
+          ],
+          "correctIndex": 3,
+          "explanation": "Remote Help depends on supported clients, licensing, tenant enablement and access permissions. Installing the app alone does not establish the entire authorization and service configuration.",
+          "hints": [
+            "Check client readiness and authorized access together."
+          ],
+          "domainId": "md-102-device-management",
+          "subdomain": "remote-help-prerequisites",
+          "isGoldenEligible": false,
+          "tags": [
+            "md-102",
+            "practice-test-1",
+            "device-management"
+          ],
+          "data": {
+            "examCode": "MD-102",
+            "sourceQuestionNumbers": [
+              34
+            ],
+            "sourceTest": "MD-102 Practice Test 1",
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/intune/device-management/remote-help/remote-help-windows"
+            ]
+          }
+        },
+        {
+          "objectiveId": "md-102.test1.analytics-baseline",
+          "type": "multiple_choice",
+          "difficulty": 3,
+          "prompt": "A team wants an Endpoint analytics baseline representative of its managed estate. What should it do before judging performance against that baseline?",
+          "choices": [
+            "Onboard an appropriate representative device population and verify the required telemetry is available",
+            "Compare devices without any collected telemetry",
+            "Assume exactly ten devices is a universal platform requirement",
+            "Choose only the fastest laptop and label it representative"
+          ],
+          "correctIndex": 0,
+          "explanation": "A meaningful baseline needs eligible onboarded devices and suitable data. The arbitrary device count in the source is not a universal requirement; representativeness and data availability affect interpretation.",
+          "hints": [
+            "Check whether the baseline represents the actual estate."
+          ],
+          "domainId": "md-102-device-management",
+          "subdomain": "analytics-baseline",
+          "isGoldenEligible": false,
+          "tags": [
+            "md-102",
+            "practice-test-1",
+            "device-management"
+          ],
+          "data": {
+            "examCode": "MD-102",
+            "sourceQuestionNumbers": [
+              35
+            ],
+            "sourceTest": "MD-102 Practice Test 1",
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/intune/analytics/baselines"
+            ]
+          }
+        },
+        {
+          "objectiveId": "md-102.test1.win32-dependency-diagnosis",
+          "type": "multiple_choice",
+          "difficulty": 5,
+          "prompt": "App2 fails because App1 is missing. App2’s detection rule already accurately reports whether App2 is installed. Intune must install App1 first and verify its installation before proceeding. Which design addresses the missing prerequisite without falsifying detection?",
+          "choices": [
+            "Mark App1 as installed without verifying its installation",
+            "Deploy both independently and assume assignments guarantee execution order",
+            "Change App2’s detection to report installed whenever App1 is present",
+            "Configure App1 as App2’s Win32 app dependency with appropriate installation behavior and accurate detection for each app"
+          ],
+          "correctIndex": 3,
+          "explanation": "Win32 dependencies express prerequisite app installation. Detection rules establish whether their own app is installed; falsely declaring App2 present or relying on assignment order does not install the missing prerequisite.",
+          "hints": [
+            "Separate prerequisite installation from installed-state detection."
+          ],
+          "domainId": "md-102-app-management",
+          "subdomain": "win32-dependency-diagnosis",
+          "isGoldenEligible": false,
+          "tags": [
+            "md-102",
+            "practice-test-1",
+            "app-management"
+          ],
+          "data": {
+            "examCode": "MD-102",
+            "sourceQuestionNumbers": [
+              42
+            ],
+            "sourceTest": "MD-102 Practice Test 1",
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/intune/app-management/deployment/add-win32"
+            ]
+          },
+          "evidence": "App2’s installed-state detection works; the missing App1 prerequisite causes installation failure.",
+          "constraints": [
+            "Install App1 before App2",
+            "Preserve truthful installed-state detection",
+            "Handle a failed App1 installation safely"
+          ]
+        },
+        {
+          "objectiveId": "md-102.test1.supported-office-configuration",
+          "type": "multiple_choice",
+          "difficulty": 2,
+          "prompt": "An administrator uses Office Deployment Tool to deploy a currently supported Office product. What file specifies the product, languages and deployment options passed to the tool?",
+          "choices": [
+            "An Intune scope-tag image",
+            "A supported configuration XML file",
+            "A DNS zone file",
+            "A Kubernetes service account token"
+          ],
+          "correctIndex": 1,
+          "explanation": "ODT uses a configuration XML for supported product and deployment settings. The retired Office 2019/Windows 10 assumptions in the source are not retained as a new deployment recommendation.",
+          "hints": [
+            "Identify the configuration format consumed by the deployment tool."
+          ],
+          "domainId": "md-102-app-management",
+          "subdomain": "supported-office-configuration",
+          "isGoldenEligible": false,
+          "tags": [
+            "md-102",
+            "practice-test-1",
+            "app-management"
+          ],
+          "data": {
+            "examCode": "MD-102",
+            "sourceQuestionNumbers": [
+              44
+            ],
+            "sourceTest": "MD-102 Practice Test 1",
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/microsoft-365-apps/deploy/overview-office-deployment-tool"
+            ]
+          }
+        },
+        {
+          "objectiveId": "md-102.test1.apple-push-certificate",
+          "type": "multiple_choice",
+          "difficulty": 1,
+          "prompt": "An Intune tenant will enroll supported iPads. Which Apple management prerequisite must be established and maintained in the tenant?",
+          "choices": [
+            "An Apple MDM push certificate",
+            "An AWS root access key",
+            "A Windows ISO selection profile",
+            "A Route 53 DNS alias"
+          ],
+          "correctIndex": 0,
+          "explanation": "Intune uses an Apple MDM push certificate for Apple device management. Maintain its renewal and account continuity; Apple Configurator enrollment also has its own profile and device-preparation requirements.",
+          "hints": [
+            "Identify the Apple device-management trust prerequisite."
+          ],
+          "domainId": "md-102-device-management",
+          "subdomain": "apple-push-certificate",
+          "isGoldenEligible": false,
+          "tags": [
+            "md-102",
+            "practice-test-1",
+            "device-management"
+          ],
+          "data": {
+            "examCode": "MD-102",
+            "sourceQuestionNumbers": [
+              45
+            ],
+            "sourceTest": "MD-102 Practice Test 1",
+            "contentOrigin": "authored-standalone-replacement",
+            "requiresEditorialReview": true,
+            "bossEligible": false,
+            "sourceReferences": [
+              "https://learn.microsoft.com/en-us/intune/device-enrollment/apple/apple-mdm-push-certificate-get"
+            ]
+          }
+        }
+      ],
+      "referenceMaterial": {
+        "conversionAudit": {
+          "examCode": "MD-102",
+          "sourceQuestionCount": 45,
+          "sourceFile": "Pasted text (2)(1).txt",
+          "sourceSha256": "b48e44efc5ad3d2ebc19cbbe098a1a546909db0b18850d86385761ee7dfaa617",
+          "sourcePreserved": true,
+          "importQuestionCount": 32,
+          "reviewStatus": "PENDING",
+          "sourceMapping": [
+            {
+              "sourceQuestionNumber": 1,
+              "status": "withheld-retired",
+              "reviewNote": "Retired Microsoft Deployment Toolkit workflow; preserve for reference but do not publish as current MD-102 preparation."
+            },
+            {
+              "sourceQuestionNumber": 2,
+              "status": "corrected-replacement",
+              "targetObjectiveId": "md-102.test1.delivery-optimization",
+              "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+            },
+            {
+              "sourceQuestionNumber": 3,
+              "status": "corrected-replacement",
+              "targetObjectiveId": "md-102.test1.macos-defender",
+              "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+            },
+            {
+              "sourceQuestionNumber": 4,
+              "status": "corrected-replacement",
+              "targetObjectiveId": "md-102.test1.hello-pin-policy",
+              "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+            },
+            {
+              "sourceQuestionNumber": 5,
+              "status": "corrected-replacement",
+              "targetObjectiveId": "md-102.test1.remoting-authorization",
+              "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+            },
+            {
+              "sourceQuestionNumber": 6,
+              "status": "corrected-replacement",
+              "targetObjectiveId": "md-102.test1.subscription-activation",
+              "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+            },
+            {
+              "sourceQuestionNumber": 7,
+              "status": "corrected-replacement",
+              "targetObjectiveId": "md-102.test1.endpoint-analytics",
+              "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+            },
+            {
+              "sourceQuestionNumber": 8,
+              "status": "corrected-replacement",
+              "targetObjectiveId": "md-102.test1.m365-app-deployment",
+              "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+            },
+            {
+              "sourceQuestionNumber": 9,
+              "status": "consolidated-replacement",
+              "targetObjectiveId": "md-102.test1.hello-pin-policy",
+              "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+            },
+            {
+              "sourceQuestionNumber": 10,
+              "status": "corrected-replacement",
+              "targetObjectiveId": "md-102.test1.chrome-bookmarks",
+              "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+            },
+            {
+              "sourceQuestionNumber": 11,
+              "status": "withheld-retired",
+              "reviewNote": "Retired Microsoft Deployment Toolkit workflow; preserve for reference but do not publish as current MD-102 preparation."
+            },
+            {
+              "sourceQuestionNumber": 12,
+              "status": "corrected-replacement",
+              "targetObjectiveId": "md-102.test1.authenticator-number-matching",
+              "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+            },
+            {
+              "sourceQuestionNumber": 13,
+              "status": "corrected-replacement",
+              "targetObjectiveId": "md-102.test1.android-corporate-profile",
+              "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+            },
+            {
+              "sourceQuestionNumber": 14,
+              "status": "corrected-replacement",
+              "targetObjectiveId": "md-102.test1.android-patch-compliance",
+              "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+            },
+            {
+              "sourceQuestionNumber": 15,
+              "status": "corrected-replacement",
+              "targetObjectiveId": "md-102.test1.defender-onboarding",
+              "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+            },
+            {
+              "sourceQuestionNumber": 16,
+              "status": "corrected-replacement",
+              "targetObjectiveId": "md-102.test1.targeting-versus-scope-tags",
+              "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+            },
+            {
+              "sourceQuestionNumber": 17,
+              "status": "corrected-replacement",
+              "targetObjectiveId": "md-102.test1.defender-connector",
+              "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+            },
+            {
+              "sourceQuestionNumber": 18,
+              "status": "corrected-replacement",
+              "targetObjectiveId": "md-102.test1.ios-lob-package",
+              "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+            },
+            {
+              "sourceQuestionNumber": 19,
+              "status": "corrected-replacement",
+              "targetObjectiveId": "md-102.test1.os-based-groups",
+              "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+            },
+            {
+              "sourceQuestionNumber": 20,
+              "status": "withheld-retired",
+              "reviewNote": "Retired Microsoft Deployment Toolkit workflow; preserve for reference but do not publish as current MD-102 preparation."
+            },
+            {
+              "sourceQuestionNumber": 21,
+              "status": "corrected-replacement",
+              "targetObjectiveId": "md-102.test1.enable-remoting-target",
+              "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+            },
+            {
+              "sourceQuestionNumber": 22,
+              "status": "corrected-replacement",
+              "targetObjectiveId": "md-102.test1.data-warehouse-report",
+              "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+            },
+            {
+              "sourceQuestionNumber": 23,
+              "status": "corrected-replacement",
+              "targetObjectiveId": "md-102.test1.esp-diagnostics",
+              "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+            },
+            {
+              "sourceQuestionNumber": 24,
+              "status": "corrected-replacement",
+              "targetObjectiveId": "md-102.test1.retire-versus-wipe",
+              "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+            },
+            {
+              "sourceQuestionNumber": 25,
+              "status": "withheld-retired",
+              "reviewNote": "Retired Microsoft Deployment Toolkit workflow; preserve for reference but do not publish as current MD-102 preparation."
+            },
+            {
+              "sourceQuestionNumber": 26,
+              "status": "consolidated-replacement",
+              "targetObjectiveId": "md-102.test1.hello-pin-policy",
+              "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+            },
+            {
+              "sourceQuestionNumber": 27,
+              "status": "corrected-replacement",
+              "targetObjectiveId": "md-102.test1.guest-log-collection",
+              "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+            },
+            {
+              "sourceQuestionNumber": 28,
+              "status": "corrected-replacement",
+              "targetObjectiveId": "md-102.test1.entra-join",
+              "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+            },
+            {
+              "sourceQuestionNumber": 29,
+              "status": "corrected-replacement",
+              "targetObjectiveId": "md-102.test1.endpoint-security-policies",
+              "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+            },
+            {
+              "sourceQuestionNumber": 30,
+              "status": "corrected-replacement",
+              "targetObjectiveId": "md-102.test1.preview-build-control",
+              "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+            },
+            {
+              "sourceQuestionNumber": 31,
+              "status": "corrected-replacement",
+              "targetObjectiveId": "md-102.test1.win32-preparation",
+              "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+            },
+            {
+              "sourceQuestionNumber": 32,
+              "status": "corrected-replacement",
+              "targetObjectiveId": "md-102.test1.provisioning-without-reimage",
+              "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+            },
+            {
+              "sourceQuestionNumber": 33,
+              "status": "corrected-replacement",
+              "targetObjectiveId": "md-102.test1.android-enrollment-restrictions",
+              "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+            },
+            {
+              "sourceQuestionNumber": 34,
+              "status": "corrected-replacement",
+              "targetObjectiveId": "md-102.test1.remote-help-prerequisites",
+              "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+            },
+            {
+              "sourceQuestionNumber": 35,
+              "status": "corrected-replacement",
+              "targetObjectiveId": "md-102.test1.analytics-baseline",
+              "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+            },
+            {
+              "sourceQuestionNumber": 36,
+              "status": "consolidated-replacement",
+              "targetObjectiveId": "md-102.test1.defender-onboarding",
+              "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+            },
+            {
+              "sourceQuestionNumber": 37,
+              "status": "withheld-retired",
+              "reviewNote": "Retired Microsoft Deployment Toolkit workflow; preserve for reference but do not publish as current MD-102 preparation."
+            },
+            {
+              "sourceQuestionNumber": 38,
+              "status": "consolidated-replacement",
+              "targetObjectiveId": "md-102.test1.endpoint-analytics",
+              "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+            },
+            {
+              "sourceQuestionNumber": 39,
+              "status": "consolidated-replacement",
+              "targetObjectiveId": "md-102.test1.esp-diagnostics",
+              "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+            },
+            {
+              "sourceQuestionNumber": 40,
+              "status": "consolidated-replacement",
+              "targetObjectiveId": "md-102.test1.macos-defender",
+              "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+            },
+            {
+              "sourceQuestionNumber": 41,
+              "status": "consolidated-replacement",
+              "targetObjectiveId": "md-102.test1.defender-connector",
+              "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+            },
+            {
+              "sourceQuestionNumber": 42,
+              "status": "corrected-replacement",
+              "targetObjectiveId": "md-102.test1.win32-dependency-diagnosis",
+              "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+            },
+            {
+              "sourceQuestionNumber": 43,
+              "status": "withheld-retired",
+              "reviewNote": "Retired Microsoft Deployment Toolkit workflow; preserve for reference but do not publish as current MD-102 preparation."
+            },
+            {
+              "sourceQuestionNumber": 44,
+              "status": "corrected-replacement",
+              "targetObjectiveId": "md-102.test1.supported-office-configuration",
+              "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+            },
+            {
+              "sourceQuestionNumber": 45,
+              "status": "corrected-replacement",
+              "targetObjectiveId": "md-102.test1.apple-push-certificate",
+              "reviewNote": "Standalone current scenario replaces the source item; repeated variants map to one assessment."
+            }
+          ],
+          "summary": {
+            "withheld-retired": 6,
+            "corrected-replacement": 32,
+            "consolidated-replacement": 7
+          },
+          "independentFactCheck": "Targeted source errors checked against primary documentation. Standalone replacements still require final editorial review.",
+          "conversionPolicy": "Use current standalone supported-platform scenarios; do not silently change a source key or reconstruct missing context. Consolidate repeated concepts and preserve retirement/correction reasons.",
+          "routing": {
+            "lane": "CERTIFICATIONS",
+            "certExam": "MD_102",
+            "requiresMigration": "20261009020000_add_md102_certification",
+            "note": "Deploy migration and regenerate Prisma before importing. MD-102 is not an Azure/AZ-104 pool."
+          },
+          "examReference": "https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/md-102",
+          "coverageWarning": "Supplementary practice, not a complete current exam blueprint.",
+          "reviewReferences": [
+            "https://learn.microsoft.com/en-us/troubleshoot/mem/configmgr/mdt/mdt-retirement"
+          ],
+          "difficultyCounts": {
+            "3": 21,
+            "4": 2,
+            "2": 6,
+            "1": 2,
+            "5": 1
+          }
+        }
+      }
+    }
+  ]
+}

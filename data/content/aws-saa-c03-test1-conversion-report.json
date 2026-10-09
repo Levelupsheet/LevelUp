@@ -1,0 +1,412 @@
+{
+  "examCode": "SAA-C03",
+  "sourceQuestionCount": 65,
+  "sourceFile": "Pasted text(2).txt",
+  "sourceSha256": "076b591787af80e59968652a0582aab76fdf753eaa72e3eebc7896a84df2594b",
+  "sourcePreserved": true,
+  "importQuestionCount": 60,
+  "reviewStatus": "PENDING",
+  "sourceMapping": [
+    {
+      "sourceQuestionNumber": 1,
+      "status": "withheld-review",
+      "reviewNote": "Native Lambda mounting of cross-account EFS requires explicit current service/API support validation; generic EFS cross-account NFS documentation alone is insufficient."
+    },
+    {
+      "sourceQuestionNumber": 2,
+      "status": "corrected-replacement",
+      "reviewNote": "Authored a focused current scenario; changed or removed unsupported source assumptions.",
+      "targetObjectiveId": "saa-c03.test1.ordered-queue-throughput"
+    },
+    {
+      "sourceQuestionNumber": 3,
+      "status": "combined-single-answer",
+      "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+      "targetObjectiveId": "saa-c03.test1.root-account-security"
+    },
+    {
+      "sourceQuestionNumber": 4,
+      "status": "adapted",
+      "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+      "targetObjectiveId": "saa-c03.test1.api-protocols"
+    },
+    {
+      "sourceQuestionNumber": 5,
+      "status": "adapted",
+      "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+      "targetObjectiveId": "saa-c03.test1.permissions-boundary"
+    },
+    {
+      "sourceQuestionNumber": 6,
+      "status": "corrected-replacement",
+      "reviewNote": "Removed unconditional source claims; authored a scoped question with explicit conditions.",
+      "targetObjectiveId": "saa-c03.test1.q06"
+    },
+    {
+      "sourceQuestionNumber": 7,
+      "status": "corrected-replacement",
+      "reviewNote": "Authored a focused current scenario; changed or removed unsupported source assumptions.",
+      "targetObjectiveId": "saa-c03.test1.provisioned-volume-billing"
+    },
+    {
+      "sourceQuestionNumber": 8,
+      "status": "combined-single-answer",
+      "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+      "targetObjectiveId": "saa-c03.test1.efs-network-and-iam"
+    },
+    {
+      "sourceQuestionNumber": 9,
+      "status": "combined-single-answer",
+      "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+      "targetObjectiveId": "saa-c03.test1.object-lock-versions"
+    },
+    {
+      "sourceQuestionNumber": 10,
+      "status": "combined-single-answer",
+      "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+      "targetObjectiveId": "saa-c03.test1.s3-transfer-performance"
+    },
+    {
+      "sourceQuestionNumber": 11,
+      "status": "adapted",
+      "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+      "targetObjectiveId": "saa-c03.test1.serverless-ingestion"
+    },
+    {
+      "sourceQuestionNumber": 12,
+      "status": "adapted",
+      "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+      "targetObjectiveId": "saa-c03.test1.scheduled-scaling"
+    },
+    {
+      "sourceQuestionNumber": 13,
+      "status": "adapted",
+      "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+      "targetObjectiveId": "saa-c03.test1.global-accelerator-udp"
+    },
+    {
+      "sourceQuestionNumber": 14,
+      "status": "adapted",
+      "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+      "targetObjectiveId": "saa-c03.test1.multi-az-web-availability"
+    },
+    {
+      "sourceQuestionNumber": 15,
+      "status": "adapted",
+      "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+      "targetObjectiveId": "saa-c03.test1.cloudfront-custom-origin"
+    },
+    {
+      "sourceQuestionNumber": 16,
+      "status": "adapted",
+      "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+      "targetObjectiveId": "saa-c03.test1.resolver-outbound"
+    },
+    {
+      "sourceQuestionNumber": 17,
+      "status": "adapted",
+      "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+      "targetObjectiveId": "saa-c03.test1.recoverable-instance-store"
+    },
+    {
+      "sourceQuestionNumber": 18,
+      "status": "adapted",
+      "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+      "targetObjectiveId": "saa-c03.test1.s3-prefix-throughput"
+    },
+    {
+      "sourceQuestionNumber": 19,
+      "status": "combined-single-answer",
+      "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+      "targetObjectiveId": "saa-c03.test1.hdd-volume-boot-limits"
+    },
+    {
+      "sourceQuestionNumber": 20,
+      "status": "withheld-review",
+      "reviewNote": "RDS behind a PrivateLink NLB needs a supported endpoint registration and failover design; the supplied answer omits this operational requirement."
+    },
+    {
+      "sourceQuestionNumber": 21,
+      "status": "adapted",
+      "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+      "targetObjectiveId": "saa-c03.test1.fsx-lustre-workload"
+    },
+    {
+      "sourceQuestionNumber": 22,
+      "status": "corrected-replacement",
+      "reviewNote": "Authored a focused current scenario; changed or removed unsupported source assumptions.",
+      "targetObjectiveId": "saa-c03.test1.outposts-control-plane"
+    },
+    {
+      "sourceQuestionNumber": 23,
+      "status": "adapted",
+      "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+      "targetObjectiveId": "saa-c03.test1.alb-path-routing"
+    },
+    {
+      "sourceQuestionNumber": 24,
+      "status": "adapted",
+      "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+      "targetObjectiveId": "saa-c03.test1.cross-region-ami"
+    },
+    {
+      "sourceQuestionNumber": 25,
+      "status": "adapted",
+      "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+      "targetObjectiveId": "saa-c03.test1.cluster-placement"
+    },
+    {
+      "sourceQuestionNumber": 26,
+      "status": "combined-single-answer",
+      "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+      "targetObjectiveId": "saa-c03.test1.asg-maintenance-standby"
+    },
+    {
+      "sourceQuestionNumber": 27,
+      "status": "withheld-review",
+      "reviewNote": "A blanket most-cost-effective storage-class choice cannot be proven without retention, retrieval volume and pricing assumptions."
+    },
+    {
+      "sourceQuestionNumber": 28,
+      "status": "adapted",
+      "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+      "targetObjectiveId": "saa-c03.test1.encrypted-direct-connect"
+    },
+    {
+      "sourceQuestionNumber": 29,
+      "status": "adapted",
+      "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+      "targetObjectiveId": "saa-c03.test1.s3-file-gateway"
+    },
+    {
+      "sourceQuestionNumber": 30,
+      "status": "corrected-replacement",
+      "reviewNote": "Authored a focused current scenario; changed or removed unsupported source assumptions.",
+      "targetObjectiveId": "saa-c03.test1.ranked-leaderboard"
+    },
+    {
+      "sourceQuestionNumber": 31,
+      "status": "adapted",
+      "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+      "targetObjectiveId": "saa-c03.test1.interruptible-spot-workflow"
+    },
+    {
+      "sourceQuestionNumber": 32,
+      "status": "adapted",
+      "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+      "targetObjectiveId": "saa-c03.test1.kms-key-audit"
+    },
+    {
+      "sourceQuestionNumber": 33,
+      "status": "adapted",
+      "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+      "targetObjectiveId": "saa-c03.test1.container-billing"
+    },
+    {
+      "sourceQuestionNumber": 34,
+      "status": "adapted",
+      "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+      "targetObjectiveId": "saa-c03.test1.stream-score-pipeline"
+    },
+    {
+      "sourceQuestionNumber": 35,
+      "status": "adapted",
+      "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+      "targetObjectiveId": "saa-c03.test1.long-running-compute"
+    },
+    {
+      "sourceQuestionNumber": 36,
+      "status": "adapted",
+      "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+      "targetObjectiveId": "saa-c03.test1.target-tracking"
+    },
+    {
+      "sourceQuestionNumber": 37,
+      "status": "adapted",
+      "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+      "targetObjectiveId": "saa-c03.test1.aurora-global-data"
+    },
+    {
+      "sourceQuestionNumber": 38,
+      "status": "corrected-replacement",
+      "reviewNote": "Authored a focused current scenario; changed or removed unsupported source assumptions.",
+      "targetObjectiveId": "saa-c03.test1.stream-processing-modern-service"
+    },
+    {
+      "sourceQuestionNumber": 39,
+      "status": "combined-single-answer",
+      "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+      "targetObjectiveId": "saa-c03.test1.s3-delete-protection"
+    },
+    {
+      "sourceQuestionNumber": 40,
+      "status": "corrected-replacement",
+      "reviewNote": "Removed a misleading source premise and authored an explicit service capability assessment.",
+      "targetObjectiveId": "saa-c03.test1.viewer-country-access"
+    },
+    {
+      "sourceQuestionNumber": 41,
+      "status": "adapted",
+      "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+      "targetObjectiveId": "saa-c03.test1.serverless-data-warehouse"
+    },
+    {
+      "sourceQuestionNumber": 42,
+      "status": "adapted",
+      "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+      "targetObjectiveId": "saa-c03.test1.cost-anomaly-detection"
+    },
+    {
+      "sourceQuestionNumber": 43,
+      "status": "corrected-replacement",
+      "reviewNote": "Authored a focused current scenario; changed or removed unsupported source assumptions.",
+      "targetObjectiveId": "saa-c03.test1.object-permission-resource"
+    },
+    {
+      "sourceQuestionNumber": 44,
+      "status": "adapted",
+      "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+      "targetObjectiveId": "saa-c03.test1.cache-access-patterns"
+    },
+    {
+      "sourceQuestionNumber": 45,
+      "status": "withheld-review",
+      "reviewNote": "RDS Custom for Oracle has an announced end-of-support date; the new architecture needs explicit eligibility and lifecycle review."
+    },
+    {
+      "sourceQuestionNumber": 46,
+      "status": "combined-single-answer",
+      "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+      "targetObjectiveId": "saa-c03.test1.privileged-account-auditing"
+    },
+    {
+      "sourceQuestionNumber": 47,
+      "status": "corrected-replacement",
+      "reviewNote": "Removed a misleading source premise and authored an explicit service capability assessment.",
+      "targetObjectiveId": "saa-c03.test1.threat-versus-vulnerability-detection"
+    },
+    {
+      "sourceQuestionNumber": 48,
+      "status": "adapted",
+      "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+      "targetObjectiveId": "saa-c03.test1.windows-file-service"
+    },
+    {
+      "sourceQuestionNumber": 49,
+      "status": "adapted",
+      "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+      "targetObjectiveId": "saa-c03.test1.visual-data-preparation"
+    },
+    {
+      "sourceQuestionNumber": 50,
+      "status": "corrected-replacement",
+      "reviewNote": "Authored a focused current scenario; changed or removed unsupported source assumptions.",
+      "targetObjectiveId": "saa-c03.test1.eks-identity-boundary"
+    },
+    {
+      "sourceQuestionNumber": 51,
+      "status": "adapted",
+      "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+      "targetObjectiveId": "saa-c03.test1.accelerated-multipart-transfer"
+    },
+    {
+      "sourceQuestionNumber": 52,
+      "status": "adapted",
+      "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+      "targetObjectiveId": "saa-c03.test1.waf-country-control"
+    },
+    {
+      "sourceQuestionNumber": 53,
+      "status": "corrected-replacement",
+      "reviewNote": "Removed a misleading source premise and authored an explicit service capability assessment.",
+      "targetObjectiveId": "saa-c03.test1.custom-entity-extraction"
+    },
+    {
+      "sourceQuestionNumber": 54,
+      "status": "adapted",
+      "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+      "targetObjectiveId": "saa-c03.test1.short-lived-query-results"
+    },
+    {
+      "sourceQuestionNumber": 55,
+      "status": "corrected-replacement",
+      "reviewNote": "Removed unconditional source claims; authored a scoped question with explicit conditions.",
+      "targetObjectiveId": "saa-c03.test1.q55"
+    },
+    {
+      "sourceQuestionNumber": 56,
+      "status": "adapted",
+      "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+      "targetObjectiveId": "saa-c03.test1.cross-account-role-assumption"
+    },
+    {
+      "sourceQuestionNumber": 57,
+      "status": "combined-single-answer",
+      "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+      "targetObjectiveId": "saa-c03.test1.sql-server-migration-compatibility"
+    },
+    {
+      "sourceQuestionNumber": 58,
+      "status": "corrected-replacement",
+      "reviewNote": "Authored a focused current scenario; changed or removed unsupported source assumptions.",
+      "targetObjectiveId": "saa-c03.test1.lambda-throttle-diagnosis"
+    },
+    {
+      "sourceQuestionNumber": 59,
+      "status": "adapted",
+      "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+      "targetObjectiveId": "saa-c03.test1.api-error-monitoring"
+    },
+    {
+      "sourceQuestionNumber": 60,
+      "status": "adapted",
+      "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+      "targetObjectiveId": "saa-c03.test1.efs-inter-region-network"
+    },
+    {
+      "sourceQuestionNumber": 61,
+      "status": "withheld-review",
+      "reviewNote": "AD Connector/Identity Center integration requires supported identity-source and topology details that the source does not fully establish."
+    },
+    {
+      "sourceQuestionNumber": 62,
+      "status": "corrected-replacement",
+      "reviewNote": "Authored a focused current scenario; changed or removed unsupported source assumptions.",
+      "targetObjectiveId": "saa-c03.test1.durable-transaction-burst"
+    },
+    {
+      "sourceQuestionNumber": 63,
+      "status": "corrected-replacement",
+      "reviewNote": "Removed unconditional source claims; authored a scoped question with explicit conditions.",
+      "targetObjectiveId": "saa-c03.test1.q63"
+    },
+    {
+      "sourceQuestionNumber": 64,
+      "status": "combined-single-answer",
+      "reviewNote": "Source-based content normalized to supported MCQ; retained statements require editorial fact-checking.",
+      "targetObjectiveId": "saa-c03.test1.s3-lifecycle-direction"
+    },
+    {
+      "sourceQuestionNumber": 65,
+      "status": "corrected-replacement",
+      "reviewNote": "Authored a focused current scenario; changed or removed unsupported source assumptions.",
+      "targetObjectiveId": "saa-c03.test1.fifo-processing-boundary"
+    }
+  ],
+  "summary": {
+    "withheld-review": 5,
+    "corrected-replacement": 16,
+    "combined-single-answer": 10,
+    "adapted": 34
+  },
+  "independentFactCheck": "Targeted current corrections checked against primary documentation; retained source content requires editorial review. Automated validation is not independent factual certification.",
+  "coverageWarning": "Supplementary SAA-C03 practice; no complete blueprint coverage or weighting claim.",
+  "examReference": "https://docs.aws.amazon.com/aws-certification/latest/solutions-architect-associate-03.html",
+  "difficultyCounts": {
+    "3": 43,
+    "1": 1,
+    "2": 10,
+    "4": 4,
+    "5": 2
+  }
+}
