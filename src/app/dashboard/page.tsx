@@ -1134,7 +1134,7 @@ async function analyzeResumeStage12() {
 
           <div className="dashboardBattleShortcuts" style={{ marginTop: 10, display: "grid", gap: 10 }}>
             {hrBattleUnlocked ? (
-              <button className="dashboardAssetButton dashboardAssetButtonBlue dashboardToggleAction dashboardHrBattleButton" style={{ width: "100%" }} onClick={() => setMockInterviewOpen(true)}>
+              <button className="dashboardAssetButton dashboardAssetButtonBlue dashboardToggleAction dashboardHrBattleButton" style={{ width: "100%" }} onClick={() => window.location.assign("/interview/hr")}>
                 <img className="dashboardToggleState dashboardToggleOnState" src="/ui/grimdark/toggle-on.webp?v=20260927-layerfix" alt="" aria-hidden="true" />
                 <img className="dashboardToggleState dashboardToggleOffState" src="/ui/grimdark/toggle-off.png?v=20260927-layerfix" alt="" aria-hidden="true" />
                 <span className="dashboardButtonAssetLabel">{hrPassed ? "Start HR Battle →" : "Start HR Battle →"}</span></button>
@@ -1145,7 +1145,7 @@ async function analyzeResumeStage12() {
             )}
             {((localLevel || 1) >= 5 || hasTechReady) ? (
               <button className="dashboardAssetButton dashboardAssetButtonBlue" style={{ width: "100%" }} type="button" onClick={() => setMockInterviewOpen(true)}>
-                <span className="dashboardButtonAssetLabel">Start Tech Battle →</span></button>
+                <span className="dashboardButtonAssetLabel">Start Tech Interview →</span></button>
             ) : null}
             {hasFreeStartCooldown && <small style={{ display: "block", marginTop: 0, color: "#f5d37b" }}>Free users can start another session in {freeStartCooldownLabel}.</small>}
           </div>
@@ -1161,7 +1161,7 @@ async function analyzeResumeStage12() {
 
           <div className={"dashboardBattleStatus dashboardProgressionGate " + (((localLevel || 1) >= 5 || elig?.eligible) ? "unlocked" : "locked")}>
             <span className="dashboardBattleStatusDot" />
-            <div><b>{techPassed ? "Boss Battle complete" : ((localLevel || 1) >= 5 || elig?.eligible) ? "Boss Battle unlocked" : "Boss Battle locked"}</b><small>{techPassed ? `Technical battle cleared${techLatest?.scoreAvg != null ? ` • Score ${Number(techLatest.scoreAvg).toFixed(1)}` : ""}. Keep training while your skills are fresh.` : ((localLevel || 1) >= 5 || elig?.eligible) ? "You meet the current progression gate." : "Reach Level 5 or qualify through mastery to unlock."}</small></div>
+            <div><b>{techPassed ? "Tech Interview complete" : ((localLevel || 1) >= 5 || elig?.eligible) ? "Tech Interview unlocked" : "Tech Interview locked"}</b><small>{techPassed ? `Tech practice benchmark met${techLatest?.scoreAvg != null ? ` • Score ${(Number(techLatest.scoreAvg) * 100).toFixed(0) + "%"}` : ""}. Keep training while your skills are fresh.` : ((localLevel || 1) >= 5 || elig?.eligible) ? "You meet the current progression gate." : "Reach Level 5 or qualify through mastery to unlock."}</small></div>
           </div>
 
           <div className="card powerHudCard dashboardGameCard dashboardUtilityCard">
@@ -1203,13 +1203,13 @@ async function analyzeResumeStage12() {
           <div className="card dashboardNextAction dashboardGrimdarkPanel">
             <div className="dashboardNextCopy">
               <div className="dashboardEyebrow">RECOMMENDED NEXT</div>
-              <h2>{hasTechReady ? "Your Tech Battle is ready" : hrBattleUnlocked && !hrPassed ? "Take your HR Battle" : `Continue your ${careerCharacterName(selectedCareer?.careerPath, user?.startingPosition)} path`}</h2>
+              <h2>{hasTechReady ? "Your Tech Interview is ready" : hrBattleUnlocked && !hrPassed ? "Take your HR Battle" : `Continue your ${careerCharacterName(selectedCareer?.careerPath, user?.startingPosition)} path`}</h2>
               <p>{hasTechReady ? "You cleared the HR gate. Put your technical reasoning to the test and keep your career progression moving." : hrBattleUnlocked && !hrPassed ? "You have unlocked the interview track. Complete the HR Battle to move toward the technical interview." : "Keep your momentum moving with the next training session. Your XP, mastery, and unlock progress update as you complete challenges."}</p>
             </div>
             {hasTechReady ? (
-              <button className="primary dashboardNextButton gdActionBlue" type="button" onClick={() => setMockInterviewOpen(true)}>Start Tech Battle →</button>
+              <button className="primary dashboardNextButton gdActionBlue" type="button" onClick={() => setMockInterviewOpen(true)}>Start Tech Interview →</button>
             ) : hrBattleUnlocked && !hrPassed ? (
-              <button className="dashboardNextButton dashboardAssetButton dashboardAssetButtonOrange dashboardNextAssetButton" type="button" onClick={() => setMockInterviewOpen(true)}><img className="dashboardButtonAssetImage" src="/ui/grimdark/button-orange.png?v=20260927-next-hr" alt="" aria-hidden="true" /><span className="dashboardButtonAssetLabel">Start HR Battle →</span></button>
+              <button className="dashboardNextButton dashboardAssetButton dashboardAssetButtonOrange dashboardNextAssetButton" type="button" onClick={() => window.location.assign("/interview/hr")}><img className="dashboardButtonAssetImage" src="/ui/grimdark/button-orange.png?v=20260927-next-hr" alt="" aria-hidden="true" /><span className="dashboardButtonAssetLabel">Start HR Battle →</span></button>
             ) : (
               <button className="gold dashboardNextButton gdActionOrange" type="button" onClick={() => !hasFreeStartCooldown && setShowLaunchModal(true)} disabled={hasFreeStartCooldown}>
                 {hasFreeStartCooldown ? `Available in ${freeStartCooldownLabel}` : "Continue training →"}
@@ -1415,7 +1415,7 @@ async function analyzeResumeStage12() {
           </div>
         </div>
       ) : null}
-      <MockInterviewModal open={mockInterviewOpen} onClose={() => setMockInterviewOpen(false)} />
+      <MockInterviewModal open={mockInterviewOpen} onClose={() => { setMockInterviewOpen(false); void fetch("/api/interviews/tech/status", {cache:"no-store"}).then(r => r.ok ? r.json() : null).then(data => { if(data){setTechPassed(Boolean(data.passed));setTechLatest(data.latest || null);} }).catch(() => {}); }} />
 </>
   );
 }

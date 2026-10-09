@@ -1,28 +1,4 @@
-import { z } from "zod";
-import { prisma } from "../../../_lib/prisma";
-import { buildInterviewPlan } from "@/lib/interviewIntelligence";
-
-const Body = z.object({ userId: z.string().min(1) });
-
-export async function POST(req: Request) {
-  try {
-    const { userId } = Body.parse(await req.json());
-    const user = await prisma.user.findUnique({ where: { id: userId } });
-    if (!user) return Response.json({ error: "User not found" }, { status: 404 });
-
-    const plan = await buildInterviewPlan(userId, "TECH" as any);
-    const session = await prisma.interviewSession.create({
-      data: {
-        userId,
-        kind: "TECH",
-        status: "IN_PROGRESS",
-        startedAt: new Date(),
-        summary: JSON.stringify({ stage4: true, plan }),
-      },
-    });
-
-    return Response.json({ ok: true, session, nextQuestion: plan[0]?.prompt || null, interviewPlan: plan });
-  } catch (e: any) {
-    return Response.json({ error: e?.message ?? "Bad request" }, { status: 400 });
-  }
-}
+import { z } from 'zod';
+import { beginTechInterview, techSessionUser } from '@/lib/techInterviewSession';
+const Body=z.object({role:z.string().trim().min(2).max(160).optional(),industry:z.string().trim().min(2).max(160).optional(),level:z.enum(['Entry level','Intermediate','Senior']).default('Entry level')});
+export async function POST(req:Request){const user=await techSessionUser();if(!user)return Response.json({error:'Sign in to save an interview'},{status:401});try{const session=await beginTechInterview(user.id,({...Body.parse(await req.json())} as {role?:string;industry?:string;level:string}));return Response.json({session});}catch(e:any){return Response.json({error:e instanceof z.ZodError?'Choose a valid role and level':e.message},{status:e instanceof z.ZodError?400:503});}}

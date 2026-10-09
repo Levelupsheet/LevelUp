@@ -1,20 +1,4 @@
-import { prisma } from "../../../_lib/prisma";
-
-function parseSummary(value?: string | null) {
-  if (!value) return value;
-  try { return JSON.parse(value); } catch { return value; }
-}
-
-export async function GET(req: Request) {
-  const url = new URL(req.url);
-  const userId = url.searchParams.get("userId");
-  if (!userId) return Response.json({ error: "userId required" }, { status: 400 });
-
-  const latest = await prisma.interviewSession.findFirst({
-    where: { userId, kind: "TECH", status: "FINISHED" },
-    orderBy: { finishedAt: "desc" },
-    select: { pass: true, finishedAt: true, scoreAvg: true, summary: true },
-  });
-
-  return Response.json({ ok: true, passed: Boolean(latest?.pass), latest: latest ? { ...latest, summary: parseSummary(latest.summary) } : null });
-}
+import { prisma } from '@/lib/prisma';
+import { readTechState, serializeTechSession, techSessionUser } from '@/lib/techInterviewSession';
+export const dynamic='force-dynamic';
+export async function GET(){const user=await techSessionUser();if(!user)return Response.json({error:'Sign in required'},{status:401});try{const active=await prisma.interviewSession.findFirst({where:{userId:user.id,kind:'TECH',status:'IN_PROGRESS'},orderBy:{startedAt:'desc'},include:{turns:{orderBy:[{turnIndex:'asc'},{createdAt:'asc'}]}}});const latest=await prisma.interviewSession.findFirst({where:{userId:user.id,kind:'TECH',status:'FINISHED'},orderBy:{finishedAt:'desc'},include:{turns:{orderBy:[{turnIndex:'asc'},{createdAt:'asc'}]}}});return Response.json({configured:!!process.env.OPENAI_API_KEY,session:active && readTechState(active.summary)?serializeTechSession(active):null,report:latest && readTechState(latest.summary)?serializeTechSession(latest):null,passed:!!latest?.pass,latest:latest?{pass:latest.pass,finishedAt:latest.finishedAt,scoreAvg:latest.scoreAvg}:null});}catch{return Response.json({error:'Could not load your interview'},{status:500});}}
